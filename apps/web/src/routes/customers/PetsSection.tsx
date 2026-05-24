@@ -10,6 +10,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { useDeletePet, usePets } from "@/queries/pets";
 import { PetFormDialog } from "@/routes/customers/PetFormDialog";
+import { TransferPetDialog } from "@/routes/customers/TransferPetDialog";
 
 /** A customer's pets — master medical profiles. Mounted on the customer detail page. */
 export function PetsSection({ customerId }: { customerId: string }) {
@@ -21,6 +22,7 @@ export function PetsSection({ customerId }: { customerId: string }) {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<PetResponse | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PetResponse | null>(null);
+  const [transferTarget, setTransferTarget] = useState<PetResponse | null>(null);
 
   const openCreate = () => {
     setEditing(null);
@@ -84,6 +86,14 @@ export function PetsSection({ customerId }: { customerId: string }) {
             <Button
               size="icon"
               variant="ghost"
+              aria-label={t("customers.pets.transfer")}
+              onClick={() => setTransferTarget(row.original)}
+            >
+              <Icon.link className="size-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
               aria-label={t("admin.common.edit")}
               onClick={() => openEdit(row.original)}
             >
@@ -136,6 +146,12 @@ export function PetsSection({ customerId }: { customerId: string }) {
         customerId={customerId}
         pet={editing}
         onClose={() => setFormOpen(false)}
+      />
+
+      <TransferPetDialog
+        pet={transferTarget}
+        currentCustomerId={customerId}
+        onClose={() => setTransferTarget(null)}
       />
 
       <Dialog
