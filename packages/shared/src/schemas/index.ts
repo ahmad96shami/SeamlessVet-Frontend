@@ -7,3 +7,4 @@ export * from "./users";
 export * from "./products";
 export * from "./services";
 export * from "./systemSettings";
+export * from "./inventory";
