@@ -1,0 +1,6 @@
+{
+  "name": "@vet/web",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Center Web App (operations + admin + POS) — scaffolded in WEB.md milestone W0. Placeholder for now."
+}
