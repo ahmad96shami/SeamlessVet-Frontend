@@ -66,6 +66,112 @@
     "medication": "Medication",
     "product": "Product"
   },
+  "inventory": {
+    "title": "Inventory",
+    "description": "Central warehouse and field doctors' inventory balances.",
+    "searchPlaceholder": "Search: name or barcode",
+    "filterLocation": "Location",
+    "lowStockOnly": "Low stock only",
+    "empty": "No stock items",
+    "noProducts": "No products — add one from the catalog first",
+    "tab": {
+      "stock": "Stock",
+      "movements": "Movement history",
+      "alerts": "Alerts"
+    },
+    "location": {
+      "all": "All locations",
+      "warehouse": "Central warehouse",
+      "field": "Field inventory"
+    },
+    "col": {
+      "product": "Product",
+      "category": "Category",
+      "quantity": "Quantity",
+      "reorderPoint": "Reorder point",
+      "expiry": "Expiry",
+      "purchasePrice": "Purchase price",
+      "sellingPrice": "Selling price",
+      "location": "Location",
+      "status": "Status",
+      "type": "Type",
+      "date": "Date",
+      "change": "Change",
+      "reason": "Reason",
+      "doctor": "Doctor"
+    },
+    "status": {
+      "ok": "OK",
+      "low": "Low",
+      "out": "Out of stock",
+      "expiringSoon": "Expiring soon",
+      "expired": "Expired"
+    },
+    "movementType": {
+      "receive": "Receive",
+      "adjust": "Adjust",
+      "load_to_field": "Load to field",
+      "unload_from_field": "Unload from field",
+      "sale_deduct": "Sale deduction",
+      "return_add": "Sale return"
+    },
+    "kpi": {
+      "activeItems": "Active items",
+      "lowStock": "Low stock",
+      "expiring": "Expiring soon"
+    },
+    "receive": {
+      "action": "Receive stock",
+      "title": "Receive stock into the warehouse",
+      "product": "Product",
+      "quantity": "Quantity received",
+      "reason": "Note (optional)",
+      "submit": "Confirm receipt",
+      "success": "Stock received"
+    },
+    "adjust": {
+      "action": "Adjust stock",
+      "title": "Adjust stock balance",
+      "product": "Product",
+      "location": "Location",
+      "delta": "Change amount",
+      "deltaHint": "Positive to add, negative to remove",
+      "reason": "Reason",
+      "submit": "Confirm adjustment",
+      "success": "Stock adjusted"
+    },
+    "movements": {
+      "title": "Stock movement history",
+      "description": "An append-only log of every stock change.",
+      "filterType": "Movement type",
+      "empty": "No movements"
+    },
+    "load": {
+      "action": "Load field vehicle",
+      "unloadAction": "Unload from vehicle",
+      "title": "Load stock to a field doctor",
+      "unloadTitle": "Unload stock from a field doctor",
+      "doctor": "Doctor",
+      "selectDoctor": "Select a doctor",
+      "product": "Product",
+      "quantity": "Quantity",
+      "deltaNote": "Recorded as a delta (+/−) movement — both warehouse and vehicle balances move in one transaction, with an idempotency key to prevent duplication.",
+      "loadSubmit": "Confirm load",
+      "unloadSubmit": "Confirm unload",
+      "loadSuccess": "Stock loaded",
+      "unloadSuccess": "Stock unloaded"
+    },
+    "alerts": {
+      "title": "Inventory alerts",
+      "description": "Items low on stock or approaching expiry.",
+      "lowStockTitle": "Low stock",
+      "expiringTitle": "Expiring soon",
+      "noLowStock": "No low-stock items",
+      "noExpiring": "No items approaching expiry",
+      "daysLeft": "{{days}} days left",
+      "expiredAgo": "Expired {{days}} days ago"
+    }
+  },
   "admin": {
     "common": {
       "create": "Create",

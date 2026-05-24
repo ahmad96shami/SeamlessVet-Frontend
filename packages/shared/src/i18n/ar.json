@@ -66,6 +66,112 @@
     "medication": "دواء",
     "product": "منتج"
   },
+  "inventory": {
+    "title": "المخزون",
+    "description": "أرصدة المستودع المركزي ومخازن الأطباء الميدانية.",
+    "searchPlaceholder": "بحث: اسم أو باركود",
+    "filterLocation": "الموقع",
+    "lowStockOnly": "منخفض فقط",
+    "empty": "لا توجد أصناف في المخزون",
+    "noProducts": "لا توجد منتجات — أضف منتجًا من الكتالوج أولًا",
+    "tab": {
+      "stock": "المخزون",
+      "movements": "سجل الحركات",
+      "alerts": "التنبيهات"
+    },
+    "location": {
+      "all": "كل المواقع",
+      "warehouse": "المستودع المركزي",
+      "field": "مخزن ميداني"
+    },
+    "col": {
+      "product": "المنتج",
+      "category": "الفئة",
+      "quantity": "الكمية",
+      "reorderPoint": "حد الطلب",
+      "expiry": "الانتهاء",
+      "purchasePrice": "سعر الشراء",
+      "sellingPrice": "سعر البيع",
+      "location": "الموقع",
+      "status": "الحالة",
+      "type": "النوع",
+      "date": "التاريخ",
+      "change": "التغيّر",
+      "reason": "السبب",
+      "doctor": "الطبيب"
+    },
+    "status": {
+      "ok": "جيد",
+      "low": "منخفض",
+      "out": "نفد",
+      "expiringSoon": "قرب الانتهاء",
+      "expired": "منتهٍ"
+    },
+    "movementType": {
+      "receive": "استلام",
+      "adjust": "تعديل",
+      "load_to_field": "تحميل ميداني",
+      "unload_from_field": "إرجاع من الميدان",
+      "sale_deduct": "خصم بيع",
+      "return_add": "إرجاع بيع"
+    },
+    "kpi": {
+      "activeItems": "أصناف نشطة",
+      "lowStock": "مخزون منخفض",
+      "expiring": "قرب الانتهاء"
+    },
+    "receive": {
+      "action": "استلام بضاعة",
+      "title": "استلام بضاعة في المستودع",
+      "product": "المنتج",
+      "quantity": "الكمية المستلمة",
+      "reason": "ملاحظة (اختياري)",
+      "submit": "تأكيد الاستلام",
+      "success": "تم استلام البضاعة"
+    },
+    "adjust": {
+      "action": "تعديل المخزون",
+      "title": "تعديل رصيد المخزون",
+      "product": "المنتج",
+      "location": "الموقع",
+      "delta": "مقدار التغيير",
+      "deltaHint": "موجب للزيادة، سالب للنقصان",
+      "reason": "السبب",
+      "submit": "تأكيد التعديل",
+      "success": "تم تعديل المخزون"
+    },
+    "movements": {
+      "title": "سجل حركات المخزون",
+      "description": "سجل غير قابل للتعديل لكل تغيّر في المخزون.",
+      "filterType": "نوع الحركة",
+      "empty": "لا توجد حركات"
+    },
+    "load": {
+      "action": "تحميل سيارة طبيب",
+      "unloadAction": "إرجاع من سيارة",
+      "title": "تحميل مخزون لطبيب ميداني",
+      "unloadTitle": "إرجاع مخزون من طبيب ميداني",
+      "doctor": "الطبيب",
+      "selectDoctor": "اختر طبيبًا",
+      "product": "المنتج",
+      "quantity": "الكمية",
+      "deltaNote": "يُسجَّل كحركة دلتا (+/−) — تُحوَّل الأرصدة على المركزي والسيارة معًا بمفتاح idempotency لمنع التكرار.",
+      "loadSubmit": "تأكيد التحميل",
+      "unloadSubmit": "تأكيد الإرجاع",
+      "loadSuccess": "تم تحميل المخزون",
+      "unloadSuccess": "تم إرجاع المخزون"
+    },
+    "alerts": {
+      "title": "تنبيهات المخزون",
+      "description": "أصناف منخفضة المخزون أو قاربت على انتهاء الصلاحية.",
+      "lowStockTitle": "مخزون منخفض",
+      "expiringTitle": "قرب الانتهاء",
+      "noLowStock": "لا توجد أصناف منخفضة المخزون",
+      "noExpiring": "لا توجد أصناف قاربت على الانتهاء",
+      "daysLeft": "{{days}} يوم متبقٍ",
+      "expiredAgo": "منتهٍ منذ {{days}} يوم"
+    }
+  },
   "admin": {
     "common": {
       "create": "إنشاء",

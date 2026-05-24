@@ -15,11 +15,15 @@ export const StockLevelResponseSchema = z.object({
   nameAr: z.string(),
   nameLatin: z.string().nullish(),
   barcode: z.string().nullish(),
+  category: z.string(),
+  unitOfMeasure: z.string().nullish(),
   locationType: z.string(),
   locationId: z.string(),
   quantity: z.number(),
   reorderPoint: z.number(),
   expirationDate: z.string().nullish(), // DateOnly → "yyyy-MM-dd"
+  purchasePrice: z.number(),
+  sellingPrice: z.number(),
   belowReorderPoint: z.boolean(),
 });
 export type StockLevelResponse = z.infer<typeof StockLevelResponseSchema>;
