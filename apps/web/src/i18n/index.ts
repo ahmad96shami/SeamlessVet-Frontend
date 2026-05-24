@@ -9,7 +9,9 @@ void i18next
   .init({
     ...baseI18nConfig,
     detection: {
-      order: ["localStorage", "navigator", "htmlTag"],
+      // Arabic-first: <html lang="ar"> wins over the browser locale; a user's explicit
+      // toggle is remembered in localStorage and takes precedence on the next visit.
+      order: ["localStorage", "htmlTag", "navigator"],
       caches: ["localStorage"],
       lookupLocalStorage: "vet.lang",
     },
