@@ -23,6 +23,7 @@ import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useFieldInventories, useStock } from "@/queries/inventory";
 import { AdjustStockDialog } from "@/routes/inventory/AdjustStockDialog";
 import { InventoryTabs } from "@/routes/inventory/InventoryTabs";
+import { LoadFieldDialog } from "@/routes/inventory/LoadFieldDialog";
 import { ReceiveStockDialog } from "@/routes/inventory/ReceiveStockDialog";
 
 /** True once today is past the expiration day (date-only comparison). */
@@ -42,6 +43,7 @@ export function StockPage() {
   const [locationType, setLocationType] = useState("warehouse");
   const [lowStockOnly, setLowStockOnly] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
+  const [loadOpen, setLoadOpen] = useState(false);
   const [adjustTarget, setAdjustTarget] = useState<StockLevelResponse | null>(null);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
 
@@ -177,10 +179,16 @@ export function StockPage() {
       title={t("inventory.title")}
       description={t("inventory.description")}
       actions={
-        <Button onClick={() => setReceiveOpen(true)}>
-          <Icon.plus className="size-4" />
-          {t("inventory.receive.action")}
-        </Button>
+        <>
+          <Button variant="secondary" onClick={() => setLoadOpen(true)}>
+            <Icon.truck className="size-4" />
+            {t("inventory.load.action")}
+          </Button>
+          <Button onClick={() => setReceiveOpen(true)}>
+            <Icon.plus className="size-4" />
+            {t("inventory.receive.action")}
+          </Button>
+        </>
       }
     >
       <div className="space-y-4">
@@ -226,6 +234,7 @@ export function StockPage() {
       </div>
 
       <ReceiveStockDialog open={receiveOpen} onClose={() => setReceiveOpen(false)} />
+      <LoadFieldDialog open={loadOpen} onClose={() => setLoadOpen(false)} />
       <AdjustStockDialog
         stockItem={adjustTarget}
         locationLabel={adjustTarget ? locationLabel(adjustTarget) : ""}

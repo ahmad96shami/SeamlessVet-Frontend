@@ -4,16 +4,20 @@ import {
   listFieldInventories,
   listMovements,
   listStock,
+  loadField,
   receiveStock,
+  unloadField,
   type AdjustStockInput,
   type ApiError,
   type FieldInventoryResponse,
   type IdentifierResponse,
   type InventoryMovementResponse,
+  type LoadFieldInput,
   type MovementListParams,
   type ReceiveStockInput,
   type StockLevelResponse,
   type StockListParams,
+  type UnloadFieldInput,
 } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
@@ -64,6 +68,24 @@ export function useAdjustStock() {
   const qc = useQueryClient();
   return useMutation<IdentifierResponse, ApiError, AdjustStockInput>({
     mutationFn: (input) => adjustStock(apiClient, input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  });
+}
+
+/** POST /inventory/load-field — warehouse → field two-leg transfer. Refetches all inventory reads. */
+export function useLoadField() {
+  const qc = useQueryClient();
+  return useMutation<IdentifierResponse, ApiError, LoadFieldInput>({
+    mutationFn: (input) => loadField(apiClient, input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  });
+}
+
+/** POST /inventory/unload-field — field → warehouse two-leg transfer. Refetches all inventory reads. */
+export function useUnloadField() {
+  const qc = useQueryClient();
+  return useMutation<IdentifierResponse, ApiError, UnloadFieldInput>({
+    mutationFn: (input) => unloadField(apiClient, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }
