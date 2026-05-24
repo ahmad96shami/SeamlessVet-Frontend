@@ -11,6 +11,7 @@ import { UsersPage } from "@/routes/admin/UsersPage";
 import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
+import { StockPage } from "@/routes/inventory/StockPage";
 import { useAuthStore } from "@/stores/authStore";
 
 function PublicOnly({ children }: { children: ReactNode }) {
@@ -61,6 +62,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "cashier"]}>
               <Placeholder titleKey="nav.pos" milestone="W6" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="inventory"
+          element={
+            <RequireRole roles={["admin", "inventory_staff"]}>
+              <StockPage />
             </RequireRole>
           }
         />

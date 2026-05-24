@@ -43,6 +43,13 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["admin", "cashier"],
   },
   {
+    to: "/inventory",
+    labelKey: "nav.inventory",
+    icon: Icon.truck,
+    section: "navSection.operations",
+    roles: ["admin", "inventory_staff"],
+  },
+  {
     to: "/admin/products",
     labelKey: "nav.products",
     icon: Icon.box,
