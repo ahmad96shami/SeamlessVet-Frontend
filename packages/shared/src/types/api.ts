@@ -3977,6 +3977,7 @@ export interface operations {
                 search?: string | null;
                 type?: string | null;
                 assignedDoctorId?: string | null;
+                ledgerStatus?: string | null;
                 skip?: number | null;
                 take?: number | null;
             };
