@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Placeholder } from "@/components/Placeholder";
 import { AppShell } from "@/components/layout/AppShell";
 import { RegistrationRequestsPage } from "@/routes/admin/RegistrationRequestsPage";
+import { SettingsPage } from "@/routes/admin/SettingsPage";
 import { UsersPage } from "@/routes/admin/UsersPage";
 import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
@@ -81,7 +82,7 @@ export function AppRoutes() {
           path="admin/settings"
           element={
             <RequireRole roles={["admin"]}>
-              <Placeholder titleKey="nav.settings" milestone="W1" />
+              <SettingsPage />
             </RequireRole>
           }
         />
