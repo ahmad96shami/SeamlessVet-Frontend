@@ -20,13 +20,21 @@ interface DataTableProps<TData> {
   data: TData[];
   isLoading?: boolean;
   emptyMessage: string;
+  /** When set, rows become clickable (cursor + click handler). Action buttons should stopPropagation. */
+  onRowClick?: (row: TData) => void;
 }
 
 /**
  * Headless TanStack Table v8 wrapper for admin lists. Server-driven — pagination/sorting/filtering
  * are owned by the calling screen (it sets the query params), so this only renders the core model.
  */
-export function DataTable<TData>({ columns, data, isLoading, emptyMessage }: DataTableProps<TData>) {
+export function DataTable<TData>({
+  columns,
+  data,
+  isLoading,
+  emptyMessage,
+  onRowClick,
+}: DataTableProps<TData>) {
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
 
   return (
@@ -63,7 +71,11 @@ export function DataTable<TData>({ columns, data, isLoading, emptyMessage }: Dat
             </TableRow>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                key={row.id}
+                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                className={onRowClick ? "cursor-pointer" : undefined}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

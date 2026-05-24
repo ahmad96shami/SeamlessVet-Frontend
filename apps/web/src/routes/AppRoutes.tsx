@@ -10,6 +10,8 @@ import { SettingsPage } from "@/routes/admin/SettingsPage";
 import { UsersPage } from "@/routes/admin/UsersPage";
 import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
+import { CustomerDetailPage } from "@/routes/customers/CustomerDetailPage";
+import { CustomersPage } from "@/routes/customers/CustomersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
 import { AlertsPage } from "@/routes/inventory/AlertsPage";
 import { MovementsPage } from "@/routes/inventory/MovementsPage";
@@ -53,7 +55,19 @@ export function AppRoutes() {
         <Route index element={<Placeholder titleKey="nav.dashboard" milestone="W9" />} />
         <Route
           path="operations/customers"
-          element={<Placeholder titleKey="nav.customers" milestone="W3" />}
+          element={
+            <RequireRole roles={["admin", "accountant", "receptionist", "vet_clinic", "vet_both"]}>
+              <CustomersPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="operations/customers/:id"
+          element={
+            <RequireRole roles={["admin", "accountant", "receptionist", "vet_clinic", "vet_both"]}>
+              <CustomerDetailPage />
+            </RequireRole>
+          }
         />
         <Route
           path="operations/visits"
