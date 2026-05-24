@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   listFieldInventories,
   listStock,
+  receiveStock,
   type ApiError,
   type FieldInventoryResponse,
+  type IdentifierResponse,
+  type ReceiveStockInput,
   type StockLevelResponse,
   type StockListParams,
 } from "@vet/shared";
@@ -30,5 +33,14 @@ export function useFieldInventories() {
     queryKey: [KEY, "field-inventories"],
     queryFn: () => listFieldInventories(apiClient),
     staleTime: 60_000,
+  });
+}
+
+/** POST /inventory/receive — receive stock into the warehouse. Refetches all inventory reads. */
+export function useReceiveStock() {
+  const qc = useQueryClient();
+  return useMutation<IdentifierResponse, ApiError, ReceiveStockInput>({
+    mutationFn: (input) => receiveStock(apiClient, input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }

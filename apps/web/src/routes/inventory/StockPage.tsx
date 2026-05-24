@@ -13,12 +13,15 @@ import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
 import { AdminPage } from "@/components/layout/AdminPage";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useFieldInventories, useStock } from "@/queries/inventory";
+import { ReceiveStockDialog } from "@/routes/inventory/ReceiveStockDialog";
 
 /** True once today is past the expiration day (date-only comparison). */
 function isExpired(date: string): boolean {
@@ -36,6 +39,7 @@ export function StockPage() {
   // Default to the central warehouse — the design's primary stock view.
   const [locationType, setLocationType] = useState("warehouse");
   const [lowStockOnly, setLowStockOnly] = useState(false);
+  const [receiveOpen, setReceiveOpen] = useState(false);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
 
   useEffect(() => reset(), [debouncedSearch, locationType, lowStockOnly, reset]);
@@ -143,7 +147,16 @@ export function StockPage() {
   );
 
   return (
-    <AdminPage title={t("inventory.title")} description={t("inventory.description")}>
+    <AdminPage
+      title={t("inventory.title")}
+      description={t("inventory.description")}
+      actions={
+        <Button onClick={() => setReceiveOpen(true)}>
+          <Icon.plus className="size-4" />
+          {t("inventory.receive.action")}
+        </Button>
+      }
+    >
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <Input
@@ -184,6 +197,8 @@ export function StockPage() {
           onNext={next}
         />
       </div>
+
+      <ReceiveStockDialog open={receiveOpen} onClose={() => setReceiveOpen(false)} />
     </AdminPage>
   );
 }
