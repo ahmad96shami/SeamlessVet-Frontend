@@ -9,16 +9,60 @@
     "loading": "جارٍ التحميل...",
     "retry": "إعادة المحاولة"
   },
+  "nav": {
+    "dashboard": "الرئيسية",
+    "customers": "العملاء",
+    "visits": "الزيارات",
+    "appointments": "المواعيد",
+    "inventory": "المخزون",
+    "pos": "نقطة البيع",
+    "users": "المستخدمون",
+    "settings": "الإعدادات",
+    "reports": "التقارير"
+  },
+  "shell": {
+    "signOut": "تسجيل الخروج",
+    "language": "اللغة",
+    "account": "الحساب"
+  },
+  "dashboard": {
+    "title": "الرئيسية",
+    "welcome": "مرحبًا، {{name}}"
+  },
+  "placeholder": {
+    "title": "قيد الإنشاء",
+    "body": "هذه الشاشة ستُبنى في مرحلة {{milestone}}."
+  },
+  "roles": {
+    "admin": "مدير",
+    "accountant": "محاسب",
+    "vet_clinic": "طبيب عيادة",
+    "vet_field": "طبيب ميداني",
+    "vet_both": "طبيب عيادة وميداني",
+    "receptionist": "موظف استقبال",
+    "cashier": "أمين صندوق",
+    "inventory_staff": "موظف مخزون"
+  },
   "auth": {
     "login": {
       "title": "تسجيل الدخول",
       "phone": "رقم الهاتف",
       "password": "كلمة المرور",
-      "submit": "دخول"
+      "submit": "دخول",
+      "noAccount": "ليس لديك حساب؟",
+      "createOne": "أنشئ حسابًا"
     },
     "register": {
       "title": "إنشاء حساب",
+      "fullName": "الاسم الكامل",
+      "phone": "رقم الهاتف",
+      "email": "البريد الإلكتروني (اختياري)",
+      "password": "كلمة المرور",
+      "role": "الدور المطلوب",
+      "licenseNumber": "رقم الترخيص (للأطباء)",
       "submit": "إرسال طلب التسجيل",
+      "haveAccount": "لديك حساب بالفعل؟",
+      "signIn": "تسجيل الدخول",
       "pending": "تم إرسال طلبك — الحساب بانتظار موافقة المسؤول"
     },
     "errors": {

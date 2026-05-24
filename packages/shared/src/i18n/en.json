@@ -9,16 +9,60 @@
     "loading": "Loading...",
     "retry": "Retry"
   },
+  "nav": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "visits": "Visits",
+    "appointments": "Appointments",
+    "inventory": "Inventory",
+    "pos": "Point of Sale",
+    "users": "Users",
+    "settings": "Settings",
+    "reports": "Reports"
+  },
+  "shell": {
+    "signOut": "Sign out",
+    "language": "Language",
+    "account": "Account"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {{name}}"
+  },
+  "placeholder": {
+    "title": "Under construction",
+    "body": "This screen will be built in milestone {{milestone}}."
+  },
+  "roles": {
+    "admin": "Administrator",
+    "accountant": "Accountant",
+    "vet_clinic": "Clinic veterinarian",
+    "vet_field": "Field veterinarian",
+    "vet_both": "Clinic & field veterinarian",
+    "receptionist": "Receptionist",
+    "cashier": "Cashier",
+    "inventory_staff": "Inventory staff"
+  },
   "auth": {
     "login": {
       "title": "Sign in",
       "phone": "Phone number",
       "password": "Password",
-      "submit": "Sign in"
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "createOne": "Create one"
     },
     "register": {
       "title": "Create account",
+      "fullName": "Full name",
+      "phone": "Phone number",
+      "email": "Email (optional)",
+      "password": "Password",
+      "role": "Requested role",
+      "licenseNumber": "License number (for doctors)",
       "submit": "Submit registration request",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
       "pending": "Your request was submitted — the account awaits admin approval"
     },
     "errors": {
