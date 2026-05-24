@@ -1,68 +1,96 @@
+import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router-dom";
 
-import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
-import { navForRole } from "@/config/nav";
+import { NAV_SECTION_ORDER, navForRole } from "@/config/nav";
 import { toggleLanguage } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
+/**
+ * The Center Web App shell: the design's collapsible right-edge rail (68px → 250px on hover),
+ * grouped nav sections, a brand mark, and a footer with the current user + utility pills
+ * (language toggle, sign-out, sync indicator). Page content renders in the scrolling `.page`.
+ */
 export function AppShell() {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const items = navForRole(user?.role ?? "");
+  const role = user?.role ?? "";
+  const items = navForRole(role);
+  const roleLabel = role ? t(`roles.${role}`, { defaultValue: role }) : "";
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="hidden w-60 shrink-0 flex-col border-e bg-card md:flex">
-        <div className="flex items-center gap-2 px-5 py-4 font-semibold">
-          <Icon.stethoscope className="size-5 text-primary" />
-          <span className="truncate">{t("appName")}</span>
+    <div className="app-shell h-screen">
+      <aside className="sidenav">
+        <div className="sn-brand">
+          <div className="sn-brand-mark">
+            <Icon.stethoscope size={20} />
+          </div>
+          <div className="sn-brand-text">
+            <span className="sn-brand-name">SeamlessVet</span>
+            <span className="sn-brand-sub">{t("shell.center")}</span>
+          </div>
         </div>
-        <nav className="flex flex-1 flex-col gap-1 p-3">
-          {items.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground hover:bg-accent",
-                )
-              }
-            >
-              <item.icon className="size-4" />
-              {t(item.labelKey)}
-            </NavLink>
-          ))}
+
+        <nav className="sn-items">
+          {NAV_SECTION_ORDER.map((section) => {
+            const sectionItems = items.filter((item) => item.section === section);
+            if (sectionItems.length === 0) return null;
+            return (
+              <Fragment key={section}>
+                <div className="sn-section-label">{t(section)}</div>
+                {sectionItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === "/"}
+                    title={t(item.labelKey)}
+                    className={({ isActive }) => cn("sn-item", isActive && "active")}
+                  >
+                    <span className="sn-ico">
+                      <item.icon className="size-[18px]" />
+                    </span>
+                    <span className="sn-item-label">{t(item.labelKey)}</span>
+                  </NavLink>
+                ))}
+              </Fragment>
+            );
+          })}
         </nav>
+
+        <div className="sn-footer">
+          <div className="sn-utility">
+            <span className="icon-pill" title={t("sync.online")} aria-hidden>
+              <span className="sync-dot" />
+            </span>
+            <button className="icon-pill" title={t("shell.language")} onClick={toggleLanguage}>
+              <Icon.globe size={16} />
+            </button>
+            <span className="sn-utility-spacer" />
+            <button className="icon-pill" title={t("shell.signOut")} onClick={() => void logout()}>
+              <Icon.logout size={16} />
+            </button>
+          </div>
+          <div className="sn-user">
+            <div className="sn-user-av bg-navy-900">
+              <Icon.user size={18} />
+            </div>
+            <div className="sn-user-text">
+              <div className="sn-user-name">{roleLabel}</div>
+              <div className="sn-user-role">{t("shell.center")}</div>
+            </div>
+            <span className="sn-user-chev">
+              <Icon.fwd size={14} />
+            </span>
+          </div>
+        </div>
       </aside>
 
-      <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b px-4 py-3">
-          <span className="text-sm text-muted-foreground">
-            {user ? t(`roles.${user.role}`, { defaultValue: user.role }) : null}
-          </span>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={toggleLanguage}>
-              <Icon.globe className="size-4" />
-              {t("shell.language")}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => void logout()}>
-              <Icon.logout className="size-4" />
-              {t("shell.signOut")}
-            </Button>
-          </div>
-        </header>
-        <main className="flex-1 overflow-auto p-4">
-          <Outlet />
-        </main>
-      </div>
+      <main className="page">
+        <Outlet />
+      </main>
     </div>
   );
 }

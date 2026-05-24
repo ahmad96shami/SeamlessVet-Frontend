@@ -23,10 +23,16 @@
     "settings": "Settings",
     "reports": "Reports"
   },
+  "navSection": {
+    "operations": "Operations",
+    "catalog": "Catalog",
+    "system": "System"
+  },
   "shell": {
     "signOut": "Sign out",
     "language": "Language",
-    "account": "Account"
+    "account": "Account",
+    "center": "Center · Jenin"
   },
   "dashboard": {
     "title": "Dashboard",
