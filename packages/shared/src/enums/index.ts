@@ -56,6 +56,34 @@ export const RequestStatus = {
 export type RequestStatus = EnumValues<typeof RequestStatus>;
 export const REQUEST_STATUS_VALUES = values(RequestStatus);
 
+/**
+ * Canonical fine-grained permission keys (dot-notation), mirroring the backend `PermissionKey`
+ * catalog (vet-backend `Domain/Entities/Permission.cs`). These aren't a DB enum — they're rows
+ * in the `permissions` table — but they're a fixed, server-canonical set the admin
+ * permission-override editor (web W1) offers. Keep in lockstep with the backend.
+ */
+export const PermissionKey = {
+  UsersApprove: "users.approve",
+  UsersManage: "users.manage",
+  UsersPermissionsOverride: "users.permissions.override",
+  SettingsWrite: "settings.write",
+  CatalogWrite: "catalog.write",
+  CustomersWrite: "customers.write",
+  MedicalWrite: "medical.write",
+  AppointmentsWrite: "appointments.write",
+  ContractsWrite: "contracts.write",
+  ContractsActivate: "contracts.activate",
+  InvoicesWrite: "invoices.write",
+  InvoicesRefund: "invoices.refund",
+  InvoicesVoid: "invoices.void",
+  InventoryAdjust: "inventory.adjust",
+  EntitlementsApprove: "entitlements.approve",
+  PartnershipManage: "partnership.manage",
+  ReportsRead: "reports.read",
+} as const;
+export type PermissionKey = EnumValues<typeof PermissionKey>;
+export const PERMISSION_KEY_VALUES = values(PermissionKey);
+
 // --- 2. Customers & Pets -----------------------------------------------------
 
 export const CustomerType = {
