@@ -5,6 +5,7 @@ import { Placeholder } from "@/components/Placeholder";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProductsPage } from "@/routes/admin/ProductsPage";
 import { RegistrationRequestsPage } from "@/routes/admin/RegistrationRequestsPage";
+import { ServicesPage } from "@/routes/admin/ServicesPage";
 import { SettingsPage } from "@/routes/admin/SettingsPage";
 import { UsersPage } from "@/routes/admin/UsersPage";
 import { LoginPage } from "@/routes/auth/LoginPage";
@@ -84,6 +85,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin"]}>
               <ProductsPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="admin/services"
+          element={
+            <RequireRole roles={["admin"]}>
+              <ServicesPage />
             </RequireRole>
           }
         />

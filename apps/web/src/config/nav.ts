@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import {
   BarChart3,
+  ClipboardList,
   LayoutDashboard,
   Package,
   Settings,
@@ -42,6 +43,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { to: "/admin/users", labelKey: "nav.users", icon: UserCog, roles: ["admin"] },
   { to: "/admin/products", labelKey: "nav.products", icon: Package, roles: ["admin"] },
+  { to: "/admin/services", labelKey: "nav.services", icon: ClipboardList, roles: ["admin"] },
   { to: "/admin/settings", labelKey: "nav.settings", icon: Settings, roles: ["admin"] },
   { to: "/reports", labelKey: "nav.reports", icon: BarChart3, roles: ["admin", "accountant"] },
 ];
