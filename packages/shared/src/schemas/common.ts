@@ -9,11 +9,9 @@ export const IdentifierResponseSchema = z.object({ id: z.string() });
 export type IdentifierResponse = z.infer<typeof IdentifierResponseSchema>;
 
 /**
- * An optional free-text field on a request body: trims whitespace and treats an empty
- * string as "not provided" (→ `undefined`), so a blank form input is omitted from the
- * payload rather than sent as `""`. Use for nullable `string?` columns on create/replace.
+ * An optional free-text field on a request body (nullable `string?` columns). Plain
+ * `string | undefined` so it composes cleanly with the RHF zod resolver (no `z.preprocess`,
+ * whose `unknown` input type breaks form typing). Blank inputs are dropped from the payload at
+ * submit time by the form (see the web `omitEmptyStrings` helper), so empties become null, not `""`.
  */
-export const optionalText = z.preprocess(
-  (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-  z.string().trim().optional(),
-);
+export const optionalText = z.string().trim().optional();

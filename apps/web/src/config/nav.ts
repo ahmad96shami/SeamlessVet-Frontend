@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import {
   BarChart3,
   LayoutDashboard,
+  Package,
   Settings,
   ShoppingCart,
   Stethoscope,
@@ -40,6 +41,7 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["admin"],
   },
   { to: "/admin/users", labelKey: "nav.users", icon: UserCog, roles: ["admin"] },
+  { to: "/admin/products", labelKey: "nav.products", icon: Package, roles: ["admin"] },
   { to: "/admin/settings", labelKey: "nav.settings", icon: Settings, roles: ["admin"] },
   { to: "/reports", labelKey: "nav.reports", icon: BarChart3, roles: ["admin", "accountant"] },
 ];

@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import { Placeholder } from "@/components/Placeholder";
 import { AppShell } from "@/components/layout/AppShell";
+import { ProductsPage } from "@/routes/admin/ProductsPage";
 import { RegistrationRequestsPage } from "@/routes/admin/RegistrationRequestsPage";
 import { SettingsPage } from "@/routes/admin/SettingsPage";
 import { UsersPage } from "@/routes/admin/UsersPage";
@@ -75,6 +76,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin"]}>
               <UsersPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="admin/products"
+          element={
+            <RequireRole roles={["admin"]}>
+              <ProductsPage />
             </RequireRole>
           }
         />
