@@ -238,6 +238,7 @@
       "species": "النوع/الفصيلة",
       "breed": "السلالة",
       "sex": "الجنس",
+      "sexUnset": "بدون تحديد",
       "dateOfBirth": "تاريخ الميلاد",
       "weightLatest": "الوزن (كغ)",
       "colorMarks": "اللون والعلامات",

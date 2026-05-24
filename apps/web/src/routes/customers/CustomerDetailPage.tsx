@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useCustomer } from "@/queries/customers";
 import { useFieldInventories } from "@/queries/inventory";
 import { CustomerFormDialog } from "@/routes/customers/CustomerFormDialog";
+import { PetsSection } from "@/routes/customers/PetsSection";
 
 export function statusVariant(status: string): BadgeProps["variant"] {
   if (status === "has_debt") return "warning";
@@ -107,7 +108,9 @@ export function CustomerDetailPage() {
         </div>
       </div>
 
-      {/* Pets section (SC3) and ledger statement (SC5) mount below. */}
+      <PetsSection customerId={c.id} />
+
+      {/* The ledger statement (W3.4) mounts below. */}
 
       <CustomerFormDialog open={editOpen} customer={c} onClose={() => setEditOpen(false)} />
     </div>

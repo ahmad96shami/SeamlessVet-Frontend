@@ -238,6 +238,7 @@
       "species": "Species",
       "breed": "Breed",
       "sex": "Sex",
+      "sexUnset": "Unspecified",
       "dateOfBirth": "Date of birth",
       "weightLatest": "Weight (kg)",
       "colorMarks": "Color & markings",
