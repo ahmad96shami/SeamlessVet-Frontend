@@ -5,6 +5,7 @@ import {
   Settings,
   ShoppingCart,
   Stethoscope,
+  UserCheck,
   UserCog,
   Users,
 } from "lucide-react";
@@ -32,6 +33,12 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["admin", "receptionist", "vet_clinic", "vet_both"],
   },
   { to: "/pos", labelKey: "nav.pos", icon: ShoppingCart, roles: ["admin", "cashier"] },
+  {
+    to: "/admin/registration-requests",
+    labelKey: "nav.registrations",
+    icon: UserCheck,
+    roles: ["admin"],
+  },
   { to: "/admin/users", labelKey: "nav.users", icon: UserCog, roles: ["admin"] },
   { to: "/admin/settings", labelKey: "nav.settings", icon: Settings, roles: ["admin"] },
   { to: "/reports", labelKey: "nav.reports", icon: BarChart3, roles: ["admin", "accountant"] },
