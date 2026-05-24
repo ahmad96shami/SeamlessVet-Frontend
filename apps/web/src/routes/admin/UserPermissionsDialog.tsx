@@ -1,10 +1,10 @@
 import { PERMISSION_KEY_VALUES } from "@vet/shared";
-import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { Icon } from "@/components/ui/icon";
 import { useAddPermissionOverride, useUserDetail } from "@/queries/users";
 
 /**
@@ -47,7 +47,7 @@ export function UserPermissionsDialog({
     >
       {detail.isLoading ? (
         <div className="flex justify-center py-8">
-          <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          <Icon.spinner className="size-5 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <div className="space-y-1">

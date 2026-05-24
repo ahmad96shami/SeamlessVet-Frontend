@@ -4,8 +4,8 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { Loader2 } from "lucide-react";
 
+import { Icon } from "@/components/ui/icon";
 import {
   Table,
   TableBody,
@@ -49,7 +49,7 @@ export function DataTable<TData>({ columns, data, isLoading, emptyMessage }: Dat
           {isLoading ? (
             <TableRow className="hover:bg-transparent">
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
+                <Icon.spinner className="mx-auto size-5 animate-spin text-muted-foreground" />
               </TableCell>
             </TableRow>
           ) : data.length === 0 ? (

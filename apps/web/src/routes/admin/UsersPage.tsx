@@ -1,6 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { ROLE_KEY_VALUES, USER_STATUS_VALUES, type UserResponse } from "@vet/shared";
-import { Shield } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -10,6 +9,7 @@ import { Pagination } from "@/components/data-table/Pagination";
 import { AdminPage } from "@/components/layout/AdminPage";
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -119,7 +119,7 @@ export function UsersPage() {
                 </Button>
               ) : null}
               <Button size="sm" variant="ghost" onClick={() => setPermUserId(u.id)}>
-                <Shield className="size-4" />
+                <Icon.shield className="size-4" />
                 {t("admin.users.permissions")}
               </Button>
             </div>

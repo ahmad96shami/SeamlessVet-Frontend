@@ -1,6 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatCurrency, type ServiceResponse } from "@vet/shared";
-import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -10,6 +9,7 @@ import { Pagination } from "@/components/data-table/Pagination";
 import { AdminPage } from "@/components/layout/AdminPage";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
@@ -78,7 +78,7 @@ export function ServicesPage() {
               aria-label={t("admin.common.edit")}
               onClick={() => openEdit(row.original)}
             >
-              <Pencil className="size-4" />
+              <Icon.edit className="size-4" />
             </Button>
             <Button
               size="icon"
@@ -86,7 +86,7 @@ export function ServicesPage() {
               aria-label={t("admin.common.delete")}
               onClick={() => setDeleteTarget(row.original)}
             >
-              <Trash2 className="size-4 text-destructive" />
+              <Icon.trash className="size-4 text-destructive" />
             </Button>
           </div>
         ),
@@ -111,7 +111,7 @@ export function ServicesPage() {
       description={t("admin.services.description")}
       actions={
         <Button onClick={openCreate}>
-          <Plus className="size-4" />
+          <Icon.plus className="size-4" />
           {t("admin.services.new")}
         </Button>
       }

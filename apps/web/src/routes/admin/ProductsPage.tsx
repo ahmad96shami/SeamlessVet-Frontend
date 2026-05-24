@@ -1,6 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatCurrency, PRODUCT_CATEGORY_VALUES, type ProductResponse } from "@vet/shared";
-import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -11,6 +10,7 @@ import { AdminPage } from "@/components/layout/AdminPage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -100,7 +100,7 @@ export function ProductsPage() {
               aria-label={t("admin.common.edit")}
               onClick={() => openEdit(row.original)}
             >
-              <Pencil className="size-4" />
+              <Icon.edit className="size-4" />
             </Button>
             <Button
               size="icon"
@@ -108,7 +108,7 @@ export function ProductsPage() {
               aria-label={t("admin.common.delete")}
               onClick={() => setDeleteTarget(row.original)}
             >
-              <Trash2 className="size-4 text-destructive" />
+              <Icon.trash className="size-4 text-destructive" />
             </Button>
           </div>
         ),
@@ -133,7 +133,7 @@ export function ProductsPage() {
       description={t("admin.products.description")}
       actions={
         <Button onClick={openCreate}>
-          <Plus className="size-4" />
+          <Icon.plus className="size-4" />
           {t("admin.products.new")}
         </Button>
       }

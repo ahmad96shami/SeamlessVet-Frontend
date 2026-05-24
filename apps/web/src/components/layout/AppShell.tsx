@@ -1,8 +1,8 @@
-import { Globe, LogOut, PawPrint } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { navForRole } from "@/config/nav";
 import { toggleLanguage } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ export function AppShell() {
     <div className="flex min-h-screen">
       <aside className="hidden w-60 shrink-0 flex-col border-e bg-card md:flex">
         <div className="flex items-center gap-2 px-5 py-4 font-semibold">
-          <PawPrint className="size-5 text-primary" />
+          <Icon.stethoscope className="size-5 text-primary" />
           <span className="truncate">{t("appName")}</span>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
@@ -50,11 +50,11 @@ export function AppShell() {
           </span>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={toggleLanguage}>
-              <Globe className="size-4" />
+              <Icon.globe className="size-4" />
               {t("shell.language")}
             </Button>
             <Button variant="outline" size="sm" onClick={() => void logout()}>
-              <LogOut className="size-4" />
+              <Icon.logout className="size-4" />
               {t("shell.signOut")}
             </Button>
           </div>

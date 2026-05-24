@@ -5,7 +5,6 @@ import {
   type ApiError,
   type SystemSettingsPatchRequest,
 } from "@vet/shared";
-import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -15,6 +14,7 @@ import { Field } from "@/components/form/Field";
 import { AdminPage } from "@/components/layout/AdminPage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -69,7 +69,7 @@ export function SettingsPage() {
         <CardContent className="pt-6">
           {!query.data ? (
             <div className="flex justify-center py-10">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              <Icon.spinner className="size-5 animate-spin text-muted-foreground" />
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-6" noValidate>

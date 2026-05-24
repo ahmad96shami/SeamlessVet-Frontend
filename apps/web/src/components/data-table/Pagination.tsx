@@ -1,7 +1,7 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 
 interface PaginationProps {
   /** 1-based page number, for display. */
@@ -21,14 +21,14 @@ export function Pagination({ page, canPrev, canNext, onPrev, onNext }: Paginatio
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" onClick={onPrev} disabled={!canPrev}>
           {/* Logical arrows: "previous" points toward the start of the reading direction. */}
-          <ChevronRight className="size-4 ltr:hidden" />
-          <ChevronLeft className="size-4 rtl:hidden" />
+          <Icon.chevronRight className="size-4 ltr:hidden" />
+          <Icon.chevronLeft className="size-4 rtl:hidden" />
           {t("admin.common.previous")}
         </Button>
         <Button variant="outline" size="sm" onClick={onNext} disabled={!canNext}>
           {t("admin.common.next")}
-          <ChevronLeft className="size-4 ltr:hidden" />
-          <ChevronRight className="size-4 rtl:hidden" />
+          <Icon.chevronLeft className="size-4 ltr:hidden" />
+          <Icon.chevronRight className="size-4 rtl:hidden" />
         </Button>
       </div>
     </div>

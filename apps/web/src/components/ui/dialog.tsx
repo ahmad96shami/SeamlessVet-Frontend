@@ -1,8 +1,8 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 
 interface DialogProps {
@@ -59,7 +59,7 @@ export function Dialog({ open, onClose, title, description, children, className 
             aria-label="close"
             className="-me-2 -mt-2 shrink-0"
           >
-            <X className="size-4" />
+            <Icon.close className="size-4" />
           </Button>
         </div>
         {children}
