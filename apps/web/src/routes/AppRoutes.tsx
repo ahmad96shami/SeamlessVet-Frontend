@@ -11,6 +11,7 @@ import { UsersPage } from "@/routes/admin/UsersPage";
 import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
+import { MovementsPage } from "@/routes/inventory/MovementsPage";
 import { StockPage } from "@/routes/inventory/StockPage";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -70,6 +71,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "inventory_staff"]}>
               <StockPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="inventory/movements"
+          element={
+            <RequireRole roles={["admin", "inventory_staff"]}>
+              <MovementsPage />
             </RequireRole>
           }
         />

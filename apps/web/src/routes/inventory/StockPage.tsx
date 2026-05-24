@@ -22,6 +22,7 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useFieldInventories, useStock } from "@/queries/inventory";
 import { AdjustStockDialog } from "@/routes/inventory/AdjustStockDialog";
+import { InventoryTabs } from "@/routes/inventory/InventoryTabs";
 import { ReceiveStockDialog } from "@/routes/inventory/ReceiveStockDialog";
 
 /** True once today is past the expiration day (date-only comparison). */
@@ -183,6 +184,7 @@ export function StockPage() {
       }
     >
       <div className="space-y-4">
+        <InventoryTabs />
         <div className="flex flex-wrap items-center gap-2">
           <Input
             placeholder={t("inventory.searchPlaceholder")}

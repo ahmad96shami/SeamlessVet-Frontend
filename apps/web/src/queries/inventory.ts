@@ -2,12 +2,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   adjustStock,
   listFieldInventories,
+  listMovements,
   listStock,
   receiveStock,
   type AdjustStockInput,
   type ApiError,
   type FieldInventoryResponse,
   type IdentifierResponse,
+  type InventoryMovementResponse,
+  type MovementListParams,
   type ReceiveStockInput,
   type StockLevelResponse,
   type StockListParams,
@@ -22,6 +25,15 @@ export function useStock(params: StockListParams) {
   return useQuery<StockLevelResponse[], ApiError>({
     queryKey: [KEY, "stock", params],
     queryFn: () => listStock(apiClient, params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+/** GET /inventory/movements — append-only movement history, newest first; offset-paged. */
+export function useMovements(params: MovementListParams) {
+  return useQuery<InventoryMovementResponse[], ApiError>({
+    queryKey: [KEY, "movements", params],
+    queryFn: () => listMovements(apiClient, params),
     placeholderData: (prev) => prev,
   });
 }
