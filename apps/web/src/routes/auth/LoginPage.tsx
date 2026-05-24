@@ -27,7 +27,7 @@ export function LoginPage() {
 
   return (
     <AuthLayout>
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm border-0 shadow-[var(--shadow-pop)]">
         <CardHeader>
           <CardTitle>{t("auth.login.title")}</CardTitle>
           <CardDescription>{t("appName")}</CardDescription>

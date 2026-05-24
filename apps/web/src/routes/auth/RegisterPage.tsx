@@ -44,7 +44,7 @@ export function RegisterPage() {
   if (register.isSuccess) {
     return (
       <AuthLayout>
-        <Card className="w-full max-w-sm">
+        <Card className="w-full max-w-sm border-0 shadow-[var(--shadow-pop)]">
           <CardHeader>
             <CardTitle>{t("auth.register.title")}</CardTitle>
           </CardHeader>
@@ -63,7 +63,7 @@ export function RegisterPage() {
 
   return (
     <AuthLayout>
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm border-0 shadow-[var(--shadow-pop)]">
         <CardHeader>
           <CardTitle>{t("auth.register.title")}</CardTitle>
         </CardHeader>
