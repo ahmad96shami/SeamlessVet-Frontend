@@ -43,13 +43,13 @@ export function Dialog({ open, onClose, title, description, children, className 
         aria-modal="true"
         aria-label={title}
         className={cn(
-          "relative z-10 max-h-[90vh] w-full max-w-lg overflow-auto rounded-xl border bg-card p-6 shadow-lg",
+          "relative z-10 max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-card p-6 shadow-[var(--shadow-pop)]",
           className,
         )}
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold">{title}</h2>
+            <h2 className="text-lg font-bold text-navy-900">{title}</h2>
             {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
           </div>
           <Button

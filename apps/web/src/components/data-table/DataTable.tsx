@@ -30,7 +30,7 @@ export function DataTable<TData>({ columns, data, isLoading, emptyMessage }: Dat
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
 
   return (
-    <div className="rounded-lg border">
+    <div className="overflow-hidden rounded-2xl border">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((group) => (

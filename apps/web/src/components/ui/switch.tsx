@@ -23,7 +23,7 @@ export function Switch({ checked, onCheckedChange, disabled, id, ...aria }: Swit
       onClick={() => onCheckedChange(!checked)}
       className={cn(
         "flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-        checked ? "justify-end bg-primary" : "justify-start bg-input",
+        checked ? "justify-end bg-teal-500" : "justify-start bg-ink-200",
       )}
       {...aria}
     >

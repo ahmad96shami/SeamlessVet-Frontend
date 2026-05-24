@@ -103,7 +103,7 @@
   --space-8: 32px;
 
   /* ── shadcn semantic bridge (what the cva primitives consume) ── */
-  --radius: 0.875rem; /* 14px → rounded-lg on buttons/inputs */
+  --radius: 0.625rem; /* 10px → rounded-lg on buttons/inputs (app.css); cards use rounded-2xl=16px */
   --background: var(--paper-soft);
   --foreground: var(--ink-900);
   --card: var(--paper);

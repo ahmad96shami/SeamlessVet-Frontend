@@ -16,14 +16,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, containerClassName, children, ...props }, ref) => (
     <div className={cn("relative", containerClassName)}>
-      <select
-        ref={ref}
-        className={cn(
-          "flex h-10 w-full appearance-none rounded-md border border-input bg-background px-3 pe-9 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-          className,
-        )}
-        {...props}
-      >
+      <select ref={ref} className={cn("select appearance-none pe-9", className)} {...props}>
         {children}
       </select>
       <Icon.chevronDown className="pointer-events-none absolute inset-y-0 end-3 my-auto size-4 text-muted-foreground" />
