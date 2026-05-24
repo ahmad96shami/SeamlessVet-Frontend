@@ -6,7 +6,7 @@ import {
   STOCK_LOCATION_VALUES,
   type StockLevelResponse,
 } from "@vet/shared";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { DataTable } from "@/components/data-table/DataTable";
@@ -21,6 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useFieldInventories, useStock } from "@/queries/inventory";
+import { AdjustStockDialog } from "@/routes/inventory/AdjustStockDialog";
 import { ReceiveStockDialog } from "@/routes/inventory/ReceiveStockDialog";
 
 /** True once today is past the expiration day (date-only comparison). */
@@ -40,6 +41,7 @@ export function StockPage() {
   const [locationType, setLocationType] = useState("warehouse");
   const [lowStockOnly, setLowStockOnly] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
+  const [adjustTarget, setAdjustTarget] = useState<StockLevelResponse | null>(null);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
 
   useEffect(() => reset(), [debouncedSearch, locationType, lowStockOnly, reset]);
@@ -60,6 +62,16 @@ export function StockPage() {
     for (const f of fieldInvs.data ?? []) map.set(f.id, f.doctorName);
     return map;
   }, [fieldInvs.data]);
+
+  // Field rows show the owning doctor; warehouse rows the warehouse label. Shared by the location
+  // column and the adjust dialog header.
+  const locationLabel = useCallback(
+    (r: StockLevelResponse) =>
+      r.locationType === "field"
+        ? (doctorByLocation.get(r.locationId) ?? t("inventory.location.field"))
+        : t("inventory.location.warehouse"),
+    [doctorByLocation, t],
+  );
 
   const columns = useMemo<ColumnDef<StockLevelResponse>[]>(
     () => [
@@ -92,10 +104,7 @@ export function StockPage() {
       {
         id: "location",
         header: t("inventory.col.location"),
-        cell: ({ row }) =>
-          row.original.locationType === "field"
-            ? (doctorByLocation.get(row.original.locationId) ?? t("inventory.location.field"))
-            : t("inventory.location.warehouse"),
+        cell: ({ row }) => locationLabel(row.original),
       },
       {
         accessorKey: "quantity",
@@ -142,8 +151,24 @@ export function StockPage() {
           return <Badge variant="success">{t("inventory.status.ok")}</Badge>;
         },
       },
+      {
+        id: "actions",
+        header: "",
+        cell: ({ row }) => (
+          <div className="flex justify-end">
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label={t("inventory.adjust.action")}
+              onClick={() => setAdjustTarget(row.original)}
+            >
+              <Icon.edit className="size-4" />
+            </Button>
+          </div>
+        ),
+      },
     ],
-    [t, lang, doctorByLocation],
+    [t, lang, locationLabel],
   );
 
   return (
@@ -199,6 +224,11 @@ export function StockPage() {
       </div>
 
       <ReceiveStockDialog open={receiveOpen} onClose={() => setReceiveOpen(false)} />
+      <AdjustStockDialog
+        stockItem={adjustTarget}
+        locationLabel={adjustTarget ? locationLabel(adjustTarget) : ""}
+        onClose={() => setAdjustTarget(null)}
+      />
     </AdminPage>
   );
 }

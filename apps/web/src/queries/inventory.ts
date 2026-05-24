@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  adjustStock,
   listFieldInventories,
   listStock,
   receiveStock,
+  type AdjustStockInput,
   type ApiError,
   type FieldInventoryResponse,
   type IdentifierResponse,
@@ -41,6 +43,15 @@ export function useReceiveStock() {
   const qc = useQueryClient();
   return useMutation<IdentifierResponse, ApiError, ReceiveStockInput>({
     mutationFn: (input) => receiveStock(apiClient, input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  });
+}
+
+/** POST /inventory/adjust — signed delta correction at a location. Refetches all inventory reads. */
+export function useAdjustStock() {
+  const qc = useQueryClient();
+  return useMutation<IdentifierResponse, ApiError, AdjustStockInput>({
+    mutationFn: (input) => adjustStock(apiClient, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }
