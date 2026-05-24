@@ -1,0 +1,36 @@
+{
+  "appName": "Veterinary Practice Management System",
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading...",
+    "retry": "Retry"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "phone": "Phone number",
+      "password": "Password",
+      "submit": "Sign in"
+    },
+    "register": {
+      "title": "Create account",
+      "submit": "Submit registration request",
+      "pending": "Your request was submitted — the account awaits admin approval"
+    },
+    "errors": {
+      "invalidCredentials": "Incorrect phone number or password",
+      "accountInactive": "Account not yet active — awaiting admin approval",
+      "accountSuspended": "This account has been suspended"
+    }
+  },
+  "sync": {
+    "online": "Online and synced",
+    "syncing": "Syncing ({{count}} pending)",
+    "offline": "Offline ({{count}} pending)",
+    "conflict": "Needs conflict resolution"
+  }
+}
