@@ -8,6 +8,7 @@ import { useSystemSettings } from "@/queries/systemSettings";
 import { usePosCartStore, type CartLine } from "@/stores/posCartStore";
 
 import { CartCustomerVisit } from "./CartCustomerVisit";
+import { CartIssue } from "./CartIssue";
 import { CartPayments } from "./CartPayments";
 import { computeTotals, lineTotal } from "./cartTotals";
 
@@ -165,6 +166,7 @@ export function CartPanel() {
         </dl>
 
         <CartPayments total={totals.total} />
+        <CartIssue total={totals.total} />
       </div>
     </div>
   );
