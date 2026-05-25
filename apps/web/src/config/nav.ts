@@ -106,6 +106,15 @@ export const NAV_ITEMS: NavItem[] = [
     section: "navSection.system",
     roles: ["admin", "accountant"],
   },
+  {
+    // Doctor self-service income — outside the reports.read gate (vets only; admins/accountants
+    // get the full reports surface above).
+    to: "/my-income",
+    labelKey: "nav.myIncome",
+    icon: Icon.chart,
+    section: "navSection.operations",
+    roles: ["vet_clinic", "vet_field", "vet_both"],
+  },
 ];
 
 export function navForRole(role: string): NavItem[] {

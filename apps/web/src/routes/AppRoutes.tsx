@@ -19,6 +19,19 @@ import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
 import { PartnersPage } from "@/routes/finance/PartnersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
+import { ClinicProfitsPage } from "@/routes/reports/ClinicProfitsPage";
+import { DoctorEntitlementsReportPage } from "@/routes/reports/DoctorEntitlementsReportPage";
+import { DoctorIncomePage } from "@/routes/reports/DoctorIncomePage";
+import { FarmAccountPage } from "@/routes/reports/FarmAccountPage";
+import { FieldVisitsPage } from "@/routes/reports/FieldVisitsPage";
+import { InventoryMovementPage } from "@/routes/reports/InventoryMovementPage";
+import { MyIncomePage } from "@/routes/reports/MyIncomePage";
+import { OverviewPage } from "@/routes/reports/OverviewPage";
+import { ProfitAndLossPage } from "@/routes/reports/ProfitAndLossPage";
+import { ProfitPerBatchPage } from "@/routes/reports/ProfitPerBatchPage";
+import { ReportsLayout } from "@/routes/reports/ReportsLayout";
+import { SalesPage } from "@/routes/reports/SalesPage";
+import { UpcomingVaccinationsPage } from "@/routes/reports/UpcomingVaccinationsPage";
 import { InvoicesPage } from "@/routes/pos/InvoicesPage";
 import { PosLayout } from "@/routes/pos/PosLayout";
 import { PosPage } from "@/routes/pos/PosPage";
@@ -206,7 +219,29 @@ export function AppRoutes() {
           path="reports"
           element={
             <RequireRole roles={["admin", "accountant"]}>
-              <Placeholder titleKey="nav.reports" milestone="W9" />
+              <ReportsLayout />
+            </RequireRole>
+          }
+        >
+          <Route index element={<OverviewPage />} />
+          <Route path="doctor-income" element={<DoctorIncomePage />} />
+          <Route path="clinic-profits" element={<ClinicProfitsPage />} />
+          <Route path="profit-per-batch" element={<ProfitPerBatchPage />} />
+          <Route path="profit-and-loss" element={<ProfitAndLossPage />} />
+          <Route path="sales" element={<SalesPage />} />
+          <Route path="inventory-movement" element={<InventoryMovementPage />} />
+          <Route path="field-visits" element={<FieldVisitsPage />} />
+          <Route path="farm-account" element={<FarmAccountPage />} />
+          <Route path="vaccinations" element={<UpcomingVaccinationsPage />} />
+          <Route path="entitlements" element={<DoctorEntitlementsReportPage />} />
+        </Route>
+
+        {/* Doctor self-service income — outside the reports.read gate; any vet may see their own. */}
+        <Route
+          path="my-income"
+          element={
+            <RequireRole roles={["admin", "accountant", "vet_clinic", "vet_field", "vet_both"]}>
+              <MyIncomePage />
             </RequireRole>
           }
         />
