@@ -15,6 +15,7 @@ import { CustomerDetailPage } from "@/routes/customers/CustomerDetailPage";
 import { CustomersPage } from "@/routes/customers/CustomersPage";
 import { BatchesPage } from "@/routes/finance/BatchesPage";
 import { ContractsPage } from "@/routes/finance/ContractsPage";
+import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
 import { InvoicesPage } from "@/routes/pos/InvoicesPage";
@@ -157,10 +158,7 @@ export function AppRoutes() {
           <Route index element={<Navigate to="/finance/contracts" replace />} />
           <Route path="contracts" element={<ContractsPage />} />
           <Route path="batches" element={<BatchesPage />} />
-          <Route
-            path="entitlements"
-            element={<Placeholder titleKey="finance.tabs.entitlements" milestone="W8.5" />}
-          />
+          <Route path="entitlements" element={<EntitlementsPage />} />
         </Route>
         <Route
           path="admin/registration-requests"
