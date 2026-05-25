@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useContracts } from "@/queries/contracts";
 import { ContractDetailPanel } from "@/routes/finance/ContractDetailPanel";
 import { ContractFormDialog } from "@/routes/finance/ContractFormDialog";
+import { ContractLifecycleActions } from "@/routes/finance/ContractLifecycleActions";
 import { contractStatusVariant } from "@/routes/finance/statusVariants";
 
 export function ContractsPage() {
@@ -104,7 +105,7 @@ export function ContractsPage() {
     [t, lang, customers.byId, doctors.byId],
   );
 
-  const canEdit = selected && (selected.status === "draft" || selected.status === "active");
+  const isActionable = selected && (selected.status === "draft" || selected.status === "active");
 
   return (
     <div className="space-y-4">
@@ -165,18 +166,14 @@ export function ContractsPage() {
             customerName={customerName(selected.customerId)}
             doctorName={doctorName(selected.responsibleDoctorId)}
             footer={
-              canEdit ? (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
+              isActionable ? (
+                <ContractLifecycleActions
+                  contract={selected}
+                  onEdit={() => {
                     setEditing(selected);
                     setFormOpen(true);
                   }}
-                >
-                  <Icon.edit className="size-4" />
-                  {t("admin.common.edit")}
-                </Button>
+                />
               ) : null
             }
           />
