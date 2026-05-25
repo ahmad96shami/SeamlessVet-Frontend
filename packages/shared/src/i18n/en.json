@@ -906,7 +906,23 @@
     "online": "Online and synced",
     "syncing": "Syncing ({{count}} pending)",
     "offline": "Offline ({{count}} pending)",
-    "conflict": "Needs conflict resolution"
+    "conflict": "Needs conflict resolution",
+    "panelTitle": "Sync status",
+    "panelEmpty": "Nothing waiting to sync.",
+    "pendingItem": "Waiting to sync",
+    "failedItem": "Sync failed — will retry",
+    "conflictItem": "Rejected by the server",
+    "retry": "Retry",
+    "retryAll": "Retry conflicts",
+    "discard": "Discard",
+    "discardConfirm": "Discard this operation for good? This can't be undone.",
+    "syncNow": "Sync now",
+    "attempts_one": "1 attempt",
+    "attempts_other": "{{count}} attempts",
+    "label": {
+      "newVisit": "New visit",
+      "posSale": "Sale"
+    }
   },
   "pwa": {
     "updateTitle": "A new version is available",
