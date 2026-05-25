@@ -13,6 +13,7 @@ import { useServices } from "@/queries/services";
 import { usePosCartStore } from "@/stores/posCartStore";
 
 import { BarcodeScannerDialog } from "./BarcodeScannerDialog";
+import { ReceiptVoucherDialog } from "./ReceiptVoucherDialog";
 
 type Filter = "all" | "products" | "services";
 const FILTERS: Filter[] = ["all", "products", "services"];
@@ -28,6 +29,7 @@ export function CatalogPanel() {
   const debounced = useDebouncedValue(search, 300);
   const [filter, setFilter] = useState<Filter>("all");
   const [scanOpen, setScanOpen] = useState(false);
+  const [voucherOpen, setVoucherOpen] = useState(false);
 
   // Products come from warehouse stock (on-hand + low-stock flag + selling price); the search
   // matches name + barcode server-side. Services have no inventory.
@@ -55,6 +57,10 @@ export function CatalogPanel() {
         <Button type="button" variant="secondary" onClick={() => setScanOpen(true)}>
           <Icon.box className="size-4" />
           {t("pos.search.scan")}
+        </Button>
+        <Button type="button" variant="secondary" onClick={() => setVoucherOpen(true)}>
+          <Icon.paper className="size-4" />
+          {t("pos.voucher.new")}
         </Button>
       </div>
 
@@ -165,6 +171,7 @@ export function CatalogPanel() {
           setScanOpen(false);
         }}
       />
+      <ReceiptVoucherDialog open={voucherOpen} onClose={() => setVoucherOpen(false)} />
     </div>
   );
 }
