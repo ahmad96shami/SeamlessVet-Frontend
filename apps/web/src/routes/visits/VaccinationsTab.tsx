@@ -8,7 +8,11 @@ import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
+import { useCustomer } from "@/queries/customers";
+import { useFieldInventories } from "@/queries/inventory";
+import { usePet } from "@/queries/pets";
 import { useDeleteVaccination, useVaccinations } from "@/queries/vaccinations";
+import { VaccinationCertificate } from "@/routes/visits/VaccinationCertificate";
 import { VaccinationFormDialog } from "@/routes/visits/VaccinationFormDialog";
 
 /** Vaccinations recorded on the visit (PRD §5.2). `nextDueDate` drives the M11 reminders. */
@@ -18,6 +22,17 @@ export function VaccinationsTab({ visit, readOnly }: { visit: VisitResponse; rea
   const query = useVaccinations({ visitId: visit.id, take: 200 });
   const rows = query.data ?? [];
   const del = useDeleteVaccination();
+
+  // Names for the printable certificate: recipient is the visit's pet, else the customer (farm).
+  const owner = useCustomer(visit.customerId);
+  const pet = usePet(visit.petId ?? null);
+  const fieldInvs = useFieldInventories();
+  const ownerName = owner.data?.fullName ?? null;
+  const recipientName = pet.data?.name ?? owner.data?.fullName ?? null;
+  const doctorName = useMemo(
+    () => (fieldInvs.data ?? []).find((f) => f.doctorId === visit.doctorId)?.doctorName ?? null,
+    [fieldInvs.data, visit.doctorId],
+  );
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<VaccinationResponse | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<VaccinationResponse | null>(null);
@@ -45,24 +60,32 @@ export function VaccinationsTab({ visit, readOnly }: { visit: VisitResponse; rea
           ),
       },
     ];
-    if (!readOnly) {
-      cols.push({
-        id: "actions",
-        header: "",
-        cell: ({ row }) => (
-          <div className="flex justify-end gap-1">
-            <Button size="icon" variant="ghost" aria-label={t("admin.common.edit")} onClick={() => { setEditing(row.original); setFormOpen(true); }}>
-              <Icon.edit className="size-4" />
-            </Button>
-            <Button size="icon" variant="ghost" aria-label={t("admin.common.delete")} onClick={() => setDeleteTarget(row.original)}>
-              <Icon.trash className="size-4 text-destructive" />
-            </Button>
-          </div>
-        ),
-      });
-    }
+    cols.push({
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <div className="flex justify-end gap-1">
+          <VaccinationCertificate
+            vaccination={row.original}
+            recipientName={recipientName}
+            ownerName={ownerName}
+            doctorName={doctorName}
+          />
+          {!readOnly ? (
+            <>
+              <Button size="icon" variant="ghost" aria-label={t("admin.common.edit")} onClick={() => { setEditing(row.original); setFormOpen(true); }}>
+                <Icon.edit className="size-4" />
+              </Button>
+              <Button size="icon" variant="ghost" aria-label={t("admin.common.delete")} onClick={() => setDeleteTarget(row.original)}>
+                <Icon.trash className="size-4 text-destructive" />
+              </Button>
+            </>
+          ) : null}
+        </div>
+      ),
+    });
     return cols;
-  }, [t, lang, readOnly]);
+  }, [t, lang, readOnly, recipientName, ownerName, doctorName]);
 
   const confirmDelete = () => {
     if (!deleteTarget) return;

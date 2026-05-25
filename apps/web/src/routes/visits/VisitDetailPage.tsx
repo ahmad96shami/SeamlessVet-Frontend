@@ -20,6 +20,7 @@ import { FollowUpsTab } from "@/routes/visits/FollowUpsTab";
 import { PrescriptionsTab } from "@/routes/visits/PrescriptionsTab";
 import { ProceduresTab } from "@/routes/visits/ProceduresTab";
 import { VaccinationsTab } from "@/routes/visits/VaccinationsTab";
+import { VisitReportButton } from "@/routes/visits/VisitReportButton";
 import { visitRef, visitStatusVariant } from "@/routes/visits/VisitsPage";
 
 type TabId =
@@ -92,6 +93,7 @@ export function VisitDetailPage() {
         .filter(Boolean)
         .join(" · ")
     : null;
+  const petLabel = pet ? [pet.name, pet.species].filter(Boolean).join(" · ") : null;
   const subBits = [
     customer.data ? `${t("visits.detail.owner")}: ${customer.data.fullName}` : null,
     `${t("visits.detail.visitNumber")} ${visitRef(v)}`,
@@ -147,22 +149,30 @@ export function VisitDetailPage() {
             </p>
           ) : null}
         </div>
-        {!isTerminal ? (
-          <div className="flex items-center gap-2">
-            {isOpen ? (
-              <Button variant="teal" onClick={onStart} disabled={busy}>
-                <Icon.check className="size-4" />
-                {t("visits.actions.start")}
+        <div className="flex flex-wrap items-center gap-2">
+          <VisitReportButton
+            visit={v}
+            petLabel={petLabel}
+            ownerName={customer.data?.fullName ?? null}
+            doctorName={doctorName ?? null}
+          />
+          {!isTerminal ? (
+            <>
+              {isOpen ? (
+                <Button variant="teal" onClick={onStart} disabled={busy}>
+                  <Icon.check className="size-4" />
+                  {t("visits.actions.start")}
+                </Button>
+              ) : null}
+              <Button onClick={() => setConfirm("complete")} disabled={busy}>
+                {t("visits.actions.complete")}
               </Button>
-            ) : null}
-            <Button onClick={() => setConfirm("complete")} disabled={busy}>
-              {t("visits.actions.complete")}
-            </Button>
-            <Button variant="outline" onClick={() => setConfirm("cancel")} disabled={busy}>
-              {t("visits.actions.cancel")}
-            </Button>
-          </div>
-        ) : null}
+              <Button variant="outline" onClick={() => setConfirm("cancel")} disabled={busy}>
+                {t("visits.actions.cancel")}
+              </Button>
+            </>
+          ) : null}
+        </div>
       </header>
 
       {isTerminal ? (
