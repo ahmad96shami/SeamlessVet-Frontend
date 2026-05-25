@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  buildCreateVisitRequest,
   cancelVisit,
   completeVisit,
-  createVisit,
   getVisit,
   listVisits,
   updateVisit,
@@ -15,6 +15,7 @@ import {
 } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
+import { sendOrQueue, type SendOrQueueResult } from "@/services/sendOrQueue";
 
 const KEY = "visits";
 
@@ -34,11 +35,39 @@ export function useVisit(id: string | null) {
   });
 }
 
+/**
+ * Create a visit, online or offline (W7). Builds the request once (minting the client id + stable
+ * idempotency key), optimistically prepends the new visit to every cached list so it appears
+ * immediately — including offline, where the names still resolve from the cached reference data —
+ * then sends-or-queues it. Online → refetch to adopt the authoritative row; queued → keep the
+ * optimistic row until the engine replays it; a real failure → drop it (refetch).
+ */
 export function useCreateVisit() {
   const qc = useQueryClient();
-  return useMutation<IdentifierResponse, ApiError, VisitCreateRequest>({
-    mutationFn: (body) => createVisit(apiClient, body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  return useMutation<SendOrQueueResult, ApiError, VisitCreateRequest>({
+    mutationFn: (body) => {
+      const descriptor = buildCreateVisitRequest(body);
+      const now = new Date().toISOString();
+      const optimistic: VisitResponse = {
+        id: descriptor.entityId as string,
+        visitType: body.visitType,
+        customerId: body.customerId,
+        petId: body.petId ?? null,
+        doctorId: body.doctorId,
+        status: body.status ?? "open",
+        chiefComplaint: body.chiefComplaint ?? null,
+        createdAt: now,
+        updatedAt: now,
+      };
+      qc.setQueriesData<VisitResponse[]>({ queryKey: [KEY] }, (old) =>
+        Array.isArray(old) ? [optimistic, ...old] : old,
+      );
+      return sendOrQueue(descriptor);
+    },
+    onSuccess: (res) => {
+      if (!res.queued) qc.invalidateQueries({ queryKey: [KEY] });
+    },
+    onError: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }
 

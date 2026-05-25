@@ -375,6 +375,7 @@
       "visitType": "Visit type",
       "chiefComplaint": "Chief complaint",
       "created": "Visit opened",
+      "queued": "Visit saved locally — it'll sync when you're back online",
       "pickCustomerFirst": "Select a customer first"
     },
     "detail": {
@@ -683,6 +684,7 @@
       "submit": "Collect & print",
       "submitting": "Issuing…",
       "success": "Invoice issued",
+      "queued": "Sale saved locally — it'll post when you're back online",
       "newSale": "New sale",
       "printReceipt": "Print receipt",
       "needLines": "Add a product or service, or link a visit with charges"

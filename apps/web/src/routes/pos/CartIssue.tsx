@@ -51,8 +51,14 @@ export function CartIssue({ total }: { total: number }) {
     };
     issue.mutate(input, {
       onSuccess: (res) => {
-        setIssuedId(res.id);
         s.clear();
+        if (res.queued) {
+          // Offline: the sale is queued and will post (stock + ledger) on reconnect. No receipt yet —
+          // it prints from the invoices history once it syncs.
+          toast.success(t("pos.issue.queued"));
+        } else {
+          setIssuedId(res.id);
+        }
       },
       onError: (e) => toast.error(e.message),
     });

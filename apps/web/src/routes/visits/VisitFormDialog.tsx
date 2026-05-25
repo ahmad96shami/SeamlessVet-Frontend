@@ -78,9 +78,15 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
       },
       {
         onSuccess: (res) => {
-          toast.success(t("visits.create.created"));
           onClose();
-          navigate(`/operations/visits/${res.id}`);
+          if (res.queued) {
+            // Offline: the visit is queued + shown optimistically in the list; its detail can't load
+            // until it reaches the server, so stay on the list rather than navigate into a blank page.
+            toast.success(t("visits.create.queued"));
+          } else {
+            toast.success(t("visits.create.created"));
+            navigate(`/operations/visits/${res.id}`);
+          }
         },
         onError: (e: ApiError) => toast.error(e.message),
       },

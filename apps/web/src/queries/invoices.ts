@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  buildPosInvoiceRequest,
   getInvoice,
-  issuePosInvoice,
   listInvoices,
   voidInvoice,
   type ApiError,
@@ -12,6 +12,7 @@ import {
 } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
+import { sendOrQueue, type SendOrQueueResult } from "@/services/sendOrQueue";
 
 const KEY = "invoices";
 
@@ -31,12 +32,18 @@ export function useInvoice(id: string | null) {
   });
 }
 
-/** POST /pos/invoices — deducts stock + posts the credit portion to the customer ledger. */
+/**
+ * POST /pos/invoices — deducts stock + posts the credit portion to the customer ledger. Online or
+ * offline (W7): sends-or-queues the issuance. The financial side effects (assembly, stock deduct,
+ * ledger) stay server-authoritative, so an offline sale is parked and only reconciled on replay —
+ * we don't fabricate an invoice/ledger locally. Online success invalidates the affected reads.
+ */
 export function useIssuePosInvoice() {
   const qc = useQueryClient();
-  return useMutation<IdentifierResponse, ApiError, PosInvoiceInput>({
-    mutationFn: (input) => issuePosInvoice(apiClient, input),
-    onSuccess: () => {
+  return useMutation<SendOrQueueResult, ApiError, PosInvoiceInput>({
+    mutationFn: (input) => sendOrQueue(buildPosInvoiceRequest(input)),
+    onSuccess: (res) => {
+      if (res.queued) return; // reconciled by the sync engine on reconnect
       qc.invalidateQueries({ queryKey: [KEY] });
       qc.invalidateQueries({ queryKey: ["inventory"] }); // sale_deduct moved stock
       qc.invalidateQueries({ queryKey: ["customers"] }); // ledger balance changed (credit sale)
