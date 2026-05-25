@@ -17,6 +17,7 @@ import { BatchesPage } from "@/routes/finance/BatchesPage";
 import { ContractsPage } from "@/routes/finance/ContractsPage";
 import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
+import { PartnersPage } from "@/routes/finance/PartnersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
 import { InvoicesPage } from "@/routes/pos/InvoicesPage";
 import { PosLayout } from "@/routes/pos/PosLayout";
@@ -159,6 +160,7 @@ export function AppRoutes() {
           <Route path="contracts" element={<ContractsPage />} />
           <Route path="batches" element={<BatchesPage />} />
           <Route path="entitlements" element={<EntitlementsPage />} />
+          <Route path="partners" element={<PartnersPage />} />
         </Route>
         <Route
           path="admin/registration-requests"

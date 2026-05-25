@@ -47,7 +47,7 @@ export interface PartnerListParams {
  * A partner's profit share over an effective window (GET /partnership-shares[/{id}], PRD §6.8). A share
  * is active on date D when `effectiveFrom ≤ D && (effectiveTo is null || effectiveTo ≥ D)` (inclusive
  * both ends). Per environment, **active shares may not sum to more than 100% on any date** — enforced
- * server-side; create/update return 409 `partnership_share_exceeded` when violated. `sharePercent` is a
+ * server-side; create/update return 409 `partnership_overallocated` when violated. `sharePercent` is a
  * 0–100 percentage. Date fields are `yyyy-MM-dd`.
  */
 export const PartnershipShareResponseSchema = z.object({
