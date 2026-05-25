@@ -5,6 +5,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { SyncIndicator } from "@/components/layout/SyncIndicator";
 import { Icon } from "@/components/ui/icon";
 import { NAV_SECTION_ORDER, navForRole } from "@/config/nav";
+import { useNotificationsRealtime } from "@/hooks/useNotificationsRealtime";
 import { toggleLanguage } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
@@ -18,6 +19,7 @@ export function AppShell() {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  useNotificationsRealtime(); // open the SignalR hub for the session; live pushes → feed + toast
   const role = user?.role ?? "";
   const items = navForRole(role);
   const roleLabel = role ? t(`roles.${role}`, { defaultValue: role }) : "";
