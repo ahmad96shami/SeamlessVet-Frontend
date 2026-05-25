@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router-dom";
 
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { SyncIndicator } from "@/components/layout/SyncIndicator";
 import { Icon } from "@/components/ui/icon";
 import { NAV_SECTION_ORDER, navForRole } from "@/config/nav";
@@ -66,6 +67,7 @@ export function AppShell() {
         <div className="sn-footer">
           <div className="sn-utility">
             <SyncIndicator />
+            <NotificationBell />
             <button className="icon-pill" title={t("shell.language")} onClick={toggleLanguage}>
               <Icon.globe size={16} />
             </button>
