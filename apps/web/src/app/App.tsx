@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import { AppRoutes } from "@/routes/AppRoutes";
 import { setOnAuthError } from "@/services/apiClient";
+import { startSyncEngine } from "@/services/syncEngine";
 import { useAuthStore } from "@/stores/authStore";
 
 export function App() {
@@ -14,6 +15,11 @@ export function App() {
     setOnAuthError(handleAuthError);
     restore();
   }, [restore, handleAuthError]);
+
+  useEffect(() => {
+    // Connectivity listeners + replay the offline write-queue on reconnect / at boot.
+    return startSyncEngine();
+  }, []);
 
   return (
     <BrowserRouter>
