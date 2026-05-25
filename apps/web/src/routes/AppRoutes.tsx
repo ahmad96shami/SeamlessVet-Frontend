@@ -8,6 +8,7 @@ import { RegistrationRequestsPage } from "@/routes/admin/RegistrationRequestsPag
 import { ServicesPage } from "@/routes/admin/ServicesPage";
 import { SettingsPage } from "@/routes/admin/SettingsPage";
 import { UsersPage } from "@/routes/admin/UsersPage";
+import { AppointmentsPage } from "@/routes/appointments/AppointmentsPage";
 import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
 import { CustomerDetailPage } from "@/routes/customers/CustomerDetailPage";
@@ -93,6 +94,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "accountant", "receptionist", "vet_clinic", "vet_both"]}>
               <PetTimelinePage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="operations/appointments"
+          element={
+            <RequireRole roles={["admin", "receptionist", "vet_clinic", "vet_both"]}>
+              <AppointmentsPage />
             </RequireRole>
           }
         />

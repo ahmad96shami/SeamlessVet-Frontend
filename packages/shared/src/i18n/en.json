@@ -298,6 +298,13 @@
     "completed": "Completed",
     "cancelled": "Cancelled"
   },
+  "appointmentStatus": {
+    "scheduled": "Scheduled",
+    "confirmed": "Confirmed",
+    "attended": "Attended",
+    "no_show": "No-show",
+    "cancelled": "Cancelled"
+  },
   "severity": {
     "mild": "Mild",
     "moderate": "Moderate",
@@ -524,6 +531,29 @@
       "procedures": "procedures",
       "prescriptions": "prescriptions",
       "vaccinations": "vaccinations"
+    }
+  },
+  "appointments": {
+    "title": "Appointments",
+    "description": "Scheduling calendar with conflict detection.",
+    "today": "Today",
+    "prev": "Previous",
+    "next": "Next",
+    "me": "Me",
+    "allDoctors": "All doctors",
+    "filterDoctor": "Doctor",
+    "filterStatus": "Status",
+    "allStatuses": "All statuses",
+    "now": "Now",
+    "closed": "Closed",
+    "empty": "No appointments in this period",
+    "unknownDoctor": "—",
+    "untitled": "Appointment",
+    "more": "+{{count}}",
+    "view": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
     }
   },
   "admin": {

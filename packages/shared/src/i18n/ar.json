@@ -298,6 +298,13 @@
     "completed": "مكتملة",
     "cancelled": "ملغاة"
   },
+  "appointmentStatus": {
+    "scheduled": "مجدول",
+    "confirmed": "مؤكد",
+    "attended": "تم الحضور",
+    "no_show": "لم يحضر",
+    "cancelled": "ملغى"
+  },
   "severity": {
     "mild": "خفيفة",
     "moderate": "متوسطة",
@@ -524,6 +531,29 @@
       "procedures": "إجراءات",
       "prescriptions": "وصفات",
       "vaccinations": "تطعيمات"
+    }
+  },
+  "appointments": {
+    "title": "المواعيد",
+    "description": "جدول المواعيد مع كشف التعارضات.",
+    "today": "اليوم",
+    "prev": "السابق",
+    "next": "التالي",
+    "me": "أنا",
+    "allDoctors": "كل الأطباء",
+    "filterDoctor": "الطبيب",
+    "filterStatus": "الحالة",
+    "allStatuses": "كل الحالات",
+    "now": "الآن",
+    "closed": "مغلق",
+    "empty": "لا توجد مواعيد في هذه الفترة",
+    "unknownDoctor": "—",
+    "untitled": "موعد",
+    "more": "+{{count}}",
+    "view": {
+      "day": "يوم",
+      "week": "أسبوع",
+      "month": "شهر"
     }
   },
   "admin": {
