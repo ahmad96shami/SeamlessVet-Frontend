@@ -16,6 +16,7 @@ import { ProtectedRoute, RequireRole } from "@/routes/guards";
 import { AlertsPage } from "@/routes/inventory/AlertsPage";
 import { MovementsPage } from "@/routes/inventory/MovementsPage";
 import { StockPage } from "@/routes/inventory/StockPage";
+import { VisitsPage } from "@/routes/visits/VisitsPage";
 import { useAuthStore } from "@/stores/authStore";
 
 function PublicOnly({ children }: { children: ReactNode }) {
@@ -71,7 +72,11 @@ export function AppRoutes() {
         />
         <Route
           path="operations/visits"
-          element={<Placeholder titleKey="nav.visits" milestone="W4" />}
+          element={
+            <RequireRole roles={["admin", "receptionist", "vet_clinic", "vet_both"]}>
+              <VisitsPage />
+            </RequireRole>
+          }
         />
         <Route
           path="pos"
