@@ -16,6 +16,7 @@ export interface NavItem {
 export const NAV_SECTION_ORDER = [
   "navSection.operations",
   "navSection.catalog",
+  "navSection.finance",
   "navSection.system",
 ] as const;
 
@@ -69,6 +70,13 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Icon.pill,
     section: "navSection.catalog",
     roles: ["admin"],
+  },
+  {
+    to: "/finance/contracts",
+    labelKey: "nav.contracts",
+    icon: Icon.paper,
+    section: "navSection.finance",
+    roles: ["admin", "accountant"],
   },
   {
     to: "/admin/registration-requests",
