@@ -38,6 +38,7 @@ export function AppointmentsPage() {
   const [status, setStatus] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [formStart, setFormStart] = useState<Date | undefined>(undefined);
+  const [editAppt, setEditAppt] = useState<AppointmentResponse | null>(null);
 
   const range = useMemo(() => viewRange(view, anchor), [view, anchor]);
   const doctors = useDoctorOptions();
@@ -92,13 +93,19 @@ export function AppointmentsPage() {
     setView("day");
   };
   const openNew = () => {
+    setEditAppt(null);
     const s = new Date(anchor);
     s.setHours(9, 0, 0, 0);
     setFormStart(s);
     setFormOpen(true);
   };
   const openSlot = (start: Date) => {
+    setEditAppt(null);
     setFormStart(start);
+    setFormOpen(true);
+  };
+  const openAppointment = (a: AppointmentResponse) => {
+    setEditAppt(a);
     setFormOpen(true);
   };
 
@@ -229,6 +236,7 @@ export function AppointmentsPage() {
               labelFor={labelFor}
               onSelectDay={view === "week" ? openDay : undefined}
               onSelectSlot={openSlot}
+              onSelectAppointment={openAppointment}
             />
           )}
         </div>
@@ -242,6 +250,7 @@ export function AppointmentsPage() {
         <AppointmentFormDialog
           open
           onClose={() => setFormOpen(false)}
+          appointment={editAppt ?? undefined}
           initialStart={formStart}
           initialDoctorId={doctorId || undefined}
         />

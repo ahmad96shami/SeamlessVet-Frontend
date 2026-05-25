@@ -1,4 +1,4 @@
-import { formatDate, type ApiError, type CustomerResponse } from "@vet/shared";
+import { formatDate, type ApiError, type AppointmentResponse, type CustomerResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -19,38 +19,53 @@ import {
   toDateTimeLocal,
   windowsOverlap,
 } from "@/lib/calendar";
-import { useAppointments, useCreateAppointment } from "@/queries/appointments";
-import { useCustomers } from "@/queries/customers";
+import {
+  useAppointments,
+  useCreateAppointment,
+  useUpdateAppointment,
+} from "@/queries/appointments";
+import { useCustomer, useCustomers } from "@/queries/customers";
 import { usePets } from "@/queries/pets";
 import { useServices } from "@/queries/services";
+import { appointmentStatusVariant } from "@/routes/appointments/appointmentStatus";
 
 const DURATIONS = [15, 30, 45, 60, 90];
 const CREATE_STATUSES = ["scheduled", "confirmed"] as const;
 const OCCUPYING = new Set(["scheduled", "confirmed", "attended"]);
+const TERMINAL = new Set(["attended", "no_show", "cancelled"]);
 
 /**
- * Book a new appointment: pick a customer (live search) + optional pet, a doctor, optional service,
- * the time + duration, status, notes. Mirrors the visit-create dialog's customer step. A client-side
- * overlap pre-check warns when the chosen doctor's slot is taken; the backend is authoritative and
- * rejects a true clash with 409 `appointment_conflict`, surfaced inline (the appointment isn't saved).
+ * Book a new appointment or edit/reschedule an existing one (pass `appointment`). New mode: customer
+ * live search → details. Edit mode: the customer is fixed (rebook to move it), the rest is editable
+ * and PATCHed. A client-side overlap pre-check warns when the chosen doctor's slot is taken
+ * (excluding the appointment itself); the backend is authoritative — a true clash returns 409
+ * `appointment_conflict`, surfaced inline. A terminal appointment (attended/cancelled/no-show) opens
+ * read-only.
  */
 export function AppointmentFormDialog({
   open,
   onClose,
+  appointment,
   initialStart,
   initialDoctorId,
 }: {
   open: boolean;
   onClose: () => void;
+  appointment?: AppointmentResponse;
   initialStart?: Date;
   initialDoctorId?: string;
 }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
+  const editing = !!appointment;
+  const readOnly = !!appointment && TERMINAL.has(appointment.status);
+
   const create = useCreateAppointment();
+  const update = useUpdateAppointment();
   const doctors = useDoctorOptions();
   const services = useServices({ take: 200 });
+  const editCustomer = useCustomer(editing ? (appointment?.customerId ?? null) : null);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
@@ -69,27 +84,42 @@ export function AppointmentFormDialog({
   const petsQuery = usePets(customer ? { customerId: customer.id, take: 100 } : { take: 0 });
   const pets = customer ? (petsQuery.data ?? []) : [];
 
+  // Initialise the editable fields when the dialog opens / target changes.
   useEffect(() => {
     if (!open) return;
-    setSearch("");
-    setCustomer(null);
-    setPetId("");
-    setServiceId("");
-    setDoctorId(initialDoctorId ?? "");
-    setScheduledAt(initialStart ? toDateTimeLocal(initialStart) : "");
-    setDurationMin(30);
-    setStatus("scheduled");
-    setNotes("");
+    if (appointment) {
+      setPetId(appointment.petId ?? "");
+      setServiceId(appointment.serviceId ?? "");
+      setDoctorId(appointment.doctorId ?? "");
+      setScheduledAt(toDateTimeLocal(new Date(appointment.scheduledAt)));
+      setDurationMin(appointment.durationMin ?? 30);
+      setStatus(appointment.status === "confirmed" ? "confirmed" : "scheduled");
+      setNotes(appointment.notes ?? "");
+    } else {
+      setSearch("");
+      setPetId("");
+      setServiceId("");
+      setDoctorId(initialDoctorId ?? "");
+      setScheduledAt(initialStart ? toDateTimeLocal(initialStart) : "");
+      setDurationMin(30);
+      setStatus("scheduled");
+      setNotes("");
+    }
     setServerError(null);
-  }, [open, initialStart, initialDoctorId]);
+  }, [open, appointment, initialStart, initialDoctorId]);
+
+  // The customer chip: from the fetch in edit mode, reset to null (search) in create mode.
+  useEffect(() => {
+    if (!open) return;
+    setCustomer(appointment ? (editCustomer.data ?? null) : null);
+  }, [open, appointment, editCustomer.data]);
 
   // Drop a stale "not saved" conflict error once the user adjusts the slot/doctor/duration.
   useEffect(() => {
     setServerError(null);
   }, [scheduledAt, doctorId, durationMin]);
 
-  // Pre-check the doctor's other appointments on the chosen day for an overlap (UX hint; the server
-  // is authoritative). Querying the whole day keeps the request stable as the time/duration changes.
+  // Pre-check the doctor's other appointments on the chosen day for an overlap (excluding this one).
   const start = scheduledAt ? new Date(scheduledAt) : null;
   const dayAnchor = start && !Number.isNaN(start.getTime()) ? start : new Date();
   const dayAppts = useAppointments({
@@ -101,54 +131,107 @@ export function AppointmentFormDialog({
 
   const conflict = useMemo(() => {
     const s = scheduledAt ? new Date(scheduledAt) : null;
-    if (!s || Number.isNaN(s.getTime()) || !doctorId) return null;
+    if (!s || Number.isNaN(s.getTime()) || !doctorId || readOnly) return null;
     const e = appointmentEnd(s, durationMin);
     return (
       (dayAppts.data ?? []).find(
         (a) =>
+          a.id !== appointment?.id &&
           a.doctorId === doctorId &&
           OCCUPYING.has(a.status) &&
           windowsOverlap(s, e, new Date(a.scheduledAt), appointmentEnd(new Date(a.scheduledAt), a.durationMin)),
       ) ?? null
     );
-  }, [dayAppts.data, scheduledAt, durationMin, doctorId]);
+  }, [dayAppts.data, scheduledAt, durationMin, doctorId, appointment?.id, readOnly]);
 
-  const canSubmit = !!customer && !!doctorId && !!scheduledAt && !create.isPending;
+  const busy = create.isPending || update.isPending;
+  const canSubmit = !!customer && !!doctorId && !!scheduledAt && !busy && !readOnly;
+  const showDetails = editing || !!customer;
 
   const onSubmit = () => {
     if (!customer || !doctorId || !scheduledAt) return;
     setServerError(null);
-    create.mutate(
-      {
-        customerId: customer.id,
-        petId: petId || undefined,
-        doctorId,
-        serviceId: serviceId || undefined,
-        scheduledAt: new Date(scheduledAt).toISOString(),
-        durationMin,
-        status,
-        notes: notes.trim() || undefined,
-      },
-      {
-        onSuccess: () => {
-          toast.success(t("appointments.created"));
-          onClose();
+    const onError = (e: ApiError) => {
+      setServerError(
+        e.code === "appointment_conflict" ? t("appointments.conflictError") : e.message,
+      );
+      toast.error(e.message);
+    };
+
+    if (appointment) {
+      update.mutate(
+        {
+          id: appointment.id,
+          body: {
+            petId: petId || undefined,
+            doctorId,
+            serviceId: serviceId || undefined,
+            scheduledAt: new Date(scheduledAt).toISOString(),
+            durationMin,
+            status,
+            notes: notes.trim() || undefined,
+          },
         },
-        onError: (e: ApiError) => {
-          setServerError(
-            e.code === "appointment_conflict" ? t("appointments.conflictError") : e.message,
-          );
-          toast.error(e.message);
+        {
+          onSuccess: () => {
+            toast.success(t("appointments.updated"));
+            onClose();
+          },
+          onError,
         },
-      },
-    );
+      );
+    } else {
+      create.mutate(
+        {
+          customerId: customer.id,
+          petId: petId || undefined,
+          doctorId,
+          serviceId: serviceId || undefined,
+          scheduledAt: new Date(scheduledAt).toISOString(),
+          durationMin,
+          status,
+          notes: notes.trim() || undefined,
+        },
+        {
+          onSuccess: () => {
+            toast.success(t("appointments.created"));
+            onClose();
+          },
+          onError,
+        },
+      );
+    }
   };
 
+  const title = editing
+    ? readOnly
+      ? t("appointments.detailTitle")
+      : t("appointments.editTitle")
+    : t("appointments.newTitle");
+
   return (
-    <Dialog open={open} onClose={onClose} title={t("appointments.newTitle")} className="max-w-xl">
+    <Dialog open={open} onClose={onClose} title={title} className="max-w-xl">
       <div className="space-y-4">
-        {/* Step 1 — customer */}
-        {customer ? (
+        {editing && appointment ? (
+          <div className="flex items-center gap-2">
+            <Badge variant={appointmentStatusVariant(appointment.status)}>
+              {t(`appointmentStatus.${appointment.status}`, { defaultValue: appointment.status })}
+            </Badge>
+            {readOnly ? (
+              <span className="text-xs text-muted-foreground">{t("appointments.lockedHint")}</span>
+            ) : null}
+          </div>
+        ) : null}
+
+        {/* Step 1 — customer (fixed in edit mode) */}
+        {editing ? (
+          <div className="rounded-xl border bg-[var(--paper-soft)] p-3">
+            <span className="text-xs text-muted-foreground">{t("appointments.customer")}</span>
+            <span className="block truncate font-medium">
+              {customer?.fullName ?? editCustomer.data?.fullName ?? "…"}
+            </span>
+          </div>
+        ) : customer ? (
           <div className="flex items-center justify-between gap-2 rounded-xl border bg-[var(--paper-soft)] p-3">
             <span className="min-w-0">
               <span className="text-xs text-muted-foreground">{t("appointments.customer")}</span>
@@ -199,10 +282,10 @@ export function AppointmentFormDialog({
         )}
 
         {/* Step 2 — appointment details */}
-        {customer ? (
+        {showDetails ? (
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={t("appointments.pet")}>
-              <Select value={petId} onChange={(e) => setPetId(e.target.value)}>
+              <Select value={petId} onChange={(e) => setPetId(e.target.value)} disabled={readOnly}>
                 <option value="">{t("appointments.noPet")}</option>
                 {pets.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -213,7 +296,7 @@ export function AppointmentFormDialog({
               </Select>
             </Field>
             <Field label={t("appointments.doctor")}>
-              <Select value={doctorId} onChange={(e) => setDoctorId(e.target.value)}>
+              <Select value={doctorId} onChange={(e) => setDoctorId(e.target.value)} disabled={readOnly}>
                 <option value="">{t("appointments.selectDoctor")}</option>
                 {doctors.options.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -227,12 +310,14 @@ export function AppointmentFormDialog({
                 type="datetime-local"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
+                disabled={readOnly}
               />
             </Field>
             <Field label={t("appointments.duration")}>
               <Select
                 value={String(durationMin)}
                 onChange={(e) => setDurationMin(Number(e.target.value))}
+                disabled={readOnly}
               >
                 {DURATIONS.map((d) => (
                   <option key={d} value={d}>
@@ -242,7 +327,7 @@ export function AppointmentFormDialog({
               </Select>
             </Field>
             <Field label={t("appointments.service")}>
-              <Select value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
+              <Select value={serviceId} onChange={(e) => setServiceId(e.target.value)} disabled={readOnly}>
                 <option value="">{t("appointments.noService")}</option>
                 {(services.data ?? []).map((s) => (
                   <option key={s.id} value={s.id}>
@@ -255,6 +340,7 @@ export function AppointmentFormDialog({
               <Select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as (typeof CREATE_STATUSES)[number])}
+                disabled={readOnly}
               >
                 {CREATE_STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -265,7 +351,12 @@ export function AppointmentFormDialog({
             </Field>
             <div className="sm:col-span-2">
               <Field label={t("appointments.notes")}>
-                <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+                <Textarea
+                  rows={2}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  disabled={readOnly}
+                />
               </Field>
             </div>
 
@@ -295,12 +386,18 @@ export function AppointmentFormDialog({
         ) : null}
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={create.isPending}>
-            {t("admin.common.cancel")}
+          <Button variant="outline" onClick={onClose} disabled={busy}>
+            {readOnly ? t("appointments.close") : t("admin.common.cancel")}
           </Button>
-          <Button onClick={onSubmit} disabled={!canSubmit}>
-            {create.isPending ? t("admin.common.saving") : t("appointments.book")}
-          </Button>
+          {readOnly ? null : (
+            <Button onClick={onSubmit} disabled={!canSubmit}>
+              {busy
+                ? t("admin.common.saving")
+                : editing
+                  ? t("admin.common.save")
+                  : t("appointments.book")}
+            </Button>
+          )}
         </div>
       </div>
     </Dialog>

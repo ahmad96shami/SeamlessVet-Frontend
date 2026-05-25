@@ -569,6 +569,11 @@
     "created": "Appointment booked",
     "conflictWarning": "Overlaps an existing {{time}} appointment for this doctor.",
     "conflictError": "This appointment overlaps another for the same doctor — not saved.",
+    "editTitle": "Edit appointment",
+    "detailTitle": "Appointment details",
+    "updated": "Appointment updated",
+    "lockedHint": "This appointment is closed and can't be edited.",
+    "close": "Close",
     "view": {
       "day": "Day",
       "week": "Week",
