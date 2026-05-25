@@ -907,5 +907,13 @@
     "syncing": "Syncing ({{count}} pending)",
     "offline": "Offline ({{count}} pending)",
     "conflict": "Needs conflict resolution"
+  },
+  "pwa": {
+    "updateTitle": "A new version is available",
+    "updateBody": "Reload to apply the latest updates.",
+    "reload": "Reload",
+    "offlineReady": "App ready to work offline",
+    "installTitle": "Install the app on your device?",
+    "install": "Install"
   }
 }

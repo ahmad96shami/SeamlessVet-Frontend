@@ -128,6 +128,9 @@ importers:
       vite-tsconfig-paths:
         specifier: ^6.1.1
         version: 6.1.1(typescript@6.0.3)(vite@8.0.14(@types/node@25.9.1)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0))
+      workbox-window:
+        specifier: 7.4.1
+        version: 7.4.1
 
   packages/shared:
     dependencies:

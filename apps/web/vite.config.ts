@@ -10,7 +10,9 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths(),
     VitePWA({
-      registerType: "autoUpdate",
+      // Prompt (not autoUpdate): a silent reload could interrupt a form or an in-flight sync, so
+      // the user chooses when to apply an update (W7 — services/pwa.ts surfaces the toast).
+      registerType: "prompt",
       manifest: {
         name: "نظام إدارة العيادة البيطرية",
         short_name: "VetSystem",
@@ -24,10 +26,13 @@ export default defineConfig({
         theme_color: "#0f766e",
         icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" }],
       },
-      // W0 ships an installable app shell only; full offline runtime caching + sync UI is W7.
+      // Precache the app shell + static assets so the UI boots offline. API reads are cached
+      // separately by the TanStack Query persister (W7.4) — not via Workbox runtime caching —
+      // so there's one source of truth for read freshness/invalidation.
       workbox: {
         navigateFallback: "/index.html",
         globPatterns: ["**/*.{js,css,html,svg,woff2}"],
+        cleanupOutdatedCaches: true,
       },
       devOptions: { enabled: false },
     }),
