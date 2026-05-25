@@ -14,6 +14,8 @@ import { RegisterPage } from "@/routes/auth/RegisterPage";
 import { CustomerDetailPage } from "@/routes/customers/CustomerDetailPage";
 import { CustomersPage } from "@/routes/customers/CustomersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
+import { InvoicesPage } from "@/routes/pos/InvoicesPage";
+import { PosLayout } from "@/routes/pos/PosLayout";
 import { PosPage } from "@/routes/pos/PosPage";
 import { AlertsPage } from "@/routes/inventory/AlertsPage";
 import { MovementsPage } from "@/routes/inventory/MovementsPage";
@@ -110,10 +112,13 @@ export function AppRoutes() {
           path="pos"
           element={
             <RequireRole roles={["admin", "cashier"]}>
-              <PosPage />
+              <PosLayout />
             </RequireRole>
           }
-        />
+        >
+          <Route index element={<PosPage />} />
+          <Route path="invoices" element={<InvoicesPage />} />
+        </Route>
         <Route
           path="inventory"
           element={
