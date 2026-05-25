@@ -1,7 +1,8 @@
 import type { AxiosInstance } from "axios";
 import { z } from "zod";
 
-import { newGuidV7 } from "../http/idempotency";
+import { idempotencyKey, newGuidV7 } from "../http/idempotency";
+import { sendRequest, type RequestDescriptor } from "../offline/queue";
 import { IdentifierResponseSchema, type IdentifierResponse } from "../schemas/common";
 import {
   VisitCreateRequestSchema,
@@ -15,8 +16,10 @@ import {
 
 const VisitListSchema = z.array(VisitResponseSchema);
 
-// Mutations carry the `Idempotency-Key` header automatically (the host apiClient injects it on
-// POST/PATCH); the create wrapper mints the client GUID v7 `id` so screens never handle ids.
+// Create mints the client GUID v7 `id` + a stable idempotency key once, via a RequestDescriptor —
+// so the online path and the offline write-queue replay the IDENTICAL request (W7). Screens that
+// must work offline build the descriptor and route it through sendOrQueue; the wrapper below is the
+// plain online path (build → send).
 
 /** GET /visits — offset-paged; filters customerId / petId / doctorId / status. */
 export async function listVisits(
@@ -33,14 +36,32 @@ export async function getVisit(client: AxiosInstance, id: string): Promise<Visit
   return VisitResponseSchema.parse(res.data);
 }
 
+/**
+ * Build the `POST /visits` request — mints the client GUID v7 `id` + a stable idempotency key.
+ * `descriptor.entityId` is that `id` (so an offline caller can optimistically render/navigate
+ * before the row reaches the server).
+ */
+export function buildCreateVisitRequest(body: VisitCreateRequest): RequestDescriptor {
+  const payload = VisitCreateRequestSchema.parse(body);
+  const id = newGuidV7();
+  return {
+    method: "POST",
+    url: "/visits",
+    body: { ...payload, id },
+    idempotencyKey: idempotencyKey(),
+    label: "sync.label.newVisit",
+    entityKind: "visit",
+    entityId: id,
+  };
+}
+
 /** POST /visits — create (status defaults to `open`; `visit_number` left null server-side). */
 export async function createVisit(
   client: AxiosInstance,
   body: VisitCreateRequest,
 ): Promise<IdentifierResponse> {
-  const payload = VisitCreateRequestSchema.parse(body);
-  const res = await client.post("/visits", { ...payload, id: newGuidV7() });
-  return IdentifierResponseSchema.parse(res.data);
+  const data = await sendRequest(client, buildCreateVisitRequest(body));
+  return IdentifierResponseSchema.parse(data);
 }
 
 /** PATCH /visits/{id} — section-level update (non-terminal; `id` lives in the URL). */

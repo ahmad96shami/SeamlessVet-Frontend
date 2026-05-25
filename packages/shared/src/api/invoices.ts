@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { IDEMPOTENCY_HEADER } from "../constants";
 import { idempotencyKey, newGuidV7 } from "../http/idempotency";
+import { sendRequest, type RequestDescriptor } from "../offline/queue";
 import { IdentifierResponseSchema, type IdentifierResponse } from "../schemas/common";
 import {
   ExamFeeInvoiceRequestSchema,
@@ -41,17 +42,34 @@ export async function getInvoice(client: AxiosInstance, id: string): Promise<Inv
 // the inventory delta-intent pattern. Issuance returns only `{ id }`; refetch GET /invoices/{id} to
 // render the receipt.
 
+/**
+ * Build the `POST /pos/invoices` request — mints the invoice GUID v7 `id` + one idempotency key,
+ * sent BOTH in the body (invoice-level dedup in the service) and as the header (request-level
+ * dedup). `descriptor.entityId` is the invoice id, so an offline sale can print from local data
+ * and reconcile on replay.
+ */
+export function buildPosInvoiceRequest(input: PosInvoiceInput): RequestDescriptor {
+  const key = idempotencyKey();
+  const id = newGuidV7();
+  const body = PosInvoiceRequestSchema.parse({ ...input, id, idempotencyKey: key });
+  return {
+    method: "POST",
+    url: "/pos/invoices",
+    body,
+    idempotencyKey: key,
+    label: "sync.label.posSale",
+    entityKind: "invoice",
+    entityId: id,
+  };
+}
+
 /** POST /pos/invoices — POS issuance (walk-in, or customer/visit-linked). */
 export async function issuePosInvoice(
   client: AxiosInstance,
   input: PosInvoiceInput,
 ): Promise<IdentifierResponse> {
-  const key = idempotencyKey();
-  const payload = PosInvoiceRequestSchema.parse({ ...input, id: newGuidV7(), idempotencyKey: key });
-  const res = await client.post("/pos/invoices", payload, {
-    headers: { [IDEMPOTENCY_HEADER]: key },
-  });
-  return IdentifierResponseSchema.parse(res.data);
+  const data = await sendRequest(client, buildPosInvoiceRequest(input));
+  return IdentifierResponseSchema.parse(data);
 }
 
 /** POST /visits/{visitId}/field-invoice — field-visit invoice (shared wrapper; field/mobile surface). */
