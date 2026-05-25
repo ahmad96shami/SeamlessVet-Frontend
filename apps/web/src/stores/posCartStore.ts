@@ -29,9 +29,8 @@ export interface PaymentLeg {
 
 interface PosCartState {
   lines: CartLine[];
-  /** Linked customer (null = walk-in / no ledger). `customerLabel` is just for display. */
+  /** Linked customer (null = walk-in / no ledger); the name is resolved from the id for display. */
   customerId: string | null;
-  customerLabel: string | null;
   /** Linked visit — its unbilled dispensed meds + procedures auto-assemble server-side at issuance. */
   visitId: string | null;
   invoiceDiscount: number;
@@ -43,8 +42,11 @@ interface PosCartState {
   setLineDiscount: (key: string, discountAmount: number) => void;
   removeLine: (key: string) => void;
   setInvoiceDiscount: (amount: number) => void;
-  setCustomer: (id: string | null, label: string | null) => void;
-  setVisit: (id: string | null) => void;
+  /** Set/clear the customer. Changing the customer drops any linked visit (it belonged to the old one). */
+  setCustomer: (id: string | null) => void;
+  /** Link a visit + its owning customer together (visit picker / deep-link). */
+  linkVisit: (visitId: string, customerId: string) => void;
+  clearVisit: () => void;
   setPayments: (payments: PaymentLeg[]) => void;
   clear: () => void;
 }
@@ -57,7 +59,6 @@ interface PosCartState {
 export const usePosCartStore = create<PosCartState>((set) => ({
   lines: [],
   customerId: null,
-  customerLabel: null,
   visitId: null,
   invoiceDiscount: 0,
   payments: [],
@@ -87,16 +88,10 @@ export const usePosCartStore = create<PosCartState>((set) => ({
     })),
   removeLine: (key) => set((s) => ({ lines: s.lines.filter((l) => l.key !== key) })),
   setInvoiceDiscount: (invoiceDiscount) => set({ invoiceDiscount }),
-  setCustomer: (customerId, customerLabel) => set({ customerId, customerLabel }),
-  setVisit: (visitId) => set({ visitId }),
+  setCustomer: (customerId) => set({ customerId, visitId: null }),
+  linkVisit: (visitId, customerId) => set({ visitId, customerId }),
+  clearVisit: () => set({ visitId: null }),
   setPayments: (payments) => set({ payments }),
   clear: () =>
-    set({
-      lines: [],
-      customerId: null,
-      customerLabel: null,
-      visitId: null,
-      invoiceDiscount: 0,
-      payments: [],
-    }),
+    set({ lines: [], customerId: null, visitId: null, invoiceDiscount: 0, payments: [] }),
 }));

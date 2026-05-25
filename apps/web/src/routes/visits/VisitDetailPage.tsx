@@ -1,7 +1,7 @@
 import { formatDateTime } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import { ProceduresTab } from "@/routes/visits/ProceduresTab";
 import { VaccinationsTab } from "@/routes/visits/VaccinationsTab";
 import { VisitReportButton } from "@/routes/visits/VisitReportButton";
 import { visitRef, visitStatusVariant } from "@/routes/visits/VisitsPage";
+import { useAuthStore } from "@/stores/authStore";
 
 type TabId =
   | "assessment"
@@ -57,6 +58,9 @@ export function VisitDetailPage() {
   const complete = useCompleteVisit();
   const cancel = useCancelVisit();
 
+  const navigate = useNavigate();
+  const role = useAuthStore((s) => s.user?.role);
+
   const [tab, setTab] = useState<TabId>("assessment");
   const [confirm, setConfirm] = useState<null | "complete" | "cancel">(null);
 
@@ -87,6 +91,8 @@ export function VisitDetailPage() {
 
   const isTerminal = v.status === "completed" || v.status === "cancelled";
   const isOpen = v.status === "open";
+  // Hand off to the cashier surface (admin/cashier only); a cancelled visit has nothing to bill.
+  const canBill = (role === "admin" || role === "cashier") && v.status !== "cancelled";
   const title = pet?.name ?? customer.data?.fullName ?? "—";
   const petMeta = pet
     ? [pet.species, pet.breed, pet.sex ? t(`petSex.${pet.sex}`, { defaultValue: pet.sex }) : null]
@@ -156,6 +162,15 @@ export function VisitDetailPage() {
             ownerName={customer.data?.fullName ?? null}
             doctorName={doctorName ?? null}
           />
+          {canBill ? (
+            <Button
+              variant="secondary"
+              onClick={() => navigate(`/pos?customerId=${v.customerId}&visitId=${v.id}`)}
+            >
+              <Icon.receipt className="size-4" />
+              {t("visits.actions.ringUp")}
+            </Button>
+          ) : null}
           {!isTerminal ? (
             <>
               {isOpen ? (

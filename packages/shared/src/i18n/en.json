@@ -399,6 +399,7 @@
       "completed": "Visit completed",
       "cancelled": "Visit cancelled",
       "print": "Print report",
+      "ringUp": "Ring up at POS",
       "linkInvoice": "Link to invoice",
       "timeline": "Medical timeline"
     },

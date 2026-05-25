@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useSystemSettings } from "@/queries/systemSettings";
 import { usePosCartStore, type CartLine } from "@/stores/posCartStore";
 
+import { CartCustomerVisit } from "./CartCustomerVisit";
 import { computeTotals, lineTotal } from "./cartTotals";
 
 /** A single editable cart line: name + qty stepper + unit-price + line-discount + line total. */
@@ -121,6 +122,8 @@ export function CartPanel() {
           </Button>
         ) : null}
       </div>
+
+      <CartCustomerVisit />
 
       <div className="min-h-0 flex-1 overflow-auto">
         {lines.length === 0 ? (
