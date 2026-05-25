@@ -8,7 +8,7 @@ import {
   type CustomerResponse,
 } from "@vet/shared";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -53,7 +53,7 @@ export function CustomerFormDialog({
     resolver: zodResolver(CustomerRequestSchema),
     defaultValues: DEFAULTS,
   });
-  const { register, handleSubmit, reset, setError, formState } = form;
+  const { register, control, handleSubmit, reset, setError, formState } = form;
   const errors = formState.errors;
 
   useEffect(() => {
@@ -113,13 +113,19 @@ export function CustomerFormDialog({
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("customers.type")} error={errors.type?.message}>
-            <Select {...register("type")}>
-              {CUSTOMER_TYPE_VALUES.map((ct) => (
-                <option key={ct} value={ct}>
-                  {t(`customerType.${ct}`)}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
+                  {CUSTOMER_TYPE_VALUES.map((ct) => (
+                    <option key={ct} value={ct}>
+                      {t(`customerType.${ct}`)}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            />
           </Field>
           <Field label={t("customers.fullName")} error={errors.fullName?.message}>
             <Input autoFocus {...register("fullName")} />
@@ -137,14 +143,20 @@ export function CustomerFormDialog({
             <Input dir="ltr" {...register("email")} />
           </Field>
           <Field label={t("customers.assignedDoctor")} error={errors.assignedDoctorId?.message}>
-            <Select {...register("assignedDoctorId")}>
-              <option value="">{t("customers.noDoctor")}</option>
-              {(doctors.data ?? []).map((d) => (
-                <option key={d.doctorId} value={d.doctorId}>
-                  {d.doctorName}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              name="assignedDoctorId"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
+                  <option value="">{t("customers.noDoctor")}</option>
+                  {(doctors.data ?? []).map((d) => (
+                    <option key={d.doctorId} value={d.doctorId}>
+                      {d.doctorName}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            />
           </Field>
         </div>
         <Field label={t("customers.address")} error={errors.address?.message}>

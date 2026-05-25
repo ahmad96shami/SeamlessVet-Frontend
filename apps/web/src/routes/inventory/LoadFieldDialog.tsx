@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { applyFieldErrors, type ApiError } from "@vet/shared";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -37,7 +37,7 @@ export function LoadFieldDialog({ open, onClose }: { open: boolean; onClose: () 
   const fieldInvs = useFieldInventories();
   const products = useProducts({ take: 200 });
   const form = useForm<TransferForm>({ resolver: zodResolver(TransferFormSchema), defaultValues: DEFAULTS });
-  const { register, handleSubmit, reset, setError, formState } = form;
+  const { register, control, handleSubmit, reset, setError, formState } = form;
   const errors = formState.errors;
   const pending = load.isPending || unload.isPending;
 
@@ -90,25 +90,37 @@ export function LoadFieldDialog({ open, onClose }: { open: boolean; onClose: () 
         </div>
 
         <Field label={t("inventory.load.doctor")} error={errors.fieldInventoryId?.message}>
-          <Select autoFocus {...register("fieldInventoryId")}>
-            <option value="">{t("inventory.load.selectDoctor")}</option>
-            {(fieldInvs.data ?? []).map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.doctorName}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            name="fieldInventoryId"
+            control={control}
+            render={({ field }) => (
+              <Select autoFocus value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
+                <option value="">{t("inventory.load.selectDoctor")}</option>
+                {(fieldInvs.data ?? []).map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.doctorName}
+                  </option>
+                ))}
+              </Select>
+            )}
+          />
         </Field>
         <Field label={t("inventory.load.product")} error={errors.productId?.message}>
-          <Select {...register("productId")}>
-            <option value="">{t("inventory.load.product")}</option>
-            {(products.data ?? []).map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nameAr}
-                {p.barcode ? ` · ${p.barcode}` : ""}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            name="productId"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
+                <option value="">{t("inventory.load.product")}</option>
+                {(products.data ?? []).map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.nameAr}
+                    {p.barcode ? ` · ${p.barcode}` : ""}
+                  </option>
+                ))}
+              </Select>
+            )}
+          />
         </Field>
         <Field label={t("inventory.load.quantity")} error={errors.quantity?.message}>
           <Input

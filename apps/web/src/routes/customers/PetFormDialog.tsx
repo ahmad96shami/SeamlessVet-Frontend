@@ -7,7 +7,7 @@ import {
   type PetResponse,
 } from "@vet/shared";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -64,7 +64,7 @@ export function PetFormDialog({
   const create = useCreatePet();
   const update = useUpdatePet();
   const form = useForm<PetFormValues>({ resolver: zodResolver(PetFormSchema), defaultValues: DEFAULTS });
-  const { register, handleSubmit, reset, setError, formState } = form;
+  const { register, control, handleSubmit, reset, setError, formState } = form;
   const errors = formState.errors;
 
   useEffect(() => {
@@ -144,14 +144,20 @@ export function PetFormDialog({
             <Input {...register("breed")} />
           </Field>
           <Field label={t("customers.pets.sex")} error={errors.sex?.message}>
-            <Select {...register("sex")}>
-              <option value="">{t("customers.pets.sexUnset")}</option>
-              {PET_SEX_VALUES.map((s) => (
-                <option key={s} value={s}>
-                  {t(`petSex.${s}`)}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              name="sex"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
+                  <option value="">{t("customers.pets.sexUnset")}</option>
+                  {PET_SEX_VALUES.map((s) => (
+                    <option key={s} value={s}>
+                      {t(`petSex.${s}`)}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            />
           </Field>
           <Field label={t("customers.pets.dateOfBirth")} error={errors.dateOfBirth?.message}>
             <Input type="date" dir="ltr" {...register("dateOfBirth")} />

@@ -328,6 +328,39 @@
   .icon-pill:hover { background: var(--ink-100); }
   .icon-pill .badge { position: absolute; top: 6px; inset-inline-start: 6px; background: var(--red); color: white; font-size: 10px; font-weight: 800; border-radius: 999px; padding: 2px 5px; line-height: 1; border: 2px solid var(--paper); }
 
+  /* ── Form controls (inputs · textarea · custom select) ──── */
+  .input, .textarea, .select-trigger {
+    width: 100%; background: var(--paper); color: var(--fg-1);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-input);
+    font-family: var(--font-ar); font-size: var(--fs-body); line-height: 1.4;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+  }
+  .input, .select-trigger { height: 40px; padding-inline: 14px; }
+  .textarea { display: block; padding: 10px 14px; min-height: 84px; resize: vertical; line-height: 1.55; }
+  .input::placeholder, .textarea::placeholder { color: var(--ink-400); }
+  .input:hover:not(:disabled), .textarea:hover:not(:disabled), .select-trigger:hover:not(:disabled) { border-color: var(--ink-300); }
+  .input:focus, .textarea:focus, .select-trigger:focus-visible, .select-trigger[data-open="true"] {
+    border-color: var(--focus-border); box-shadow: var(--focus-ring);
+  }
+  .input:disabled, .textarea:disabled, .select-trigger:disabled {
+    background: var(--ink-50); color: var(--fg-disabled); cursor: not-allowed; border-color: var(--border-soft);
+  }
+  /* file/number niceties */
+  .input[type="number"] { font-variant-numeric: tabular-nums; }
+
+  /* Custom select (drop-in for native <select>; menu is portalled to <body>) */
+  .select-trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; text-align: start; }
+  .select-trigger .select-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .select-trigger .select-value.placeholder { color: var(--ink-400); }
+  .select-trigger .select-chev { flex: 0 0 auto; color: var(--ink-400); transition: transform 0.18s; }
+  .select-trigger[data-open="true"] .select-chev { transform: rotate(180deg); }
+  .select-menu { list-style: none; margin: 0; background: var(--paper); border: 1px solid var(--ink-100); border-radius: var(--radius-chip); box-shadow: var(--shadow-pop); padding: 6px; max-height: 280px; overflow-y: auto; z-index: 60; }
+  .select-option { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 8px; font-size: var(--fs-body); color: var(--fg-1); cursor: pointer; white-space: nowrap; user-select: none; }
+  .select-option[data-active="true"] { background: var(--ink-50); }
+  .select-option[data-selected="true"] { color: var(--teal-700); font-weight: 700; }
+  .select-option[data-selected="true"]::after { content: ""; width: 7px; height: 7px; border-radius: 999px; background: var(--teal-500); flex: 0 0 auto; }
+  .select-option[aria-disabled="true"] { color: var(--fg-disabled); cursor: not-allowed; }
+
   /* ════════ Shell: collapsible right-rail side-nav ════════ */
   .sidenav { position: absolute; top: 0; bottom: 0; inset-inline-start: 0; width: 68px; background: var(--paper); border-inline-end: 1px solid var(--ink-100); display: flex; flex-direction: column; z-index: 5; overflow: hidden; transition: width 0.22s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.22s; }
   .sidenav:hover { width: 250px; box-shadow: 0 8px 28px rgba(15, 42, 68, 0.1); }
@@ -338,7 +371,8 @@
   .sidenav:hover .sn-brand-text { opacity: 1; }
   .sidenav .sn-brand-name { font-weight: 800; font-size: 15px; color: var(--fg-strong); letter-spacing: -0.01em; }
   .sidenav .sn-brand-sub { font-size: 11px; color: var(--ink-500); margin-top: 2px; }
-  .sidenav .sn-items { display: flex; flex-direction: column; gap: 1px; padding: 10px; flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; }
+  .sidenav .sn-items { display: flex; flex-direction: column; gap: 1px; padding: 10px; flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+  .sidenav .sn-items::-webkit-scrollbar { width: 0; height: 0; display: none; }
   .sidenav .sn-section-label { font-size: 10px; font-weight: 800; color: var(--ink-400); letter-spacing: 0.08em; padding: 12px 10px 4px; white-space: nowrap; opacity: 0; transition: opacity 0.18s; }
   .sidenav:hover .sn-section-label { opacity: 1; }
   .sidenav .sn-section-label::before { content: ""; display: block; height: 1px; background: var(--ink-100); margin-bottom: 8px; transition: opacity 0.18s; }

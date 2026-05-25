@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { applyFieldErrors, type ApiError, type ReceiveStockInput } from "@vet/shared";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -31,7 +31,7 @@ export function ReceiveStockDialog({ open, onClose }: { open: boolean; onClose: 
   const receive = useReceiveStock();
   const products = useProducts({ take: 200 });
   const form = useForm<ReceiveForm>({ resolver: zodResolver(ReceiveFormSchema), defaultValues: DEFAULTS });
-  const { register, handleSubmit, reset, setError, formState } = form;
+  const { register, control, handleSubmit, reset, setError, formState } = form;
   const errors = formState.errors;
 
   useEffect(() => {
@@ -53,15 +53,21 @@ export function ReceiveStockDialog({ open, onClose }: { open: boolean; onClose: 
     <Dialog open={open} onClose={onClose} title={t("inventory.receive.title")}>
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <Field label={t("inventory.receive.product")} error={errors.productId?.message}>
-          <Select autoFocus {...register("productId")}>
-            <option value="">{t("inventory.receive.product")}</option>
-            {(products.data ?? []).map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nameAr}
-                {p.barcode ? ` · ${p.barcode}` : ""}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            name="productId"
+            control={control}
+            render={({ field }) => (
+              <Select autoFocus value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
+                <option value="">{t("inventory.receive.product")}</option>
+                {(products.data ?? []).map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.nameAr}
+                    {p.barcode ? ` · ${p.barcode}` : ""}
+                  </option>
+                ))}
+              </Select>
+            )}
+          />
         </Field>
         <Field label={t("inventory.receive.quantity")} error={errors.quantity?.message}>
           <Input
