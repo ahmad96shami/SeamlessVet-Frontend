@@ -9,6 +9,7 @@ import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { useCustomer } from "@/queries/customers";
 import { useFieldInventories } from "@/queries/inventory";
+import { CloseAccountSection } from "@/routes/customers/CloseAccountSection";
 import { CustomerFormDialog } from "@/routes/customers/CustomerFormDialog";
 import { PetsSection } from "@/routes/customers/PetsSection";
 import { StatementSection } from "@/routes/customers/StatementSection";
@@ -108,6 +109,8 @@ export function CustomerDetailPage() {
           {formatCurrency(c.balance, lang)}
         </div>
       </div>
+
+      <CloseAccountSection customer={c} />
 
       <PetsSection customerId={c.id} />
 
