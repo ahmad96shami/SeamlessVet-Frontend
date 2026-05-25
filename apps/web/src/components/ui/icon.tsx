@@ -290,6 +290,20 @@ export const Icon = {
       <path d="M21 12a9 9 0 0 0-9-9" />
     </Svg>
   ),
+  image: (p: IconProps) => (
+    <Svg {...p}>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="8.5" cy="9.5" r="1.6" />
+      <path d="M21 16l-5-4-4 3-2.5-2L3 18" />
+    </Svg>
+  ),
+  upload: (p: IconProps) => (
+    <Svg {...p}>
+      <path d="M12 15V4" />
+      <path d="M8 8l4-4 4 4" />
+      <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+    </Svg>
+  ),
 } satisfies Record<string, (p: IconProps) => ReactNode>;
 
 export type IconName = keyof typeof Icon;

@@ -14,6 +14,7 @@ import { useFieldInventories } from "@/queries/inventory";
 import { usePets } from "@/queries/pets";
 import { useCancelVisit, useCompleteVisit, useUpdateVisit, useVisit } from "@/queries/visits";
 import { AssessmentTab } from "@/routes/visits/AssessmentTab";
+import { AttachmentsTab } from "@/routes/visits/AttachmentsTab";
 import { DiagnosisTab } from "@/routes/visits/DiagnosisTab";
 import { FollowUpsTab } from "@/routes/visits/FollowUpsTab";
 import { PrescriptionsTab } from "@/routes/visits/PrescriptionsTab";
@@ -21,7 +22,14 @@ import { ProceduresTab } from "@/routes/visits/ProceduresTab";
 import { VaccinationsTab } from "@/routes/visits/VaccinationsTab";
 import { visitRef, visitStatusVariant } from "@/routes/visits/VisitsPage";
 
-type TabId = "assessment" | "diagnosis" | "procedures" | "prescriptions" | "followups" | "vaccinations";
+type TabId =
+  | "assessment"
+  | "diagnosis"
+  | "procedures"
+  | "prescriptions"
+  | "followups"
+  | "vaccinations"
+  | "files";
 
 const TAB_IDS = [
   "assessment",
@@ -30,6 +38,7 @@ const TAB_IDS = [
   "prescriptions",
   "followups",
   "vaccinations",
+  "files",
 ] as const;
 
 export function VisitDetailPage() {
@@ -187,6 +196,7 @@ export function VisitDetailPage() {
       {tab === "prescriptions" ? <PrescriptionsTab visitId={v.id} readOnly={isTerminal} /> : null}
       {tab === "followups" ? <FollowUpsTab visit={v} readOnly={isTerminal} /> : null}
       {tab === "vaccinations" ? <VaccinationsTab visit={v} readOnly={isTerminal} /> : null}
+      {tab === "files" ? <AttachmentsTab visitId={v.id} readOnly={isTerminal} /> : null}
 
       <Dialog
         open={confirm !== null}
