@@ -288,6 +288,244 @@
       "shareUnavailable": "لا يوجد رقم هاتف لهذا العميل لإرسال الكشف."
     }
   },
+  "visitType": {
+    "in_clinic": "داخل العيادة",
+    "field": "ميدانية"
+  },
+  "visitStatus": {
+    "open": "مفتوحة",
+    "in_progress": "قيد التنفيذ",
+    "completed": "مكتملة",
+    "cancelled": "ملغاة"
+  },
+  "severity": {
+    "mild": "خفيفة",
+    "moderate": "متوسطة",
+    "severe": "شديدة",
+    "critical": "حرجة"
+  },
+  "dispenseType": {
+    "administered_in_clinic": "داخل العيادة",
+    "dispensed_to_owner": "يُصرف للمالك"
+  },
+  "attachmentType": {
+    "photo": "صورة",
+    "pdf": "PDF"
+  },
+  "uploadStatus": {
+    "pending": "قيد الرفع",
+    "uploaded": "تم الرفع",
+    "failed": "فشل"
+  },
+  "visits": {
+    "title": "الزيارات",
+    "description": "زيارات العيادة والسجل الطبي للحالات.",
+    "searchPlaceholder": "ابحث برقم الزيارة",
+    "new": "زيارة جديدة",
+    "newTitle": "فتح زيارة جديدة",
+    "empty": "لا توجد زيارات",
+    "filterStatus": "الحالة",
+    "filterDoctor": "الطبيب",
+    "allStatuses": "كل الحالات",
+    "allDoctors": "كل الأطباء",
+    "noNumber": "بدون رقم",
+    "noPet": "بدون حيوان",
+    "unknownDoctor": "—",
+    "col": {
+      "number": "رقم الزيارة",
+      "pet": "الحيوان",
+      "customer": "العميل",
+      "doctor": "الطبيب",
+      "type": "النوع",
+      "status": "الحالة",
+      "started": "البدء"
+    },
+    "create": {
+      "customer": "العميل",
+      "searchCustomer": "ابحث عن عميل",
+      "selectCustomer": "اختر عميلًا",
+      "pet": "الحيوان",
+      "noPet": "بدون حيوان محدد",
+      "doctor": "الطبيب",
+      "selectDoctor": "اختر طبيبًا",
+      "currentUser": "أنا",
+      "visitType": "نوع الزيارة",
+      "chiefComplaint": "الشكوى الرئيسية",
+      "created": "تم فتح الزيارة",
+      "pickCustomerFirst": "اختر عميلًا أولًا"
+    },
+    "detail": {
+      "back": "رجوع إلى الزيارات",
+      "notFound": "الزيارة غير موجودة",
+      "owner": "المالك",
+      "visitNumber": "رقم الزيارة",
+      "startedAt": "بدأت",
+      "duration": "المدة",
+      "minutes": "دقيقة",
+      "lockedHint": "هذه الزيارة مغلقة — السجل للقراءة فقط."
+    },
+    "actions": {
+      "start": "بدء الكشف",
+      "complete": "إنهاء الزيارة",
+      "cancel": "إلغاء الزيارة",
+      "completeTitle": "إنهاء الزيارة",
+      "completeBody": "سيتم إغلاق الزيارة وتصبح غير قابلة للتعديل.",
+      "cancelTitle": "إلغاء الزيارة",
+      "cancelBody": "سيتم إلغاء الزيارة دون أي رسوم.",
+      "started": "بدأت الزيارة",
+      "completed": "تم إنهاء الزيارة",
+      "cancelled": "تم إلغاء الزيارة",
+      "print": "طباعة التقرير",
+      "linkInvoice": "ربط بفاتورة",
+      "timeline": "السجل الطبي"
+    },
+    "tab": {
+      "assessment": "التقييم المبدئي",
+      "diagnosis": "التشخيص",
+      "procedures": "الإجراءات",
+      "prescriptions": "الوصفات",
+      "followups": "المتابعة اليومية",
+      "vaccinations": "التطعيمات",
+      "files": "الملفات"
+    },
+    "assessment": {
+      "title": "التقييم المبدئي",
+      "chiefComplaint": "الشكوى الرئيسية",
+      "symptoms": "الأعراض",
+      "vitals": "المؤشرات الحيوية",
+      "temperature": "الحرارة (°م)",
+      "heartRate": "النبض (/د)",
+      "respiratoryRate": "التنفس (/د)",
+      "weight": "الوزن (كغ)",
+      "clinicalNotes": "ملاحظات سريرية",
+      "save": "حفظ التقييم",
+      "saved": "تم حفظ التقييم"
+    },
+    "diagnosis": {
+      "title": "التشخيص",
+      "preliminary": "تشخيص مبدئي",
+      "final": "تشخيص نهائي",
+      "severity": "الحدة",
+      "severityNone": "بدون تحديد",
+      "icdVetCode": "كود ICD-Vet",
+      "save": "حفظ التشخيص",
+      "saved": "تم حفظ التشخيص"
+    },
+    "procedures": {
+      "title": "الإجراءات",
+      "add": "إضافة إجراء",
+      "empty": "لا توجد إجراءات",
+      "service": "الخدمة",
+      "noService": "بدون خدمة",
+      "price": "السعر",
+      "result": "النتيجة",
+      "resultPlaceholder": "نتيجة الإجراء أو الملاحظات",
+      "newTitle": "إضافة إجراء",
+      "editTitle": "تعديل الإجراء",
+      "deleteConfirm": "سيتم حذف هذا الإجراء.",
+      "col": { "service": "الإجراء", "price": "السعر", "result": "النتيجة" }
+    },
+    "prescriptions": {
+      "title": "الوصفات الطبية",
+      "add": "إضافة وصفة",
+      "empty": "لا توجد وصفات",
+      "product": "الدواء",
+      "selectProduct": "اختر دواءً",
+      "dosage": "الجرعة",
+      "frequency": "التكرار",
+      "duration": "المدة",
+      "notes": "ملاحظات",
+      "dispenseType": "طريقة الصرف",
+      "quantity": "الكمية",
+      "newTitle": "إضافة وصفة",
+      "editTitle": "تعديل الوصفة",
+      "deleteConfirm": "سيتم حذف هذه الوصفة.",
+      "col": { "product": "الدواء", "dosage": "الجرعة", "frequency": "التكرار", "duration": "المدة", "dispense": "الصرف", "qty": "الكمية" }
+    },
+    "followups": {
+      "title": "المتابعة اليومية",
+      "add": "إضافة متابعة",
+      "empty": "لا توجد متابعات",
+      "clinicOnly": "المتابعة اليومية متاحة لزيارات العيادة فقط (الحالات المنوّمة).",
+      "entryDate": "التاريخ",
+      "condition": "الحالة",
+      "administeredMeds": "الأدوية المُعطاة",
+      "notes": "ملاحظات",
+      "newTitle": "إضافة متابعة يومية",
+      "editTitle": "تعديل المتابعة",
+      "deleteConfirm": "سيتم حذف هذه المتابعة.",
+      "col": { "date": "التاريخ", "condition": "الحالة", "vitals": "المؤشرات", "meds": "الأدوية" }
+    },
+    "vaccinations": {
+      "title": "التطعيمات",
+      "add": "إضافة تطعيم",
+      "empty": "لا توجد تطعيمات",
+      "vaccineType": "نوع اللقاح",
+      "dateGiven": "تاريخ الإعطاء",
+      "nextDueDate": "الجرعة القادمة",
+      "certificate": "الشهادة",
+      "printCertificate": "طباعة شهادة",
+      "newTitle": "إضافة تطعيم",
+      "editTitle": "تعديل التطعيم",
+      "deleteConfirm": "سيتم حذف هذا التطعيم.",
+      "col": { "type": "اللقاح", "given": "تاريخ الإعطاء", "due": "الجرعة القادمة" }
+    },
+    "files": {
+      "title": "الملفات والمرفقات",
+      "add": "رفع ملف",
+      "empty": "لا توجد مرفقات",
+      "fileType": "نوع الملف",
+      "fileTitle": "العنوان",
+      "docDate": "تاريخ المستند",
+      "description": "الوصف",
+      "file": "الملف",
+      "chooseFile": "اختر ملفًا",
+      "uploading": "جارٍ الرفع...",
+      "uploaded": "تم رفع الملف",
+      "view": "عرض",
+      "newTitle": "رفع مرفق",
+      "deleteConfirm": "سيتم حذف هذا المرفق.",
+      "pendingHint": "لم يكتمل الرفع"
+    },
+    "report": {
+      "action": "تقرير الزيارة",
+      "title": "تقرير زيارة طبية",
+      "diagnosisSummary": "ملخص التشخيص",
+      "procedures": "الإجراءات",
+      "prescriptions": "الوصفات الطبية",
+      "recommendations": "التوصيات والملاحظات",
+      "nextVisit": "الزيارة القادمة",
+      "vitals": "المؤشرات الحيوية",
+      "doctor": "الطبيب المعالج",
+      "none": "—"
+    },
+    "certificate": {
+      "action": "شهادة تطعيم",
+      "title": "شهادة تطعيم",
+      "petName": "اسم الحيوان",
+      "owner": "المالك",
+      "vaccineType": "نوع اللقاح",
+      "dateGiven": "تاريخ الإعطاء",
+      "nextDueDate": "موعد الجرعة القادمة",
+      "issuedAt": "تاريخ الإصدار",
+      "doctor": "الطبيب",
+      "signature": "التوقيع والختم"
+    },
+    "timeline": {
+      "title": "السجل الطبي",
+      "subtitle": "كل الزيارات — العيادة والميدان",
+      "back": "رجوع",
+      "filterDoctor": "الطبيب",
+      "allDoctors": "كل الأطباء",
+      "from": "من",
+      "to": "إلى",
+      "empty": "لا توجد زيارات في السجل",
+      "openVisit": "فتح الزيارة",
+      "procedures": "إجراءات",
+      "prescriptions": "وصفات",
+      "vaccinations": "تطعيمات"
+    }
+  },
   "admin": {
     "common": {
       "create": "إنشاء",

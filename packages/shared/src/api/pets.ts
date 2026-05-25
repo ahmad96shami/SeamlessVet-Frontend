@@ -6,10 +6,13 @@ import { IdentifierResponseSchema, type IdentifierResponse } from "../schemas/co
 import {
   PetRequestSchema,
   PetResponseSchema,
+  PetTimelineResponseSchema,
   PetTransferRequestSchema,
   type PetListParams,
   type PetRequest,
   type PetResponse,
+  type PetTimelineParams,
+  type PetTimelineResponse,
   type PetTransferRequest,
 } from "../schemas/pets";
 
@@ -68,4 +71,14 @@ export async function transferPet(
   const payload = PetTransferRequestSchema.parse(body);
   const res = await client.post(`/pets/${id}/transfer`, payload);
   return IdentifierResponseSchema.parse(res.data);
+}
+
+/** GET /pets/{id}/timeline — chronological clinic + field medical history (M5 task 17). */
+export async function getPetTimeline(
+  client: AxiosInstance,
+  id: string,
+  params?: PetTimelineParams,
+): Promise<PetTimelineResponse> {
+  const res = await client.get(`/pets/${id}/timeline`, { params });
+  return PetTimelineResponseSchema.parse(res.data);
 }

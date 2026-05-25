@@ -52,3 +52,60 @@ export interface PetListParams {
   skip?: number;
   take?: number;
 }
+
+// --- Pet medical timeline (GET /pets/{id}/timeline) --------------------------
+
+/**
+ * The pet's chronological medical history (M5 task 17) — every visit (clinic + field), most recent
+ * first, each carrying its procedures, prescriptions, and vaccinations. A read model only.
+ */
+export const TimelineProcedureSchema = z.object({
+  id: z.string(),
+  serviceId: z.string().nullish(),
+  resultText: z.string().nullish(),
+  price: z.number(),
+});
+
+export const TimelinePrescriptionSchema = z.object({
+  id: z.string(),
+  productId: z.string(),
+  dispenseType: z.string(),
+  quantity: z.number().nullish(),
+  dosage: z.string().nullish(),
+});
+
+export const TimelineVaccinationSchema = z.object({
+  id: z.string(),
+  vaccineType: z.string(),
+  dateGiven: z.string(),
+  nextDueDate: z.string().nullish(),
+});
+
+export const PetTimelineVisitSchema = z.object({
+  visitId: z.string(),
+  visitType: z.string(),
+  visitNumber: z.string().nullish(),
+  status: z.string(),
+  startedAt: z.string().nullish(),
+  endedAt: z.string().nullish(),
+  doctorId: z.string(),
+  preliminaryDiagnosis: z.string().nullish(),
+  finalDiagnosis: z.string().nullish(),
+  procedures: z.array(TimelineProcedureSchema),
+  prescriptions: z.array(TimelinePrescriptionSchema),
+  vaccinations: z.array(TimelineVaccinationSchema),
+});
+export type PetTimelineVisit = z.infer<typeof PetTimelineVisitSchema>;
+
+export const PetTimelineResponseSchema = z.object({
+  petId: z.string(),
+  visits: z.array(PetTimelineVisitSchema),
+});
+export type PetTimelineResponse = z.infer<typeof PetTimelineResponseSchema>;
+
+/** Timeline filters: `from`/`to` are ISO-8601 instants; `doctorId` narrows to one doctor. */
+export interface PetTimelineParams {
+  from?: string;
+  to?: string;
+  doctorId?: string;
+}

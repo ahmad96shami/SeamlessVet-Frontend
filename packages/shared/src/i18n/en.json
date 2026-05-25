@@ -288,6 +288,244 @@
       "shareUnavailable": "This customer has no phone number to send the statement to."
     }
   },
+  "visitType": {
+    "in_clinic": "In-clinic",
+    "field": "Field"
+  },
+  "visitStatus": {
+    "open": "Open",
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "severity": {
+    "mild": "Mild",
+    "moderate": "Moderate",
+    "severe": "Severe",
+    "critical": "Critical"
+  },
+  "dispenseType": {
+    "administered_in_clinic": "In-clinic",
+    "dispensed_to_owner": "Dispensed to owner"
+  },
+  "attachmentType": {
+    "photo": "Photo",
+    "pdf": "PDF"
+  },
+  "uploadStatus": {
+    "pending": "Pending",
+    "uploaded": "Uploaded",
+    "failed": "Failed"
+  },
+  "visits": {
+    "title": "Visits",
+    "description": "In-clinic visits and case medical records.",
+    "searchPlaceholder": "Search by visit number",
+    "new": "New visit",
+    "newTitle": "Open a new visit",
+    "empty": "No visits",
+    "filterStatus": "Status",
+    "filterDoctor": "Doctor",
+    "allStatuses": "All statuses",
+    "allDoctors": "All doctors",
+    "noNumber": "No number",
+    "noPet": "No pet",
+    "unknownDoctor": "—",
+    "col": {
+      "number": "Visit no.",
+      "pet": "Pet",
+      "customer": "Customer",
+      "doctor": "Doctor",
+      "type": "Type",
+      "status": "Status",
+      "started": "Started"
+    },
+    "create": {
+      "customer": "Customer",
+      "searchCustomer": "Search for a customer",
+      "selectCustomer": "Select a customer",
+      "pet": "Pet",
+      "noPet": "No specific pet",
+      "doctor": "Doctor",
+      "selectDoctor": "Select a doctor",
+      "currentUser": "Me",
+      "visitType": "Visit type",
+      "chiefComplaint": "Chief complaint",
+      "created": "Visit opened",
+      "pickCustomerFirst": "Select a customer first"
+    },
+    "detail": {
+      "back": "Back to visits",
+      "notFound": "Visit not found",
+      "owner": "Owner",
+      "visitNumber": "Visit no.",
+      "startedAt": "Started",
+      "duration": "Duration",
+      "minutes": "min",
+      "lockedHint": "This visit is closed — the record is read-only."
+    },
+    "actions": {
+      "start": "Start visit",
+      "complete": "Complete visit",
+      "cancel": "Cancel visit",
+      "completeTitle": "Complete visit",
+      "completeBody": "The visit will be closed and can no longer be edited.",
+      "cancelTitle": "Cancel visit",
+      "cancelBody": "The visit will be cancelled with no charges.",
+      "started": "Visit started",
+      "completed": "Visit completed",
+      "cancelled": "Visit cancelled",
+      "print": "Print report",
+      "linkInvoice": "Link to invoice",
+      "timeline": "Medical timeline"
+    },
+    "tab": {
+      "assessment": "Assessment",
+      "diagnosis": "Diagnosis",
+      "procedures": "Procedures",
+      "prescriptions": "Prescriptions",
+      "followups": "Daily follow-up",
+      "vaccinations": "Vaccinations",
+      "files": "Files"
+    },
+    "assessment": {
+      "title": "Initial assessment",
+      "chiefComplaint": "Chief complaint",
+      "symptoms": "Symptoms",
+      "vitals": "Vitals",
+      "temperature": "Temp (°C)",
+      "heartRate": "Heart rate (/min)",
+      "respiratoryRate": "Resp. rate (/min)",
+      "weight": "Weight (kg)",
+      "clinicalNotes": "Clinical notes",
+      "save": "Save assessment",
+      "saved": "Assessment saved"
+    },
+    "diagnosis": {
+      "title": "Diagnosis",
+      "preliminary": "Preliminary diagnosis",
+      "final": "Final diagnosis",
+      "severity": "Severity",
+      "severityNone": "Unspecified",
+      "icdVetCode": "ICD-Vet code",
+      "save": "Save diagnosis",
+      "saved": "Diagnosis saved"
+    },
+    "procedures": {
+      "title": "Procedures",
+      "add": "Add procedure",
+      "empty": "No procedures",
+      "service": "Service",
+      "noService": "No service",
+      "price": "Price",
+      "result": "Result",
+      "resultPlaceholder": "Procedure result or notes",
+      "newTitle": "Add procedure",
+      "editTitle": "Edit procedure",
+      "deleteConfirm": "This procedure will be deleted.",
+      "col": { "service": "Procedure", "price": "Price", "result": "Result" }
+    },
+    "prescriptions": {
+      "title": "Prescriptions",
+      "add": "Add prescription",
+      "empty": "No prescriptions",
+      "product": "Medication",
+      "selectProduct": "Select a medication",
+      "dosage": "Dosage",
+      "frequency": "Frequency",
+      "duration": "Duration",
+      "notes": "Notes",
+      "dispenseType": "Dispense type",
+      "quantity": "Quantity",
+      "newTitle": "Add prescription",
+      "editTitle": "Edit prescription",
+      "deleteConfirm": "This prescription will be deleted.",
+      "col": { "product": "Medication", "dosage": "Dosage", "frequency": "Frequency", "duration": "Duration", "dispense": "Dispense", "qty": "Qty" }
+    },
+    "followups": {
+      "title": "Daily follow-up",
+      "add": "Add follow-up",
+      "empty": "No follow-ups",
+      "clinicOnly": "Daily follow-up is available for in-clinic (hospitalized) visits only.",
+      "entryDate": "Date",
+      "condition": "Condition",
+      "administeredMeds": "Administered meds",
+      "notes": "Notes",
+      "newTitle": "Add daily follow-up",
+      "editTitle": "Edit follow-up",
+      "deleteConfirm": "This follow-up will be deleted.",
+      "col": { "date": "Date", "condition": "Condition", "vitals": "Vitals", "meds": "Meds" }
+    },
+    "vaccinations": {
+      "title": "Vaccinations",
+      "add": "Add vaccination",
+      "empty": "No vaccinations",
+      "vaccineType": "Vaccine type",
+      "dateGiven": "Date given",
+      "nextDueDate": "Next due",
+      "certificate": "Certificate",
+      "printCertificate": "Print certificate",
+      "newTitle": "Add vaccination",
+      "editTitle": "Edit vaccination",
+      "deleteConfirm": "This vaccination will be deleted.",
+      "col": { "type": "Vaccine", "given": "Date given", "due": "Next due" }
+    },
+    "files": {
+      "title": "Files & attachments",
+      "add": "Upload file",
+      "empty": "No attachments",
+      "fileType": "File type",
+      "fileTitle": "Title",
+      "docDate": "Document date",
+      "description": "Description",
+      "file": "File",
+      "chooseFile": "Choose a file",
+      "uploading": "Uploading...",
+      "uploaded": "File uploaded",
+      "view": "View",
+      "newTitle": "Upload attachment",
+      "deleteConfirm": "This attachment will be deleted.",
+      "pendingHint": "Upload incomplete"
+    },
+    "report": {
+      "action": "Visit report",
+      "title": "Medical visit report",
+      "diagnosisSummary": "Diagnosis summary",
+      "procedures": "Procedures",
+      "prescriptions": "Prescriptions",
+      "recommendations": "Recommendations & notes",
+      "nextVisit": "Next visit",
+      "vitals": "Vitals",
+      "doctor": "Attending doctor",
+      "none": "—"
+    },
+    "certificate": {
+      "action": "Vaccination certificate",
+      "title": "Vaccination certificate",
+      "petName": "Pet name",
+      "owner": "Owner",
+      "vaccineType": "Vaccine type",
+      "dateGiven": "Date given",
+      "nextDueDate": "Next due date",
+      "issuedAt": "Issued",
+      "doctor": "Doctor",
+      "signature": "Signature & stamp"
+    },
+    "timeline": {
+      "title": "Medical timeline",
+      "subtitle": "All visits — clinic and field",
+      "back": "Back",
+      "filterDoctor": "Doctor",
+      "allDoctors": "All doctors",
+      "from": "From",
+      "to": "To",
+      "empty": "No visits in the timeline",
+      "openVisit": "Open visit",
+      "procedures": "procedures",
+      "prescriptions": "prescriptions",
+      "vaccinations": "vaccinations"
+    }
+  },
   "admin": {
     "common": {
       "create": "Create",
