@@ -5,6 +5,7 @@ import {
 } from "@vet/shared";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
@@ -31,6 +32,7 @@ const VET_ROLES = ["vet_clinic", "vet_field", "vet_both"];
  */
 export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const me = useAuthStore((s) => s.user);
   const isVet = !!me && VET_ROLES.includes(me.role);
 
@@ -75,9 +77,10 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
         chiefComplaint: chiefComplaint.trim() || undefined,
       },
       {
-        onSuccess: () => {
+        onSuccess: (res) => {
           toast.success(t("visits.create.created"));
           onClose();
+          navigate(`/operations/visits/${res.id}`);
         },
         onError: (e: ApiError) => toast.error(e.message),
       },

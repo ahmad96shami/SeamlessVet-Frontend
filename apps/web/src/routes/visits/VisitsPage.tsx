@@ -6,6 +6,7 @@ import {
 } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
@@ -37,6 +38,7 @@ export function visitRef(v: Pick<VisitResponse, "visitNumber" | "id">): string {
 export function VisitsPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const navigate = useNavigate();
 
   const [status, setStatus] = useState("");
   const [doctor, setDoctor] = useState("");
@@ -180,6 +182,7 @@ export function VisitsPage() {
           data={rows}
           isLoading={query.isLoading}
           emptyMessage={t("visits.empty")}
+          onRowClick={(v) => navigate(`/operations/visits/${v.id}`)}
         />
         <Pagination
           page={page + 1}
