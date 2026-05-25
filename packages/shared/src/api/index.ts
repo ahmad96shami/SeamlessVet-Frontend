@@ -23,3 +23,4 @@ export * from "./batches";
 export * from "./entitlements";
 export * from "./partnership";
 export * from "./reports";
+export * from "./notifications";

@@ -959,6 +959,27 @@
     "installTitle": "Install the app on your device?",
     "install": "Install"
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications.",
+    "markAllRead": "Mark all read",
+    "markRead": "Mark read",
+    "unread_one": "1 unread notification",
+    "unread_other": "{{count}} unread notifications",
+    "connecting": "Connecting to live notifications…",
+    "type": {
+      "appointment_reminder": "Appointment reminder",
+      "follow_up_due": "Follow-up due",
+      "vaccination_due": "Vaccination due",
+      "low_stock": "Low stock",
+      "expiry_warning": "Expiry warning",
+      "registration_request": "New registration request",
+      "negative_stock": "Negative-stock attempt",
+      "account_ready_for_settlement": "Account ready for settlement",
+      "entitlement_approved": "Entitlement approved",
+      "report_delivery": "Report ready"
+    }
+  },
   "contractStatus": {
     "draft": "Draft",
     "active": "Active",

@@ -959,6 +959,27 @@
     "installTitle": "تثبيت التطبيق على جهازك؟",
     "install": "تثبيت"
   },
+  "notifications": {
+    "title": "الإشعارات",
+    "empty": "لا توجد إشعارات.",
+    "markAllRead": "تعليم الكل كمقروء",
+    "markRead": "تعليم كمقروء",
+    "unread_one": "إشعار واحد غير مقروء",
+    "unread_other": "{{count}} إشعارات غير مقروءة",
+    "connecting": "جارٍ الاتصال بالإشعارات الحية…",
+    "type": {
+      "appointment_reminder": "تذكير بموعد",
+      "follow_up_due": "متابعة مستحقة",
+      "vaccination_due": "تطعيم مستحق",
+      "low_stock": "مخزون منخفض",
+      "expiry_warning": "تحذير قرب انتهاء الصلاحية",
+      "registration_request": "طلب تسجيل جديد",
+      "negative_stock": "محاولة سحب مخزون سالب",
+      "account_ready_for_settlement": "حساب جاهز للتسوية",
+      "entitlement_approved": "تمت الموافقة على مستحق",
+      "report_delivery": "تقرير جاهز"
+    }
+  },
   "contractStatus": {
     "draft": "مسوّدة",
     "active": "ساري",
