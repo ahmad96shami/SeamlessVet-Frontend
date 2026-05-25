@@ -362,6 +362,11 @@
   .select-option[aria-disabled="true"] { color: var(--fg-disabled); cursor: not-allowed; }
 
   /* ════════ Shell: collapsible right-rail side-nav ════════ */
+  /* The rail is out of flow (absolute) and expands on hover as an OVERLAY. The content reserves
+     only the COLLAPSED width (68px), so hovering never reflows the page — the extra width paints
+     on top of it. */
+  .app-shell { position: relative; display: flex; height: 100vh; overflow: hidden; }
+  .app-shell > .page { margin-inline-start: 68px; }
   .sidenav { position: absolute; top: 0; bottom: 0; inset-inline-start: 0; width: 68px; background: var(--paper); border-inline-end: 1px solid var(--ink-100); display: flex; flex-direction: column; z-index: 5; overflow: hidden; transition: width 0.22s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.22s; }
   .sidenav:hover { width: 250px; box-shadow: 0 8px 28px rgba(15, 42, 68, 0.1); }
   .sidenav .sn-brand { display: flex; align-items: center; gap: 10px; padding: 14px 16px 12px; border-bottom: 1px solid var(--ink-100); min-height: 64px; }
