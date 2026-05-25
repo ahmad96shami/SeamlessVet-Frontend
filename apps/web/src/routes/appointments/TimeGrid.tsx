@@ -27,6 +27,8 @@ interface TimeGridProps {
   labelFor: (a: AppointmentResponse) => AppointmentLabel;
   onSelectDay?: (d: Date) => void;
   onSelectAppointment?: (a: AppointmentResponse) => void;
+  /** Click an empty area of a day column → book at that day + hour. */
+  onSelectSlot?: (start: Date) => void;
 }
 
 /**
@@ -41,6 +43,7 @@ export function TimeGrid({
   labelFor,
   onSelectDay,
   onSelectAppointment,
+  onSelectSlot,
 }: TimeGridProps) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -137,7 +140,19 @@ export function TimeGrid({
             return (
               <div
                 key={day.toISOString()}
-                className="relative border-s"
+                onClick={
+                  onSelectSlot
+                    ? (e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const raw = DAY_START_HOUR + Math.floor((e.clientY - rect.top) / HOUR_ROW_PX);
+                        const hour = Math.max(DAY_START_HOUR, Math.min(DAY_END_HOUR - 1, raw));
+                        onSelectSlot(
+                          new Date(day.getFullYear(), day.getMonth(), day.getDate(), hour, 0),
+                        );
+                      }
+                    : undefined
+                }
+                className={cn("relative border-s", onSelectSlot && "cursor-pointer")}
                 style={{
                   height: bodyHeight,
                   background: closed
@@ -212,7 +227,10 @@ function AppointmentBlock({
 
   return (
     <div
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation(); // don't let a block click fall through to the column's "book slot"
+        onClick?.();
+      }}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={

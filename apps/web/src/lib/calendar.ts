@@ -87,3 +87,19 @@ export function viewRange(view: CalendarView, anchor: Date): ViewRange {
 export function hoursSinceMidnight(d: Date): number {
   return d.getHours() + d.getMinutes() / 60;
 }
+
+/** End of an appointment window (start + duration, defaulting to 30 min like the backend). */
+export function appointmentEnd(start: Date, durationMin?: number | null): Date {
+  return new Date(start.getTime() + (durationMin ?? DEFAULT_DURATION_MIN) * 60_000);
+}
+
+/** Do two half-open windows [aStart, aEnd) and [bStart, bEnd) overlap? (Back-to-back doesn't.) */
+export function windowsOverlap(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
+  return aStart < bEnd && bStart < aEnd;
+}
+
+const pad2 = (n: number) => String(n).padStart(2, "0");
+/** Format a Date as the value an `<input type="datetime-local">` expects (local, no tz). */
+export function toDateTimeLocal(d: Date): string {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}

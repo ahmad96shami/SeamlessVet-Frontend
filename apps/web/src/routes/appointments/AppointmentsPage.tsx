@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useAppointments } from "@/queries/appointments";
 import { useCustomers } from "@/queries/customers";
 import { usePets } from "@/queries/pets";
+import { AppointmentFormDialog } from "@/routes/appointments/AppointmentFormDialog";
 import { MonthGrid } from "@/routes/appointments/MonthGrid";
 import { TimeGrid, type AppointmentLabel } from "@/routes/appointments/TimeGrid";
 
@@ -35,6 +36,8 @@ export function AppointmentsPage() {
   const [anchor, setAnchor] = useState<Date>(() => startOfDay(new Date()));
   const [doctorId, setDoctorId] = useState("");
   const [status, setStatus] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [formStart, setFormStart] = useState<Date | undefined>(undefined);
 
   const range = useMemo(() => viewRange(view, anchor), [view, anchor]);
   const doctors = useDoctorOptions();
@@ -88,6 +91,16 @@ export function AppointmentsPage() {
     setAnchor(startOfDay(d));
     setView("day");
   };
+  const openNew = () => {
+    const s = new Date(anchor);
+    s.setHours(9, 0, 0, 0);
+    setFormStart(s);
+    setFormOpen(true);
+  };
+  const openSlot = (start: Date) => {
+    setFormStart(start);
+    setFormOpen(true);
+  };
 
   const rangeLabel = useMemo(() => {
     if (view === "day") return formatDate(anchor, lang, "EEEE، d MMMM yyyy");
@@ -101,7 +114,16 @@ export function AppointmentsPage() {
   }, [view, anchor, lang]);
 
   return (
-    <AdminPage title={t("appointments.title")} description={t("appointments.description")}>
+    <AdminPage
+      title={t("appointments.title")}
+      description={t("appointments.description")}
+      actions={
+        <Button onClick={openNew}>
+          <Icon.plus className="size-4" />
+          {t("appointments.new")}
+        </Button>
+      }
+    >
       <div className="space-y-4">
         {/* View switcher + date navigation */}
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -206,6 +228,7 @@ export function AppointmentsPage() {
               appointments={appointments}
               labelFor={labelFor}
               onSelectDay={view === "week" ? openDay : undefined}
+              onSelectSlot={openSlot}
             />
           )}
         </div>
@@ -214,6 +237,15 @@ export function AppointmentsPage() {
           <p className="text-center text-sm text-muted-foreground">{t("appointments.empty")}</p>
         ) : null}
       </div>
+
+      {formOpen ? (
+        <AppointmentFormDialog
+          open
+          onClose={() => setFormOpen(false)}
+          initialStart={formStart}
+          initialDoctorId={doctorId || undefined}
+        />
+      ) : null}
     </AdminPage>
   );
 }
