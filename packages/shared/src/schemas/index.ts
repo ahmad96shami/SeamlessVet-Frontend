@@ -18,3 +18,5 @@ export * from "./dailyFollowUps";
 export * from "./vaccinations";
 export * from "./attachments";
 export * from "./appointments";
+export * from "./invoices";
+export * from "./receiptVouchers";

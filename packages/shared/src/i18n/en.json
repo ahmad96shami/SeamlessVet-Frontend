@@ -324,6 +324,22 @@
     "uploaded": "Uploaded",
     "failed": "Failed"
   },
+  "paymentMethod": {
+    "cash": "Cash",
+    "card": "Card",
+    "bank_transfer": "Bank transfer",
+    "credit": "Customer credit"
+  },
+  "invoiceType": {
+    "pos": "POS",
+    "field": "Field visit",
+    "exam_fee": "Exam fee"
+  },
+  "invoiceStatus": {
+    "issued": "Issued",
+    "flagged": "Flagged",
+    "void": "Void"
+  },
   "visits": {
     "title": "Visits",
     "description": "In-clinic visits and case medical records.",
@@ -589,6 +605,149 @@
       "day": "Day",
       "week": "Week",
       "month": "Month"
+    }
+  },
+  "pos": {
+    "title": "Point of Sale",
+    "subtitle": "Ring up sales, take mixed payments, print, and void",
+    "tabs": {
+      "register": "Register",
+      "invoices": "Invoices",
+      "today": "Today's sales"
+    },
+    "search": {
+      "placeholder": "Search: product name, barcode, or code",
+      "scan": "Barcode scanner",
+      "scanTitle": "Scan barcode",
+      "scanHint": "Point the camera at the barcode",
+      "scanUnavailable": "Scanner unavailable in this browser",
+      "noResults": "No matching results",
+      "all": "All",
+      "products": "Products",
+      "services": "Services"
+    },
+    "catalog": {
+      "available": "Available",
+      "outOfStock": "Out of stock",
+      "lowStock": "Low",
+      "service": "Service",
+      "add": "Add"
+    },
+    "cart": {
+      "title": "Invoice",
+      "empty": "Cart is empty — add a product or service from the list",
+      "qty": "Qty",
+      "remove": "Remove",
+      "lineDiscount": "Line discount",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "invoiceDiscount": "Invoice discount",
+      "tax": "VAT",
+      "taxExempt": "— exempt",
+      "total": "Total due",
+      "clear": "Clear cart"
+    },
+    "link": {
+      "walkIn": "Quick walk-in sale",
+      "customer": "Customer",
+      "selectCustomer": "Select a customer",
+      "searchCustomer": "Search by name or phone",
+      "change": "Change",
+      "clear": "Remove",
+      "walkInBadge": "Walk-in",
+      "visit": "Linked visit",
+      "linkVisit": "Link a visit",
+      "noVisit": "No visit",
+      "visitCharges": "Visit charges",
+      "visitChargesHint": "Unbilled dispensed-to-owner meds and procedures are added automatically at issuance",
+      "noVisitCharges": "No unbilled charges for this visit",
+      "dispensed": "Dispensed",
+      "procedure": "Procedure"
+    },
+    "payment": {
+      "title": "Payment method",
+      "add": "Add payment",
+      "remove": "Remove payment",
+      "amount": "Amount",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "change": "Change",
+      "onCredit": "Recorded on customer account",
+      "fullyPaid": "Fully paid",
+      "creditNeedsCustomer": "Credit requires selecting a customer",
+      "walkInMustPay": "A walk-in sale must be paid in full (cash or card)",
+      "exceedsTotal": "Payments exceed the total due"
+    },
+    "issue": {
+      "submit": "Collect & print",
+      "submitting": "Issuing…",
+      "success": "Invoice issued",
+      "newSale": "New sale",
+      "printReceipt": "Print receipt",
+      "needLines": "Add a product or service, or link a visit with charges"
+    },
+    "receipt": {
+      "title": "Sales receipt",
+      "invoiceNo": "Invoice no.",
+      "date": "Date",
+      "cashier": "Cashier",
+      "customer": "Customer",
+      "walkIn": "Walk-in",
+      "item": "Item",
+      "qty": "Qty",
+      "price": "Price",
+      "lineTotal": "Total",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "tax": "VAT",
+      "total": "Total",
+      "paid": "Paid",
+      "balanceDue": "Balance (on account)",
+      "paymentMethod": "Payment",
+      "thankYou": "Thank you for your business",
+      "void": "VOID INVOICE"
+    },
+    "voucher": {
+      "title": "Receipt voucher",
+      "new": "Receipt voucher",
+      "subtitle": "Record a payment received from a customer",
+      "customer": "Customer",
+      "amount": "Amount",
+      "method": "Method",
+      "notes": "Notes",
+      "submit": "Issue voucher",
+      "submitting": "Issuing…",
+      "success": "Receipt voucher issued",
+      "print": "Print voucher",
+      "receiptTitle": "Receipt voucher",
+      "voucherNo": "Voucher no.",
+      "receivedFrom": "Received from",
+      "theSum": "The sum of",
+      "via": "Via",
+      "signature": "Signature"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "empty": "No invoices",
+      "number": "Number",
+      "date": "Date",
+      "customer": "Customer",
+      "type": "Type",
+      "status": "Status",
+      "total": "Total",
+      "walkIn": "Walk-in",
+      "view": "View",
+      "reprint": "Reprint",
+      "filterStatus": "Status",
+      "all": "All"
+    },
+    "void": {
+      "action": "Void",
+      "title": "Void invoice",
+      "body": "This appends a reversing void row + a compensating ledger entry; the original invoice stays untouched. Stock is NOT returned automatically — record a manual return if needed.",
+      "confirm": "Confirm void",
+      "success": "Invoice voided",
+      "alreadyVoid": "This invoice is already void"
     }
   },
   "admin": {
