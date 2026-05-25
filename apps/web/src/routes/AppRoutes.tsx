@@ -16,6 +16,7 @@ import { ProtectedRoute, RequireRole } from "@/routes/guards";
 import { AlertsPage } from "@/routes/inventory/AlertsPage";
 import { MovementsPage } from "@/routes/inventory/MovementsPage";
 import { StockPage } from "@/routes/inventory/StockPage";
+import { PetTimelinePage } from "@/routes/visits/PetTimelinePage";
 import { VisitDetailPage } from "@/routes/visits/VisitDetailPage";
 import { VisitsPage } from "@/routes/visits/VisitsPage";
 import { useAuthStore } from "@/stores/authStore";
@@ -84,6 +85,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "receptionist", "vet_clinic", "vet_both"]}>
               <VisitDetailPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="operations/pets/:petId/timeline"
+          element={
+            <RequireRole roles={["admin", "accountant", "receptionist", "vet_clinic", "vet_both"]}>
+              <PetTimelinePage />
             </RequireRole>
           }
         />

@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createPet,
   deletePet,
+  getPet,
+  getPetTimeline,
   listPets,
   transferPet,
   updatePet,
@@ -10,6 +12,8 @@ import {
   type PetListParams,
   type PetRequest,
   type PetResponse,
+  type PetTimelineParams,
+  type PetTimelineResponse,
 } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
@@ -20,6 +24,24 @@ export function usePets(params: PetListParams) {
   return useQuery<PetResponse[], ApiError>({
     queryKey: [KEY, params],
     queryFn: () => listPets(apiClient, params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function usePet(id: string | null) {
+  return useQuery<PetResponse, ApiError>({
+    queryKey: [KEY, "detail", id],
+    queryFn: () => getPet(apiClient, id as string),
+    enabled: id !== null,
+  });
+}
+
+/** GET /pets/{id}/timeline — chronological clinic + field medical history. */
+export function usePetTimeline(id: string | null, params: PetTimelineParams) {
+  return useQuery<PetTimelineResponse, ApiError>({
+    queryKey: [KEY, "timeline", id, params],
+    queryFn: () => getPetTimeline(apiClient, id as string, params),
+    enabled: id !== null,
     placeholderData: (prev) => prev,
   });
 }

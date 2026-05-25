@@ -2,6 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { formatDate, formatQuantity, type PetResponse } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { DataTable } from "@/components/data-table/DataTable";
@@ -16,6 +17,7 @@ import { TransferPetDialog } from "@/routes/customers/TransferPetDialog";
 export function PetsSection({ customerId }: { customerId: string }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const navigate = useNavigate();
   const query = usePets({ customerId, take: 100 });
   const pets = query.data ?? [];
   const del = useDeletePet();
@@ -86,6 +88,14 @@ export function PetsSection({ customerId }: { customerId: string }) {
             <Button
               size="icon"
               variant="ghost"
+              aria-label={t("visits.actions.timeline")}
+              onClick={() => navigate(`/operations/pets/${row.original.id}/timeline`)}
+            >
+              <Icon.stethoscope className="size-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
               aria-label={t("customers.pets.transfer")}
               onClick={() => setTransferTarget(row.original)}
             >
@@ -111,7 +121,7 @@ export function PetsSection({ customerId }: { customerId: string }) {
         ),
       },
     ],
-    [t, lang],
+    [t, lang, navigate],
   );
 
   const confirmDelete = () => {
