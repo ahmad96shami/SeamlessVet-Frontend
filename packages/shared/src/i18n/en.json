@@ -24,7 +24,8 @@
     "contracts": "Contracts",
     "entitlements": "Entitlements",
     "partners": "Partners",
-    "reports": "Reports"
+    "reports": "Reports",
+    "myIncome": "My income"
   },
   "navSection": {
     "operations": "Operations",
@@ -452,7 +453,11 @@
       "newTitle": "Add procedure",
       "editTitle": "Edit procedure",
       "deleteConfirm": "This procedure will be deleted.",
-      "col": { "service": "Procedure", "price": "Price", "result": "Result" }
+      "col": {
+        "service": "Procedure",
+        "price": "Price",
+        "result": "Result"
+      }
     },
     "prescriptions": {
       "title": "Prescriptions",
@@ -469,7 +474,14 @@
       "newTitle": "Add prescription",
       "editTitle": "Edit prescription",
       "deleteConfirm": "This prescription will be deleted.",
-      "col": { "product": "Medication", "dosage": "Dosage", "frequency": "Frequency", "duration": "Duration", "dispense": "Dispense", "qty": "Qty" }
+      "col": {
+        "product": "Medication",
+        "dosage": "Dosage",
+        "frequency": "Frequency",
+        "duration": "Duration",
+        "dispense": "Dispense",
+        "qty": "Qty"
+      }
     },
     "followups": {
       "title": "Daily follow-up",
@@ -483,7 +495,12 @@
       "newTitle": "Add daily follow-up",
       "editTitle": "Edit follow-up",
       "deleteConfirm": "This follow-up will be deleted.",
-      "col": { "date": "Date", "condition": "Condition", "vitals": "Vitals", "meds": "Meds" }
+      "col": {
+        "date": "Date",
+        "condition": "Condition",
+        "vitals": "Vitals",
+        "meds": "Meds"
+      }
     },
     "vaccinations": {
       "title": "Vaccinations",
@@ -497,7 +514,11 @@
       "newTitle": "Add vaccination",
       "editTitle": "Edit vaccination",
       "deleteConfirm": "This vaccination will be deleted.",
-      "col": { "type": "Vaccine", "given": "Date given", "due": "Next due" }
+      "col": {
+        "type": "Vaccine",
+        "given": "Date given",
+        "due": "Next due"
+      }
     },
     "files": {
       "title": "Files & attachments",
@@ -1132,6 +1153,207 @@
         "exceededError": "Active shares exceed 100% on some date.",
         "deleteConfirm": "Delete this share?"
       }
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "KPIs and operational + financial reports with export",
+    "tabs": {
+      "overview": "Overview",
+      "doctorIncome": "Doctor income",
+      "clinicProfits": "Clinic profits",
+      "profitPerBatch": "Batch profit",
+      "profitAndLoss": "Profit & loss",
+      "sales": "Sales",
+      "inventoryMovement": "Inventory movement",
+      "fieldVisits": "Field visits",
+      "farmAccount": "Farm account",
+      "vaccinations": "Upcoming vaccinations",
+      "entitlements": "Doctor entitlements"
+    },
+    "period": {
+      "last30": "Last 30 days",
+      "thisMonth": "This month",
+      "quarter": "Quarter",
+      "year": "Year",
+      "all": "All time",
+      "custom": "Custom",
+      "from": "From",
+      "to": "To"
+    },
+    "export": {
+      "pdf": "Export PDF",
+      "excel": "Export Excel",
+      "exporting": "Exporting…",
+      "failed": "Export failed"
+    },
+    "filters": {
+      "doctor": "Doctor",
+      "customer": "Customer",
+      "batch": "Batch",
+      "product": "Product",
+      "cashier": "Cashier",
+      "location": "Location",
+      "allDoctors": "All doctors",
+      "allCustomers": "All customers",
+      "allProducts": "All products",
+      "allLocations": "All locations",
+      "selectBatch": "Select a batch",
+      "selectCustomer": "Select a customer",
+      "warehouse": "Warehouse",
+      "field": "Field",
+      "visitType": "Visit type",
+      "allTypes": "All types"
+    },
+    "common": {
+      "noData": "No data for the selected period",
+      "total": "Total",
+      "asOf": "As of",
+      "loading": "Loading…"
+    },
+    "kpi": {
+      "title": "KPI dashboard",
+      "subtitle": "Live snapshot · clinic + field",
+      "visitsToday": "Visits today",
+      "revenueThisMonth": "Month revenue",
+      "pendingEntitlements": "Pending entitlements",
+      "lowStockItems": "Low-stock items"
+    },
+    "overview": {
+      "salesMix": "Sales by payment method",
+      "salesMixHint": "Effective invoices · last 30 days",
+      "doctorLeaderboard": "Doctor income",
+      "doctorLeaderboardHint": "{{visits}} visits · {{revenue}}",
+      "topMovement": "Inventory movement — most active",
+      "topMovementHint": "in · out · balance",
+      "noSales": "No sales in the period",
+      "viewReport": "View report"
+    },
+    "doctorIncome": {
+      "title": "Doctor income",
+      "subtitle": "Visit count, revenue and calculated share per doctor",
+      "colDoctor": "Doctor",
+      "colVisits": "Visits",
+      "colRevenue": "Revenue",
+      "colShare": "Doctor net",
+      "totalDoctors": "Doctors",
+      "totalVisits": "Total visits",
+      "totalRevenue": "Total revenue",
+      "totalShare": "Total entitlements",
+      "empty": "No income data"
+    },
+    "clinicProfits": {
+      "title": "Clinic profits",
+      "subtitle": "Revenue, COGS, net profit (gross margin) and the partner split",
+      "revenue": "Revenue (ex-tax)",
+      "cogs": "Cost of goods sold",
+      "netProfit": "Clinic net profit",
+      "doctorShares": "Doctor shares (memo)",
+      "doctorSharesHint": "A separate line, not subtracted from net profit",
+      "distributed": "Distributed to partners",
+      "retained": "Retained by clinic",
+      "partnerSplit": "Partner split",
+      "colPartner": "Partner",
+      "colSharePct": "Share",
+      "colAmount": "Amount",
+      "noPartners": "No partner distribution (solo environment)"
+    },
+    "profitPerBatch": {
+      "title": "Batch profit",
+      "subtitle": "Cost/revenue and doctor + clinic share for a supervision batch",
+      "pickPrompt": "Select a batch to view its profitability",
+      "system": "Entitlement system",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "revenue": "Revenue",
+      "drugCost": "Drug cost",
+      "drugProfit": "Drug profit",
+      "examFee": "Exam fee",
+      "doctorShare": "Doctor share",
+      "ceiling": "Ceiling applied",
+      "clinicShare": "Clinic share",
+      "distributed": "Distributed to partners",
+      "retained": "Retained by clinic"
+    },
+    "profitAndLoss": {
+      "title": "Profit & loss",
+      "subtitle": "Simplified income statement for the period (gross margin — no expense ledger)",
+      "revenue": "Revenue (ex-tax)",
+      "tax": "Tax collected (memo)",
+      "cogs": "Cost of goods sold",
+      "grossProfit": "Gross profit",
+      "doctorShares": "Doctor shares (memo)",
+      "memoNote": "Memo lines are not part of gross profit."
+    },
+    "sales": {
+      "title": "Sales",
+      "subtitle": "Money taken in over the period, broken down by payment method",
+      "total": "Total collected",
+      "invoiceCount": "Invoices",
+      "colMethod": "Payment method",
+      "colAmount": "Amount",
+      "colPayments": "Payments",
+      "empty": "No sales in the period"
+    },
+    "inventoryMovement": {
+      "title": "Inventory movement",
+      "subtitle": "Inflows, outflows and balance per (location, product)",
+      "colProduct": "Product",
+      "colLocation": "Location",
+      "colIn": "In",
+      "colOut": "Out",
+      "colNet": "Net change",
+      "colBalance": "Current balance",
+      "trendUp": "↑ rising",
+      "trendDown": "↓ falling",
+      "trendFlat": "≈ flat",
+      "empty": "No inventory movement in the period"
+    },
+    "fieldVisits": {
+      "title": "Field visits",
+      "subtitle": "Field-visit log with services and medications",
+      "colVisit": "Visit",
+      "colDoctor": "Doctor",
+      "colCustomer": "Customer",
+      "colStatus": "Status",
+      "colDate": "Date",
+      "services": "Services",
+      "medications": "Medications",
+      "none": "—",
+      "loadMore": "Load more",
+      "totalCount": "{{count}} visits",
+      "empty": "No field visits in the period"
+    },
+    "farmAccount": {
+      "title": "Farm account",
+      "subtitle": "The customer's full ledger statement",
+      "pickPrompt": "Select a customer to view their statement",
+      "opening": "Opening balance",
+      "closing": "Closing balance",
+      "colDate": "Date",
+      "colType": "Type",
+      "colDebit": "Debit",
+      "colCredit": "Credit",
+      "colBalance": "Balance",
+      "empty": "No entries in the period"
+    },
+    "vaccinations": {
+      "title": "Upcoming vaccinations",
+      "subtitle": "Vaccinations due within the selected date range",
+      "colVaccine": "Vaccine",
+      "colPet": "Pet",
+      "colCustomer": "Customer",
+      "colGiven": "Date given",
+      "colDue": "Next due",
+      "empty": "No vaccinations due"
+    },
+    "myIncome": {
+      "title": "My income",
+      "subtitle": "Your visits, revenue and calculated entitlements",
+      "visits": "My visits",
+      "revenue": "Revenue",
+      "share": "My calculated entitlements",
+      "empty": "No income data for you in the period"
     }
   }
 }

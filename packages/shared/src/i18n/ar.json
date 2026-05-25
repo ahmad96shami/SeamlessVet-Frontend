@@ -24,7 +24,8 @@
     "contracts": "العقود",
     "entitlements": "المستحقات",
     "partners": "الشركاء",
-    "reports": "التقارير"
+    "reports": "التقارير",
+    "myIncome": "دخلي"
   },
   "navSection": {
     "operations": "العمليات",
@@ -452,7 +453,11 @@
       "newTitle": "إضافة إجراء",
       "editTitle": "تعديل الإجراء",
       "deleteConfirm": "سيتم حذف هذا الإجراء.",
-      "col": { "service": "الإجراء", "price": "السعر", "result": "النتيجة" }
+      "col": {
+        "service": "الإجراء",
+        "price": "السعر",
+        "result": "النتيجة"
+      }
     },
     "prescriptions": {
       "title": "الوصفات الطبية",
@@ -469,7 +474,14 @@
       "newTitle": "إضافة وصفة",
       "editTitle": "تعديل الوصفة",
       "deleteConfirm": "سيتم حذف هذه الوصفة.",
-      "col": { "product": "الدواء", "dosage": "الجرعة", "frequency": "التكرار", "duration": "المدة", "dispense": "الصرف", "qty": "الكمية" }
+      "col": {
+        "product": "الدواء",
+        "dosage": "الجرعة",
+        "frequency": "التكرار",
+        "duration": "المدة",
+        "dispense": "الصرف",
+        "qty": "الكمية"
+      }
     },
     "followups": {
       "title": "المتابعة اليومية",
@@ -483,7 +495,12 @@
       "newTitle": "إضافة متابعة يومية",
       "editTitle": "تعديل المتابعة",
       "deleteConfirm": "سيتم حذف هذه المتابعة.",
-      "col": { "date": "التاريخ", "condition": "الحالة", "vitals": "المؤشرات", "meds": "الأدوية" }
+      "col": {
+        "date": "التاريخ",
+        "condition": "الحالة",
+        "vitals": "المؤشرات",
+        "meds": "الأدوية"
+      }
     },
     "vaccinations": {
       "title": "التطعيمات",
@@ -497,7 +514,11 @@
       "newTitle": "إضافة تطعيم",
       "editTitle": "تعديل التطعيم",
       "deleteConfirm": "سيتم حذف هذا التطعيم.",
-      "col": { "type": "اللقاح", "given": "تاريخ الإعطاء", "due": "الجرعة القادمة" }
+      "col": {
+        "type": "اللقاح",
+        "given": "تاريخ الإعطاء",
+        "due": "الجرعة القادمة"
+      }
     },
     "files": {
       "title": "الملفات والمرفقات",
@@ -1132,6 +1153,207 @@
         "exceededError": "مجموع النسب الفعّالة يتجاوز ١٠٠٪ في أحد التواريخ.",
         "deleteConfirm": "حذف هذه النسبة؟"
       }
+    }
+  },
+  "reports": {
+    "title": "التقارير",
+    "subtitle": "مؤشرات الأداء وتقارير التشغيل والمالية مع التصدير",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "doctorIncome": "دخل الأطباء",
+      "clinicProfits": "أرباح المركز",
+      "profitPerBatch": "ربح الدورة",
+      "profitAndLoss": "الأرباح والخسائر",
+      "sales": "المبيعات",
+      "inventoryMovement": "حركة المخزون",
+      "fieldVisits": "زيارات الميدان",
+      "farmAccount": "حساب المزرعة",
+      "vaccinations": "تطعيمات قادمة",
+      "entitlements": "مستحقات الأطباء"
+    },
+    "period": {
+      "last30": "آخر ٣٠ يوم",
+      "thisMonth": "هذا الشهر",
+      "quarter": "الربع",
+      "year": "السنة",
+      "all": "كل الفترات",
+      "custom": "مخصص",
+      "from": "من",
+      "to": "إلى"
+    },
+    "export": {
+      "pdf": "تصدير PDF",
+      "excel": "تصدير Excel",
+      "exporting": "جارٍ التصدير…",
+      "failed": "تعذّر التصدير"
+    },
+    "filters": {
+      "doctor": "الطبيب",
+      "customer": "العميل",
+      "batch": "الدورة",
+      "product": "المنتج",
+      "cashier": "الكاشير",
+      "location": "الموقع",
+      "allDoctors": "كل الأطباء",
+      "allCustomers": "كل العملاء",
+      "allProducts": "كل المنتجات",
+      "allLocations": "كل المواقع",
+      "selectBatch": "اختر دورة",
+      "selectCustomer": "اختر عميلًا",
+      "warehouse": "المستودع",
+      "field": "الميدان",
+      "visitType": "نوع الزيارة",
+      "allTypes": "كل الأنواع"
+    },
+    "common": {
+      "noData": "لا توجد بيانات للفترة المحددة",
+      "total": "الإجمالي",
+      "asOf": "حتى تاريخ",
+      "loading": "جارٍ التحميل…"
+    },
+    "kpi": {
+      "title": "لوحة المؤشرات",
+      "subtitle": "لقطة لحظية · يشمل العيادة والميدان",
+      "visitsToday": "زيارات اليوم",
+      "revenueThisMonth": "إيراد الشهر",
+      "pendingEntitlements": "مستحقات معلّقة",
+      "lowStockItems": "أصناف منخفضة"
+    },
+    "overview": {
+      "salesMix": "توزيع المبيعات حسب طريقة الدفع",
+      "salesMixHint": "الفواتير الفعّالة · آخر ٣٠ يوم",
+      "doctorLeaderboard": "دخل الأطباء",
+      "doctorLeaderboardHint": "{{visits}} زيارة · {{revenue}}",
+      "topMovement": "حركة المخزون — الأكثر نشاطًا",
+      "topMovementHint": "داخل · خارج · رصيد",
+      "noSales": "لا مبيعات في الفترة",
+      "viewReport": "عرض التقرير"
+    },
+    "doctorIncome": {
+      "title": "دخل الأطباء",
+      "subtitle": "عدد الزيارات والإيراد والحصة المحتسبة لكل طبيب",
+      "colDoctor": "الطبيب",
+      "colVisits": "الزيارات",
+      "colRevenue": "الإيراد",
+      "colShare": "صافي الطبيب",
+      "totalDoctors": "عدد الأطباء",
+      "totalVisits": "إجمالي الزيارات",
+      "totalRevenue": "إجمالي الإيراد",
+      "totalShare": "إجمالي المستحقات",
+      "empty": "لا توجد بيانات دخل"
+    },
+    "clinicProfits": {
+      "title": "أرباح المركز",
+      "subtitle": "الإيراد وتكلفة البضاعة وصافي الربح (هامش إجمالي) وتوزيع الشركاء",
+      "revenue": "الإيراد (بدون ضريبة)",
+      "cogs": "تكلفة البضاعة المباعة",
+      "netProfit": "صافي ربح المركز",
+      "doctorShares": "مستحقات الأطباء (مذكرة)",
+      "doctorSharesHint": "بند منفصل لا يُخصم من صافي الربح",
+      "distributed": "موزّع على الشركاء",
+      "retained": "محتجز للمركز",
+      "partnerSplit": "توزيع الشركاء",
+      "colPartner": "الشريك",
+      "colSharePct": "النسبة",
+      "colAmount": "المبلغ",
+      "noPartners": "لا يوجد توزيع شركاء (بيئة فردية)"
+    },
+    "profitPerBatch": {
+      "title": "ربح الدورة",
+      "subtitle": "تفصيل التكلفة والإيراد وحصة الطبيب والمركز لدورة إشراف",
+      "pickPrompt": "اختر دورة لعرض ربحيتها",
+      "system": "نظام المستحقات",
+      "enabled": "مفعّل",
+      "disabled": "موقوف",
+      "revenue": "الإيراد",
+      "drugCost": "تكلفة الأدوية",
+      "drugProfit": "ربح الأدوية",
+      "examFee": "الكشفية",
+      "doctorShare": "حصة الطبيب",
+      "ceiling": "السقف المطبّق",
+      "clinicShare": "حصة المركز",
+      "distributed": "موزّع على الشركاء",
+      "retained": "محتجز للمركز"
+    },
+    "profitAndLoss": {
+      "title": "الأرباح والخسائر",
+      "subtitle": "قائمة دخل مبسّطة للفترة (هامش إجمالي — لا يوجد سجل مصروفات)",
+      "revenue": "الإيراد (بدون ضريبة)",
+      "tax": "الضريبة المحصّلة (مذكرة)",
+      "cogs": "تكلفة البضاعة المباعة",
+      "grossProfit": "إجمالي الربح",
+      "doctorShares": "مستحقات الأطباء (مذكرة)",
+      "memoNote": "البنود المعلّمة (مذكرة) ليست جزءًا من إجمالي الربح."
+    },
+    "sales": {
+      "title": "المبيعات",
+      "subtitle": "المبالغ المحصّلة خلال الفترة مفصّلة حسب طريقة الدفع",
+      "total": "إجمالي المحصّل",
+      "invoiceCount": "عدد الفواتير",
+      "colMethod": "طريقة الدفع",
+      "colAmount": "المبلغ",
+      "colPayments": "عدد الدفعات",
+      "empty": "لا مبيعات في الفترة"
+    },
+    "inventoryMovement": {
+      "title": "حركة المخزون",
+      "subtitle": "الوارد والصادر والرصيد لكل (موقع، منتج)",
+      "colProduct": "المنتج",
+      "colLocation": "الموقع",
+      "colIn": "داخل",
+      "colOut": "خارج",
+      "colNet": "صافي التغيّر",
+      "colBalance": "الرصيد الحالي",
+      "trendUp": "↑ يرتفع",
+      "trendDown": "↓ ينخفض",
+      "trendFlat": "≈ ثابت",
+      "empty": "لا حركة مخزون في الفترة"
+    },
+    "fieldVisits": {
+      "title": "زيارات الميدان",
+      "subtitle": "سجل الزيارات الميدانية مع الخدمات والأدوية",
+      "colVisit": "الزيارة",
+      "colDoctor": "الطبيب",
+      "colCustomer": "العميل",
+      "colStatus": "الحالة",
+      "colDate": "التاريخ",
+      "services": "الخدمات",
+      "medications": "الأدوية",
+      "none": "—",
+      "loadMore": "تحميل المزيد",
+      "totalCount": "{{count}} زيارة",
+      "empty": "لا زيارات ميدانية في الفترة"
+    },
+    "farmAccount": {
+      "title": "حساب المزرعة",
+      "subtitle": "كشف حساب العميل الكامل",
+      "pickPrompt": "اختر عميلًا لعرض كشف حسابه",
+      "opening": "الرصيد الافتتاحي",
+      "closing": "الرصيد الختامي",
+      "colDate": "التاريخ",
+      "colType": "النوع",
+      "colDebit": "مدين",
+      "colCredit": "دائن",
+      "colBalance": "الرصيد",
+      "empty": "لا حركات في الفترة"
+    },
+    "vaccinations": {
+      "title": "تطعيمات قادمة",
+      "subtitle": "التطعيمات المستحقة ضمن النطاق الزمني المحدد",
+      "colVaccine": "اللقاح",
+      "colPet": "الحيوان",
+      "colCustomer": "العميل",
+      "colGiven": "تاريخ الإعطاء",
+      "colDue": "الاستحقاق التالي",
+      "empty": "لا تطعيمات مستحقة"
+    },
+    "myIncome": {
+      "title": "دخلي",
+      "subtitle": "زياراتك وإيرادك ومستحقاتك المحتسبة",
+      "visits": "زياراتي",
+      "revenue": "الإيراد",
+      "share": "مستحقاتي المحتسبة",
+      "empty": "لا توجد بيانات دخل لك في الفترة"
     }
   }
 }
