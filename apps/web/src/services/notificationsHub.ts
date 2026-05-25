@@ -43,6 +43,10 @@ export async function startNotificationsHub(): Promise<void> {
   const conn = new HubConnectionBuilder()
     .withUrl(`${API_BASE_URL}/hubs/notifications`, {
       accessTokenFactory: () => tokenStorage.getTokens()?.accessToken ?? "",
+      // Auth rides the ?access_token= query string, not cookies — so the negotiate/handshake must
+      // NOT send credentials. The SignalR client defaults `withCredentials` to true, which the
+      // backend CORS policy (no AllowCredentials) rejects on preflight. Turn it off.
+      withCredentials: false,
     })
     .withAutomaticReconnect()
     .configureLogging(LogLevel.Warning)
