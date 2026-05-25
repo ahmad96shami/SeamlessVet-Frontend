@@ -15,9 +15,13 @@ import { usePets } from "@/queries/pets";
 import { useCancelVisit, useCompleteVisit, useUpdateVisit, useVisit } from "@/queries/visits";
 import { AssessmentTab } from "@/routes/visits/AssessmentTab";
 import { DiagnosisTab } from "@/routes/visits/DiagnosisTab";
+import { PrescriptionsTab } from "@/routes/visits/PrescriptionsTab";
+import { ProceduresTab } from "@/routes/visits/ProceduresTab";
 import { visitRef, visitStatusVariant } from "@/routes/visits/VisitsPage";
 
-type TabId = "assessment" | "diagnosis";
+type TabId = "assessment" | "diagnosis" | "procedures" | "prescriptions";
+
+const TAB_IDS = ["assessment", "diagnosis", "procedures", "prescriptions"] as const;
 
 export function VisitDetailPage() {
   const { id = "" } = useParams();
@@ -150,8 +154,8 @@ export function VisitDetailPage() {
       ) : null}
 
       {/* Clinical-record tabs */}
-      <div className="flex gap-1 border-b">
-        {(["assessment", "diagnosis"] as const).map((id) => (
+      <div className="flex flex-wrap gap-1 border-b">
+        {TAB_IDS.map((id) => (
           <button
             key={id}
             type="button"
@@ -168,11 +172,10 @@ export function VisitDetailPage() {
         ))}
       </div>
 
-      {tab === "assessment" ? (
-        <AssessmentTab visit={v} readOnly={isTerminal} />
-      ) : (
-        <DiagnosisTab visit={v} readOnly={isTerminal} />
-      )}
+      {tab === "assessment" ? <AssessmentTab visit={v} readOnly={isTerminal} /> : null}
+      {tab === "diagnosis" ? <DiagnosisTab visit={v} readOnly={isTerminal} /> : null}
+      {tab === "procedures" ? <ProceduresTab visitId={v.id} readOnly={isTerminal} /> : null}
+      {tab === "prescriptions" ? <PrescriptionsTab visitId={v.id} readOnly={isTerminal} /> : null}
 
       <Dialog
         open={confirm !== null}
