@@ -8,6 +8,7 @@ import { useSystemSettings } from "@/queries/systemSettings";
 import { usePosCartStore, type CartLine } from "@/stores/posCartStore";
 
 import { CartCustomerVisit } from "./CartCustomerVisit";
+import { CartPayments } from "./CartPayments";
 import { computeTotals, lineTotal } from "./cartTotals";
 
 /** A single editable cart line: name + qty stepper + unit-price + line-discount + line total. */
@@ -162,6 +163,8 @@ export function CartPanel() {
             <dd className="tabular-nums">{formatCurrency(totals.total, lang)}</dd>
           </div>
         </dl>
+
+        <CartPayments total={totals.total} />
       </div>
     </div>
   );
