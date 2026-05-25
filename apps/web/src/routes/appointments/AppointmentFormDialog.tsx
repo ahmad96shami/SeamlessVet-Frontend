@@ -1,6 +1,13 @@
-import { formatDate, type ApiError, type AppointmentResponse, type CustomerResponse } from "@vet/shared";
+import {
+  formatDate,
+  getAppointment,
+  type ApiError,
+  type AppointmentResponse,
+  type CustomerResponse,
+} from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
@@ -21,13 +28,19 @@ import {
 } from "@/lib/calendar";
 import {
   useAppointments,
+  useAttendAppointment,
+  useCancelAppointment,
   useCreateAppointment,
+  useNoShowAppointment,
   useUpdateAppointment,
 } from "@/queries/appointments";
 import { useCustomer, useCustomers } from "@/queries/customers";
 import { usePets } from "@/queries/pets";
 import { useServices } from "@/queries/services";
 import { appointmentStatusVariant } from "@/routes/appointments/appointmentStatus";
+import { apiClient } from "@/services/apiClient";
+
+type LifecycleAction = "attend" | "no_show" | "cancel";
 
 const DURATIONS = [15, 30, 45, 60, 90];
 const CREATE_STATUSES = ["scheduled", "confirmed"] as const;
@@ -57,12 +70,16 @@ export function AppointmentFormDialog({
 }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const navigate = useNavigate();
 
   const editing = !!appointment;
   const readOnly = !!appointment && TERMINAL.has(appointment.status);
 
   const create = useCreateAppointment();
   const update = useUpdateAppointment();
+  const attend = useAttendAppointment();
+  const cancelAppt = useCancelAppointment();
+  const noShow = useNoShowAppointment();
   const doctors = useDoctorOptions();
   const services = useServices({ take: 200 });
   const editCustomer = useCustomer(editing ? (appointment?.customerId ?? null) : null);
@@ -78,6 +95,7 @@ export function AppointmentFormDialog({
   const [status, setStatus] = useState<(typeof CREATE_STATUSES)[number]>("scheduled");
   const [notes, setNotes] = useState("");
   const [serverError, setServerError] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<LifecycleAction | null>(null);
 
   const customersQuery = useCustomers({ search: debouncedSearch || undefined, take: 20 });
   const candidates = customersQuery.data ?? [];
@@ -106,6 +124,7 @@ export function AppointmentFormDialog({
       setNotes("");
     }
     setServerError(null);
+    setPendingAction(null);
   }, [open, appointment, initialStart, initialDoctorId]);
 
   // The customer chip: from the fetch in edit mode, reset to null (search) in create mode.
@@ -202,6 +221,53 @@ export function AppointmentFormDialog({
       );
     }
   };
+
+  const lifecycleBusy = attend.isPending || cancelAppt.isPending || noShow.isPending;
+
+  const runAction = () => {
+    if (!appointment || !pendingAction) return;
+    const id = appointment.id;
+    const fail = (e: ApiError) => toast.error(e.message);
+    if (pendingAction === "attend") {
+      attend.mutate(id, {
+        onSuccess: async () => {
+          toast.success(t("appointments.attended"));
+          let visitId: string | null | undefined;
+          try {
+            visitId = (await getAppointment(apiClient, id)).visitId;
+          } catch {
+            /* the appointment is attended regardless; just can't deep-link */
+          }
+          onClose();
+          if (visitId) navigate(`/operations/visits/${visitId}`);
+        },
+        onError: fail,
+      });
+    } else if (pendingAction === "cancel") {
+      cancelAppt.mutate(id, {
+        onSuccess: () => {
+          toast.success(t("appointments.cancelled"));
+          onClose();
+        },
+        onError: fail,
+      });
+    } else {
+      noShow.mutate(id, {
+        onSuccess: () => {
+          toast.success(t("appointments.noShowed"));
+          onClose();
+        },
+        onError: fail,
+      });
+    }
+  };
+
+  const confirmMessage =
+    pendingAction === "attend"
+      ? t("appointments.confirmAttend")
+      : pendingAction === "cancel"
+        ? t("appointments.confirmCancel")
+        : t("appointments.confirmNoShow");
 
   const title = editing
     ? readOnly
@@ -385,20 +451,84 @@ export function AppointmentFormDialog({
           </div>
         ) : null}
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={busy}>
-            {readOnly ? t("appointments.close") : t("admin.common.cancel")}
-          </Button>
-          {readOnly ? null : (
-            <Button onClick={onSubmit} disabled={!canSubmit}>
-              {busy
-                ? t("admin.common.saving")
-                : editing
-                  ? t("admin.common.save")
-                  : t("appointments.book")}
+        {pendingAction ? (
+          <div className="space-y-3 rounded-lg border bg-[var(--paper-soft)] p-3">
+            <p className="text-sm">{confirmMessage}</p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setPendingAction(null)}
+                disabled={lifecycleBusy}
+              >
+                {t("appointments.confirmBack")}
+              </Button>
+              <Button
+                variant={
+                  pendingAction === "cancel"
+                    ? "destructive"
+                    : pendingAction === "attend"
+                      ? "teal"
+                      : "default"
+                }
+                onClick={runAction}
+                disabled={lifecycleBusy}
+              >
+                {lifecycleBusy ? t("admin.common.saving") : t("appointments.confirmAction")}
+              </Button>
+            </div>
+          </div>
+        ) : readOnly ? (
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={onClose}>
+              {t("appointments.close")}
             </Button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap gap-2">
+              {editing ? (
+                <>
+                  <Button
+                    variant="teal"
+                    size="sm"
+                    onClick={() => setPendingAction("attend")}
+                    disabled={busy}
+                  >
+                    {t("appointments.attend")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPendingAction("no_show")}
+                    disabled={busy}
+                  >
+                    {t("appointments.noShow")}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setPendingAction("cancel")}
+                    disabled={busy}
+                  >
+                    {t("appointments.cancelAppt")}
+                  </Button>
+                </>
+              ) : null}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose} disabled={busy}>
+                {t("admin.common.cancel")}
+              </Button>
+              <Button onClick={onSubmit} disabled={!canSubmit}>
+                {busy
+                  ? t("admin.common.saving")
+                  : editing
+                    ? t("admin.common.save")
+                    : t("appointments.book")}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </Dialog>
   );
