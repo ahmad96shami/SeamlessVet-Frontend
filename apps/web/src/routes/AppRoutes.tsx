@@ -14,6 +14,7 @@ import { RegisterPage } from "@/routes/auth/RegisterPage";
 import { CustomerDetailPage } from "@/routes/customers/CustomerDetailPage";
 import { CustomersPage } from "@/routes/customers/CustomersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
+import { PosPage } from "@/routes/pos/PosPage";
 import { AlertsPage } from "@/routes/inventory/AlertsPage";
 import { MovementsPage } from "@/routes/inventory/MovementsPage";
 import { StockPage } from "@/routes/inventory/StockPage";
@@ -109,7 +110,7 @@ export function AppRoutes() {
           path="pos"
           element={
             <RequireRole roles={["admin", "cashier"]}>
-              <Placeholder titleKey="nav.pos" milestone="W6" />
+              <PosPage />
             </RequireRole>
           }
         />
