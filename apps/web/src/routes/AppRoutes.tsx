@@ -13,6 +13,7 @@ import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
 import { CustomerDetailPage } from "@/routes/customers/CustomerDetailPage";
 import { CustomersPage } from "@/routes/customers/CustomersPage";
+import { BatchesPage } from "@/routes/finance/BatchesPage";
 import { ContractsPage } from "@/routes/finance/ContractsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
@@ -155,7 +156,7 @@ export function AppRoutes() {
         >
           <Route index element={<Navigate to="/finance/contracts" replace />} />
           <Route path="contracts" element={<ContractsPage />} />
-          <Route path="batches" element={<Placeholder titleKey="finance.tabs.batches" milestone="W8.4" />} />
+          <Route path="batches" element={<BatchesPage />} />
           <Route
             path="entitlements"
             element={<Placeholder titleKey="finance.tabs.entitlements" milestone="W8.5" />}
