@@ -945,8 +945,12 @@
     "discard": "تجاهل",
     "discardConfirm": "تجاهل هذه العملية نهائيًا؟ لا يمكن التراجع.",
     "syncNow": "مزامنة الآن",
+    "attempts_zero": "بلا محاولات",
     "attempts_one": "محاولة واحدة",
-    "attempts_other": "{{count}} محاولات",
+    "attempts_two": "محاولتان",
+    "attempts_few": "{{count}} محاولات",
+    "attempts_many": "{{count}} محاولة",
+    "attempts_other": "{{count}} محاولة",
     "label": {
       "newVisit": "زيارة جديدة",
       "posSale": "عملية بيع"
@@ -965,8 +969,12 @@
     "empty": "لا توجد إشعارات.",
     "markAllRead": "تعليم الكل كمقروء",
     "markRead": "تعليم كمقروء",
+    "unread_zero": "لا إشعارات غير مقروءة",
     "unread_one": "إشعار واحد غير مقروء",
-    "unread_other": "{{count}} إشعارات غير مقروءة",
+    "unread_two": "إشعاران غير مقروءين",
+    "unread_few": "{{count}} إشعارات غير مقروءة",
+    "unread_many": "{{count}} إشعارًا غير مقروء",
+    "unread_other": "{{count}} إشعار غير مقروء",
     "connecting": "جارٍ الاتصال بالإشعارات الحية…",
     "type": {
       "appointment_reminder": "تذكير بموعد",
