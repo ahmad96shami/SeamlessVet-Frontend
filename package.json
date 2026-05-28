@@ -18,8 +18,18 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
-    ]
+      "esbuild",
+      "msgpackr-extract"
+    ],
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "react-native-worklets": "^0.9.1"
+      }
+    },
+    "overrides": {
+      "react": "19.2.3",
+      "react-dom": "19.2.3"
+    }
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

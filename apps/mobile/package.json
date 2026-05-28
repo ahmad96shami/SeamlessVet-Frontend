@@ -2,5 +2,43 @@
   "name": "@vet/mobile",
   "private": true,
   "version": "0.0.0",
-  "description": "Field Mobile App (field doctors, Expo + PowerSync) — scaffolded in MOBILE.md milestone Mo0. Placeholder for now."
+  "description": "Field Mobile App (field doctors) — Expo + Expo Router + NativeWind + PowerSync. Built on @vet/shared.",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "prebuild": "expo prebuild",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~56.0.13",
+    "@vet/shared": "workspace:*",
+    "expo": "~56.0.5",
+    "expo-constants": "~56.0.16",
+    "expo-dev-client": "~56.0.16",
+    "expo-linking": "~56.0.12",
+    "expo-router": "~56.2.7",
+    "expo-splash-screen": "~56.0.10",
+    "expo-status-bar": "~56.0.4",
+    "expo-system-ui": "~56.0.5",
+    "nativewind": "^4.2.4",
+    "react": "^19.2.6",
+    "react-native": "0.85.3",
+    "react-native-gesture-handler": "~2.31.2",
+    "react-native-get-random-values": "^2.0.0",
+    "react-native-reanimated": "~4.4.0",
+    "react-native-safe-area-context": "~5.8.0",
+    "react-native-screens": "~4.25.2",
+    "react-native-worklets": "^0.9.1",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.0",
+    "@types/react": "^19.1.1",
+    "babel-preset-expo": "~56.0.13",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^6.0.3"
+  }
 }

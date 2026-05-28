@@ -28,6 +28,16 @@ export default tseslint.config(
     },
   },
   {
+    // Mobile config files are CommonJS by Metro/Tailwind/Babel contract — they
+    // are loaded via require() by tooling that doesn't understand ESM.
+    files: [
+      "apps/mobile/metro.config.js",
+      "apps/mobile/tailwind.config.js",
+      "apps/mobile/babel.config.js",
+    ],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
+  {
     // Cross-platform guard: @vet/shared is consumed by web (Vite) and mobile (Expo/RN).
     files: ["packages/shared/src/**/*.{ts,tsx}"],
     rules: {
