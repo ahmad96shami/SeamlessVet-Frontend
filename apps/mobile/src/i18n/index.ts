@@ -8,13 +8,16 @@ import {
   type AppLanguage,
 } from "@vet/shared";
 
+import { getStoredLanguage, setStoredLanguage } from "@/lib/langStorage";
+
 /**
- * Pick the initial language from the device locale (expo-localization). Only
- * Arabic / English are supported; everything else falls back to Arabic-first.
- * Persisted user override (MMKV) lands in Mo0 task 6 — until then this is
- * device-detected every launch.
+ * Initial language order: persisted user override (MMKV) → device locale
+ * (expo-localization) → Arabic fallback. Unsupported device locales fall back
+ * to Arabic-first.
  */
 function detectInitialLanguage(): AppLanguage {
+  const stored = getStoredLanguage();
+  if (stored) return stored;
   const code = getLocales()[0]?.languageCode ?? FALLBACK_LANGUAGE;
   return (SUPPORTED_LANGUAGES as readonly string[]).includes(code)
     ? (code as AppLanguage)
@@ -27,5 +30,17 @@ void i18next.use(initReactI18next).init({
   // Resources are bundled (sync init); no Suspense boundary needed.
   react: { useSuspense: false },
 });
+
+// Persist every change so the next launch picks it up.
+i18next.on("languageChanged", (lng) => {
+  if ((SUPPORTED_LANGUAGES as readonly string[]).includes(lng)) {
+    setStoredLanguage(lng as AppLanguage);
+  }
+});
+
+export function toggleLanguage(): void {
+  const next: AppLanguage = i18next.resolvedLanguage === "ar" ? "en" : "ar";
+  void i18next.changeLanguage(next);
+}
 
 export default i18next;
