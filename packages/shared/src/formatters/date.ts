@@ -24,7 +24,9 @@ function toLatinDigits(s: string): string {
 }
 
 export const DATE_FORMAT = "yyyy/MM/dd";
-export const DATE_TIME_FORMAT = "yyyy/MM/dd HH:mm";
+// 12-hour clock, time before date — the `a` token emits "AM"/"PM" in en and "ص"/"م" in ar
+// via date-fns's Arabic locale. (Matches the W6 receipt voucher convention requested by ops.)
+export const DATE_TIME_FORMAT = "h:mm a yyyy/MM/dd";
 
 /** Arabic-aware date formatting; digits forced to Latin via [[toLatinDigits]]. */
 export function formatDate(
