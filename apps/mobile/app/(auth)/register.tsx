@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/Button";
 import { Field } from "@/components/Field";
 import { TextField } from "@/components/TextField";
+import { omitEmptyStrings } from "@/lib/forms";
 import { useRegister } from "@/queries/auth";
 
 // The mobile app is the field-doctor client; only vet_field self-registers here.
@@ -36,7 +37,11 @@ export default function RegisterScreen() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    registerMut.mutate(values, {
+    // Empty optional text → omitted (stored as null on the backend, never ""),
+    // matching the web pattern. Critical for `license_details` (jsonb) which
+    // rejects empty strings, and `email` (unique-when-present) where "" would
+    // collide between accounts.
+    registerMut.mutate(omitEmptyStrings(values), {
       onError: (err) => {
         const error = err as ApiError;
         applyFieldErrors(error, (name, e) => form.setError(name as never, e));
