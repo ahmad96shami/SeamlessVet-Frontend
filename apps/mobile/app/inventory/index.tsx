@@ -156,6 +156,17 @@ export default function InventoryScreen() {
               {t("mobile.inventory.recordReturn", { defaultValue: "تسجيل إرجاع" })}
             </Text>
           </Pressable>
+          <Pressable
+            // Same expo-router typed-routes caveat as above.
+            onPress={() => router.push("/inventory/movements" as never)}
+            className="bg-paper border-ink-100 flex-1 flex-row items-center justify-center gap-1.5 rounded-pill border px-3 py-2.5"
+            accessibilityRole="button"
+          >
+            <Truck size={14} color="#0B6573" />
+            <Text className="text-navy-900 text-[13px] font-tajawal-bold">
+              {t("inventory.movements.title", { defaultValue: "سجل الحركات" })}
+            </Text>
+          </Pressable>
         </View>
       </Card>
 
