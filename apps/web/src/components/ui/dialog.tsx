@@ -81,6 +81,9 @@ export function Dialog({ open, onClose, title, description, children, className 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden />
+      {/* The panel itself is non-scrolling so its rounded corners stay crisp; scrolling happens on
+          the inner content area. Otherwise the scrollbar (on the start side under RTL) eats into
+          the panel's rounded corner on that edge and the modal looks lopsided. */}
       <div
         ref={contentRef}
         role="dialog"
@@ -88,11 +91,11 @@ export function Dialog({ open, onClose, title, description, children, className 
         aria-label={title}
         tabIndex={-1}
         className={cn(
-          "relative z-10 max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-card p-6 shadow-[var(--shadow-pop)] outline-none",
+          "relative z-10 flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-card shadow-[var(--shadow-pop)] outline-none",
           className,
         )}
       >
-        <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
           <div className="space-y-1">
             <h2 className="text-lg font-bold text-navy-900">{title}</h2>
             {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
@@ -107,7 +110,7 @@ export function Dialog({ open, onClose, title, description, children, className 
             <Icon.close className="size-4" />
           </Button>
         </div>
-        {children}
+        <div className="min-h-0 flex-1 overflow-auto px-6 pb-6 pt-2">{children}</div>
       </div>
     </div>,
     document.body,
