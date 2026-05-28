@@ -1,6 +1,7 @@
 import { formatCurrency, formatNumber } from "@vet/shared";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Money } from "@/components/ui/money";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -51,7 +52,7 @@ export function AdminDashboard() {
         <StatCard
           tone="navy"
           icon={<Icon.receipt className="size-5" />}
-          value={formatCurrency(k?.revenueThisMonth ?? 0, i18n.language)}
+          value={<Money value={k?.revenueThisMonth ?? 0} />}
           label={t("reports.kpi.revenueThisMonth")}
           isLoading={kpi.isLoading}
         />

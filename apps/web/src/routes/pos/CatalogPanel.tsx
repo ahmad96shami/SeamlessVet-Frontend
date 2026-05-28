@@ -1,6 +1,7 @@
 import { formatCurrency, formatQuantity } from "@vet/shared";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -124,7 +125,7 @@ export function CatalogPanel() {
                     </span>
                   ) : null}
                   <div className="mt-2 flex items-baseline justify-between">
-                    <span className="font-bold text-navy-900">{formatCurrency(p.sellingPrice, lang)}</span>
+                    <span className="font-bold text-navy-900"><Money value={p.sellingPrice} /></span>
                     <span className="text-xs text-muted-foreground">
                       {t("pos.catalog.available")}: {formatQuantity(p.quantity, lang)}
                     </span>
@@ -155,7 +156,7 @@ export function CatalogPanel() {
                 </div>
                 <span className="text-sm font-semibold leading-tight text-navy-900">{s.nameAr}</span>
                 <div className="mt-2 flex items-baseline justify-between">
-                  <span className="font-bold text-navy-900">{formatCurrency(s.defaultPrice, lang)}</span>
+                  <span className="font-bold text-navy-900"><Money value={s.defaultPrice} /></span>
                 </div>
               </button>
             ))}

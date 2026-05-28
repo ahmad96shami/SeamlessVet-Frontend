@@ -2,6 +2,7 @@ import { formatCurrency } from "@vet/shared";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Money } from "@/components/ui/money";
 
 import { Icon } from "@/components/ui/icon";
 import { useMyIncome } from "@/queries/reports";
@@ -36,14 +37,14 @@ export function VetDashboard() {
         <StatCard
           tone="teal"
           icon={<Icon.receipt className="size-5" />}
-          value={formatCurrency(myRevenue, i18n.language)}
+          value={<Money value={myRevenue} />}
           label={t("dashboard.vet.monthRevenue")}
         />
         <Link to="/my-income" className="block">
           <StatCard
             tone="navy"
             icon={<Icon.shield className="size-5" />}
-            value={formatCurrency(myShare, i18n.language)}
+            value={<Money value={myShare} />}
             label={t("dashboard.vet.monthShare")}
           />
         </Link>

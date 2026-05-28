@@ -453,6 +453,12 @@
   /* Loading skeleton — used in KPI tiles and similar to replace bare "—" while data is in flight. */
   .skeleton { display: inline-block; background: linear-gradient(90deg, var(--ink-50) 0%, var(--ink-100) 50%, var(--ink-50) 100%); background-size: 200% 100%; border-radius: 6px; animation: sv-skeleton 1.4s ease-in-out infinite; }
   @keyframes sv-skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  /* <Money> — currency symbol de-emphasised next to the digit body. The body keeps the
+     surrounding text's size/weight; the symbol drops to ~75% size and a muted colour so the
+     amount reads cleanly without the ₪ glyph fighting the digits for visual weight. */
+  .money { display: inline-flex; align-items: baseline; gap: 3px; white-space: nowrap; }
+  .money-symbol { font-size: 0.78em; font-weight: 600; color: var(--ink-500); }
   .sidenav .sn-user-chev { opacity: 0; transition: opacity 0.18s; }
   .sidenav:hover .sn-user-chev { opacity: 1; }
   .sidenav .sn-utility { display: flex; flex-direction: column; gap: 6px; }

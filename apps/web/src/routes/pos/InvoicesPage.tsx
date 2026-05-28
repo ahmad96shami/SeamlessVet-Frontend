@@ -2,6 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { formatCurrency, formatDate, type InvoiceResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
@@ -86,7 +87,7 @@ export function InvoicesPage() {
         accessorKey: "total",
         header: t("pos.invoices.total"),
         cell: ({ row }) => (
-          <span className="font-medium tabular-nums">{formatCurrency(row.original.total, lang)}</span>
+          <span className="font-medium tabular-nums"><Money value={row.original.total} /></span>
         ),
       },
     ],

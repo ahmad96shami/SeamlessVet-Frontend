@@ -5,6 +5,7 @@ import {
   type ApiError,
   type DoctorEntitlementResponse,
 } from "@vet/shared";
+import { Money } from "@/components/ui/money";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -51,7 +52,7 @@ function SummaryCard({
           <div className="text-xs text-muted-foreground">{hint}</div>
         </div>
       </div>
-      <div className="text-xl font-bold">{formatCurrency(amount, lang)}</div>
+      <div className="text-xl font-bold"><Money value={amount} /></div>
       <div className="text-xs text-muted-foreground">{count}</div>
     </div>
   );
@@ -139,7 +140,7 @@ export function EntitlementsPage() {
         header: t("finance.entitlements.colAmount"),
         cell: ({ row }) => (
           <span className={cn("font-medium", row.original.computedAmount <= 0 && "text-muted-foreground")}>
-            {formatCurrency(row.original.computedAmount, lang)}
+            <Money value={row.original.computedAmount} />
           </span>
         ),
       },
@@ -149,7 +150,7 @@ export function EntitlementsPage() {
         cell: ({ row }) =>
           row.original.ceilingApplied != null ? (
             <span className="flex items-center gap-1">
-              {formatCurrency(row.original.ceilingApplied, lang)}
+              <Money value={row.original.ceilingApplied} />
               <Badge variant="warning">{t("finance.entitlements.ceilingApplied")}</Badge>
             </span>
           ) : (
@@ -283,7 +284,7 @@ export function EntitlementsPage() {
             {t("finance.entitlements.settlementLock")}
           </span>
           <span className="whitespace-nowrap font-medium text-foreground">
-            {t("finance.entitlements.approvedTotal")}: {formatCurrency(summary.approved.amount, lang)}
+            {t("finance.entitlements.approvedTotal")}: <Money value={summary.approved.amount} />
           </span>
         </div>
       </div>
@@ -323,7 +324,7 @@ function PayEntitlementDialog({
       <div className="space-y-4">
         {target ? (
           <div className="text-sm text-muted-foreground">
-            {formatCurrency(target.computedAmount, i18n.language)}
+            <Money value={target.computedAmount} />
           </div>
         ) : null}
         <Field label={t("finance.entitlements.payMethod")}>

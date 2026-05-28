@@ -2,6 +2,7 @@ import { formatCurrency } from "@vet/shared";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
+import { Money } from "@/components/ui/money";
 
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -45,7 +46,7 @@ export function IssuedSaleDialog({ invoiceId, onClose }: { invoiceId: string; on
               {invoice.data.number ?? `#${invoice.data.id.slice(0, 8)}`}
             </div>
             <div className="mt-1 text-2xl font-extrabold tabular-nums text-navy-900">
-              {formatCurrency(invoice.data.total, lang)}
+              <Money value={invoice.data.total} />
             </div>
           </div>
           <div className="flex gap-2">

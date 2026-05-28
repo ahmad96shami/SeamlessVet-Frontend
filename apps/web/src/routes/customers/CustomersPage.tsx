@@ -5,6 +5,7 @@ import {
   LEDGER_STATUS_VALUES,
   type CustomerResponse,
 } from "@vet/shared";
+import { Money } from "@/components/ui/money";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -120,7 +121,7 @@ export function CustomersPage() {
             b > 0 ? "font-medium text-destructive" : b < 0 ? "font-medium text-success" : "text-muted-foreground";
           return (
             <span className={cls} dir="ltr">
-              {formatCurrency(b, lang)}
+              <Money value={b} />
             </span>
           );
         },

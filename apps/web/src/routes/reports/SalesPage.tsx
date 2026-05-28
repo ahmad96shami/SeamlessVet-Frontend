@@ -1,6 +1,7 @@
 import { formatCurrency, formatNumber } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { Select } from "@/components/ui/select";
 import { useDoctorOptions } from "@/hooks/useDoctorOptions";
@@ -45,7 +46,7 @@ export function SalesPage() {
       />
 
       <SummaryGrid className="sm:grid-cols-2 lg:grid-cols-2">
-        <SummaryStat label={t("reports.sales.total")} value={formatCurrency(d?.total ?? 0, lang)} tone="teal" />
+        <SummaryStat label={t("reports.sales.total")} value={<Money value={d?.total ?? 0} />} tone="teal" />
         <SummaryStat label={t("reports.sales.invoiceCount")} value={formatNumber(d?.invoiceCount ?? 0, lang)} />
       </SummaryGrid>
 
@@ -67,7 +68,7 @@ export function SalesPage() {
                 <tr key={m.method}>
                   <td className="font-medium">{t(`paymentMethod.${m.method}`, { defaultValue: m.method })}</td>
                   <td className="num">{formatNumber(m.paymentCount, lang)}</td>
-                  <td className="num font-semibold">{formatCurrency(m.amount, lang)}</td>
+                  <td className="num font-semibold"><Money value={m.amount} /></td>
                 </tr>
               ))}
             </tbody>

@@ -1,6 +1,7 @@
 import { formatCurrency, formatDate, type CustomerResponse } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -49,10 +50,10 @@ export function FarmAccountPage() {
       ) : (
         <>
           <SummaryGrid className="sm:grid-cols-2 lg:grid-cols-2">
-            <SummaryStat label={t("reports.farmAccount.opening")} value={formatCurrency(d?.openingBalance ?? 0, lang)} />
+            <SummaryStat label={t("reports.farmAccount.opening")} value={<Money value={d?.openingBalance ?? 0} />} />
             <SummaryStat
               label={t("reports.farmAccount.closing")}
-              value={formatCurrency(d?.closingBalance ?? 0, lang)}
+              value={<Money value={d?.closingBalance ?? 0} />}
               tone={(d?.closingBalance ?? 0) > 0 ? "red" : "green"}
             />
           </SummaryGrid>
@@ -75,7 +76,7 @@ export function FarmAccountPage() {
                     <td>{t(`ledgerEntryType.${e.entryType}`, { defaultValue: e.entryType })}</td>
                     <td className="num">{e.amount > 0 ? formatCurrency(e.amount, lang) : "—"}</td>
                     <td className="num">{e.amount < 0 ? formatCurrency(-e.amount, lang) : "—"}</td>
-                    <td className="num font-semibold">{formatCurrency(e.balanceAfter, lang)}</td>
+                    <td className="num font-semibold"><Money value={e.balanceAfter} /></td>
                   </tr>
                 ))}
                 {(d?.entries.length ?? 0) === 0 && !query.isLoading ? (

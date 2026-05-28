@@ -1,6 +1,7 @@
 import { formatCurrency, formatDate, formatPercent } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { useClinicProfits } from "@/queries/reports";
 import { DEFAULT_PERIOD, resolvePeriod, type PeriodValue } from "@/routes/reports/period";
@@ -28,16 +29,16 @@ export function ClinicProfitsPage() {
       />
 
       <SummaryGrid>
-        <SummaryStat label={t("reports.clinicProfits.revenue")} value={formatCurrency(d?.revenue ?? 0, lang)} />
-        <SummaryStat label={t("reports.clinicProfits.cogs")} value={formatCurrency(d?.cogs ?? 0, lang)} tone="red" />
-        <SummaryStat label={t("reports.clinicProfits.netProfit")} value={formatCurrency(d?.netProfit ?? 0, lang)} tone="teal" />
+        <SummaryStat label={t("reports.clinicProfits.revenue")} value={<Money value={d?.revenue ?? 0} />} />
+        <SummaryStat label={t("reports.clinicProfits.cogs")} value={<Money value={d?.cogs ?? 0} />} tone="red" />
+        <SummaryStat label={t("reports.clinicProfits.netProfit")} value={<Money value={d?.netProfit ?? 0} />} tone="teal" />
         <SummaryStat
           label={t("reports.clinicProfits.doctorShares")}
-          value={formatCurrency(d?.doctorShares ?? 0, lang)}
+          value={<Money value={d?.doctorShares ?? 0} />}
           hint={t("reports.clinicProfits.doctorSharesHint")}
         />
-        <SummaryStat label={t("reports.clinicProfits.distributed")} value={formatCurrency(d?.distributedToPartners ?? 0, lang)} tone="navy" />
-        <SummaryStat label={t("reports.clinicProfits.retained")} value={formatCurrency(d?.retainedByClinic ?? 0, lang)} tone="green" />
+        <SummaryStat label={t("reports.clinicProfits.distributed")} value={<Money value={d?.distributedToPartners ?? 0} />} tone="navy" />
+        <SummaryStat label={t("reports.clinicProfits.retained")} value={<Money value={d?.retainedByClinic ?? 0} />} tone="green" />
       </SummaryGrid>
 
       <div className="card flush">
@@ -59,7 +60,7 @@ export function ClinicProfitsPage() {
                 <tr key={p.partnerId}>
                   <td className="font-medium">{p.displayName}</td>
                   <td className="num">{formatPercent(p.sharePercent, lang)}</td>
-                  <td className="num font-semibold">{formatCurrency(p.amount, lang)}</td>
+                  <td className="num font-semibold"><Money value={p.amount} /></td>
                 </tr>
               ))}
             </tbody>

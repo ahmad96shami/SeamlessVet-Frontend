@@ -6,6 +6,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -127,7 +128,7 @@ export function CloseAccountSection({ customer }: { customer: CustomerResponse }
                     </span>
                   </span>
                   <span className="flex items-center gap-2">
-                    <span className="font-medium">{formatCurrency(e.computedAmount, lang)}</span>
+                    <span className="font-medium"><Money value={e.computedAmount} /></span>
                     <Badge variant={entitlementStatusVariant(e.status)}>
                       {t(`entitlementStatus.${e.status}`, { defaultValue: e.status })}
                     </Badge>

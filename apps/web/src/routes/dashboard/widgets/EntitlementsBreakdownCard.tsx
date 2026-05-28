@@ -1,6 +1,7 @@
 import { formatCurrency, type DoctorEntitlementResponse } from "@vet/shared";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Money } from "@/components/ui/money";
 
 import { Icon } from "@/components/ui/icon";
 import { useDoctorEntitlementsReport } from "@/queries/reports";
@@ -55,7 +56,7 @@ export function EntitlementsBreakdownCard() {
               <span className="inline-block size-2.5 rounded-full" style={{ background: tone.color }} />
               {t(tone.labelKey)}
             </span>
-            <span className="font-semibold tabular-nums">{formatCurrency(totals[tone.status], i18n.language)}</span>
+            <span className="font-semibold tabular-nums"><Money value={totals[tone.status]} /></span>
           </div>
         ))}
       </div>

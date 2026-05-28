@@ -6,6 +6,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { Money } from "@/components/ui/money";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
@@ -96,10 +97,10 @@ export function ContractMedicationPrices({
               <li key={row.id} className="flex items-center justify-between gap-2 p-2.5 text-sm">
                 <span className="min-w-0 truncate">{product?.nameAr ?? row.productId}</span>
                 <span className="flex items-center gap-2">
-                  <span className="font-medium">{formatCurrency(row.contractPrice, lang)}</span>
+                  <span className="font-medium"><Money value={row.contractPrice} /></span>
                   {product ? (
                     <span className="text-xs text-muted-foreground line-through">
-                      {formatCurrency(product.sellingPrice, lang)}
+                      <Money value={product.sellingPrice} />
                     </span>
                   ) : null}
                   {isDraft ? (

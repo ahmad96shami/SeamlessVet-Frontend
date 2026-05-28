@@ -2,6 +2,7 @@ import { formatCurrency, type CustomerResponse } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
+import { Money } from "@/components/ui/money";
 
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -106,7 +107,7 @@ export function CustomerDetailPage() {
       <div className="rounded-2xl border p-4">
         <div className="text-sm text-muted-foreground">{t("customers.statement.currentBalance")}</div>
         <div className={cn("text-2xl font-bold", balanceClass(c.balance))} dir="ltr">
-          {formatCurrency(c.balance, lang)}
+          <Money value={c.balance} />
         </div>
       </div>
 

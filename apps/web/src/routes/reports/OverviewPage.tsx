@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Money } from "@/components/ui/money";
 
 import { Icon } from "@/components/ui/icon";
 import { useProductLookup } from "@/hooks/useProductLookup";
@@ -54,7 +55,7 @@ export function OverviewPage() {
         <StatCard
           tone="navy"
           icon={<Icon.receipt className="size-5" />}
-          value={formatCurrency(kpi.data?.revenueThisMonth ?? 0, lang)}
+          value={<Money value={kpi.data?.revenueThisMonth ?? 0} />}
           label={t("reports.kpi.revenueThisMonth")}
           isLoading={kpi.isLoading}
         />
@@ -131,7 +132,7 @@ export function OverviewPage() {
                       />
                       {t(`paymentMethod.${m.method}`, { defaultValue: m.method })}
                     </span>
-                    <span className="font-semibold tabular-nums">{formatCurrency(m.amount, lang)}</span>
+                    <span className="font-semibold tabular-nums"><Money value={m.amount} /></span>
                   </div>
                 ))}
               </div>

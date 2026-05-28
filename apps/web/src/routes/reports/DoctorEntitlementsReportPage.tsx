@@ -4,6 +4,7 @@ import {
   formatCurrency,
   type DoctorEntitlementResponse,
 } from "@vet/shared";
+import { Money } from "@/components/ui/money";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -61,7 +62,7 @@ export function DoctorEntitlementsReportPage() {
         header: t("finance.entitlements.colAmount"),
         cell: ({ row }) => (
           <span className={cn("font-semibold", row.original.computedAmount <= 0 && "text-muted-foreground")}>
-            {formatCurrency(row.original.computedAmount, lang)}
+            <Money value={row.original.computedAmount} />
           </span>
         ),
       },

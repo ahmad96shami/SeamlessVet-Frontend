@@ -2,6 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { formatCurrency, formatNumber, VISIT_TYPE_VALUES, type DoctorIncomeRow } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
@@ -50,13 +51,13 @@ export function DoctorIncomePage() {
       {
         accessorKey: "totalRevenue",
         header: t("reports.doctorIncome.colRevenue"),
-        cell: ({ row }) => formatCurrency(row.original.totalRevenue, lang),
+        cell: ({ row }) => <Money value={row.original.totalRevenue} />,
       },
       {
         accessorKey: "calculatedShare",
         header: t("reports.doctorIncome.colShare"),
         cell: ({ row }) => (
-          <span className="font-semibold">{formatCurrency(row.original.calculatedShare, lang)}</span>
+          <span className="font-semibold"><Money value={row.original.calculatedShare} /></span>
         ),
       },
     ],
@@ -70,8 +71,8 @@ export function DoctorIncomePage() {
       <SummaryGrid>
         <SummaryStat label={t("reports.doctorIncome.totalDoctors")} value={formatNumber(query.data?.doctorCount ?? 0, lang)} />
         <SummaryStat label={t("reports.doctorIncome.totalVisits")} value={formatNumber(query.data?.totalVisitCount ?? 0, lang)} />
-        <SummaryStat label={t("reports.doctorIncome.totalRevenue")} value={formatCurrency(query.data?.totalRevenue ?? 0, lang)} />
-        <SummaryStat label={t("reports.doctorIncome.totalShare")} value={formatCurrency(query.data?.totalCalculatedShare ?? 0, lang)} tone="teal" />
+        <SummaryStat label={t("reports.doctorIncome.totalRevenue")} value={<Money value={query.data?.totalRevenue ?? 0} />} />
+        <SummaryStat label={t("reports.doctorIncome.totalShare")} value={<Money value={query.data?.totalCalculatedShare ?? 0} />} tone="teal" />
       </SummaryGrid>
 
       <ReportFilterBar

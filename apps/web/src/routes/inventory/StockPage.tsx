@@ -1,3 +1,4 @@
+import { Money } from "@/components/ui/money";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   formatCurrency,
@@ -142,7 +143,7 @@ export function StockPage() {
       {
         accessorKey: "sellingPrice",
         header: t("inventory.col.sellingPrice"),
-        cell: ({ row }) => formatCurrency(row.original.sellingPrice, lang),
+        cell: ({ row }) => <Money value={row.original.sellingPrice} />,
       },
       {
         id: "status",

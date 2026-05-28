@@ -1,5 +1,6 @@
 import { formatCurrency } from "@vet/shared";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -139,7 +140,7 @@ export function CartPanel() {
         <dl className="space-y-1.5 text-sm">
           <div className="flex items-center justify-between">
             <dt className="text-muted-foreground">{t("pos.cart.subtotal")}</dt>
-            <dd className="font-medium tabular-nums">{formatCurrency(totals.subtotal, lang)}</dd>
+            <dd className="font-medium tabular-nums"><Money value={totals.subtotal} /></dd>
           </div>
           <div className="flex items-center justify-between gap-2">
             <dt className="text-muted-foreground">{t("pos.cart.invoiceDiscount")}</dt>
@@ -161,7 +162,7 @@ export function CartPanel() {
           </div>
           <div className="mt-1 flex items-center justify-between border-t pt-2 text-base font-bold text-navy-900">
             <dt>{t("pos.cart.total")}</dt>
-            <dd className="tabular-nums">{formatCurrency(totals.total, lang)}</dd>
+            <dd className="tabular-nums"><Money value={totals.total} /></dd>
           </div>
         </dl>
 

@@ -1,3 +1,4 @@
+import { Money } from "@/components/ui/money";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatCurrency, PRODUCT_CATEGORY_VALUES, type ProductResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
@@ -82,7 +83,7 @@ export function ProductsPage() {
       {
         accessorKey: "sellingPrice",
         header: t("admin.products.colSellingPrice"),
-        cell: ({ row }) => formatCurrency(row.original.sellingPrice, lang),
+        cell: ({ row }) => <Money value={row.original.sellingPrice} />,
       },
       {
         accessorKey: "reorderPoint",

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
+import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -92,7 +93,7 @@ export function ReceiptVoucherDialog({
             <div className="text-xs text-muted-foreground">{t("pos.voucher.voucherNo")}</div>
             <div className="text-lg font-bold" dir="ltr">{`#${issuedId.slice(0, 8)}`}</div>
             <div className="mt-1 text-2xl font-extrabold tabular-nums text-navy-900">
-              {formatCurrency(amountNum, lang)}
+              <Money value={amountNum} />
             </div>
           </div>
           <div className="flex gap-2">
@@ -134,7 +135,7 @@ export function ReceiptVoucherDialog({
                   </span>
                   {c.balance > 0 ? (
                     <Badge variant="warning" className="tabular-nums">
-                      {formatCurrency(c.balance, lang)}
+                      <Money value={c.balance} />
                     </Badge>
                   ) : null}
                 </button>
@@ -150,7 +151,7 @@ export function ReceiptVoucherDialog({
               <div className="truncate font-semibold text-navy-900">{picked.data?.fullName ?? "…"}</div>
               {picked.data && picked.data.balance > 0 ? (
                 <div className="text-xs text-muted-foreground tabular-nums">
-                  {formatCurrency(picked.data.balance, lang)}
+                  <Money value={picked.data.balance} />
                 </div>
               ) : null}
             </div>

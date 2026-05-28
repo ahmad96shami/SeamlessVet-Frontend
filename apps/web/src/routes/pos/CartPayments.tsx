@@ -1,5 +1,6 @@
 import { formatCurrency, type PaymentMethod } from "@vet/shared";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -86,7 +87,7 @@ export function CartPayments({ total }: { total: number }) {
 
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground">{t("pos.payment.paid")}</span>
-        <span className="tabular-nums">{formatCurrency(paid, lang)}</span>
+        <span className="tabular-nums"><Money value={paid} /></span>
       </div>
 
       {overpaid ? (
@@ -97,7 +98,7 @@ export function CartPayments({ total }: { total: number }) {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">{t("pos.payment.onCredit")}</span>
           <span className="font-semibold tabular-nums text-navy-900">
-            {formatCurrency(remaining, lang)}
+            <Money value={remaining} />
           </span>
         </div>
       ) : (

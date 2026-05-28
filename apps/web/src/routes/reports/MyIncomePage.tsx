@@ -1,6 +1,7 @@
 import { formatCurrency, formatNumber } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { Icon } from "@/components/ui/icon";
 import { useMyIncome } from "@/queries/reports";
@@ -43,13 +44,13 @@ export function MyIncomePage() {
         <StatCard
           tone="navy"
           icon={<Icon.receipt className="size-5" />}
-          value={formatCurrency(d?.totalRevenue ?? 0, lang)}
+          value={<Money value={d?.totalRevenue ?? 0} />}
           label={t("reports.myIncome.revenue")}
         />
         <StatCard
           tone="green"
           icon={<Icon.shield className="size-5" />}
-          value={formatCurrency(d?.totalCalculatedShare ?? 0, lang)}
+          value={<Money value={d?.totalCalculatedShare ?? 0} />}
           label={t("reports.myIncome.share")}
         />
       </div>

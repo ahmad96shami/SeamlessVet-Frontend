@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
+import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -80,14 +81,14 @@ export function InvoiceDetailDialog({
                   × {formatQuantity(it.quantity, lang)}
                 </span>
               </span>
-              <span className="tabular-nums">{formatCurrency(it.lineTotal, lang)}</span>
+              <span className="tabular-nums"><Money value={it.lineTotal} /></span>
             </div>
           ))}
         </div>
 
         <div className="flex items-center justify-between border-t pt-2 text-base font-bold text-navy-900">
           <span>{t("pos.receipt.total")}</span>
-          <span className="tabular-nums">{formatCurrency(invoice.total, lang)}</span>
+          <span className="tabular-nums"><Money value={invoice.total} /></span>
         </div>
 
         {confirmVoid ? (

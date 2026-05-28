@@ -1,6 +1,7 @@
 import { formatCurrency, formatQuantity } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -88,7 +89,7 @@ function VisitChargesPreview({ visitId }: { visitId: string }) {
                   <Badge variant="secondary">{t("pos.link.procedure")}</Badge>
                   <span className="truncate">{p.name}</span>
                 </span>
-                <span className="tabular-nums text-muted-foreground">{formatCurrency(p.price, lang)}</span>
+                <span className="tabular-nums text-muted-foreground"><Money value={p.price} /></span>
               </li>
             ))}
           </ul>

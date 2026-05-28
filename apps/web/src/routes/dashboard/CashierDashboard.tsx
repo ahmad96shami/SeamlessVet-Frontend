@@ -2,6 +2,7 @@ import { formatCurrency } from "@vet/shared";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Money } from "@/components/ui/money";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -40,7 +41,7 @@ export function CashierDashboard() {
         <StatCard
           tone="teal"
           icon={<Icon.receipt className="size-5" />}
-          value={formatCurrency(total, i18n.language)}
+          value={<Money value={total} />}
           label={t("dashboard.cashier.todaysSales")}
         />
         <StatCard
@@ -69,7 +70,7 @@ export function CashierDashboard() {
             {byMethod.map((m) => (
               <div key={m.method} className="flex items-center justify-between text-sm">
                 <span>{t(`paymentMethod.${m.method}`, { defaultValue: m.method })}</span>
-                <span className="font-semibold tabular-nums">{formatCurrency(m.amount, i18n.language)}</span>
+                <span className="font-semibold tabular-nums"><Money value={m.amount} /></span>
               </div>
             ))}
           </div>

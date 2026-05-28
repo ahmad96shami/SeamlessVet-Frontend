@@ -9,6 +9,7 @@ import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
+import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -203,7 +204,7 @@ export function StatementSection({ customer }: { customer: CustomerResponse }) {
                 <TableRow className="text-muted-foreground hover:bg-transparent">
                   <TableCell colSpan={6}>{t("customers.statement.opening")}</TableCell>
                   <TableCell className="text-end font-medium" dir="ltr">
-                    {formatCurrency(stmt?.openingBalance ?? 0, lang)}
+                    <Money value={stmt?.openingBalance ?? 0} />
                   </TableCell>
                 </TableRow>
                 {entries.map((e) => {
@@ -235,7 +236,7 @@ export function StatementSection({ customer }: { customer: CustomerResponse }) {
                         )}
                       </TableCell>
                       <TableCell className={cn("text-end font-medium", balanceClass(e.balanceAfter))} dir="ltr">
-                        {formatCurrency(e.balanceAfter, lang)}
+                        <Money value={e.balanceAfter} />
                       </TableCell>
                     </TableRow>
                   );
@@ -254,19 +255,19 @@ export function StatementSection({ customer }: { customer: CustomerResponse }) {
               <span>
                 {t("customers.statement.totalDebit")}:{" "}
                 <b className="text-destructive" dir="ltr">
-                  {formatCurrency(totalDebit, lang)}
+                  <Money value={totalDebit} />
                 </b>
               </span>
               <span>
                 {t("customers.statement.totalCredit")}:{" "}
                 <b className="text-success" dir="ltr">
-                  {formatCurrency(totalCredit, lang)}
+                  <Money value={totalCredit} />
                 </b>
               </span>
               <span className="font-semibold">
                 {t("customers.statement.closing")}:{" "}
                 <b className={balanceClass(stmt?.closingBalance ?? 0)} dir="ltr">
-                  {formatCurrency(stmt?.closingBalance ?? 0, lang)}
+                  <Money value={stmt?.closingBalance ?? 0} />
                 </b>
               </span>
             </div>

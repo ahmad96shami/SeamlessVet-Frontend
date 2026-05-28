@@ -1,6 +1,7 @@
 import { formatCurrency, formatDate, formatPercent } from "@vet/shared";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Select } from "@/components/ui/select";
@@ -55,19 +56,19 @@ export function ProfitPerBatchPage() {
           </div>
 
           <SummaryGrid>
-            <SummaryStat label={t("reports.profitPerBatch.revenue")} value={formatCurrency(d.revenue, lang)} />
-            <SummaryStat label={t("reports.profitPerBatch.drugCost")} value={formatCurrency(d.drugCost, lang)} tone="red" />
-            <SummaryStat label={t("reports.profitPerBatch.drugProfit")} value={formatCurrency(d.drugProfit, lang)} />
-            <SummaryStat label={t("reports.profitPerBatch.examFee")} value={formatCurrency(d.examFee, lang)} />
+            <SummaryStat label={t("reports.profitPerBatch.revenue")} value={<Money value={d.revenue} />} />
+            <SummaryStat label={t("reports.profitPerBatch.drugCost")} value={<Money value={d.drugCost} />} tone="red" />
+            <SummaryStat label={t("reports.profitPerBatch.drugProfit")} value={<Money value={d.drugProfit} />} />
+            <SummaryStat label={t("reports.profitPerBatch.examFee")} value={<Money value={d.examFee} />} />
             <SummaryStat
               label={t("reports.profitPerBatch.doctorShare")}
-              value={formatCurrency(d.doctorShare, lang)}
+              value={<Money value={d.doctorShare} />}
               tone="amber"
               hint={d.ceilingApplied != null ? `${t("reports.profitPerBatch.ceiling")}: ${formatCurrency(d.ceilingApplied, lang)}` : undefined}
             />
-            <SummaryStat label={t("reports.profitPerBatch.clinicShare")} value={formatCurrency(d.clinicShare, lang)} tone="teal" />
-            <SummaryStat label={t("reports.profitPerBatch.distributed")} value={formatCurrency(d.distributedToPartners, lang)} tone="navy" />
-            <SummaryStat label={t("reports.profitPerBatch.retained")} value={formatCurrency(d.retainedByClinic, lang)} tone="green" />
+            <SummaryStat label={t("reports.profitPerBatch.clinicShare")} value={<Money value={d.clinicShare} />} tone="teal" />
+            <SummaryStat label={t("reports.profitPerBatch.distributed")} value={<Money value={d.distributedToPartners} />} tone="navy" />
+            <SummaryStat label={t("reports.profitPerBatch.retained")} value={<Money value={d.retainedByClinic} />} tone="green" />
           </SummaryGrid>
 
           {d.partnerAllocations.length > 0 ? (
@@ -88,7 +89,7 @@ export function ProfitPerBatchPage() {
                     <tr key={p.partnerId}>
                       <td className="font-medium">{p.displayName}</td>
                       <td className="num">{formatPercent(p.sharePercent, lang)}</td>
-                      <td className="num font-semibold">{formatCurrency(p.amount, lang)}</td>
+                      <td className="num font-semibold"><Money value={p.amount} /></td>
                     </tr>
                   ))}
                 </tbody>

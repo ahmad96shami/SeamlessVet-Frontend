@@ -3,6 +3,7 @@ import { formatCurrency, type ProcedureResponse } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { Money } from "@/components/ui/money";
 
 import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ export function ProceduresTab({ visitId, readOnly }: { visitId: string; readOnly
         accessorKey: "price",
         header: t("visits.procedures.col.price"),
         cell: ({ row }) => (
-          <span dir="ltr">{formatCurrency(row.original.price, lang)}</span>
+          <span dir="ltr"><Money value={row.original.price} /></span>
         ),
       },
       {

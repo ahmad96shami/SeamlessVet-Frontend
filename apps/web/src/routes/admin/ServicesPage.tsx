@@ -1,3 +1,4 @@
+import { Money } from "@/components/ui/money";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatCurrency, type ServiceResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
@@ -65,7 +66,7 @@ export function ServicesPage() {
       {
         accessorKey: "defaultPrice",
         header: t("admin.services.colPrice"),
-        cell: ({ row }) => formatCurrency(row.original.defaultPrice, lang),
+        cell: ({ row }) => <Money value={row.original.defaultPrice} />,
       },
       {
         id: "actions",
