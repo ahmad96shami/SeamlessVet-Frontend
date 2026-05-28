@@ -10,9 +10,8 @@ import {
   type RegisterRequest,
 } from "@vet/shared";
 
-import { Button } from "@/components/Button";
-import { Field } from "@/components/Field";
-import { TextField } from "@/components/TextField";
+import { Shield } from "@/components/icons";
+import { Button, Input } from "@/components/ui";
 import { omitEmptyStrings } from "@/lib/forms";
 import { useRegister } from "@/queries/auth";
 
@@ -54,10 +53,17 @@ export default function RegisterScreen() {
 
   if (registerMut.isSuccess) {
     return (
-      <View className="flex-1 items-center justify-center bg-white px-6">
-        <Text className="mb-2 text-2xl font-bold text-slate-900">{t("auth.register.title")}</Text>
-        <Text className="mb-6 text-center text-sm text-slate-600">{t("auth.register.pending")}</Text>
-        <Link href="/(auth)/login" className="text-base font-medium text-teal-700">
+      <View className="bg-paper flex-1 items-center justify-center px-6">
+        <View className="bg-amber-soft mb-4 h-16 w-16 items-center justify-center rounded-card">
+          <Shield size={32} color="#8A6A00" />
+        </View>
+        <Text className="text-navy-900 mb-2 text-[20px] font-tajawal-extrabold">
+          {t("auth.register.title")}
+        </Text>
+        <Text className="text-ink-500 mb-6 text-center text-[14px] font-tajawal">
+          {t("auth.register.pending")}
+        </Text>
+        <Link href="/(auth)/login" className="text-teal-700 text-[15px] font-tajawal-bold">
           {t("auth.register.signIn")}
         </Link>
       </View>
@@ -66,33 +72,42 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-white"
+      className="bg-paper flex-1"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerClassName="flex-grow px-6 py-8">
-        <Text className="mb-1 text-2xl font-bold text-slate-900">{t("auth.register.title")}</Text>
-        <Text className="mb-6 text-sm text-slate-500">{t("appName")}</Text>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingVertical: 32 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="mb-6">
+          <Text className="text-navy-900 text-[24px] font-tajawal-extrabold">
+            {t("auth.register.title")}
+          </Text>
+          <Text className="text-ink-500 mt-1 text-[14px] font-tajawal">{t("appName")}</Text>
+        </View>
 
-        <Controller
-          control={form.control}
-          name="fullName"
-          render={({ field, fieldState }) => (
-            <Field label={t("auth.register.fullName")} error={fieldState.error?.message}>
-              <TextField
+        <View className="gap-3.5">
+          <Controller
+            control={form.control}
+            name="fullName"
+            render={({ field, fieldState }) => (
+              <Input
+                label={t("auth.register.fullName")}
+                error={fieldState.error?.message}
                 value={field.value}
                 onChangeText={field.onChange}
                 onBlur={field.onBlur}
                 autoComplete="name"
               />
-            </Field>
-          )}
-        />
-        <Controller
-          control={form.control}
-          name="phonePrimary"
-          render={({ field, fieldState }) => (
-            <Field label={t("auth.register.phone")} error={fieldState.error?.message}>
-              <TextField
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="phonePrimary"
+            render={({ field, fieldState }) => (
+              <Input
+                label={t("auth.register.phone")}
+                error={fieldState.error?.message}
                 value={field.value}
                 onChangeText={field.onChange}
                 onBlur={field.onBlur}
@@ -100,61 +115,68 @@ export default function RegisterScreen() {
                 autoComplete="tel"
                 autoCapitalize="none"
               />
-            </Field>
-          )}
-        />
-        <Controller
-          control={form.control}
-          name="email"
-          render={({ field, fieldState }) => (
-            <Field label={t("auth.register.email")} error={fieldState.error?.message}>
-              <TextField
-                value={field.value}
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="email"
+            render={({ field, fieldState }) => (
+              <Input
+                label={t("auth.register.email")}
+                error={fieldState.error?.message}
+                value={field.value ?? ""}
                 onChangeText={field.onChange}
                 onBlur={field.onBlur}
                 keyboardType="email-address"
                 autoComplete="email"
                 autoCapitalize="none"
               />
-            </Field>
-          )}
-        />
-        <Controller
-          control={form.control}
-          name="password"
-          render={({ field, fieldState }) => (
-            <Field label={t("auth.register.password")} error={fieldState.error?.message}>
-              <TextField
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="password"
+            render={({ field, fieldState }) => (
+              <Input
+                label={t("auth.register.password")}
+                error={fieldState.error?.message}
                 value={field.value}
                 onChangeText={field.onChange}
                 onBlur={field.onBlur}
                 secureTextEntry
                 autoComplete="password-new"
               />
-            </Field>
-          )}
-        />
-        <Controller
-          control={form.control}
-          name="licenseNumber"
-          render={({ field, fieldState }) => (
-            <Field label={t("auth.register.licenseNumber")} error={fieldState.error?.message}>
-              <TextField
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="licenseNumber"
+            render={({ field, fieldState }) => (
+              <Input
+                label={t("auth.register.licenseNumber")}
+                error={fieldState.error?.message}
                 value={field.value ?? ""}
                 onChangeText={field.onChange}
                 onBlur={field.onBlur}
               />
-            </Field>
-          )}
-        />
-
-        <View className="mt-2">
-          <Button label={t("auth.register.submit")} onPress={onSubmit} loading={registerMut.isPending} />
+            )}
+          />
         </View>
 
-        <View className="mt-6 flex-row items-center justify-center">
-          <Text className="text-sm text-slate-500">{t("auth.register.haveAccount")} </Text>
-          <Link href="/(auth)/login" className="text-sm font-medium text-teal-700">
+        <View className="mt-6">
+          <Button
+            label={t("auth.register.submit")}
+            onPress={onSubmit}
+            loading={registerMut.isPending}
+            block
+          />
+        </View>
+
+        <View className="mt-6 flex-row items-center justify-center gap-1">
+          <Text className="text-ink-500 text-[13px] font-tajawal">
+            {t("auth.register.haveAccount")}
+          </Text>
+          <Link href="/(auth)/login" className="text-teal-700 text-[13px] font-tajawal-bold">
             {t("auth.register.signIn")}
           </Link>
         </View>
