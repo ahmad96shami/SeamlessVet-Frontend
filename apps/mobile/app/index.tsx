@@ -1,6 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { Alert, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "@vet/shared";
 
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/Button";
@@ -25,6 +26,11 @@ export default function Index() {
         </Text>
         <Text className="mt-4 text-xs text-slate-400">
           lng: {i18n.resolvedLanguage} · role: {user?.role ?? "—"}
+        </Text>
+        {/* Hermes Intl smoke (audit requirement): if this renders correctly,
+            cross-locale currency formatting via Intl works on-device. */}
+        <Text className="mt-1 text-xs text-slate-400">
+          Intl ar-PS: {formatCurrency(1234.5, "ar")}
         </Text>
         <View className="mt-8 w-full max-w-xs">
           <Button
