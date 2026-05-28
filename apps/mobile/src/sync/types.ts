@@ -36,6 +36,61 @@ export interface PetRow {
   updated_at: string;
 }
 
+export interface ProcedureRow {
+  id: string;
+  visit_id: string;
+  service_id: string | null;
+  result_text: string | null;
+  result_file_url: string | null;
+  price: number;
+  created_at: string;
+}
+
+export interface PrescriptionRow {
+  id: string;
+  visit_id: string;
+  product_id: string;
+  dosage: string | null;
+  frequency: string | null;
+  duration: string | null;
+  notes: string | null;
+  dispense_type: string;
+  quantity: number | null;
+  created_at: string;
+}
+
+export interface VaccinationRow {
+  id: string;
+  pet_id: string | null;
+  customer_id: string | null;
+  visit_id: string | null;
+  vaccine_type: string;
+  date_given: string;
+  next_due_date: string | null;
+  certificate_url: string | null;
+  created_at: string;
+}
+
+export interface ServiceRow {
+  id: string;
+  name_ar: string;
+  name_latin: string | null;
+  category: string | null;
+  default_price: number | null;
+  updated_at: string;
+}
+
+export interface ProductRow {
+  id: string;
+  name_ar: string;
+  name_latin: string | null;
+  barcode: string | null;
+  category: string | null;
+  selling_price: number | null;
+  unit_of_measure: string | null;
+  updated_at: string;
+}
+
 export interface VisitRow {
   id: string;
   visit_type: string;

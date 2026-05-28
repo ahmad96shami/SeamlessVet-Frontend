@@ -15,6 +15,7 @@ import {
 import { Button, Card, Pill } from "@/components/ui";
 import { ChipSelect, FormField, NumberFieldTransform } from "@/components/forms";
 import { ScreenShell, TopBar } from "@/components/layout";
+import { ProceduresSection } from "@/components/visit/ProceduresSection";
 import { omitEmptyStrings } from "@/lib/forms";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
@@ -292,6 +293,8 @@ export default function VisitDetailScreen() {
                 transform={NumberFieldTransform}
               />
             </Section>
+
+            <ProceduresSection visitId={visit.id} isTerminal={isTerminal} />
 
             {!isTerminal ? (
               <View className="mt-2 gap-2">
