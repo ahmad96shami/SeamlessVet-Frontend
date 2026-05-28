@@ -36,9 +36,9 @@ function anchorAmPm(s: string): string {
 }
 
 export const DATE_FORMAT = "yyyy/MM/dd";
-// 12-hour clock — visual layout "7:18 2026/05/28ص": time, space, date, then am/pm marker
-// glued to the last digit of the date. Date-fns emits "ص"/"م" (ar) or "AM"/"PM" (en) for `a`.
-export const DATE_TIME_FORMAT = "h:mm yyyy/MM/dda";
+// 12-hour clock — visual layout "ص7:18 2026/05/28": am/pm marker first, then the time
+// (glued to it), then space, then date. Date-fns `a` → "ص"/"م" (ar) or "AM"/"PM" (en).
+export const DATE_TIME_FORMAT = "ah:mm yyyy/MM/dd";
 
 /** Arabic-aware date formatting; digits forced to Latin via [[toLatinDigits]]. */
 export function formatDate(
