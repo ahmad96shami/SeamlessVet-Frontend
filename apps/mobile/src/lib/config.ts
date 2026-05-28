@@ -9,6 +9,16 @@ import Constants from "expo-constants";
  * substituted by the developer (or by `adb reverse tcp:5180 tcp:5180` so
  * `http://localhost:5180` is forwarded over USB).
  */
-const extra = (Constants.expoConfig?.extra ?? {}) as { apiUrl?: string };
+const extra = (Constants.expoConfig?.extra ?? {}) as {
+  apiUrl?: string;
+  powersyncUrl?: string;
+};
 
 export const API_BASE_URL: string = extra.apiUrl ?? "http://localhost:5180";
+
+/**
+ * Base URL of the self-hosted PowerSync Service (the WebSocket sync endpoint).
+ * Same per-profile resolution as {@link API_BASE_URL} — set via `extra.powersyncUrl`
+ * from `eas.json`. Local dev hits the Docker-Compose'd service on `:8080`.
+ */
+export const POWERSYNC_BASE_URL: string = extra.powersyncUrl ?? "http://localhost:8080";
