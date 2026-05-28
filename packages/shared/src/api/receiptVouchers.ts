@@ -1,8 +1,8 @@
 import type { AxiosInstance } from "axios";
 import { z } from "zod";
 
-import { IDEMPOTENCY_HEADER } from "../constants";
 import { idempotencyKey, newGuidV7 } from "../http/idempotency";
+import { sendRequest, type RequestDescriptor } from "../offline/queue";
 import { IdentifierResponseSchema, type IdentifierResponse } from "../schemas/common";
 import {
   ReceiptVoucherRequestSchema,
@@ -33,6 +33,26 @@ export async function getReceiptVoucher(
 }
 
 /**
+ * Build the `POST /receipt-vouchers` request — mints the voucher GUID v7 `id` + a stable
+ * idempotency key (body + header). Used by mobile Mo4.4 over the REST-intent queue so an
+ * offline-issued voucher applies at most once on reconnect.
+ */
+export function buildReceiptVoucherRequest(input: ReceiptVoucherInput): RequestDescriptor {
+  const key = idempotencyKey();
+  const id = newGuidV7();
+  const body = ReceiptVoucherRequestSchema.parse({ ...input, id, idempotencyKey: key });
+  return {
+    method: "POST",
+    url: "/receipt-vouchers",
+    body,
+    idempotencyKey: key,
+    label: "sync.label.receiptVoucher",
+    entityKind: "receiptVoucher",
+    entityId: id,
+  };
+}
+
+/**
  * POST /receipt-vouchers — record a payment received (Sanad Qabd); posts a `receipt_voucher` ledger
  * credit reducing the customer's balance. Mints the `id` + idempotency key (body + header).
  */
@@ -40,10 +60,6 @@ export async function issueReceiptVoucher(
   client: AxiosInstance,
   input: ReceiptVoucherInput,
 ): Promise<IdentifierResponse> {
-  const key = idempotencyKey();
-  const payload = ReceiptVoucherRequestSchema.parse({ ...input, id: newGuidV7(), idempotencyKey: key });
-  const res = await client.post("/receipt-vouchers", payload, {
-    headers: { [IDEMPOTENCY_HEADER]: key },
-  });
-  return IdentifierResponseSchema.parse(res.data);
+  const data = await sendRequest(client, buildReceiptVoucherRequest(input));
+  return IdentifierResponseSchema.parse(data);
 }

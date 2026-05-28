@@ -2,8 +2,9 @@ import { Alert, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
-import { Bell, Briefcase, Stethoscope, User, WifiOff } from "@/components/icons";
+import { Bell, Briefcase, Stethoscope, User } from "@/components/icons";
 import { NavBottomBar, ScreenShell } from "@/components/layout";
+import { SyncIndicator } from "@/components/SyncIndicator";
 import { Button, Card } from "@/components/ui";
 import { toggleLanguage } from "@/i18n";
 import { useAuthStore } from "@/stores/authStore";
@@ -112,10 +113,7 @@ function HomeHeader({ langLabel }: { langLabel: string }) {
       </Pressable>
 
       <View className="flex-row items-center gap-2">
-        <View className="bg-teal-50 flex-row items-center gap-1.5 rounded-pill px-2.5 py-1">
-          <WifiOff size={12} color="#0B6573" />
-          <Text className="text-teal-700 text-[12px] font-tajawal-bold">دون اتصال</Text>
-        </View>
+        <SyncIndicator />
         <View className="border-ink-100 bg-paper relative h-10 w-10 items-center justify-center rounded-chip border">
           <Bell size={18} color="#223D69" />
           <View className="bg-amber absolute right-1.5 top-1.5 h-2 w-2 rounded-pill" />

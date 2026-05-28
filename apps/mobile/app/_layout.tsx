@@ -12,6 +12,7 @@ import { useAppFonts } from "@/lib/fonts";
 import { queryClient } from "@/lib/queryClient";
 import { ensureArabicRTL } from "@/lib/rtl";
 import { initSentry } from "@/services/sentry";
+import { startSyncEngine } from "@/services/syncEngine";
 import { useAuthStore } from "@/stores/authStore";
 import { powerSync } from "@/sync/database";
 
@@ -41,6 +42,14 @@ export default function RootLayout() {
   useEffect(() => {
     void restore();
   }, [restore]);
+
+  // Mo4.1: subscribe the offline REST queue's sync engine to PowerSync's connection
+  // status. The engine flushes anything left from a prior session as soon as the
+  // stream reports `connected` again — no per-screen wiring needed.
+  useEffect(() => {
+    const teardown = startSyncEngine();
+    return teardown;
+  }, []);
 
   // Auth gate: anyone not signed in is bounced to (auth)/login; signed-in users
   // in the (auth) group are bounced out. Wait for restore to settle (`unknown`).

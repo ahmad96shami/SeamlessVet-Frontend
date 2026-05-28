@@ -1026,7 +1026,10 @@
     "attempts_other": "{{count}} attempts",
     "label": {
       "newVisit": "New visit",
-      "posSale": "Sale"
+      "posSale": "Sale",
+      "fieldInvoice": "Field-visit invoice",
+      "examFeeInvoice": "Exam-fee invoice",
+      "receiptVoucher": "Receipt voucher"
     }
   },
   "pwa": {
