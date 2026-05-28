@@ -2,11 +2,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 
-import { Add, Bird, Briefcase, Cow, Edit, Forward, House } from "@/components/icons";
-import { Card, Pill } from "@/components/ui";
+import { Add, Bird, Briefcase, Cow, Edit, Forward, House, Stethoscope } from "@/components/icons";
+import { Button, Card, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
-import type { CustomerRow, PetRow } from "@/sync/types";
+import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
+import { formatDate } from "@vet/shared";
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   poultry_farm: <Bird size={20} color="#0F7A8A" />,
@@ -17,7 +18,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 
 export default function CustomerDetailScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { data: customers } = useQuery<CustomerRow>(
@@ -26,6 +27,10 @@ export default function CustomerDetailScreen() {
   );
   const { data: pets } = useQuery<PetRow>(
     `SELECT * FROM pets WHERE customer_id = ? ORDER BY updated_at DESC`,
+    [id ?? ""],
+  );
+  const { data: recentVisits } = useQuery<VisitRow>(
+    `SELECT * FROM visits WHERE customer_id = ? ORDER BY started_at DESC LIMIT 5`,
     [id ?? ""],
   );
 
@@ -78,8 +83,47 @@ export default function CustomerDetailScreen() {
         </View>
       </Card>
 
-      {/* The "new visit" CTA wires through to /visits/new in Mo2.2; the picker (Mo2.1)
-          stops at customer/pet CRUD so the screen lands self-contained. */}
+      <View className="mt-5">
+        <Button
+          label={t("visits.new")}
+          variant="teal"
+          block
+          leadingIcon={<Stethoscope size={18} color="#FFFFFF" />}
+          onPress={() => router.push({ pathname: "/visits/new", params: { customerId: customer.id } })}
+        />
+      </View>
+
+      {(recentVisits ?? []).length > 0 ? (
+        <View className="mt-6 gap-2">
+          <Text className="text-navy-900 text-[15px] font-tajawal-extrabold">
+            {t("nav.visits")}
+          </Text>
+          {(recentVisits ?? []).map((v) => (
+            <Pressable
+              key={v.id}
+              onPress={() => router.push({ pathname: "/visits/[id]", params: { id: v.id } })}
+            >
+              <Card className="flex-row items-center gap-3 p-3">
+                <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
+                  <Stethoscope size={18} color="#0F7A8A" />
+                </View>
+                <View className="flex-1 gap-1">
+                  <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
+                    {v.visit_number ?? t("visits.noNumber")}
+                  </Text>
+                  <View className="flex-row flex-wrap gap-1.5">
+                    <Pill tone="neutral" label={t(`visitStatus.${v.status}`)} />
+                    {v.started_at ? (
+                      <Pill tone="neutral" label={formatDate(v.started_at, i18n.resolvedLanguage)} />
+                    ) : null}
+                  </View>
+                </View>
+                <Forward size={18} color="#94A1B5" />
+              </Card>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
 
       <View className="mt-6 flex-row items-center justify-between">
         <Text className="text-navy-900 text-[15px] font-tajawal-extrabold">
