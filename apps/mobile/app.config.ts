@@ -1,0 +1,52 @@
+import type { ExpoConfig } from "expo/config";
+
+// Per-profile env vars come from eas.json (`build.<profile>.env`), or from
+// the developer's shell at `expo start`. EXPO_PUBLIC_* are also exposed to
+// JS at bundle time; we surface them explicitly via `extra` so reads go
+// through Constants.expoConfig.extra (one resolution point).
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:5180";
+const POWERSYNC_URL = process.env.EXPO_PUBLIC_POWERSYNC_URL ?? "http://localhost:8080";
+const SENTRY_DSN = process.env.SENTRY_DSN ?? "";
+
+const config: ExpoConfig = {
+  name: "SeamlessVet Field",
+  slug: "vet-mobile",
+  scheme: "vetmobile",
+  version: "0.0.1",
+  orientation: "portrait",
+  userInterfaceStyle: "automatic",
+  // New architecture (Fabric/TurboModules) is the default in Expo SDK 56 — no
+  // explicit toggle needed. PowerSync's RN SDK (Mo1) requires it.
+  ios: {
+    supportsTablet: false,
+    bundleIdentifier: "com.seamlessvet.mobile",
+  },
+  android: {
+    package: "com.seamlessvet.mobile",
+  },
+  plugins: [
+    "expo-router",
+    "expo-secure-store",
+    "expo-localization",
+    "expo-updates",
+    [
+      // PRD §12 — Android 9+ (API 28), iOS 14+.
+      "expo-build-properties",
+      {
+        android: { minSdkVersion: 28 },
+        ios: { deploymentTarget: "14.0" },
+      },
+    ],
+    "@sentry/react-native/expo",
+  ],
+  experiments: {
+    typedRoutes: true,
+  },
+  extra: {
+    apiUrl: API_URL,
+    powersyncUrl: POWERSYNC_URL,
+    sentryDsn: SENTRY_DSN,
+  },
+};
+
+export default config;

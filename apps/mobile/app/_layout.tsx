@@ -9,7 +9,12 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { queryClient } from "@/lib/queryClient";
 import { ensureArabicRTL } from "@/lib/rtl";
+import { initSentry } from "@/services/sentry";
 import { useAuthStore } from "@/stores/authStore";
+
+// Run before the component mounts so early errors are captured. Config-driven —
+// no-op when SENTRY_DSN is unset (which is the dev default).
+initSentry();
 
 export default function RootLayout() {
   // First Arabic launch flips I18nManager.forceRTL(true) and reloads the JS

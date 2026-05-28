@@ -1,0 +1,37 @@
+{
+  "cli": {
+    "version": ">= 13.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "ios": { "simulator": false },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://localhost:5180",
+        "EXPO_PUBLIC_POWERSYNC_URL": "http://localhost:8080"
+      }
+    },
+    "staging": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.staging.seamlessvet.example",
+        "EXPO_PUBLIC_POWERSYNC_URL": "https://sync.staging.seamlessvet.example"
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "android": { "buildType": "app-bundle" },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.seamlessvet.example",
+        "EXPO_PUBLIC_POWERSYNC_URL": "https://sync.seamlessvet.example"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
