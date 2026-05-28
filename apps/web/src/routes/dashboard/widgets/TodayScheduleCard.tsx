@@ -2,6 +2,7 @@ import { formatDate, type AppointmentResponse } from "@vet/shared";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import { EmptyState } from "@/components/ui/empty-state";
 import { Icon } from "@/components/ui/icon";
 import { useAppointments } from "@/queries/appointments";
 import { cn } from "@/lib/utils";
@@ -54,7 +55,7 @@ export function TodayScheduleCard({ doctorId, limit = 5 }: { doctorId?: string; 
           <Icon.spinner className="size-5 animate-spin text-muted-foreground" />
         </div>
       ) : rows.length === 0 ? (
-        <div className="py-10 text-center text-sm text-muted-foreground">{t("dashboard.todaySchedule.empty")}</div>
+        <EmptyState icon={<Icon.cal size={20} />} title={t("dashboard.todaySchedule.empty")} />
       ) : (
         rows.map((a: AppointmentResponse) => {
           const tone = STATUS_TONE[a.status] ?? "gray";

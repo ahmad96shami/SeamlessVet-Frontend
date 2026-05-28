@@ -17,11 +17,11 @@ import { useAuthStore } from "@/stores/authStore";
  * (language toggle, sign-out, sync indicator). Page content renders in the scrolling `.page`.
  */
 /**
- * Matches the bootstrap (solo) env id from appsettings.Development. When the JWT puts the user in
- * any other env, the rail shows a small chip so they can tell at a glance which env they're in —
- * this surfaces the partnership-env state the W8 work introduced.
+ * If a future env-selector writes the picked env id to this key, the rail shows a small chip
+ * so users can tell at a glance which env they're acting in (surfaces the partnership-env state
+ * W8 introduced). Until the selector lands, the key is never set and the chip stays dormant.
  */
-const BOOTSTRAP_ENV_ID = "00000000-0000-0000-0000-000000000001";
+const SELECTED_ENV_STORAGE_KEY = "vet.web.selectedEnvironmentId";
 
 export function AppShell() {
   const { t } = useTranslation();
@@ -32,7 +32,8 @@ export function AppShell() {
   const items = navForRole(role);
   const roleLabel = role ? t(`roles.${role}`, { defaultValue: role }) : "";
   const envId = user?.environmentId ?? "";
-  const showEnvChip = !!envId && envId !== BOOTSTRAP_ENV_ID;
+  const selectedEnv = typeof window !== "undefined" ? window.localStorage.getItem(SELECTED_ENV_STORAGE_KEY) : null;
+  const showEnvChip = !!selectedEnv && !!envId && selectedEnv === envId;
 
   return (
     <div className="app-shell h-screen">

@@ -44,26 +44,30 @@ export function AdminDashboard() {
         <StatCard
           tone="teal"
           icon={<Icon.stethoscope className="size-5" />}
-          value={k ? formatNumber(k.visitsToday, i18n.language) : "—"}
+          value={formatNumber(k?.visitsToday ?? 0, i18n.language)}
           label={t("reports.kpi.visitsToday")}
+          isLoading={kpi.isLoading}
         />
         <StatCard
           tone="navy"
           icon={<Icon.receipt className="size-5" />}
-          value={k ? formatCurrency(k.revenueThisMonth, i18n.language) : "—"}
+          value={formatCurrency(k?.revenueThisMonth ?? 0, i18n.language)}
           label={t("reports.kpi.revenueThisMonth")}
+          isLoading={kpi.isLoading}
         />
         <StatCard
           tone="amber"
           icon={<Icon.clock className="size-5" />}
-          value={k ? formatNumber(k.pendingEntitlements, i18n.language) : "—"}
+          value={formatNumber(k?.pendingEntitlements ?? 0, i18n.language)}
           label={t("reports.kpi.pendingEntitlements")}
+          isLoading={kpi.isLoading}
         />
         <StatCard
           tone="red"
           icon={<Icon.box className="size-5" />}
-          value={k ? formatNumber(k.lowStockItems, i18n.language) : "—"}
+          value={formatNumber(k?.lowStockItems ?? 0, i18n.language)}
           label={t("reports.kpi.lowStockItems")}
+          isLoading={kpi.isLoading}
         />
       </div>
 

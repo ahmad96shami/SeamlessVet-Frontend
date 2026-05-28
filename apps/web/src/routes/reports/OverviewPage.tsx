@@ -47,26 +47,30 @@ export function OverviewPage() {
         <StatCard
           tone="teal"
           icon={<Icon.stethoscope className="size-5" />}
-          value={kpi.data ? formatNumber(kpi.data.visitsToday, lang) : "—"}
+          value={formatNumber(kpi.data?.visitsToday ?? 0, lang)}
           label={t("reports.kpi.visitsToday")}
+          isLoading={kpi.isLoading}
         />
         <StatCard
           tone="navy"
           icon={<Icon.receipt className="size-5" />}
-          value={kpi.data ? formatCurrency(kpi.data.revenueThisMonth, lang) : "—"}
+          value={formatCurrency(kpi.data?.revenueThisMonth ?? 0, lang)}
           label={t("reports.kpi.revenueThisMonth")}
+          isLoading={kpi.isLoading}
         />
         <StatCard
           tone="amber"
           icon={<Icon.clock className="size-5" />}
-          value={kpi.data ? formatNumber(kpi.data.pendingEntitlements, lang) : "—"}
+          value={formatNumber(kpi.data?.pendingEntitlements ?? 0, lang)}
           label={t("reports.kpi.pendingEntitlements")}
+          isLoading={kpi.isLoading}
         />
         <StatCard
           tone="red"
           icon={<Icon.box className="size-5" />}
-          value={kpi.data ? formatNumber(kpi.data.lowStockItems, lang) : "—"}
+          value={formatNumber(kpi.data?.lowStockItems ?? 0, lang)}
           label={t("reports.kpi.lowStockItems")}
+          isLoading={kpi.isLoading}
         />
       </div>
 

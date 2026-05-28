@@ -2,6 +2,7 @@ import { formatDate, type UpcomingVaccinationRow } from "@vet/shared";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import { EmptyState } from "@/components/ui/empty-state";
 import { Icon } from "@/components/ui/icon";
 import { useUpcomingVaccinations } from "@/queries/reports";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,7 @@ export function VaxRemindersCard({ limit = 5 }: { limit?: number }) {
           <Icon.spinner className="size-5 animate-spin text-muted-foreground" />
         </div>
       ) : rows.length === 0 ? (
-        <div className="py-10 text-center text-sm text-muted-foreground">{t("dashboard.vaxReminders.empty")}</div>
+        <EmptyState icon={<Icon.syringe size={20} />} title={t("dashboard.vaxReminders.empty")} />
       ) : (
         rows.map((r: UpcomingVaccinationRow) => {
           const tone = urgency(r.nextDueDate);

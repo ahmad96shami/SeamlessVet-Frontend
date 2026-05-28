@@ -2,6 +2,7 @@ import { formatDate, type VisitResponse } from "@vet/shared";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import { EmptyState } from "@/components/ui/empty-state";
 import { Icon } from "@/components/ui/icon";
 import { useVisits } from "@/queries/visits";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,7 @@ export function RecentVisitsCard({ doctorId, limit = 6 }: { doctorId?: string; l
           <Icon.spinner className="size-5 animate-spin text-muted-foreground" />
         </div>
       ) : rows.length === 0 ? (
-        <div className="py-10 text-center text-sm text-muted-foreground">{t("dashboard.recentVisits.empty")}</div>
+        <EmptyState icon={<Icon.stethoscope size={20} />} title={t("dashboard.recentVisits.empty")} />
       ) : (
         rows.map((v: VisitResponse) => {
           const tone = VISIT_STATUS_TONE[v.status] ?? "gray";

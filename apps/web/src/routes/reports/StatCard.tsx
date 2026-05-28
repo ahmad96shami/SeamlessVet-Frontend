@@ -10,16 +10,21 @@ export function StatCard({
   tone = "teal",
   value,
   label,
+  isLoading,
 }: {
   icon: ReactNode;
   tone?: StatTone;
   value: ReactNode;
   label: ReactNode;
+  /** Renders a shimmer block in place of the value while data is in flight. */
+  isLoading?: boolean;
 }) {
   return (
     <div className="stat">
       <div className={cn("stat-ico", tone !== "teal" && tone)}>{icon}</div>
-      <div className="stat-val">{value}</div>
+      <div className="stat-val">
+        {isLoading ? <span className="skeleton" style={{ width: 80, height: 22 }} /> : value}
+      </div>
       <div className="stat-label">{label}</div>
     </div>
   );
