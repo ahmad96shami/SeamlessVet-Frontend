@@ -130,3 +130,77 @@ export async function computeFieldOnHand(
   );
   return Math.max(0, row?.qty ?? 0);
 }
+
+/**
+ * A single sale-or-deduct line whose requested quantity needs to be checked against
+ * field on-hand. Mo4's field-invoice preview composes the cart into this shape before
+ * enqueuing the `POST /visits/{id}/field-invoice` REST intent.
+ */
+export interface FieldStockLine {
+  productId: string;
+  /** Display label for the 🔴 prompt — the product's Arabic name. */
+  productName: string;
+  /** Positive quantity the doctor wants to deduct from the car. */
+  requestedQty: number;
+}
+
+/** One short on a single product line. `deficit` is always positive. */
+export interface FieldStockShortage {
+  productId: string;
+  productName: string;
+  requestedQty: number;
+  onHand: number;
+  deficit: number;
+}
+
+export interface FieldStockGuardResult {
+  /** True when every line has enough on-hand. */
+  ok: boolean;
+  /** Empty when `ok` is true; otherwise one entry per under-stocked product. */
+  shortages: FieldStockShortage[];
+}
+
+/**
+ * Batch-check a set of sale lines against current field on-hand. Mo4's issuance preview
+ * runs this just before queueing the REST intent — any shortage triggers the 🔴
+ * "negative stock" prompt + a reload-inventory hint, and submission is blocked locally.
+ * (The server would also reject the assembled invoice with `negative_stock`; doing it on
+ * the device first saves the round-trip and gives the doctor a clearer remediation step.)
+ *
+ * Lines with the same `productId` collapse: their requested qtys sum before the check,
+ * matching the server's per-product accounting.
+ */
+export async function checkFieldStockAvailability(
+  powerSync: { getOptional: <T>(sql: string, params: unknown[]) => Promise<T | undefined | null> },
+  lines: ReadonlyArray<FieldStockLine>,
+): Promise<FieldStockGuardResult> {
+  const byProduct = new Map<string, { name: string; requested: number }>();
+  for (const line of lines) {
+    if (line.requestedQty <= 0) continue;
+    const prior = byProduct.get(line.productId);
+    if (prior) {
+      prior.requested += line.requestedQty;
+    } else {
+      byProduct.set(line.productId, {
+        name: line.productName,
+        requested: line.requestedQty,
+      });
+    }
+  }
+
+  const shortages: FieldStockShortage[] = [];
+  for (const [productId, { name, requested }] of byProduct) {
+    const onHand = await computeFieldOnHand(powerSync, productId);
+    if (requested > onHand) {
+      shortages.push({
+        productId,
+        productName: name,
+        requestedQty: requested,
+        onHand,
+        deficit: Math.round((requested - onHand) * 1000) / 1000,
+      });
+    }
+  }
+
+  return { ok: shortages.length === 0, shortages };
+}
