@@ -340,6 +340,12 @@ export default function VisitDetailScreen() {
                 onPress={() => router.push(`/visits/${visit.id}/billing/field`)}
                 block
               />
+              <Button
+                label={t("billing.actions.openExam")}
+                variant="soft"
+                onPress={() => router.push(`/visits/${visit.id}/billing/exam`)}
+                block
+              />
             </View>
           </View>
         </ScrollView>
