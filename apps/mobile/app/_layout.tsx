@@ -1,4 +1,5 @@
 import "../global.css";
+import "@/i18n";
 
 import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
