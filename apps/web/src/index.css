@@ -342,11 +342,12 @@
     font-family: var(--font-ar); font-size: var(--fs-body);
     transition: border-color 0.15s, box-shadow 0.15s; outline: none;
   }
-  /* Tajawal has a tall ascender and a short descender, so symmetric padding parks the glyph row
-     visually high. Asymmetric padding-block (more top than bottom) compensates by shifting the
-     glyph row down so it reads visually centred for both Arabic and Latin runs. */
-  .input, .select-trigger { height: 40px; padding-block: 14px 6px; padding-inline: 14px; line-height: 1; }
-  .textarea { display: block; padding-block: 14px 8px; padding-inline: 14px; min-height: 84px; resize: vertical; line-height: 1.55; }
+  /* Tajawal's ascender + Arabic diacritics need room or they get clipped at the top of a tight
+     line-box. We keep an unforced line-height (1.4) so the em-box has ~20px of vertical breathing
+     room inside the 40px control, then apply a small asymmetric padding (10/6) so the glyph row
+     still reads slightly low — visually centred without losing diacritic peaks. */
+  .input, .select-trigger { height: 40px; padding-block: 10px 6px; padding-inline: 14px; line-height: 1.4; }
+  .textarea { display: block; padding-block: 10px; padding-inline: 14px; min-height: 84px; resize: vertical; line-height: 1.55; }
   /* Latin runs (phone, email, numbers, latin-name inputs use dir="ltr") still need to anchor to
      the logical start of the input — i.e. the right edge in an RTL document — so the text doesn't
      visually break the row's alignment. The dir="ltr" stays so the bidi algorithm keeps Latin
