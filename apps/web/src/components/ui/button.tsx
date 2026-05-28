@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 const buttonVariants = cva(
   // leading-none keeps the glyph row tight so flex centering lands on the optical centre —
   // without it Tajawal's asymmetric metrics make the label read low inside the box.
+  // cursor pointer is provided globally via @layer base (button:not(:disabled)) — putting
+  // `cursor-pointer` here would land in the utilities layer and win over the :disabled fallback.
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-bold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
