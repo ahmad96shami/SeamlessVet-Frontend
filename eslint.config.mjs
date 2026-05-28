@@ -38,6 +38,30 @@ export default tseslint.config(
     rules: { "@typescript-eslint/no-require-imports": "off" },
   },
   {
+    // Mobile is Arabic-first / RTL non-negotiable (PRD §8.1, MOBILE.md). Forbid
+    // directional Tailwind utilities (pl-*, pr-*, ml-*, mr-*, border-l/r-*,
+    // rounded-l/r-*, text-left/right) in app/ + src/ — use NativeWind logical
+    // utilities (ps-/pe-/ms-/me-/border-s/e-/rounded-s/e-/text-start/end).
+    files: ["apps/mobile/app/**/*.{ts,tsx}", "apps/mobile/src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "Literal[value=/(?:\\b(?:pl|pr|ml|mr|border-l|border-r|rounded-l|rounded-r)-\\d|\\b(?:text-left|text-right)\\b)/]",
+          message:
+            "RTL: use the NativeWind logical utility (ps-*, pe-*, ms-*, me-*, border-s-*, border-e-*, rounded-s-*, rounded-e-*, text-start, text-end) — never the directional one.",
+        },
+        {
+          selector:
+            "TemplateElement[value.raw=/(?:\\b(?:pl|pr|ml|mr|border-l|border-r|rounded-l|rounded-r)-\\d|\\b(?:text-left|text-right)\\b)/]",
+          message:
+            "RTL: use the NativeWind logical utility (ps-*, pe-*, etc.) — never the directional one.",
+        },
+      ],
+    },
+  },
+  {
     // Cross-platform guard: @vet/shared is consumed by web (Vite) and mobile (Expo/RN).
     files: ["packages/shared/src/**/*.{ts,tsx}"],
     rules: {
