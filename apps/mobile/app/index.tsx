@@ -1,58 +1,59 @@
-import { v7 as uuidv7 } from "uuid";
 import { Alert, Pressable, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { formatCurrency } from "@vet/shared";
 
-import { Bell, WifiOff } from "@/components/icons";
-import { BottomBar, ScreenShell } from "@/components/layout";
+import { Bell, Briefcase, Stethoscope, User, WifiOff } from "@/components/icons";
+import { NavBottomBar, ScreenShell } from "@/components/layout";
 import { Button, Card } from "@/components/ui";
 import { toggleLanguage } from "@/i18n";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function Index() {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  // Smoke proof for Mo0.1 — uuid v7 mint only succeeds if the
-  // react-native-get-random-values polyfill loaded first. Kept visible (in a
-  // monospace card) so the device check stays trivially observable until a real
-  // home dashboard lands with Mo2+.
-  const id = uuidv7();
 
   return (
     <ScreenShell
       header={<HomeHeader langLabel={i18n.resolvedLanguage === "ar" ? "EN" : "ع"} />}
-      footer={<BottomBar active="home" />}
+      footer={<NavBottomBar active="home" />}
     >
-      <Card className="px-4 py-5">
-        <Text className="text-ink-500 text-[12px] font-tajawal">{t("appName")}</Text>
-        <Text className="text-navy-900 mt-1 text-[22px] font-tajawal-extrabold">
-          Mo0 scaffold — uuid v7 mint OK
-        </Text>
-        <Text
-          className="text-ink-500 mt-3 text-[12px]"
-          style={{ fontFamily: "Courier" }}
-          selectable
-        >
-          {id}
-        </Text>
-        <View className="bg-ink-100 my-4 h-px" />
-        <View className="gap-1">
-          <Text className="text-ink-700 text-[13px] font-tajawal">
-            lng: <Text className="font-tajawal-bold">{i18n.resolvedLanguage}</Text>
-            {" · "}
-            role: <Text className="font-tajawal-bold">{user?.role ?? "—"}</Text>
+      <Card className="flex-row items-center gap-3 p-4">
+        <View className="bg-teal-50 h-14 w-14 items-center justify-center rounded-card">
+          <User size={22} color="#0F7A8A" />
+        </View>
+        <View className="flex-1 gap-0.5">
+          <Text className="text-ink-500 text-[12px] font-tajawal">
+            {t("dashboard.greeting.morning")}
           </Text>
-          <Text className="text-ink-700 text-[13px] font-tajawal">
-            Intl ar-PS:{" "}
-            <Text className="text-navy-900 font-tajawal-extrabold">{formatCurrency(1234.5, "ar")}</Text>
+          <Text className="text-navy-900 text-[16px] font-tajawal-extrabold" numberOfLines={1}>
+            {user?.userId ?? "—"}
+          </Text>
+          <Text className="text-ink-500 text-[12px] font-tajawal">
+            {t("nav.customers")}
+            {user?.numberPrefix ? ` · ${user.numberPrefix}` : ""}
           </Text>
         </View>
       </Card>
 
+      <View className="mt-5 flex-row gap-2">
+        <QuickAction
+          label={t("dashboard.actions.newVisit")}
+          icon={<Stethoscope size={20} color="#FFFFFF" />}
+          primary
+          onPress={() => router.push("/customers")}
+        />
+        <QuickAction
+          label={t("nav.customers")}
+          icon={<Briefcase size={20} color="#0F7A8A" />}
+          onPress={() => router.push("/customers")}
+        />
+      </View>
+
       <View className="mt-6">
         <Button
-          label={t("actions.close")}
+          label={t("shell.signOut")}
           variant="ghost"
           onPress={async () => {
             try {
@@ -65,6 +66,36 @@ export default function Index() {
         />
       </View>
     </ScreenShell>
+  );
+}
+
+interface QuickActionProps {
+  label: string;
+  icon: React.ReactNode;
+  primary?: boolean;
+  onPress: () => void;
+}
+
+function QuickAction({ label, icon, primary, onPress }: QuickActionProps) {
+  return (
+    <Pressable onPress={onPress} className="flex-1">
+      <Card
+        className={`items-center justify-center gap-2 p-4 ${primary ? "bg-navy-900" : ""}`}
+        style={primary ? { backgroundColor: "#0B1B36" } : undefined}
+      >
+        <View
+          className={`h-9 w-9 items-center justify-center rounded-chip ${primary ? "" : "bg-teal-50"}`}
+          style={primary ? { backgroundColor: "rgba(255,255,255,0.14)" } : undefined}
+        >
+          {icon}
+        </View>
+        <Text
+          className={`text-center text-[12px] font-tajawal-extrabold ${primary ? "text-paper" : "text-navy-900"}`}
+        >
+          {label}
+        </Text>
+      </Card>
+    </Pressable>
   );
 }
 

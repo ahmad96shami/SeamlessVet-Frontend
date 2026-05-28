@@ -10,7 +10,7 @@ import { Text, TextInput, View, type TextInputProps } from "react-native";
  * primitive so screens write `<Input label="…" error={…} value={…} />` instead
  * of two nested components.
  */
-interface InputProps extends Omit<TextInputProps, "style" | "placeholderTextColor"> {
+interface InputProps extends Omit<TextInputProps, "placeholderTextColor"> {
   label?: string;
   error?: string;
   hint?: string;
@@ -21,7 +21,7 @@ interface InputProps extends Omit<TextInputProps, "style" | "placeholderTextColo
 }
 
 export const Input = forwardRef<TextInput, InputProps>(function Input(
-  { label, error, hint, leading, trailing, onFocus, onBlur, ...rest },
+  { label, error, hint, leading, trailing, onFocus, onBlur, style, ...rest },
   ref,
 ) {
   const [focused, setFocused] = useState(false);
@@ -43,6 +43,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
           ref={ref}
           placeholderTextColor="#94A1B5"
           className="text-ink-900 flex-1 py-3.5 text-[15px] font-tajawal"
+          style={style}
           onFocus={(e) => {
             setFocused(true);
             onFocus?.(e);
