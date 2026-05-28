@@ -151,7 +151,7 @@ export default function CustomerDetailScreen() {
           (pets ?? []).map((pet) => (
             <Pressable
               key={pet.id}
-              onPress={() => router.push(`/customers/${customer.id}/pets/${pet.id}/edit`)}
+              onPress={() => router.push(`/customers/${customer.id}/pets/${pet.id}`)}
             >
               <Card className="flex-row items-center gap-3 p-3">
                 <View className="bg-ink-50 h-10 w-10 items-center justify-center rounded-card">

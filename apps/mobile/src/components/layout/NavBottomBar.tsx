@@ -12,7 +12,7 @@ type TabKey = "home" | "visits" | "inv" | "me";
 
 const ROUTE: Record<TabKey, string> = {
   home: "/",
-  visits: "/customers", // Mo2 lands the customers/visits picker behind the Visits tab.
+  visits: "/visits", // Mo2.6 lands the local visits list behind the Visits tab.
   inv: "/inventory",    // Mo3 will populate the inventory route — placeholder until then.
   me: "/profile",       // future "حسابي" — not yet implemented; tap is a no-op.
 };
