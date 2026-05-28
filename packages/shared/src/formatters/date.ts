@@ -23,10 +23,24 @@ function toLatinDigits(s: string): string {
     .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
 }
 
+/**
+ * Anchor the Arabic am/pm marker so bidi doesn't reorder it past the date.
+ *
+ * Without help, "7:18ص 2026/05/28" in an LTR span renders visually as
+ * "7:18 2026/05/28 ص" — the strong-RTL ص jumps past the following LTR digit run.
+ * Inserting a U+200E LEFT-TO-RIGHT MARK right after ص/م forces a bidi-level break,
+ * keeping the marker glued to the time where it logically belongs.
+ */
+function anchorAmPm(s: string): string {
+  return s.replace(/([صم])(?!‎)/g, "$1‎");
+}
+
 export const DATE_FORMAT = "yyyy/MM/dd";
-// 12-hour clock, time before date — the `a` token emits "AM"/"PM" in en and "ص"/"م" in ar
-// via date-fns's Arabic locale. (Matches the W6 receipt voucher convention requested by ops.)
-export const DATE_TIME_FORMAT = "h:mm a yyyy/MM/dd";
+// 12-hour clock with the am/pm marker glued straight onto the time ("7:18ص" not "7:18 ص") —
+// when separated by a space the bidi algorithm reorders the Arabic ص strong-RTL character past
+// the LTR date run, so it visually drifted to the far edge instead of staying next to the time.
+// Date-fns emits "ص"/"م" in ar and "AM"/"PM" in en for the `a` token.
+export const DATE_TIME_FORMAT = "h:mma yyyy/MM/dd";
 
 /** Arabic-aware date formatting; digits forced to Latin via [[toLatinDigits]]. */
 export function formatDate(
@@ -42,5 +56,5 @@ export function formatDateTime(
   locale: string = DEFAULT_LOCALE,
   pattern: string = DATE_TIME_FORMAT,
 ): string {
-  return toLatinDigits(formatDateFns(toDate(value), pattern, { locale: localeFor(locale) }));
+  return anchorAmPm(toLatinDigits(formatDateFns(toDate(value), pattern, { locale: localeFor(locale) })));
 }
