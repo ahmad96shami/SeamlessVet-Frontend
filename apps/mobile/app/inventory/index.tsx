@@ -143,6 +143,10 @@ export default function InventoryScreen() {
 
         <View className="mt-3 flex-row gap-2">
           <Pressable
+            // Cast: expo-router only regenerates its typed-routes manifest when the dev
+            // server runs; the route exists physically (app/inventory/returns/new.tsx),
+            // so a literal string would resolve at runtime — `as never` placates the
+            // stale typegen until the next `expo start`.
             onPress={() => router.push("/inventory/returns/new" as never)}
             className="bg-navy-900 active:bg-navy-800 flex-1 flex-row items-center justify-center gap-1.5 rounded-pill px-3 py-2.5"
             accessibilityRole="button"
