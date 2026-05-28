@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useCreateVaccination, useUpdateVaccination } from "@/queries/vaccinations";
@@ -81,10 +82,10 @@ export function VaccinationFormDialog({
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("visits.vaccinations.dateGiven")}>
-            <Input type="date" dir="ltr" value={dateGiven} onChange={(e) => setDateGiven(e.target.value)} />
+            <DatePicker value={dateGiven} onChange={(e) => setDateGiven(e.target.value)} />
           </Field>
           <Field label={t("visits.vaccinations.nextDueDate")}>
-            <Input type="date" dir="ltr" value={nextDueDate} onChange={(e) => setNextDueDate(e.target.value)} />
+            <DatePicker value={nextDueDate} onChange={(e) => setNextDueDate(e.target.value)} />
           </Field>
         </div>
         <div className="flex justify-end gap-2">

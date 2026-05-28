@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
+import { DatePicker } from "@/components/ui/datepicker";
 import { cn } from "@/lib/utils";
 import { PERIOD_PRESETS, type PeriodPreset, type PeriodValue } from "@/routes/reports/period";
 
@@ -29,19 +30,15 @@ export function ReportFilterBar({
       <span className="flex-1" />
       {value.preset === "custom" ? (
         <div className="flex items-center gap-1">
-          <input
-            type="date"
-            dir="ltr"
-            className="h-9 rounded-lg border bg-background px-2 text-sm"
+          <DatePicker
+            containerClassName="w-40"
             aria-label={t("reports.period.from")}
             value={value.from}
             onChange={(e) => onChange({ ...value, from: e.target.value })}
           />
           <span className="text-muted-foreground">—</span>
-          <input
-            type="date"
-            dir="ltr"
-            className="h-9 rounded-lg border bg-background px-2 text-sm"
+          <DatePicker
+            containerClassName="w-40"
             aria-label={t("reports.period.to")}
             value={value.to}
             onChange={(e) => onChange({ ...value, to: e.target.value })}

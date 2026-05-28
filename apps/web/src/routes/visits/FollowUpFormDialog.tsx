@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -86,7 +87,7 @@ export function FollowUpFormDialog({
       <div className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("visits.followups.entryDate")}>
-            <Input type="date" dir="ltr" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
+            <DatePicker value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
           </Field>
           <Field label={t("visits.followups.condition")}>
             <Input value={condition} onChange={(e) => setCondition(e.target.value)} />

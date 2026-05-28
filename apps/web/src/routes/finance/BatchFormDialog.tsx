@@ -17,6 +17,7 @@ import { z } from "zod";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -262,10 +263,22 @@ export function BatchFormDialog({
             <Input type="number" step="0.01" min="0" dir="ltr" {...register("supervisionFeeValue")} />
           </Field>
           <Field label={t("finance.batches.startDate")} error={errors.startDate?.message}>
-            <Input type="date" dir="ltr" {...register("startDate")} />
+            <Controller
+              control={control}
+              name="startDate"
+              render={({ field }) => (
+                <DatePicker value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} />
+              )}
+            />
           </Field>
           <Field label={t("finance.batches.endDate")} error={errors.endDate?.message}>
-            <Input type="date" dir="ltr" {...register("endDate")} />
+            <Controller
+              control={control}
+              name="endDate"
+              render={({ field }) => (
+                <DatePicker value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} />
+              )}
+            />
           </Field>
           <Field label={t("finance.batches.entitlementEnabled")}>
             <Controller

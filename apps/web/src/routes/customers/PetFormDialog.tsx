@@ -14,6 +14,7 @@ import { z } from "zod";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -160,7 +161,13 @@ export function PetFormDialog({
             />
           </Field>
           <Field label={t("customers.pets.dateOfBirth")} error={errors.dateOfBirth?.message}>
-            <Input type="date" dir="ltr" {...register("dateOfBirth")} />
+            <Controller
+              control={control}
+              name="dateOfBirth"
+              render={({ field }) => (
+                <DatePicker value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} />
+              )}
+            />
           </Field>
           <Field label={t("customers.pets.weightLatest")} error={errors.weightLatest?.message}>
             <Input type="number" step="0.001" min="0" dir="ltr" {...register("weightLatest")} />

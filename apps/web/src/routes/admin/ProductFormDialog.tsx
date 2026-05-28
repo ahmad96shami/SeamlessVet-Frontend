@@ -14,6 +14,7 @@ import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -170,7 +171,13 @@ export function ProductFormDialog({
             <Input {...register("supplier")} />
           </Field>
           <Field label={t("admin.products.expirationDate")} error={errors.expirationDate?.message}>
-            <Input type="date" dir="ltr" {...register("expirationDate")} />
+            <Controller
+              control={control}
+              name="expirationDate"
+              render={({ field }) => (
+                <DatePicker value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} />
+              )}
+            />
           </Field>
         </div>
         <div className="flex justify-end gap-2">

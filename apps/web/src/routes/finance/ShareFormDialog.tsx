@@ -14,6 +14,7 @@ import { z } from "zod";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -135,10 +136,22 @@ export function ShareFormDialog({
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("finance.partners.shares.effectiveFrom")} error={errors.effectiveFrom?.message}>
-            <Input type="date" dir="ltr" {...register("effectiveFrom")} />
+            <Controller
+              control={control}
+              name="effectiveFrom"
+              render={({ field }) => (
+                <DatePicker value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} />
+              )}
+            />
           </Field>
           <Field label={t("finance.partners.shares.effectiveTo")} error={errors.effectiveTo?.message}>
-            <Input type="date" dir="ltr" {...register("effectiveTo")} />
+            <Controller
+              control={control}
+              name="effectiveTo"
+              render={({ field }) => (
+                <DatePicker value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} />
+              )}
+            />
           </Field>
         </div>
         <div className="flex justify-end gap-2">

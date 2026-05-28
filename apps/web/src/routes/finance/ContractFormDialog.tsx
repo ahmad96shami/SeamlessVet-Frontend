@@ -16,6 +16,7 @@ import type { DoctorOption } from "@/hooks/useDoctorOptions";
 import { CustomerPickerDialog } from "@/routes/pos/CustomerPickerDialog";
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -196,10 +197,22 @@ export function ContractFormDialog({
             />
           </Field>
           <Field label={t("finance.contracts.periodStart")} error={errors.periodStart?.message}>
-            <Input type="date" dir="ltr" {...register("periodStart")} />
+            <Controller
+              control={control}
+              name="periodStart"
+              render={({ field }) => (
+                <DatePicker value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} />
+              )}
+            />
           </Field>
           <Field label={t("finance.contracts.periodEnd")} error={errors.periodEnd?.message}>
-            <Input type="date" dir="ltr" {...register("periodEnd")} />
+            <Controller
+              control={control}
+              name="periodEnd"
+              render={({ field }) => (
+                <DatePicker value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} />
+              )}
+            />
           </Field>
           <Field label={t("finance.contracts.totalPrice")} error={errors.totalPrice?.message}>
             <Input type="number" step="0.01" min="0" dir="ltr" {...register("totalPrice")} />

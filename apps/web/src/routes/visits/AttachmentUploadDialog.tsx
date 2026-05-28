@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -92,7 +93,7 @@ export function AttachmentUploadDialog({
             </select>
           </Field>
           <Field label={t("visits.files.docDate")}>
-            <Input type="date" dir="ltr" value={docDate} onChange={(e) => setDocDate(e.target.value)} />
+            <DatePicker value={docDate} onChange={(e) => setDocDate(e.target.value)} />
           </Field>
         </div>
         <Field label={t("visits.files.fileTitle")}>

@@ -5,8 +5,8 @@ import { Link, useParams } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Icon } from "@/components/ui/icon";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useFieldInventories } from "@/queries/inventory";
@@ -71,9 +71,19 @@ export function PetTimelinePage() {
             </option>
           ))}
         </Select>
-        <Input type="date" dir="ltr" value={from} onChange={(e) => setFrom(e.target.value)} className="w-40" aria-label={t("visits.timeline.from")} />
+        <DatePicker
+          containerClassName="w-40"
+          aria-label={t("visits.timeline.from")}
+          value={from}
+          onChange={(e) => setFrom(e.target.value)}
+        />
         <span className="text-muted-foreground">—</span>
-        <Input type="date" dir="ltr" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" aria-label={t("visits.timeline.to")} />
+        <DatePicker
+          containerClassName="w-40"
+          aria-label={t("visits.timeline.to")}
+          value={to}
+          onChange={(e) => setTo(e.target.value)}
+        />
       </div>
 
       {timeline.isLoading ? (

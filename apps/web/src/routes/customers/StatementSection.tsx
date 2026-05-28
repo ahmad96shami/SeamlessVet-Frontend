@@ -12,8 +12,8 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Icon } from "@/components/ui/icon";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -155,22 +155,18 @@ export function StatementSection({ customer }: { customer: CustomerResponse }) {
         ))}
         {range === "custom" ? (
           <div className="flex items-center gap-2">
-            <Input
-              type="date"
-              dir="ltr"
+            <DatePicker
+              containerClassName="w-40"
+              aria-label={t("customers.statement.from")}
               value={customFrom}
               onChange={(e) => setCustomFrom(e.target.value)}
-              className="w-40"
-              aria-label={t("customers.statement.from")}
             />
             <span className="text-muted-foreground">—</span>
-            <Input
-              type="date"
-              dir="ltr"
+            <DatePicker
+              containerClassName="w-40"
+              aria-label={t("customers.statement.to")}
               value={customTo}
               onChange={(e) => setCustomTo(e.target.value)}
-              className="w-40"
-              aria-label={t("customers.statement.to")}
             />
           </div>
         ) : null}
