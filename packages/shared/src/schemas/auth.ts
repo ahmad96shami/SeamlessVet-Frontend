@@ -55,3 +55,14 @@ export const LogoutRequestSchema = z.object({
   refreshToken: z.string().min(1),
 });
 export type LogoutRequest = z.infer<typeof LogoutRequestSchema>;
+
+/**
+ * POST /auth/powersync-token response (API_SURFACE § Auth) — mints a short-lived JWT for
+ * the PowerSync SDK to authenticate its stream. The OpenAPI spec declares no typed body
+ * for the 200, so this Zod schema is the contract — verified against the live response shape.
+ */
+export const PowerSyncTokenResponseSchema = z.object({
+  token: z.string().min(1),
+  expiresAt: z.string(), // ISO-8601
+});
+export type PowerSyncTokenResponse = z.infer<typeof PowerSyncTokenResponseSchema>;
