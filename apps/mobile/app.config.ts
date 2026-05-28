@@ -30,11 +30,13 @@ const config: ExpoConfig = {
     "expo-localization",
     "expo-updates",
     [
-      // PRD §12 — Android 9+ (API 28), iOS 14+.
+      // PRD §12 calls for Android 9+ (API 28) and iOS 14+. Android 28 is
+      // honored as-is; iOS deploymentTarget is bumped to 16.4 because that's
+      // Expo SDK 56's hard floor (the older iOS 14 line predates current Expo).
       "expo-build-properties",
       {
         android: { minSdkVersion: 28 },
-        ios: { deploymentTarget: "14.0" },
+        ios: { deploymentTarget: "16.4" },
       },
     ],
     "@sentry/react-native/expo",
