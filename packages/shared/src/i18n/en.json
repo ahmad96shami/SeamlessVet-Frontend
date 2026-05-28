@@ -654,6 +654,53 @@
       "vaccinations": "vaccinations"
     }
   },
+  "billing": {
+    "field": {
+      "title": "Field-visit invoice",
+      "linesTitle": "Lines (estimate)",
+      "noLines": "No billable lines.",
+      "paymentTitle": "Payment method",
+      "estimateLabel": "Estimated subtotal",
+      "totalLabel": "Total",
+      "issue": "Issue invoice",
+      "issuedTitle": "Invoice issued",
+      "issuedBody": "Recorded on the server.",
+      "queuedBody": "Saved locally; it'll send when you're back online.",
+      "failed": "Could not issue the invoice",
+      "stockShortageTitle": "Field-stock shortage",
+      "stockShortageRow": "{{product}}: needs {{requested}}, on hand {{onHand}}",
+      "notFound": "Visit not found"
+    },
+    "exam": {
+      "title": "Exam-fee invoice",
+      "amountLabel": "Fee",
+      "amountHint": "Leave blank to use the fee recorded on the visit.",
+      "paymentTitle": "Payment method",
+      "totalLabel": "Total",
+      "issue": "Issue exam fee",
+      "issuedTitle": "Exam fee issued",
+      "issuedBody": "Recorded on the server.",
+      "queuedBody": "Saved locally; it'll send when you're back online.",
+      "failed": "Could not issue the exam fee"
+    },
+    "voucher": {
+      "title": "Receipt voucher",
+      "amountLabel": "Amount received",
+      "methodTitle": "Payment method",
+      "notesLabel": "Notes (optional)",
+      "issue": "Record payment",
+      "issuedTitle": "Payment recorded",
+      "issuedBody": "Customer balance decreased.",
+      "queuedBody": "Saved locally; it'll send when you're back online.",
+      "failed": "Could not record the payment",
+      "amountPositive": "Enter an amount greater than zero."
+    },
+    "actions": {
+      "openField": "Issue field invoice",
+      "openExam": "Issue exam fee",
+      "openVoucher": "Record payment (voucher)"
+    }
+  },
   "appointments": {
     "title": "Appointments",
     "description": "Scheduling calendar with conflict detection.",

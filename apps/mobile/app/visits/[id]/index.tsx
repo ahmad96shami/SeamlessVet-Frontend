@@ -332,6 +332,15 @@ export default function VisitDetailScreen() {
                 </View>
               </View>
             ) : null}
+
+            <View className="mt-2 gap-2">
+              <Button
+                label={t("billing.actions.openField")}
+                variant="primary"
+                onPress={() => router.push(`/visits/${visit.id}/billing/field`)}
+                block
+              />
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
