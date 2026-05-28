@@ -36,11 +36,9 @@ function anchorAmPm(s: string): string {
 }
 
 export const DATE_FORMAT = "yyyy/MM/dd";
-// 12-hour clock with the am/pm marker glued straight onto the time ("7:18ص" not "7:18 ص") —
-// when separated by a space the bidi algorithm reorders the Arabic ص strong-RTL character past
-// the LTR date run, so it visually drifted to the far edge instead of staying next to the time.
-// Date-fns emits "ص"/"م" in ar and "AM"/"PM" in en for the `a` token.
-export const DATE_TIME_FORMAT = "h:mma yyyy/MM/dd";
+// 12-hour clock — visual layout "7:18 2026/05/28ص": time, space, date, then am/pm marker
+// glued to the last digit of the date. Date-fns emits "ص"/"م" (ar) or "AM"/"PM" (en) for `a`.
+export const DATE_TIME_FORMAT = "h:mm yyyy/MM/dda";
 
 /** Arabic-aware date formatting; digits forced to Latin via [[toLatinDigits]]. */
 export function formatDate(
