@@ -332,11 +332,14 @@
   .input, .textarea, .select-trigger {
     width: 100%; background: var(--paper); color: var(--fg-1);
     border: 1px solid var(--border-strong); border-radius: var(--radius-input);
-    font-family: var(--font-ar); font-size: var(--fs-body); line-height: 1.4;
+    font-family: var(--font-ar); font-size: var(--fs-body);
     transition: border-color 0.15s, box-shadow 0.15s; outline: none;
   }
-  .input, .select-trigger { height: 40px; padding-inline: 14px; }
-  .textarea { display: block; padding: 10px 14px; min-height: 84px; resize: vertical; line-height: 1.55; }
+  /* Tajawal has a tall ascender and a short descender, so a flat line-height parks the glyph
+     row high in the box. Bumping line-height to the full control height lets the baseline
+     ride the geometric centre — text inside reads as visually centred. */
+  .input, .select-trigger { height: 40px; padding-block: 0; padding-inline: 14px; line-height: 40px; }
+  .textarea { display: block; padding-block: 10px; padding-inline: 14px; min-height: 84px; resize: vertical; line-height: 1.55; }
   .input::placeholder, .textarea::placeholder { color: var(--ink-400); }
   .input:hover:not(:disabled), .textarea:hover:not(:disabled), .select-trigger:hover:not(:disabled) { border-color: var(--ink-300); }
   .input:focus, .textarea:focus, .select-trigger:focus-visible, .select-trigger[data-open="true"] {
