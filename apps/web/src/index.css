@@ -340,6 +340,14 @@
      glyph row down so it reads visually centred for both Arabic and Latin runs. */
   .input, .select-trigger { height: 40px; padding-block: 14px 6px; padding-inline: 14px; line-height: 1; }
   .textarea { display: block; padding-block: 14px 8px; padding-inline: 14px; min-height: 84px; resize: vertical; line-height: 1.55; }
+  /* Latin runs (phone, email, numbers, latin-name inputs use dir="ltr") still need to anchor to
+     the logical start of the input — i.e. the right edge in an RTL document — so the text doesn't
+     visually break the row's alignment. The dir="ltr" stays so the bidi algorithm keeps Latin
+     glyphs in their natural left-to-right order, but text-align flips to the row's logical start. */
+  html[dir="rtl"] .input[dir="ltr"],
+  html[dir="rtl"] .textarea[dir="ltr"] { text-align: right; }
+  html[dir="ltr"] .input[dir="rtl"],
+  html[dir="ltr"] .textarea[dir="rtl"] { text-align: left; }
   .input::placeholder, .textarea::placeholder { color: var(--ink-400); }
   .input:hover:not(:disabled), .textarea:hover:not(:disabled), .select-trigger:hover:not(:disabled) { border-color: var(--ink-300); }
   .input:focus, .textarea:focus, .select-trigger:focus-visible, .select-trigger[data-open="true"] {
