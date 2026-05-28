@@ -13,6 +13,7 @@
     "lint": "eslint . --max-warnings=0"
   },
   "dependencies": {
+    "@expo-google-fonts/tajawal": "^0.4.1",
     "@expo/metro-runtime": "~56.0.13",
     "@hookform/resolvers": "^5.4.0",
     "@journeyapps/react-native-quick-sqlite": "^2.5.2",
@@ -27,6 +28,7 @@
     "expo-build-properties": "~56.0.15",
     "expo-constants": "~56.0.16",
     "expo-dev-client": "~56.0.16",
+    "expo-font": "~56.0.5",
     "expo-linking": "~56.0.12",
     "expo-localization": "~56.0.6",
     "expo-secure-store": "~56.0.4",
@@ -45,6 +47,7 @@
     "react-native-reanimated": "~4.4.0",
     "react-native-safe-area-context": "~5.8.0",
     "react-native-screens": "~4.25.2",
+    "react-native-svg": "^15.15.5",
     "react-native-worklets": "^0.9.1",
     "react-hook-form": "^7.76.1",
     "react-i18next": "^17.0.8",

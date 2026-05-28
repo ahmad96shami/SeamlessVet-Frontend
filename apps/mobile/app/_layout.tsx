@@ -8,6 +8,7 @@ import { PowerSyncContext } from "@powersync/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { useAppFonts } from "@/lib/fonts";
 import { queryClient } from "@/lib/queryClient";
 import { ensureArabicRTL } from "@/lib/rtl";
 import { initSentry } from "@/services/sentry";
@@ -28,6 +29,11 @@ export default function RootLayout() {
       if (!reloading) setRtlReady(true);
     });
   }, []);
+
+  // Tajawal must finish loading before we paint — RN won't repaint already-laid-
+  // out text when a custom face arrives later, so a flash-of-system-font would
+  // leave the first frame styled wrong.
+  const [fontsLoaded] = useAppFonts();
 
   // Hydrate the auth state from secure-store on mount.
   const status = useAuthStore((s) => s.status);
@@ -50,7 +56,7 @@ export default function RootLayout() {
     }
   }, [status, segments, router]);
 
-  if (!rtlReady || status === "unknown") return null;
+  if (!rtlReady || !fontsLoaded || status === "unknown") return null;
   return (
     <SafeAreaProvider>
       <PowerSyncContext.Provider value={powerSync}>
