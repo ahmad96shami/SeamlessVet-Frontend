@@ -36,9 +36,14 @@ function anchorAmPm(s: string): string {
 }
 
 export const DATE_FORMAT = "yyyy/MM/dd";
-// 12-hour clock — visual layout "ص7:18 2026/05/28": am/pm marker first, then the time
-// (glued to it), then space, then date. Date-fns `a` → "ص"/"م" (ar) or "AM"/"PM" (en).
-export const DATE_TIME_FORMAT = "ah:mm yyyy/MM/dd";
+// 12-hour clock — visual conventions differ by locale:
+//   ar → "ص7:18 2026/05/28" (am/pm + time glued, then date) — matches Palestinian print style.
+//   en → "2026/05/28 7:18 AM" (date, time, AM/PM with breathing space).
+// Date-fns `a` → "ص"/"م" (ar) or "AM"/"PM" (en).
+export const DATE_TIME_FORMAT_AR = "ah:mm yyyy/MM/dd";
+export const DATE_TIME_FORMAT_EN = "yyyy/MM/dd h:mm a";
+/** Back-compat: callers that explicitly pass a pattern still work; locale-default uses the pair above. */
+export const DATE_TIME_FORMAT = DATE_TIME_FORMAT_AR;
 
 /** Arabic-aware date formatting; digits forced to Latin via [[toLatinDigits]]. */
 export function formatDate(
@@ -52,7 +57,8 @@ export function formatDate(
 export function formatDateTime(
   value: DateInput,
   locale: string = DEFAULT_LOCALE,
-  pattern: string = DATE_TIME_FORMAT,
+  pattern?: string,
 ): string {
-  return anchorAmPm(toLatinDigits(formatDateFns(toDate(value), pattern, { locale: localeFor(locale) })));
+  const resolved = pattern ?? (locale.startsWith("ar") ? DATE_TIME_FORMAT_AR : DATE_TIME_FORMAT_EN);
+  return anchorAmPm(toLatinDigits(formatDateFns(toDate(value), resolved, { locale: localeFor(locale) })));
 }
