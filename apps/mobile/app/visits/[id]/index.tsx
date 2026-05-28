@@ -17,6 +17,7 @@ import { ChipSelect, FormField, NumberFieldTransform } from "@/components/forms"
 import { ScreenShell, TopBar } from "@/components/layout";
 import { ProceduresSection } from "@/components/visit/ProceduresSection";
 import { PrescriptionsSection } from "@/components/visit/PrescriptionsSection";
+import { VaccinationsSection } from "@/components/visit/VaccinationsSection";
 import { omitEmptyStrings } from "@/lib/forms";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
@@ -298,6 +299,8 @@ export default function VisitDetailScreen() {
             <ProceduresSection visitId={visit.id} isTerminal={isTerminal} />
 
             <PrescriptionsSection visitId={visit.id} isTerminal={isTerminal} />
+
+            <VaccinationsSection visitId={visit.id} isTerminal={isTerminal} />
 
             {!isTerminal ? (
               <View className="mt-2 gap-2">
