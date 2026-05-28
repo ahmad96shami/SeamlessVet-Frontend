@@ -40,7 +40,7 @@ export function LoginPage() {
             <Field label={t("auth.login.password")} error={form.formState.errors.password?.message}>
               <Input type="password" autoComplete="current-password" {...form.register("password")} />
             </Field>
-            <Button type="submit" className="w-full" disabled={login.isPending}>
+            <Button type="submit" variant="teal" className="w-full" disabled={login.isPending}>
               {t("auth.login.submit")}
             </Button>
           </form>

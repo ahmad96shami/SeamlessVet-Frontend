@@ -21,7 +21,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       </Button>
 
       <div className="flex flex-col items-center gap-3 text-white">
-        <div className="grid size-14 place-items-center rounded-2xl bg-white/15 ring-1 ring-white/30">
+        <div className="grid size-14 place-items-center rounded-2xl bg-teal-500/25 text-teal-100 ring-1 ring-teal-400/40 shadow-[0_10px_36px_rgba(26,143,161,0.45)]">
           <Icon.stethoscope size={28} />
         </div>
         <span className="text-2xl font-extrabold tracking-tight">SeamlessVet</span>

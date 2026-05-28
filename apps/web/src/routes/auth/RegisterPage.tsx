@@ -50,7 +50,7 @@ export function RegisterPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">{t("auth.register.pending")}</p>
-            <Link to="/login" className={buttonVariants({ className: "w-full" })}>
+            <Link to="/login" className={buttonVariants({ variant: "teal", className: "w-full" })}>
               {t("auth.register.signIn")}
             </Link>
           </CardContent>
@@ -96,7 +96,7 @@ export function RegisterPage() {
             <Field label={t("auth.register.licenseNumber")} error={errors.licenseNumber?.message}>
               <Input dir="ltr" {...form.register("licenseNumber")} />
             </Field>
-            <Button type="submit" className="w-full" disabled={register.isPending}>
+            <Button type="submit" variant="teal" className="w-full" disabled={register.isPending}>
               {t("auth.register.submit")}
             </Button>
           </form>

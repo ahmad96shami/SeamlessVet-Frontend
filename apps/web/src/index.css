@@ -37,7 +37,7 @@
 
   --paper: #ffffff;
   --paper-soft: #f8fafb;
-  --canvas: #129aaa; /* the iconic teal app background — login hero */
+  --canvas: var(--navy-900); /* the login hero — deep navy with teal-accent brand mark */
 
   --amber: #f4b400;
   --amber-soft: #fff6dd;
