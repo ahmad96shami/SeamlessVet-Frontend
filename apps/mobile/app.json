@@ -14,7 +14,7 @@
     "android": {
       "package": "com.seamlessvet.mobile"
     },
-    "plugins": ["expo-router"],
+    "plugins": ["expo-router", "expo-secure-store", "expo-localization", "expo-updates"],
     "experiments": {
       "typedRoutes": true
     }

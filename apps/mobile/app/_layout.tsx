@@ -2,10 +2,11 @@ import "../global.css";
 import "@/i18n";
 
 import { useEffect, useState } from "react";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 import { ensureArabicRTL } from "@/lib/rtl";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function RootLayout() {
   // First Arabic launch flips I18nManager.forceRTL(true) and reloads the JS
@@ -18,7 +19,28 @@ export default function RootLayout() {
     });
   }, []);
 
-  if (!rtlReady) return null;
+  // Hydrate the auth state from secure-store on mount.
+  const status = useAuthStore((s) => s.status);
+  const restore = useAuthStore((s) => s.restore);
+  useEffect(() => {
+    void restore();
+  }, [restore]);
+
+  // Auth gate: anyone not signed in is bounced to (auth)/login; signed-in users
+  // in the (auth) group are bounced out. Wait for restore to settle (`unknown`).
+  const router = useRouter();
+  const segments = useSegments();
+  useEffect(() => {
+    if (status === "unknown") return;
+    const inAuthGroup = segments[0] === "(auth)";
+    if (status === "unauthenticated" && !inAuthGroup) {
+      router.replace("/(auth)/login");
+    } else if (status === "authenticated" && inAuthGroup) {
+      router.replace("/");
+    }
+  }, [status, segments, router]);
+
+  if (!rtlReady || status === "unknown") return null;
   return (
     <>
       <Stack screenOptions={{ headerShown: false }} />
