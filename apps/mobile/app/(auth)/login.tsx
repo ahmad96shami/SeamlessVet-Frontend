@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -11,37 +10,31 @@ import {
   type LoginRequest,
 } from "@vet/shared";
 
-import { login } from "@/api/auth";
 import { Button } from "@/components/Button";
 import { Field } from "@/components/Field";
 import { TextField } from "@/components/TextField";
-import { useAuthStore } from "@/stores/authStore";
+import { useLogin } from "@/queries/auth";
 
 export default function LoginScreen() {
   const { t } = useTranslation();
-  const setSessionFromLogin = useAuthStore((s) => s.setSessionFromLogin);
-  const [submitting, setSubmitting] = useState(false);
+  const loginMut = useLogin();
   const form = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestSchema),
     defaultValues: { phonePrimary: "", password: "" },
   });
 
-  const onSubmit = form.handleSubmit(async (values) => {
-    setSubmitting(true);
-    try {
-      const res = await login(values);
-      await setSessionFromLogin(res);
-      // Navigation flips automatically — the root layout's auth gate redirects
-      // authenticated users out of (auth) and into the app.
-    } catch (err) {
-      const error = err as ApiError;
-      applyFieldErrors(error, (name, e) => form.setError(name as never, e));
-      if (!error.fieldErrors || Object.keys(error.fieldErrors).length === 0) {
-        Alert.alert(t("auth.login.title"), error.message ?? "Login failed");
-      }
-    } finally {
-      setSubmitting(false);
-    }
+  const onSubmit = form.handleSubmit((values) => {
+    loginMut.mutate(values, {
+      onError: (err) => {
+        const error = err as ApiError;
+        applyFieldErrors(error, (name, e) => form.setError(name as never, e));
+        if (!error.fieldErrors || Object.keys(error.fieldErrors).length === 0) {
+          Alert.alert(t("auth.login.title"), error.message ?? "Login failed");
+        }
+      },
+      // onSuccess: nav flips automatically — the root layout's auth gate
+      // bounces authenticated users out of (auth) and into the app.
+    });
   });
 
   return (
@@ -86,7 +79,7 @@ export default function LoginScreen() {
         />
 
         <View className="mt-2">
-          <Button label={t("auth.login.submit")} onPress={onSubmit} loading={submitting} />
+          <Button label={t("auth.login.submit")} onPress={onSubmit} loading={loginMut.isPending} />
         </View>
 
         <View className="mt-6 flex-row items-center justify-center">
