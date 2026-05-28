@@ -15,6 +15,10 @@
   "dependencies": {
     "@expo/metro-runtime": "~56.0.13",
     "@hookform/resolvers": "^5.4.0",
+    "@journeyapps/react-native-quick-sqlite": "^2.5.2",
+    "@powersync/common": "^1.53.2",
+    "@powersync/react": "^1.10.0",
+    "@powersync/react-native": "^1.35.3",
     "@sentry/react-native": "^8.12.0",
     "@tanstack/react-query": "^5.100.14",
     "@vet/shared": "workspace:*",
