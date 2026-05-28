@@ -120,19 +120,25 @@ export default function InventoryScreen() {
                   })}
                 />
               ) : null}
+              {/* Alert pills are tappable — they deep-link to the dedicated Mo3.5 alerts
+                  feed so the doctor can see exactly which products are flagged. */}
               {counts.low > 0 ? (
-                <Pill
-                  tone="amber"
-                  leadingIcon={<Warn size={12} color="#7A4F00" />}
-                  label={t("inventory.kpi.lowStock") + ` · ${counts.low}`}
-                />
+                <Pressable onPress={() => router.push("/inventory/alerts" as never)}>
+                  <Pill
+                    tone="amber"
+                    leadingIcon={<Warn size={12} color="#7A4F00" />}
+                    label={t("inventory.kpi.lowStock") + ` · ${counts.low}`}
+                  />
+                </Pressable>
               ) : null}
               {counts.expiring > 0 ? (
-                <Pill
-                  tone="amber"
-                  leadingIcon={<Warn size={12} color="#7A4F00" />}
-                  label={t("inventory.kpi.expiring") + ` · ${counts.expiring}`}
-                />
+                <Pressable onPress={() => router.push("/inventory/alerts" as never)}>
+                  <Pill
+                    tone="amber"
+                    leadingIcon={<Warn size={12} color="#7A4F00" />}
+                    label={t("inventory.kpi.expiring") + ` · ${counts.expiring}`}
+                  />
+                </Pressable>
               ) : null}
             </View>
           </View>
