@@ -25,9 +25,10 @@ const buttonVariants = cva(
         link: "text-teal-600 underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4",
-        sm: "h-9 rounded-md px-3 text-[13px]",
-        lg: "h-11 px-6",
+        // pt-1 / pb-px nudges the Tajawal glyph row down so it reads visually centred
+        default: "h-10 px-4 pt-1 pb-px",
+        sm: "h-9 rounded-md px-3 text-[13px] pt-1 pb-px",
+        lg: "h-11 px-6 pt-1 pb-px",
         icon: "size-10",
       },
     },
