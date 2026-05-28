@@ -38,7 +38,8 @@
     "signOut": "تسجيل الخروج",
     "language": "اللغة",
     "account": "الحساب",
-    "center": "المركز · جنين"
+    "center": "المركز · جنين",
+    "envIndicator": "بيئة شريكة"
   },
   "dashboard": {
     "title": "الرئيسية",

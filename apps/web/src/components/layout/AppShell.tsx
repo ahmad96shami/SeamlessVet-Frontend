@@ -16,6 +16,13 @@ import { useAuthStore } from "@/stores/authStore";
  * grouped nav sections, a brand mark, and a footer with the current user + utility pills
  * (language toggle, sign-out, sync indicator). Page content renders in the scrolling `.page`.
  */
+/**
+ * Matches the bootstrap (solo) env id from appsettings.Development. When the JWT puts the user in
+ * any other env, the rail shows a small chip so they can tell at a glance which env they're in —
+ * this surfaces the partnership-env state the W8 work introduced.
+ */
+const BOOTSTRAP_ENV_ID = "00000000-0000-0000-0000-000000000001";
+
 export function AppShell() {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
@@ -24,6 +31,8 @@ export function AppShell() {
   const role = user?.role ?? "";
   const items = navForRole(role);
   const roleLabel = role ? t(`roles.${role}`, { defaultValue: role }) : "";
+  const envId = user?.environmentId ?? "";
+  const showEnvChip = !!envId && envId !== BOOTSTRAP_ENV_ID;
 
   return (
     <div className="app-shell h-screen">
@@ -82,7 +91,14 @@ export function AppShell() {
             </div>
             <div className="sn-user-text">
               <div className="sn-user-name">{roleLabel}</div>
-              <div className="sn-user-role">{t("shell.center")}</div>
+              <div className="sn-user-role">
+                {t("shell.center")}
+                {showEnvChip ? (
+                  <span className="sn-env-chip" title={envId}>
+                    {t("shell.envIndicator")}
+                  </span>
+                ) : null}
+              </div>
             </div>
             <span className="sn-user-chev">
               <Icon.fwd size={14} />
