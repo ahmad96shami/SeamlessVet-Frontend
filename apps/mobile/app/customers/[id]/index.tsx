@@ -2,12 +2,20 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 
-import { Add, Bird, Briefcase, Cow, Edit, Forward, House, Stethoscope } from "@/components/icons";
-import { Button, Card, Pill } from "@/components/ui";
+import { Add, Bird, Briefcase, Cow, Edit, Forward, House, Receipt, Stethoscope } from "@/components/icons";
+import { Button, Card, Money, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
 import { formatDate } from "@vet/shared";
+
+interface LedgerRow {
+  id: string;
+  customer_id: string;
+  balance: number;
+  status: string;
+  updated_at: string;
+}
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   poultry_farm: <Bird size={20} color="#0F7A8A" />,
@@ -33,8 +41,13 @@ export default function CustomerDetailScreen() {
     `SELECT * FROM visits WHERE customer_id = ? ORDER BY started_at DESC LIMIT 5`,
     [id ?? ""],
   );
+  const { data: ledgers } = useQuery<LedgerRow>(
+    `SELECT * FROM ledgers WHERE customer_id = ?`,
+    [id ?? ""],
+  );
 
   const customer = customers?.[0];
+  const ledger = ledgers?.[0];
 
   if (!customer) {
     return (
@@ -83,13 +96,31 @@ export default function CustomerDetailScreen() {
         </View>
       </Card>
 
-      <View className="mt-5">
+      {ledger ? (
+        <Card flat className="mt-3 flex-row items-center justify-between p-3">
+          <View className="gap-0.5">
+            <Text className="text-ink-500 text-[12px] font-tajawal">
+              {t(`ledgerStatus.${ledger.status}`)}
+            </Text>
+            <Money value={ledger.balance} />
+          </View>
+        </Card>
+      ) : null}
+
+      <View className="mt-5 gap-2">
         <Button
           label={t("visits.new")}
           variant="teal"
           block
           leadingIcon={<Stethoscope size={18} color="#FFFFFF" />}
           onPress={() => router.push({ pathname: "/visits/new", params: { customerId: customer.id } })}
+        />
+        <Button
+          label={t("billing.actions.openVoucher")}
+          variant="soft"
+          block
+          leadingIcon={<Receipt size={18} color="#223D69" />}
+          onPress={() => router.push(`/customers/${customer.id}/voucher`)}
         />
       </View>
 
