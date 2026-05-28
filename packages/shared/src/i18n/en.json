@@ -42,7 +42,73 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "welcome": "Welcome, {{name}}"
+    "welcome": "Welcome, {{name}}",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "subtitle": {
+      "receptionist": "Reception · today",
+      "cashier": "Cashier · today",
+      "vet": "Doctor · today",
+      "inventory": "Inventory · today"
+    },
+    "actions": {
+      "newVisit": "New visit",
+      "newCustomer": "New customer",
+      "openPos": "Open POS",
+      "openInventory": "Manage inventory",
+      "todayReport": "Today's report"
+    },
+    "viewAll": "View all",
+    "todaySchedule": {
+      "title": "Today's schedule",
+      "subtitle_one": "1 appointment",
+      "subtitle_other": "{{count}} appointments",
+      "empty": "Nothing scheduled today."
+    },
+    "recentVisits": {
+      "title": "Recent visits",
+      "empty": "No visits yet."
+    },
+    "alerts": {
+      "title": "Alerts",
+      "empty": "All clear right now.",
+      "lowStockTitle": "Low stock",
+      "lowStockBody_one": "1 item under its reorder point.",
+      "lowStockBody_other": "{{count}} items under their reorder point.",
+      "pendingRegistrationsTitle": "Registration requests",
+      "pendingRegistrationsBody_one": "1 request awaiting approval.",
+      "pendingRegistrationsBody_other": "{{count}} requests awaiting approval."
+    },
+    "entitlements": {
+      "title": "Doctor entitlements",
+      "pending": "Pending",
+      "approved": "Approved — ready to pay",
+      "paid": "Paid this month",
+      "note": "Total: {{total}}. Entitlements only pay out after the customer ledger closes."
+    },
+    "vaxReminders": {
+      "title": "Vaccination reminders",
+      "empty": "Nothing due in the next 7 days."
+    },
+    "cashier": {
+      "todaysSales": "Today's sales",
+      "invoiceCount": "Invoice count",
+      "byMethod": "By payment method",
+      "noSales": "No sales recorded today."
+    },
+    "vet": {
+      "monthRevenue": "This month's revenue",
+      "monthShare": "My share this month"
+    },
+    "inventory": {
+      "lowStock": "Items at or below reorder point",
+      "lowStockSubtitle_one": "1 item to reorder",
+      "lowStockSubtitle_other": "{{count}} items to reorder",
+      "empty": "All stock is above its reorder point."
+    }
   },
   "placeholder": {
     "title": "Under construction",

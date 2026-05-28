@@ -42,7 +42,85 @@
   },
   "dashboard": {
     "title": "الرئيسية",
-    "welcome": "مرحبًا، {{name}}"
+    "welcome": "مرحبًا، {{name}}",
+    "greeting": {
+      "morning": "صباح الخير",
+      "afternoon": "مساء الخير",
+      "evening": "مساء الخير"
+    },
+    "subtitle": {
+      "receptionist": "موظف استقبال — اليوم",
+      "cashier": "أمين صندوق — اليوم",
+      "vet": "طبيب — اليوم",
+      "inventory": "مخزون — اليوم"
+    },
+    "actions": {
+      "newVisit": "زيارة جديدة",
+      "newCustomer": "عميل جديد",
+      "openPos": "فتح نقطة البيع",
+      "openInventory": "إدارة المخزون",
+      "todayReport": "تقرير اليوم"
+    },
+    "viewAll": "عرض الكل",
+    "todaySchedule": {
+      "title": "جدول اليوم",
+      "subtitle_one": "موعد واحد",
+      "subtitle_two": "موعدان",
+      "subtitle_few": "{{count}} مواعيد",
+      "subtitle_many": "{{count}} موعدًا",
+      "subtitle_other": "{{count}} موعدًا",
+      "empty": "لا توجد مواعيد اليوم."
+    },
+    "recentVisits": {
+      "title": "زيارات حديثة",
+      "empty": "لا توجد زيارات بعد."
+    },
+    "alerts": {
+      "title": "تنبيهات تتطلب انتباهك",
+      "empty": "لا توجد تنبيهات الآن. كل شيء على ما يرام.",
+      "lowStockTitle": "مخزون منخفض",
+      "lowStockBody_one": "صنف واحد دون نقطة إعادة الطلب.",
+      "lowStockBody_two": "صنفان دون نقطة إعادة الطلب.",
+      "lowStockBody_few": "{{count}} أصناف دون نقطة إعادة الطلب.",
+      "lowStockBody_many": "{{count}} صنفًا دون نقطة إعادة الطلب.",
+      "lowStockBody_other": "{{count}} صنفًا دون نقطة إعادة الطلب.",
+      "pendingRegistrationsTitle": "طلبات تسجيل جديدة",
+      "pendingRegistrationsBody_one": "طلب واحد في انتظار الموافقة.",
+      "pendingRegistrationsBody_two": "طلبان في انتظار الموافقة.",
+      "pendingRegistrationsBody_few": "{{count}} طلبات في انتظار الموافقة.",
+      "pendingRegistrationsBody_many": "{{count}} طلبًا في انتظار الموافقة.",
+      "pendingRegistrationsBody_other": "{{count}} طلبًا في انتظار الموافقة."
+    },
+    "entitlements": {
+      "title": "مستحقات الأطباء",
+      "pending": "قيد الانتظار",
+      "approved": "مُقَرّ — جاهز للصرف",
+      "paid": "مدفوع هذا الشهر",
+      "note": "إجمالي: {{total}}. لا تُصرف مستحقات الطبيب إلا بعد إغلاق حساب العميل."
+    },
+    "vaxReminders": {
+      "title": "تذكيرات تطعيمات",
+      "empty": "لا توجد تذكيرات للأسبوع القادم."
+    },
+    "cashier": {
+      "todaysSales": "مبيعات اليوم",
+      "invoiceCount": "عدد الفواتير",
+      "byMethod": "حسب طريقة الدفع",
+      "noSales": "لا توجد مبيعات اليوم بعد."
+    },
+    "vet": {
+      "monthRevenue": "إيراد هذا الشهر",
+      "monthShare": "نصيبي هذا الشهر"
+    },
+    "inventory": {
+      "lowStock": "أصناف تحت نقطة الطلب",
+      "lowStockSubtitle_one": "صنف واحد يحتاج الطلب",
+      "lowStockSubtitle_two": "صنفان يحتاجان الطلب",
+      "lowStockSubtitle_few": "{{count}} أصناف تحتاج الطلب",
+      "lowStockSubtitle_many": "{{count}} صنفًا يحتاج الطلب",
+      "lowStockSubtitle_other": "{{count}} صنفًا يحتاج الطلب",
+      "empty": "كل المخزون فوق نقطة إعادة الطلب."
+    }
   },
   "placeholder": {
     "title": "قيد الإنشاء",

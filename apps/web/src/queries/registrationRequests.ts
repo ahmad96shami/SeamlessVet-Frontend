@@ -18,10 +18,11 @@ import { apiClient } from "@/services/apiClient";
 
 const KEY = "registration-requests";
 
-export function useRegistrationRequests(status: string) {
+export function useRegistrationRequests(status: string, options?: { enabled?: boolean }) {
   return useQuery<RegistrationRequestSummary[], ApiError>({
     queryKey: [KEY, status],
     queryFn: () => listRegistrationRequests(apiClient, { status }),
+    enabled: options?.enabled ?? true,
   });
 }
 

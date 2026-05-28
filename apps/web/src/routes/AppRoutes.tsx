@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import { Placeholder } from "@/components/Placeholder";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProductsPage } from "@/routes/admin/ProductsPage";
 import { RegistrationRequestsPage } from "@/routes/admin/RegistrationRequestsPage";
@@ -13,6 +12,7 @@ import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
 import { CustomerDetailPage } from "@/routes/customers/CustomerDetailPage";
 import { CustomersPage } from "@/routes/customers/CustomersPage";
+import { DashboardPage } from "@/routes/dashboard/DashboardPage";
 import { BatchesPage } from "@/routes/finance/BatchesPage";
 import { ContractsPage } from "@/routes/finance/ContractsPage";
 import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
@@ -77,7 +77,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Placeholder titleKey="nav.dashboard" milestone="W9" />} />
+        <Route index element={<DashboardPage />} />
         <Route
           path="operations/customers"
           element={
