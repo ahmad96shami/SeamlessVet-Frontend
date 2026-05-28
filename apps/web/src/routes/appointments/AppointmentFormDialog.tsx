@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Field } from "@/components/form/Field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -372,8 +373,8 @@ export function AppointmentFormDialog({
               </Select>
             </Field>
             <Field label={t("appointments.scheduledAt")}>
-              <Input
-                type="datetime-local"
+              <DatePicker
+                withTime
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
                 disabled={readOnly}

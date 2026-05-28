@@ -391,6 +391,12 @@
   .datepicker-foot { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--ink-100); }
   .datepicker-action { flex: 1; padding: 6px 10px; border-radius: 8px; border: 0; background: var(--ink-50); color: var(--ink-700); font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
   .datepicker-action:hover { background: var(--ink-100); color: var(--fg-strong); }
+  .datepicker-action-primary { background: var(--teal-500); color: white; }
+  .datepicker-action-primary:hover { background: var(--teal-600); color: white; }
+  /* Time row (only rendered when withTime). Hour + minute selects styled small so they fit the popup. */
+  .datepicker-time { display: flex; align-items: center; gap: 6px; padding: 8px 4px 0; margin-top: 4px; border-top: 1px solid var(--ink-100); }
+  .datepicker-time-label { font-size: 11px; font-weight: 700; color: var(--ink-500); margin-inline-end: 4px; }
+  .datepicker-time-select { height: 30px; padding: 0 8px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--paper); color: var(--fg-1); font-family: inherit; font-size: 13px; font-variant-numeric: tabular-nums; }
 
   /* ════════ Shell: collapsible right-rail side-nav ════════ */
   /* The rail is out of flow (absolute) and expands on hover as an OVERLAY. The content reserves

@@ -127,6 +127,16 @@
     "title": "قيد الإنشاء",
     "body": "هذه الشاشة ستُبنى في مرحلة {{milestone}}."
   },
+  "datepicker": {
+    "placeholder": "اختر تاريخًا",
+    "placeholderDateTime": "اختر تاريخًا ووقتًا",
+    "today": "اليوم",
+    "clear": "مسح",
+    "done": "تم",
+    "time": "الوقت",
+    "hour": "الساعة",
+    "minute": "الدقيقة"
+  },
   "roles": {
     "admin": "مدير",
     "accountant": "محاسب",

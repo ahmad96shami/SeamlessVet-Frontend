@@ -1,4 +1,4 @@
-import { formatDate } from "@vet/shared";
+import { formatDate, formatDateTime } from "@vet/shared";
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
@@ -7,28 +7,32 @@ import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 
 /**
- * Custom date picker — a drop-in replacement for `<input type="date" />`.
+ * Custom date / date-time picker — drop-in replacement for `<input type="date">` and
+ * `<input type="datetime-local">`.
  *
- * - `value` is `"YYYY-MM-DD"` (the native input value format), so RHF
- *   `{...register("date")}` keeps working when callers swap.
- * - `onChange` emits `{ target: { value } }` (same shape as `Select`).
- * - Visual trigger reuses the `.select-trigger` class so spacing, focus ring,
- *   and disabled state match the rest of the form controls.
- * - Calendar popup is portalled to `<body>` and pinned to the trigger via the
- *   same `useLayoutEffect` pattern as `Select`, so it never clips inside
- *   scrolling dialogs.
- * - Month / weekday labels come from `Intl.DateTimeFormat` in the active
- *   language — no per-component i18n strings.
+ * - `value` format mirrors the native control: `"YYYY-MM-DD"` (date-only) or
+ *   `"YYYY-MM-DDTHH:mm"` (when `withTime`). RHF `{...register("x")}` still works.
+ * - `onChange` emits `{ target: { value } }` — same shape as `Select`.
+ * - The trigger reuses `.select-trigger` so it inherits the form-control styling.
+ * - The popup is portalled to `<body>` and pinned to the trigger; if there isn't enough
+ *   space below, it flips *above* the trigger so it doesn't get clipped inside a tall
+ *   modal (this caught us on the new-product expiry field — see [[web-polish-pass-decisions]]).
+ * - Month / weekday labels come from `Intl.DateTimeFormat`; numbers are forced Latin via
+ *   the shared `formatDate` so output stays consistent with the rest of the app.
  */
 export interface DatePickerProps {
   value?: string;
   onChange?: (event: { target: { value: string } }) => void;
   disabled?: boolean;
-  /** Inclusive lower bound, `YYYY-MM-DD`. */
+  /** Inclusive lower bound, `YYYY-MM-DD` (or with time when `withTime`). */
   min?: string;
-  /** Inclusive upper bound, `YYYY-MM-DD`. */
+  /** Inclusive upper bound. */
   max?: string;
   placeholder?: string;
+  /** When true, picks a date *and* time (`YYYY-MM-DDTHH:mm` value). */
+  withTime?: boolean;
+  /** Step in minutes for the minute selector when `withTime`. Default 5. */
+  minuteStep?: number;
   className?: string;
   containerClassName?: string;
   id?: string;
@@ -36,18 +40,28 @@ export interface DatePickerProps {
   "aria-label"?: string;
 }
 
-function toIsoDate(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
 }
 
-function parseIsoDate(s: string | undefined): Date | null {
+function toIsoDate(d: Date): string {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+function toIsoDateTime(d: Date): string {
+  return `${toIsoDate(d)}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+function parseValue(s: string | undefined, withTime: boolean): Date | null {
   if (!s) return null;
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(s);
   if (!m) return null;
-  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const y = Number(m[1]);
+  const mo = Number(m[2]) - 1;
+  const day = Number(m[3]);
+  const hh = withTime ? Number(m[4] ?? "0") : 0;
+  const mm = withTime ? Number(m[5] ?? "0") : 0;
+  const d = new Date(y, mo, day, hh, mm);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
@@ -63,6 +77,14 @@ function isSameDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 
+function withDate(target: Date, from: Date): Date {
+  return new Date(target.getFullYear(), target.getMonth(), target.getDate(), from.getHours(), from.getMinutes());
+}
+
+function withTimeParts(d: Date, hh: number, mm: number): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hh, mm);
+}
+
 export function DatePicker({
   value,
   onChange,
@@ -70,28 +92,42 @@ export function DatePicker({
   min,
   max,
   placeholder,
+  withTime = false,
+  minuteStep = 5,
   className,
   containerClassName,
   id,
   name,
   "aria-label": ariaLabel,
 }: DatePickerProps) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const locale = i18n.language;
-  const selected = parseIsoDate(value);
-  const minDate = parseIsoDate(min);
-  const maxDate = parseIsoDate(max);
+  const selected = parseValue(value, withTime);
+  const minDate = parseValue(min, withTime);
+  const maxDate = parseValue(max, withTime);
 
   const [open, setOpen] = React.useState(false);
   const [viewMonth, setViewMonth] = React.useState<Date>(() => startOfMonth(selected ?? new Date()));
   const [focusedDay, setFocusedDay] = React.useState<Date>(() => selected ?? new Date());
+  const [draftTime, setDraftTime] = React.useState<{ h: number; m: number }>(() => {
+    const d = selected ?? new Date();
+    return { h: d.getHours(), m: Math.floor(d.getMinutes() / minuteStep) * minuteStep };
+  });
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const popupRef = React.useRef<HTMLDivElement>(null);
-  const [pos, setPos] = React.useState<{ top: number; left: number; width: number } | null>(null);
+  const [pos, setPos] = React.useState<{ top: number; left: number; width: number; flipUp: boolean } | null>(null);
 
   const reposition = React.useCallback(() => {
     const rect = triggerRef.current?.getBoundingClientRect();
-    if (rect) setPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    if (!rect) return;
+    const popupHeight = popupRef.current?.getBoundingClientRect().height ?? 360;
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    // Flip up when the popup doesn't fit below AND there's more room above.
+    const flipUp = spaceBelow < popupHeight + 8 && spaceAbove > spaceBelow;
+    const top = flipUp ? rect.top - popupHeight - 4 : rect.bottom + 4;
+    setPos({ top, left: rect.left, width: rect.width, flipUp });
   }, []);
 
   React.useLayoutEffect(() => {
@@ -122,18 +158,35 @@ export function DatePicker({
     const initial = selected ?? new Date();
     setViewMonth(startOfMonth(initial));
     setFocusedDay(initial);
+    if (withTime) {
+      setDraftTime({ h: initial.getHours(), m: Math.floor(initial.getMinutes() / minuteStep) * minuteStep });
+    }
     setOpen(true);
   };
 
   const isDisabledDate = (d: Date): boolean => {
-    if (minDate && d < minDate) return true;
-    if (maxDate && d > maxDate) return true;
+    if (minDate && d < new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate())) return true;
+    if (maxDate && d > new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate(), 23, 59)) return true;
     return false;
   };
 
   const choose = (d: Date) => {
     if (isDisabledDate(d)) return;
+    if (withTime) {
+      // In time mode, picking a day doesn't close — let the user confirm via "Done" so they
+      // can tweak the time first. We still update the focused day + draft.
+      setFocusedDay(d);
+      return;
+    }
     const iso = toIsoDate(d);
+    if (iso !== value) onChange?.({ target: { value: iso } });
+    setOpen(false);
+    triggerRef.current?.focus();
+  };
+
+  const confirmWithTime = () => {
+    const d = withTimeParts(focusedDay, draftTime.h, draftTime.m);
+    const iso = toIsoDateTime(d);
     if (iso !== value) onChange?.({ target: { value: iso } });
     setOpen(false);
     triggerRef.current?.focus();
@@ -155,7 +208,8 @@ export function DatePicker({
     }
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      choose(focusedDay);
+      if (withTime) confirmWithTime();
+      else choose(focusedDay);
       return;
     }
     let next: Date | null = null;
@@ -169,20 +223,17 @@ export function DatePicker({
     else if (e.key === "End") next = new Date(focusedDay.getFullYear(), focusedDay.getMonth() + 1, 0);
     if (next) {
       e.preventDefault();
-      setFocusedDay(next);
+      setFocusedDay(withDate(next, focusedDay));
       if (next.getMonth() !== viewMonth.getMonth() || next.getFullYear() !== viewMonth.getFullYear()) {
         setViewMonth(startOfMonth(next));
       }
     }
   };
 
-  // 7×6 grid starting on Saturday (week start for ar-PS); en-US starts Sunday.
-  // Intl exposes neither week-start nor day names directly in older runtimes,
-  // so we derive both from concrete dates: pick any Saturday and march forward.
   const weekStart = locale.startsWith("ar") ? 6 : 0; // 0=Sun, 6=Sat
   const dayNameFormatter = new Intl.DateTimeFormat(locale, { weekday: "short" });
   const weekdays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(2024, 0, 7 + ((weekStart + i) % 7)); // 2024-01-07 is a Sunday
+    const d = new Date(2024, 0, 7 + ((weekStart + i) % 7));
     return dayNameFormatter.format(d);
   });
 
@@ -195,6 +246,15 @@ export function DatePicker({
   const cells: Date[] = Array.from({ length: 42 }, (_, i) => {
     return new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i);
   });
+
+  const hourOptions = Array.from({ length: 24 }, (_, i) => i);
+  const minuteOptions = Array.from({ length: Math.floor(60 / minuteStep) }, (_, i) => i * minuteStep);
+
+  const display = selected
+    ? withTime
+      ? formatDateTime(selected, locale)
+      : formatDate(selected, locale)
+    : (placeholder ?? t(withTime ? "datepicker.placeholderDateTime" : "datepicker.placeholder"));
 
   return (
     <div className={cn("relative", containerClassName)}>
@@ -211,9 +271,7 @@ export function DatePicker({
         onClick={() => (open ? setOpen(false) : openCalendar())}
         onKeyDown={onTriggerKey}
       >
-        <span className={cn("select-value", !selected && "placeholder")}>
-          {selected ? formatDate(selected, locale) : (placeholder ?? "—")}
-        </span>
+        <span className={cn("select-value", !selected && "placeholder")}>{display}</span>
         <Icon.cal className="select-chev size-4" />
       </button>
       {name ? <input type="hidden" name={name} value={value ?? ""} /> : null}
@@ -280,6 +338,36 @@ export function DatePicker({
                   );
                 })}
               </div>
+              {withTime ? (
+                <div className="datepicker-time">
+                  <span className="datepicker-time-label">{t("datepicker.time")}</span>
+                  <select
+                    className="datepicker-time-select"
+                    value={draftTime.h}
+                    aria-label={t("datepicker.hour")}
+                    onChange={(e) => setDraftTime((s) => ({ ...s, h: Number(e.target.value) }))}
+                  >
+                    {hourOptions.map((h) => (
+                      <option key={h} value={h}>
+                        {pad2(h)}
+                      </option>
+                    ))}
+                  </select>
+                  <span>:</span>
+                  <select
+                    className="datepicker-time-select"
+                    value={draftTime.m}
+                    aria-label={t("datepicker.minute")}
+                    onChange={(e) => setDraftTime((s) => ({ ...s, m: Number(e.target.value) }))}
+                  >
+                    {minuteOptions.map((m) => (
+                      <option key={m} value={m}>
+                        {pad2(m)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
               <div className="datepicker-foot">
                 <button
                   type="button"
@@ -287,9 +375,10 @@ export function DatePicker({
                   onClick={() => {
                     setViewMonth(startOfMonth(today));
                     setFocusedDay(today);
+                    if (withTime) setDraftTime({ h: today.getHours(), m: Math.floor(today.getMinutes() / minuteStep) * minuteStep });
                   }}
                 >
-                  {locale.startsWith("ar") ? "اليوم" : "Today"}
+                  {t("datepicker.today")}
                 </button>
                 {value ? (
                   <button
@@ -301,7 +390,16 @@ export function DatePicker({
                       triggerRef.current?.focus();
                     }}
                   >
-                    {locale.startsWith("ar") ? "مسح" : "Clear"}
+                    {t("datepicker.clear")}
+                  </button>
+                ) : null}
+                {withTime ? (
+                  <button
+                    type="button"
+                    className="datepicker-action datepicker-action-primary"
+                    onClick={confirmWithTime}
+                  >
+                    {t("datepicker.done")}
                   </button>
                 ) : null}
               </div>

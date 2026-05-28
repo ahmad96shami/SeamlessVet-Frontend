@@ -115,6 +115,16 @@
     "title": "Under construction",
     "body": "This screen will be built in milestone {{milestone}}."
   },
+  "datepicker": {
+    "placeholder": "Pick a date",
+    "placeholderDateTime": "Pick a date and time",
+    "today": "Today",
+    "clear": "Clear",
+    "done": "Done",
+    "time": "Time",
+    "hour": "Hour",
+    "minute": "Minute"
+  },
   "roles": {
     "admin": "Administrator",
     "accountant": "Accountant",

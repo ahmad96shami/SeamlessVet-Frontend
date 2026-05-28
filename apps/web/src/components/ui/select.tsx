@@ -75,7 +75,16 @@ export function Select({
 
   const reposition = React.useCallback(() => {
     const rect = triggerRef.current?.getBoundingClientRect();
-    if (rect) setPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    if (!rect) return;
+    const menuHeight = menuRef.current?.getBoundingClientRect().height ?? 280;
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    // Flip the menu above the trigger when it doesn't fit below and there's more room above —
+    // matters inside tall modals where the field sits near the bottom edge of the viewport.
+    const flipUp = spaceBelow < menuHeight + 8 && spaceAbove > spaceBelow;
+    const top = flipUp ? Math.max(8, rect.top - menuHeight - 4) : rect.bottom + 4;
+    setPos({ top, left: rect.left, width: rect.width });
   }, []);
 
   // Keep the portalled menu pinned to the trigger while open (page/dialog scroll, resize).
