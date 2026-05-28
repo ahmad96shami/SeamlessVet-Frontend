@@ -698,8 +698,23 @@
     "actions": {
       "openField": "Issue field invoice",
       "openExam": "Issue exam fee",
-      "openVoucher": "Record payment (voucher)"
+      "openVoucher": "Record payment (voucher)",
+      "openStatement": "Account statement"
     }
+  },
+  "statement": {
+    "title": "Account statement",
+    "entriesTitle": "Entries",
+    "empty": "No ledger entries yet.",
+    "opening": "Opening balance: {{value}}",
+    "closing": "Closing balance: {{value}}",
+    "sourceServer": "Synced with the server",
+    "sourceLocal": "Offline view (last data on this device)",
+    "shareWhatsApp": "Send via WhatsApp",
+    "share": "Share",
+    "shareHeader": "Account statement — {{name}}",
+    "shareUnavailable": "WhatsApp could not be opened on this device.",
+    "shareFailed": "Sharing failed"
   },
   "appointments": {
     "title": "Appointments",

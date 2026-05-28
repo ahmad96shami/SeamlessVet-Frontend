@@ -710,8 +710,23 @@
     "actions": {
       "openField": "إصدار فاتورة زيارة",
       "openExam": "إصدار كشفية",
-      "openVoucher": "تسجيل دفعة (سند قبض)"
+      "openVoucher": "تسجيل دفعة (سند قبض)",
+      "openStatement": "كشف حساب"
     }
+  },
+  "statement": {
+    "title": "كشف حساب",
+    "entriesTitle": "الحركات",
+    "empty": "لا توجد حركات بعد.",
+    "opening": "الرصيد الافتتاحي: {{value}}",
+    "closing": "الرصيد النهائي: {{value}}",
+    "sourceServer": "تمت المزامنة مع الخادم",
+    "sourceLocal": "عرض دون اتصال (آخر بيانات على الجهاز)",
+    "shareWhatsApp": "إرسال عبر واتساب",
+    "share": "مشاركة",
+    "shareHeader": "كشف حساب — {{name}}",
+    "shareUnavailable": "تعذّر فتح واتساب على الجهاز.",
+    "shareFailed": "تعذّرت المشاركة"
   },
   "appointments": {
     "title": "المواعيد",

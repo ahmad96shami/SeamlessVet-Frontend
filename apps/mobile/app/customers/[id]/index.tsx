@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 
-import { Add, Bird, Briefcase, Cow, Edit, Forward, House, Receipt, Stethoscope } from "@/components/icons";
+import { Add, Bird, Briefcase, Cow, Edit, Forward, House, Paper, Receipt, Stethoscope } from "@/components/icons";
 import { Button, Card, Money, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
@@ -121,6 +121,13 @@ export default function CustomerDetailScreen() {
           block
           leadingIcon={<Receipt size={18} color="#223D69" />}
           onPress={() => router.push(`/customers/${customer.id}/voucher`)}
+        />
+        <Button
+          label={t("billing.actions.openStatement")}
+          variant="ghost"
+          block
+          leadingIcon={<Paper size={18} color="#223D69" />}
+          onPress={() => router.push(`/customers/${customer.id}/statement`)}
         />
       </View>
 
