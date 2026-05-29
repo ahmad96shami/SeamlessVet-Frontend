@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import type { ContractCreateRequest } from "@vet/shared";
 
 import { Forward, Search } from "@/components/icons";
 import { Card, Input } from "@/components/ui";
@@ -11,6 +12,13 @@ import { useAuthStore } from "@/stores/authStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow } from "@/sync/types";
 import { syncInsert } from "@/sync/writes";
+
+/** Parse a numeric route param ("" / undefined / non-numeric → undefined). */
+function numParam(v: string | undefined): number | undefined {
+  if (!v) return undefined;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : undefined;
+}
 
 /**
  * Author a new **draft** contract offline (Mo5.1). The customer is either passed in via the route
@@ -22,10 +30,39 @@ import { syncInsert } from "@/sync/writes";
 export default function NewContractScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const params = useLocalSearchParams<{ customerId?: string }>();
+  // `customerId` fixes the farm; the remaining params pre-fill the terms when this screen is
+  // reached as a "propose amendment" from an active contract (Mo5.4).
+  const params = useLocalSearchParams<{
+    customerId?: string;
+    periodStart?: string;
+    periodEnd?: string;
+    totalPrice?: string;
+    expectedVisitCount?: string;
+    animalType?: string;
+    animalCount?: string;
+  }>();
   const userId = useAuthStore((s) => s.user?.userId);
   const [picked, setPicked] = useState<string | null>(params.customerId ?? null);
   const [submitting, setSubmitting] = useState(false);
+
+  const prefill = useMemo<Partial<ContractCreateRequest>>(
+    () => ({
+      periodStart: params.periodStart || undefined,
+      periodEnd: params.periodEnd || undefined,
+      totalPrice: numParam(params.totalPrice),
+      expectedVisitCount: numParam(params.expectedVisitCount),
+      animalType: params.animalType || undefined,
+      animalCount: numParam(params.animalCount),
+    }),
+    [
+      params.periodStart,
+      params.periodEnd,
+      params.totalPrice,
+      params.expectedVisitCount,
+      params.animalType,
+      params.animalCount,
+    ],
+  );
 
   // The chosen customer (for the header card). Local-only — these are the doctor's farms.
   const { data: chosenRows } = useQuery<CustomerRow>(
@@ -67,6 +104,7 @@ export default function NewContractScreen() {
 
             <ContractForm
               customerId={picked}
+              defaultValues={prefill}
               submitLabel={t("actions.save")}
               submitting={submitting}
               onSubmit={async (values) => {

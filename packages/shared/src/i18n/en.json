@@ -1186,6 +1186,8 @@
       "animalCount": "Animal count",
       "animalTypePlaceholder": "Broiler poultry, dairy cattle…",
       "deleteConfirm": "Cancel the contract for {{name}}?",
+      "proposeAmendment": "Propose amendment",
+      "proposeAmendmentHint": "An active contract is read-only on the device. Create a new draft as a proposed amendment — the office activates it.",
       "medPrices": {
         "title": "Medication price overrides",
         "subtitle": "Contract prices replace catalog prices once the contract is active",
@@ -1214,7 +1216,9 @@
       "gateHint": "Field visits are billed at catalog prices while the contract is a draft.",
       "activatedByYou": "Activation will be recorded under your name.",
       "needPermission": "You need the contracts.activate permission to activate.",
-      "onlineOnly": "Activation is available only while online."
+      "onlineOnly": "Activation is available only while online.",
+      "discard": "Discard draft",
+      "discardConfirm": "Discard this draft? This can't be undone."
     },
     "batches": {
       "title": "Supervision batches",
