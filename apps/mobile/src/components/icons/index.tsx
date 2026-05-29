@@ -232,6 +232,21 @@ export const Receipt = (p: IconProps) => (
   </Frame>
 );
 
+export const Camera = (p: IconProps) => (
+  <Frame {...p}>
+    <Path d="M5 9h2.5l1.2-2h6.6L16.5 9H19a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 5 9z" />
+    <Circle cx="12" cy="13.5" r="3" />
+  </Frame>
+);
+
+export const Image = (p: IconProps) => (
+  <Frame {...p}>
+    <Rect x="4" y="5" width="16" height="14" rx="2.5" />
+    <Circle cx="9" cy="10" r="1.5" />
+    <Path d="M5 17l4.5-4.5 3 3L16 11l3.5 3.5" />
+  </Frame>
+);
+
 export const ArrowDown = (p: IconProps) => (
   <Frame {...p}>
     <Path d="M12 5v14M6 13l6 6 6-6" />

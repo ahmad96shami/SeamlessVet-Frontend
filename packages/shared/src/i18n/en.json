@@ -614,7 +614,15 @@
       "view": "View",
       "newTitle": "Upload attachment",
       "deleteConfirm": "This attachment will be deleted.",
-      "pendingHint": "Upload incomplete"
+      "pendingHint": "Upload incomplete",
+      "camera": "Take a photo",
+      "gallery": "From gallery",
+      "pendingUpload": "Waiting to upload",
+      "failedUpload": "Upload failed — will retry",
+      "rejectedUpload": "Rejected by the server",
+      "viewOnlineOnly": "Viewing requires an internet connection",
+      "permissionTitle": "Permission required",
+      "permissionBody": "Enable camera or photos permission in the app settings to attach a file."
     },
     "report": {
       "action": "Visit report",
@@ -1092,6 +1100,7 @@
     "serverWins": "Server wins",
     "serverWinsHint": "The server kept its version; your offline edit to this record was not applied.",
     "restSection": "Pending operations",
+    "attachmentsSection": "Attachments",
     "psSection": "Server conflicts",
     "noConflicts": "No conflicts.",
     "label": {

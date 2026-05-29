@@ -120,6 +120,19 @@ export interface VisitRow {
   updated_at: string;
 }
 
+export interface AttachmentRow {
+  id: string;
+  visit_id: string;
+  file_type: string;
+  /** Synced-down value (object key / null) — viewing always fetches a fresh signed URL via the API. */
+  url: string | null;
+  title: string | null;
+  doc_date: string | null;
+  description: string | null;
+  upload_status: string;
+  created_at: string;
+}
+
 export interface ContractRow {
   id: string;
   customer_id: string;

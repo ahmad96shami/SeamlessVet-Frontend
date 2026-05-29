@@ -626,7 +626,15 @@
       "view": "عرض",
       "newTitle": "رفع مرفق",
       "deleteConfirm": "سيتم حذف هذا المرفق.",
-      "pendingHint": "لم يكتمل الرفع"
+      "pendingHint": "لم يكتمل الرفع",
+      "camera": "التقاط صورة",
+      "gallery": "من المعرض",
+      "pendingUpload": "بانتظار الرفع",
+      "failedUpload": "تعذّر الرفع — ستُعاد المحاولة",
+      "rejectedUpload": "رفضه الخادم",
+      "viewOnlineOnly": "العرض متاح عند الاتصال بالإنترنت فقط",
+      "permissionTitle": "الإذن مطلوب",
+      "permissionBody": "فعّل إذن الكاميرا أو الصور من إعدادات التطبيق لإرفاق ملف."
     },
     "report": {
       "action": "تقرير الزيارة",
@@ -1108,6 +1116,7 @@
     "serverWins": "الأسبقية للخادم",
     "serverWinsHint": "طبّق الخادم نسخته؛ لم تُطبَّق تعديلاتك المحلية على هذا السجل.",
     "restSection": "عمليات قيد الإرسال",
+    "attachmentsSection": "المرفقات",
     "psSection": "تعارضات الخادم",
     "noConflicts": "لا توجد تعارضات.",
     "label": {

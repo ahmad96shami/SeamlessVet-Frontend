@@ -3,12 +3,14 @@ import { Alert, Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { QueuedRequest, QueuedRequestStatus } from "@vet/shared";
 
-import { Button, Card, Divider, Pill } from "@/components/ui";
-import { offlineQueue } from "@/services/offlineQueue";
+import { Button, Card, Pill } from "@/components/ui";
 import {
-  type PowerSyncConflict,
-  listPowerSyncConflicts,
-} from "@/services/powerSyncConflicts";
+  type AttachmentOutboxItem,
+  listAttachmentOutbox,
+} from "@/services/attachmentOutbox";
+import { discardAttachment, retryAttachment } from "@/services/attachmentUploadEngine";
+import { offlineQueue } from "@/services/offlineQueue";
+import { type PowerSyncConflict, listPowerSyncConflicts } from "@/services/powerSyncConflicts";
 import {
   discardItem,
   dismissPowerSyncConflict,
@@ -31,13 +33,20 @@ const STATUS_I18N: Record<QueuedRequestStatus, string> = {
   conflict: "sync.conflictItem",
 };
 
-/** Reload both queues whenever they change while the sheet is open (counts/syncing are the signal). */
-function useReviewData(open: boolean): { rest: QueuedRequest[]; ps: PowerSyncConflict[] } {
+/** Reload all three queues whenever they change while the sheet is open (counts/syncing are signals). */
+function useReviewData(open: boolean): {
+  rest: QueuedRequest[];
+  att: AttachmentOutboxItem[];
+  ps: PowerSyncConflict[];
+} {
   const pendingCount = useSyncStore((s) => s.pendingCount);
   const conflictCount = useSyncStore((s) => s.conflictCount);
   const psConflictCount = useSyncStore((s) => s.psConflictCount);
+  const attPendingCount = useSyncStore((s) => s.attPendingCount);
+  const attConflictCount = useSyncStore((s) => s.attConflictCount);
   const syncing = useSyncStore((s) => s.syncing);
   const [rest, setRest] = useState<QueuedRequest[]>([]);
+  const [att, setAtt] = useState<AttachmentOutboxItem[]>([]);
   const [ps, setPs] = useState<PowerSyncConflict[]>([]);
 
   useEffect(() => {
@@ -46,37 +55,38 @@ function useReviewData(open: boolean): { rest: QueuedRequest[]; ps: PowerSyncCon
     void offlineQueue.all().then((rows) => {
       if (active) setRest(rows);
     });
+    setAtt(listAttachmentOutbox());
     setPs(listPowerSyncConflicts());
     return () => {
       active = false;
     };
-  }, [open, pendingCount, conflictCount, psConflictCount, syncing]);
+  }, [open, pendingCount, conflictCount, psConflictCount, attPendingCount, attConflictCount, syncing]);
 
-  return { rest, ps };
+  return { rest, att, ps };
 }
 
 /**
  * The offline-write review sheet (PRD §8.4 — no silent loss). It unifies the hybrid write model's
- * two upload paths: the shared REST-intent queue (retryable: "retry" / "discard") and the parked
- * PowerSync server-wins rejections (acknowledge-only: "dismiss"). Reached by tapping the sync pill.
+ * three upload paths: the shared REST-intent queue + the attachment outbox (both retry / discard)
+ * and the parked PowerSync server-wins rejections (acknowledge-only: "dismiss"). Reached by tapping
+ * the sync pill.
  */
 export function SyncReviewSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
-  const { rest, ps } = useReviewData(open);
+  const { rest, att, ps } = useReviewData(open);
   const online = useSyncStore((s) => s.online);
   const conflictCount = useSyncStore((s) => s.conflictCount);
-  const isEmpty = rest.length === 0 && ps.length === 0;
+  const isEmpty = rest.length === 0 && att.length === 0 && ps.length === 0;
 
-  const confirmDiscard = (id: string) =>
+  const confirmDiscard = (onConfirm: () => void) =>
     Alert.alert(t("sync.discard"), t("sync.discardConfirm"), [
       { text: t("actions.cancel"), style: "cancel" },
-      { text: t("sync.discard"), style: "destructive", onPress: () => void discardItem(id) },
+      { text: t("sync.discard"), style: "destructive", onPress: onConfirm },
     ]);
 
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable className="flex-1 justify-end bg-[rgba(8,16,30,0.45)]" onPress={onClose}>
-        {/* stop backdrop taps from closing when interacting with the sheet body */}
         <Pressable className="bg-paper rounded-t-card max-h-[80%] px-5 pb-8 pt-4" onPress={() => {}}>
           <View className="flex-row items-center justify-between pb-1">
             <Text className="text-navy-900 text-[17px] font-tajawal-extrabold">
@@ -115,29 +125,47 @@ export function SyncReviewSheet({ open, onClose }: { open: boolean; onClose: () 
           ) : (
             <ScrollView showsVerticalScrollIndicator={false} className="grow-0">
               {rest.length > 0 ? (
-                <View className="gap-2 pb-2">
-                  <SectionLabel text={t("sync.restSection")} />
+                <Section title={t("sync.restSection")}>
                   {rest.map((req) => (
                     <RestRow
                       key={req.id}
-                      req={req}
+                      title={t(req.label)}
+                      status={req.status}
+                      code={req.lastCode}
+                      error={req.lastError}
+                      attempts={req.attempts}
                       online={online}
                       onRetry={() => void retryItem(req.id)}
-                      onDiscard={() => confirmDiscard(req.id)}
+                      onDiscard={() => confirmDiscard(() => void discardItem(req.id))}
                     />
                   ))}
-                </View>
+                </Section>
               ) : null}
 
-              {rest.length > 0 && ps.length > 0 ? <Divider /> : null}
+              {att.length > 0 ? (
+                <Section title={t("sync.attachmentsSection")}>
+                  {att.map((item) => (
+                    <RestRow
+                      key={item.id}
+                      title={item.title || t("sync.label.attachment")}
+                      status={item.status}
+                      code={item.lastCode}
+                      error={item.lastError}
+                      attempts={item.attempts}
+                      online={online}
+                      onRetry={() => void retryAttachment(item.id)}
+                      onDiscard={() => confirmDiscard(() => discardAttachment(item.id))}
+                    />
+                  ))}
+                </Section>
+              ) : null}
 
               {ps.length > 0 ? (
-                <View className="gap-2 pt-2">
-                  <SectionLabel text={t("sync.psSection")} />
+                <Section title={t("sync.psSection")}>
                   {ps.map((c) => (
                     <PsRow key={c.id} conflict={c} onDismiss={() => void dismissPowerSyncConflict(c.id)} />
                   ))}
-                </View>
+                </Section>
               ) : null}
             </ScrollView>
           )}
@@ -147,40 +175,54 @@ export function SyncReviewSheet({ open, onClose }: { open: boolean; onClose: () 
   );
 }
 
-function SectionLabel({ text }: { text: string }) {
-  return <Text className="text-ink-500 text-[11px] font-tajawal-bold">{text}</Text>;
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <View className="gap-2 pt-3">
+      <Text className="text-ink-500 text-[11px] font-tajawal-bold">{title}</Text>
+      {children}
+    </View>
+  );
 }
 
+/** A retryable/discardable queue item (shared by the REST queue + the attachment outbox). */
 function RestRow({
-  req,
+  title,
+  status,
+  code,
+  error,
+  attempts,
   online,
   onRetry,
   onDiscard,
 }: {
-  req: QueuedRequest;
+  title: string;
+  status: QueuedRequestStatus;
+  code?: string;
+  error?: string;
+  attempts: number;
   online: boolean;
   onRetry: () => void;
   onDiscard: () => void;
 }) {
   const { t } = useTranslation();
-  const actionable = req.status === "conflict" || req.status === "failed";
+  const actionable = status === "conflict" || status === "failed";
   return (
     <Card flat className="gap-1.5 p-3">
       <View className="flex-row items-start justify-between gap-2">
         <View className="min-w-0 flex-1 gap-1">
           <View className="flex-row flex-wrap items-center gap-2">
-            <Text className="text-navy-900 text-[14px] font-tajawal-bold">{t(req.label)}</Text>
-            <Pill tone={STATUS_TONE[req.status]} label={t(STATUS_I18N[req.status])} />
+            <Text className="text-navy-900 text-[14px] font-tajawal-bold">{title}</Text>
+            <Pill tone={STATUS_TONE[status]} label={t(STATUS_I18N[status])} />
           </View>
-          {req.lastError ? (
+          {error ? (
             <Text className="text-ink-500 text-[12px] font-tajawal" numberOfLines={2}>
-              {req.lastCode ? `${req.lastCode} — ` : ""}
-              {req.lastError}
+              {code ? `${code} — ` : ""}
+              {error}
             </Text>
           ) : null}
-          {req.attempts > 0 ? (
+          {attempts > 0 ? (
             <Text className="text-ink-400 text-[11px] font-tajawal">
-              {t("sync.attempts", { count: req.attempts })}
+              {t("sync.attempts", { count: attempts })}
             </Text>
           ) : null}
         </View>

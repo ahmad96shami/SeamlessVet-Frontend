@@ -15,6 +15,7 @@ import {
 import { Button, Card, Pill } from "@/components/ui";
 import { ChipSelect, FormField, NumberFieldTransform } from "@/components/forms";
 import { ScreenShell, TopBar } from "@/components/layout";
+import { AttachmentsSection } from "@/components/visit/AttachmentsSection";
 import { ProceduresSection } from "@/components/visit/ProceduresSection";
 import { PrescriptionsSection } from "@/components/visit/PrescriptionsSection";
 import { VaccinationsSection } from "@/components/visit/VaccinationsSection";
@@ -301,6 +302,8 @@ export default function VisitDetailScreen() {
             <PrescriptionsSection visitId={visit.id} isTerminal={isTerminal} />
 
             <VaccinationsSection visitId={visit.id} isTerminal={isTerminal} />
+
+            <AttachmentsSection visitId={visit.id} isTerminal={isTerminal} />
 
             {!isTerminal ? (
               <View className="mt-2 gap-2">
