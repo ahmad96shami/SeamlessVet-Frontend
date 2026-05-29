@@ -5,6 +5,7 @@ import { formatDate } from "@vet/shared";
 
 import { Edit, Paper } from "@/components/icons";
 import { Card, Money, Pill } from "@/components/ui";
+import { ContractBatchesSection } from "@/components/contract/ContractBatchesSection";
 import { ContractMedicationPricesSection } from "@/components/contract/ContractMedicationPricesSection";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
@@ -117,6 +118,8 @@ export default function ContractDetailScreen() {
       </View>
 
       <ContractMedicationPricesSection contractId={contract.id} isDraft={isDraft} />
+
+      <ContractBatchesSection contractId={contract.id} />
     </ScreenShell>
   );
 }

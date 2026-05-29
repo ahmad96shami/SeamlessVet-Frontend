@@ -459,7 +459,8 @@
       "chiefComplaint": "Chief complaint",
       "created": "Visit opened",
       "queued": "Visit saved locally — it'll sync when you're back online",
-      "pickCustomerFirst": "Select a customer first"
+      "pickCustomerFirst": "Select a customer first",
+      "addCustomer": "Add new customer"
     },
     "detail": {
       "back": "Back to visits",
@@ -1218,6 +1219,7 @@
     "batches": {
       "title": "Supervision batches",
       "subtitle": "Configure supervision cycles and the doctor's entitlement",
+      "readOnlyHint": "Supervision batches are managed at the office — shown here for reference only.",
       "new": "New batch",
       "newTitle": "New supervision batch",
       "editTitle": "Edit batch",
