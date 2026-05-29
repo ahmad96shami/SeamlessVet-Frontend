@@ -3,8 +3,9 @@ import { Alert, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
-import { Bell, Briefcase, Paper, Stethoscope, User } from "@/components/icons";
+import { Briefcase, Paper, Stethoscope, User } from "@/components/icons";
 import { NavBottomBar, ScreenShell } from "@/components/layout";
+import { NotificationBell } from "@/components/NotificationBell";
 import { SyncIndicator } from "@/components/SyncIndicator";
 import { SyncReviewSheet } from "@/components/SyncReviewSheet";
 import { Button, Card } from "@/components/ui";
@@ -129,10 +130,7 @@ function HomeHeader({ langLabel, onOpenSync }: { langLabel: string; onOpenSync: 
 
       <View className="flex-row items-center gap-2">
         <SyncIndicator onPress={onOpenSync} />
-        <View className="border-ink-100 bg-paper relative h-10 w-10 items-center justify-center rounded-chip border">
-          <Bell size={18} color="#223D69" />
-          <View className="bg-amber absolute right-1.5 top-1.5 h-2 w-2 rounded-pill" />
-        </View>
+        <NotificationBell />
       </View>
     </View>
   );
