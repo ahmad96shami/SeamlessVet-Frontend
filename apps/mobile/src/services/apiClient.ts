@@ -14,6 +14,16 @@ export function setOnAuthError(handler: () => void): void {
   onAuthError = handler;
 }
 
+let onRefreshSuccess: (() => void) | undefined;
+/**
+ * Registered at app bootstrap so a *successful* token refresh can clear the read-only
+ * "session expired" flag (Mo6.5): the access token expired (offline or just lapsed), but the
+ * refresh token was still valid, so the session is live again and queued writes can resume.
+ */
+export function setOnRefreshSuccess(handler: () => void): void {
+  onRefreshSuccess = handler;
+}
+
 const tokenProvider: TokenProvider = {
   async getAccessToken() {
     return (await tokenStorage.getTokens())?.accessToken ?? null;
@@ -25,6 +35,7 @@ const tokenProvider: TokenProvider = {
       const { data } = await refreshClient.post("/auth/refresh", { refreshToken });
       const next: AuthTokens = { accessToken: data.accessToken, refreshToken: data.refreshToken };
       await tokenStorage.setTokens(next);
+      onRefreshSuccess?.();
       return next;
     } catch {
       return null;

@@ -3,9 +3,10 @@ import type { LoginResponse } from "@vet/shared";
 
 import { logout as logoutApi } from "@/api/auth";
 import { decodeJwt } from "@/lib/jwt";
-import { setOnAuthError } from "@/services/apiClient";
+import { setOnAuthError, setOnRefreshSuccess } from "@/services/apiClient";
 import { prefs } from "@/services/mmkv";
 import { tokenStorage } from "@/services/tokenStorage";
+import { useSyncStore } from "@/stores/syncStore";
 import { connectPowerSync, disconnectAndWipePowerSync } from "@/sync/lifecycle";
 
 export type AuthStatus = "unknown" | "authenticated" | "unauthenticated";
@@ -31,13 +32,28 @@ export interface AuthUser {
 interface AuthState {
   status: AuthStatus;
   user: AuthUser | null;
+  /**
+   * Read-only mode (PRD §8.8): the access token has expired and we can't refresh yet (offline).
+   * Reads from local SQLite keep working and writes keep queuing; a successful refresh or re-login
+   * clears it. Distinct from `unauthenticated` — the session isn't *gone*, just stale.
+   */
+  sessionExpired: boolean;
   setSessionFromLogin: (res: LoginResponse) => Promise<void>;
   restore: () => Promise<void>;
   logout: () => Promise<void>;
   handleAuthError: () => void;
+  /** Recompute {@link sessionExpired} from the stored access token's `exp` (foreground / refresh). */
+  refreshSessionState: () => Promise<void>;
 }
 
 const NUMBER_PREFIX_KEY = "auth.numberPrefix";
+
+/** True when the access token's `exp` is in the past (UX-only — the server is authoritative). */
+function isAccessTokenExpired(accessToken: string | undefined): boolean {
+  if (!accessToken) return false;
+  const exp = decodeJwt(accessToken)?.exp;
+  return typeof exp === "number" ? exp * 1000 <= Date.now() : false;
+}
 
 function userFromAccessToken(
   accessToken: string,
@@ -53,9 +69,10 @@ function userFromAccessToken(
   };
 }
 
-export const useAuthStore = create<AuthState>()((set) => ({
+export const useAuthStore = create<AuthState>()((set, get) => ({
   status: "unknown",
   user: null,
+  sessionExpired: false,
 
   setSessionFromLogin: async (res) => {
     await tokenStorage.setTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
@@ -65,6 +82,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
     else prefs.remove(NUMBER_PREFIX_KEY);
     set({
       status: "authenticated",
+      sessionExpired: false,
       user: userFromAccessToken(res.accessToken, {
         role: res.roleKey,
         numberPrefix: res.numberPrefix ?? null,
@@ -83,7 +101,13 @@ export const useAuthStore = create<AuthState>()((set) => ({
       ? userFromAccessToken(tokens.accessToken, { numberPrefix })
       : null;
     // An expired access token is fine here — the first request's 401 triggers refresh-or-logout.
-    set(user ? { status: "authenticated", user } : { status: "unauthenticated", user: null });
+    // Surface read-only mode up front if the cached token is already past `exp` (e.g. the app was
+    // closed for a while); a reconnect + refresh clears it.
+    set(
+      user
+        ? { status: "authenticated", user, sessionExpired: isAccessTokenExpired(tokens?.accessToken) }
+        : { status: "unauthenticated", user: null, sessionExpired: false },
+    );
     if (user) void connectPowerSync();
   },
 
@@ -101,14 +125,36 @@ export const useAuthStore = create<AuthState>()((set) => ({
     await disconnectAndWipePowerSync();
     await tokenStorage.clear();
     prefs.remove(NUMBER_PREFIX_KEY);
-    set({ status: "unauthenticated", user: null });
+    set({ status: "unauthenticated", user: null, sessionExpired: false });
   },
 
   handleAuthError: () => {
+    // PRD §8.8: a failed refresh while **offline** is token expiry, not a dead session — stay
+    // signed in in read-only mode, keep the local DB + queued writes, and let a reconnect refresh
+    // (or re-login) resume. Only a refresh that definitively fails while **online** (revoked /
+    // expired refresh token, server reachable) is a real logout → wipe.
+    if (!useSyncStore.getState().online) {
+      set({ sessionExpired: true });
+      return;
+    }
     void disconnectAndWipePowerSync();
-    set({ status: "unauthenticated", user: null });
+    set({ status: "unauthenticated", user: null, sessionExpired: false });
+  },
+
+  refreshSessionState: async () => {
+    const tokens = await tokenStorage.getTokens();
+    set(
+      get().status === "authenticated"
+        ? { sessionExpired: isAccessTokenExpired(tokens?.accessToken) }
+        : { sessionExpired: false },
+    );
   },
 }));
+
+// A successful token refresh means the session is live again — clear read-only mode (Mo6.5).
+setOnRefreshSuccess(() => {
+  void useAuthStore.getState().refreshSessionState();
+});
 
 // Wire the apiClient's onAuthError to the store so a failed refresh logs out.
 setOnAuthError(() => useAuthStore.getState().handleAuthError());

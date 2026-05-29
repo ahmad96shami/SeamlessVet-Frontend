@@ -1,6 +1,8 @@
 import { ScrollView, View, type ViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { SessionBanner } from "@/components/SessionBanner";
+
 /**
  * The design's `.sv-screen` container — a vertical flex column with a chosen
  * background. The flexible `body` content is scrollable; `header` and `footer`
@@ -51,6 +53,7 @@ export function ScreenShell({
       {...rest}
     >
       {header}
+      <SessionBanner />
       {staticBody ? (
         <View
           className="flex-1"

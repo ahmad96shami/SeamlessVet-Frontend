@@ -2,6 +2,7 @@ import "../global.css";
 import "@/i18n";
 
 import { useEffect, useState } from "react";
+import { AppState } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { PowerSyncContext } from "@powersync/react";
@@ -42,6 +43,15 @@ export default function RootLayout() {
   useEffect(() => {
     void restore();
   }, [restore]);
+
+  // Mo6.5: re-check token expiry whenever the app returns to the foreground, so the read-only
+  // banner appears promptly if the access token lapsed while the app was backgrounded.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") void useAuthStore.getState().refreshSessionState();
+    });
+    return () => sub.remove();
+  }, []);
 
   // Mo4.1: subscribe the offline REST queue's sync engine to PowerSync's connection
   // status. The engine flushes anything left from a prior session as soon as the

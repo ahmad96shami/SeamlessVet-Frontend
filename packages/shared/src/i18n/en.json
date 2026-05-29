@@ -1076,6 +1076,9 @@
       "invalidCredentials": "Incorrect phone number or password",
       "accountInactive": "Account not yet active — awaiting admin approval",
       "accountSuspended": "This account has been suspended"
+    },
+    "session": {
+      "expiredBanner": "Session expired — reconnect to sync your changes. Your data is kept."
     }
   },
   "sync": {
