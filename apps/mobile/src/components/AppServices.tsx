@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+import { useNotificationsRealtime } from "@/hooks/useNotificationsRealtime";
 import { configureNotificationHandler, registerForPushNotificationsAsync } from "@/services/localNotifications";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -10,6 +11,9 @@ import { useAuthStore } from "@/stores/authStore";
  */
 export function AppServices(): null {
   const status = useAuthStore((s) => s.status);
+
+  // Live SignalR feed (connect on auth, stop on logout) → feed invalidation + heads-up banner.
+  useNotificationsRealtime();
 
   // Set the foreground presentation handler once, before any notification can arrive.
   useEffect(() => {
