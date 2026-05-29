@@ -1,13 +1,19 @@
 import type { Href } from "expo-router";
 import { NotificationType } from "@vet/shared";
 
-/** Read a string field from a notification's loosely-typed (server `jsonb`) `payload` blob. */
+/**
+ * Read a string field from a notification's loosely-typed (server `jsonb`) `payload` blob.
+ * The server serializes the payload jsonb with **PascalCase** keys (e.g. `VisitId`, `CustomerId`) —
+ * unlike the camelCase REST envelope — so match the key name case-insensitively (verified on-device:
+ * the `negative_stock` payload arrived as `{VisitId, ProductId, …}`).
+ */
 function strField(payload: unknown, key: string): string | undefined {
-  if (payload && typeof payload === "object" && key in payload) {
-    const v = (payload as Record<string, unknown>)[key];
-    return typeof v === "string" ? v : undefined;
-  }
-  return undefined;
+  if (!payload || typeof payload !== "object") return undefined;
+  const rec = payload as Record<string, unknown>;
+  const target = key.toLowerCase();
+  const match = Object.keys(rec).find((k) => k.toLowerCase() === target);
+  const v = match ? rec[match] : undefined;
+  return typeof v === "string" ? v : undefined;
 }
 
 /**
