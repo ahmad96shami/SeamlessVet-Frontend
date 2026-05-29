@@ -1145,6 +1145,10 @@
     "unread_one": "1 unread notification",
     "unread_other": "{{count}} unread notifications",
     "connecting": "Connecting to live notifications…",
+    "reminder": {
+      "vaccinationTitle": "Vaccination due",
+      "vaccinationBody": "{{vaccine}} is due on {{date}}"
+    },
     "type": {
       "appointment_reminder": "Appointment reminder",
       "follow_up_due": "Follow-up due",

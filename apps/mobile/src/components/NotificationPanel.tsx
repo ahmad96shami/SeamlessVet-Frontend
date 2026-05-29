@@ -1,8 +1,10 @@
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate, type NotificationResponse } from "@vet/shared";
 
 import { Button, Card, Pill } from "@/components/ui";
+import { notificationRoute } from "@/lib/notificationRoute";
 import { useMarkNotificationRead, useNotifications } from "@/queries/notifications";
 
 /**
@@ -15,6 +17,7 @@ import { useMarkNotificationRead, useNotifications } from "@/queries/notificatio
  */
 export function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
+  const router = useRouter();
   const { data, isLoading } = useNotifications();
   const markRead = useMarkNotificationRead();
 
@@ -23,7 +26,11 @@ export function NotificationPanel({ open, onClose }: { open: boolean; onClose: (
 
   const openItem = (n: NotificationResponse) => {
     if (!n.readAt) markRead.mutate(n.id);
-    // Mo7.4 adds deeplink navigation + onClose() here.
+    const href = notificationRoute(n.type, n.payload);
+    if (href) {
+      onClose();
+      router.push(href);
+    }
   };
   const markAllRead = () => {
     for (const n of unread) markRead.mutate(n.id);

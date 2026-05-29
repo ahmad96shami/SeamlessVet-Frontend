@@ -1165,6 +1165,10 @@
     "unread_many": "{{count}} إشعارًا غير مقروء",
     "unread_other": "{{count}} إشعار غير مقروء",
     "connecting": "جارٍ الاتصال بالإشعارات الحية…",
+    "reminder": {
+      "vaccinationTitle": "تطعيم مستحق",
+      "vaccinationBody": "{{vaccine}} مستحق بتاريخ {{date}}"
+    },
     "type": {
       "appointment_reminder": "تذكير بموعد",
       "follow_up_due": "متابعة مستحقة",
