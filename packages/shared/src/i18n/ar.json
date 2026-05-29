@@ -1103,12 +1103,34 @@
     "attempts_few": "{{count}} محاولات",
     "attempts_many": "{{count}} محاولة",
     "attempts_other": "{{count}} محاولة",
+    "reviewHint": "العمليات التي لم تُزامَن بعد، والتعارضات التي تحتاج إجراءً منك.",
+    "dismiss": "إخفاء",
+    "serverWins": "الأسبقية للخادم",
+    "serverWinsHint": "طبّق الخادم نسخته؛ لم تُطبَّق تعديلاتك المحلية على هذا السجل.",
+    "restSection": "عمليات قيد الإرسال",
+    "psSection": "تعارضات الخادم",
+    "noConflicts": "لا توجد تعارضات.",
     "label": {
       "newVisit": "زيارة جديدة",
       "posSale": "عملية بيع",
       "fieldInvoice": "فاتورة زيارة ميدانية",
       "examFeeInvoice": "فاتورة كشفية",
-      "receiptVoucher": "سند قبض"
+      "receiptVoucher": "سند قبض",
+      "attachment": "رفع مرفق"
+    },
+    "table": {
+      "visits": "زيارة",
+      "ledger_entries": "قيد محاسبي",
+      "inventory_movements": "حركة مخزون",
+      "customers": "عميل",
+      "pets": "حيوان",
+      "contracts": "عقد",
+      "contract_medication_prices": "سعر دواء بالعقد",
+      "prescriptions": "وصفة",
+      "procedures": "إجراء",
+      "vaccinations": "تطعيم",
+      "attachments": "مرفق",
+      "receipt_vouchers": "سند قبض"
     }
   },
   "pwa": {

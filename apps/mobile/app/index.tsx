@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -5,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Bell, Briefcase, Paper, Stethoscope, User } from "@/components/icons";
 import { NavBottomBar, ScreenShell } from "@/components/layout";
 import { SyncIndicator } from "@/components/SyncIndicator";
+import { SyncReviewSheet } from "@/components/SyncReviewSheet";
 import { Button, Card } from "@/components/ui";
 import { toggleLanguage } from "@/i18n";
 import { useAuthStore } from "@/stores/authStore";
@@ -14,10 +16,16 @@ export default function Index() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const [reviewOpen, setReviewOpen] = useState(false);
 
   return (
     <ScreenShell
-      header={<HomeHeader langLabel={i18n.resolvedLanguage === "ar" ? "EN" : "ع"} />}
+      header={
+        <HomeHeader
+          langLabel={i18n.resolvedLanguage === "ar" ? "EN" : "ع"}
+          onOpenSync={() => setReviewOpen(true)}
+        />
+      }
       footer={<NavBottomBar active="home" />}
     >
       <Card className="flex-row items-center gap-3 p-4">
@@ -71,6 +79,8 @@ export default function Index() {
           block
         />
       </View>
+
+      <SyncReviewSheet open={reviewOpen} onClose={() => setReviewOpen(false)} />
     </ScreenShell>
   );
 }
@@ -105,8 +115,8 @@ function QuickAction({ label, icon, primary, onPress }: QuickActionProps) {
   );
 }
 
-/** Compact home header — a placeholder until Mo2 brings the doctor card + sync state. */
-function HomeHeader({ langLabel }: { langLabel: string }) {
+/** Compact home header — language toggle, the live (tappable) sync pill, and the notifications bell. */
+function HomeHeader({ langLabel, onOpenSync }: { langLabel: string; onOpenSync: () => void }) {
   return (
     <View className="bg-paper border-b border-ink-100 flex-row items-center justify-between px-5 py-3">
       <Pressable
@@ -118,7 +128,7 @@ function HomeHeader({ langLabel }: { langLabel: string }) {
       </Pressable>
 
       <View className="flex-row items-center gap-2">
-        <SyncIndicator />
+        <SyncIndicator onPress={onOpenSync} />
         <View className="border-ink-100 bg-paper relative h-10 w-10 items-center justify-center rounded-chip border">
           <Bell size={18} color="#223D69" />
           <View className="bg-amber absolute right-1.5 top-1.5 h-2 w-2 rounded-pill" />

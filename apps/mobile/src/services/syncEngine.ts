@@ -2,6 +2,7 @@ import { drainQueue } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
 import { offlineQueue } from "@/services/offlineQueue";
+import { countPowerSyncConflicts, dismissPowerSyncConflict as dropPowerSyncConflict } from "@/services/powerSyncConflicts";
 import { useSyncStore } from "@/stores/syncStore";
 import { powerSync } from "@/sync/database";
 
@@ -84,7 +85,12 @@ export async function refreshSyncCounts(): Promise<void> {
     offlineQueue.conflictCount(),
     powerSync.getUploadQueueStats(false).catch(() => ({ count: 0 })),
   ]);
-  useSyncStore.getState().set({ pendingCount, conflictCount, psPendingCount: psStats.count });
+  useSyncStore.getState().set({
+    pendingCount,
+    conflictCount,
+    psPendingCount: psStats.count,
+    psConflictCount: countPowerSyncConflicts(),
+  });
 }
 
 /**
@@ -147,9 +153,19 @@ export async function retryAll(): Promise<void> {
   void syncNow();
 }
 
-/** Discard one queued item (Mo6's "discard", behind a confirm). */
+/** Discard one queued REST item (Mo6's "discard", behind a confirm). */
 export async function discardItem(id: string): Promise<void> {
   await offlineQueue.remove(id);
+  await refreshSyncCounts();
+}
+
+/**
+ * Acknowledge one parked PowerSync server-wins rejection (Mo6.2's "dismiss"). Unlike a REST
+ * conflict there's nothing to retry — the server already won and the op was discarded — so this
+ * just clears it from the review sheet.
+ */
+export async function dismissPowerSyncConflict(id: string): Promise<void> {
+  dropPowerSyncConflict(id);
   await refreshSyncCounts();
 }
 

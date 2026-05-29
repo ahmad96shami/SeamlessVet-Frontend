@@ -1087,12 +1087,34 @@
     "syncNow": "Sync now",
     "attempts_one": "1 attempt",
     "attempts_other": "{{count}} attempts",
+    "reviewHint": "Operations not yet synced, and conflicts that need your action.",
+    "dismiss": "Dismiss",
+    "serverWins": "Server wins",
+    "serverWinsHint": "The server kept its version; your offline edit to this record was not applied.",
+    "restSection": "Pending operations",
+    "psSection": "Server conflicts",
+    "noConflicts": "No conflicts.",
     "label": {
       "newVisit": "New visit",
       "posSale": "Sale",
       "fieldInvoice": "Field-visit invoice",
       "examFeeInvoice": "Exam-fee invoice",
-      "receiptVoucher": "Receipt voucher"
+      "receiptVoucher": "Receipt voucher",
+      "attachment": "Attachment upload"
+    },
+    "table": {
+      "visits": "Visit",
+      "ledger_entries": "Ledger entry",
+      "inventory_movements": "Stock movement",
+      "customers": "Customer",
+      "pets": "Animal",
+      "contracts": "Contract",
+      "contract_medication_prices": "Contract med price",
+      "prescriptions": "Prescription",
+      "procedures": "Procedure",
+      "vaccinations": "Vaccination",
+      "attachments": "Attachment",
+      "receipt_vouchers": "Receipt voucher"
     }
   },
   "pwa": {
