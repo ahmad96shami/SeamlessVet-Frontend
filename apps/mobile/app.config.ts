@@ -48,6 +48,15 @@ const config: ExpoConfig = {
         photosPermission: "يصل التطبيق إلى صورك لإرفاق ملف بالزيارة.",
       },
     ],
+    [
+      // Mo7 notifications: vaccination/visit reminders + live SignalR pushes presented as local
+      // notifications. `color` tints the Android small icon; the channel + permission are set up at
+      // runtime (localNotifications.ts). No remote-push entitlements — delivery is SignalR + local.
+      "expo-notifications",
+      {
+        color: "#0B6573",
+      },
+    ],
     "@sentry/react-native/expo",
   ],
   experiments: {
