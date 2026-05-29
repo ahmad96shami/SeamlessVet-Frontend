@@ -71,13 +71,20 @@ async function awaitPowerSyncDrained(): Promise<boolean> {
   }
 }
 
-/** Refresh the queue counts in the store (cheap; called after every state change). */
+/**
+ * Refresh the unified sync counts in the store (cheap; called after every state change). Reads
+ * **both** upload paths so the indicator + review sheet stay in lockstep: the shared REST-intent
+ * queue (`pendingCount` / `conflictCount`) and PowerSync's own CRUD upload queue (`psPendingCount`).
+ * The PowerSync *conflict* count is owned by the connector's parked-rejection store and refreshed
+ * by {@link refreshPowerSyncConflicts}.
+ */
 export async function refreshSyncCounts(): Promise<void> {
-  const [pendingCount, conflictCount] = await Promise.all([
+  const [pendingCount, conflictCount, psStats] = await Promise.all([
     offlineQueue.count(),
     offlineQueue.conflictCount(),
+    powerSync.getUploadQueueStats(false).catch(() => ({ count: 0 })),
   ]);
-  useSyncStore.getState().set({ pendingCount, conflictCount });
+  useSyncStore.getState().set({ pendingCount, conflictCount, psPendingCount: psStats.count });
 }
 
 /**
@@ -159,6 +166,13 @@ export function startSyncEngine(): () => void {
 
   const dispose = powerSync.registerListener({
     statusChanged: (status) => {
+      // Reflect PowerSync's *own* upload activity on every status change (it toggles without the
+      // online flag changing), then refresh the queue counts so the indicator's pending badge
+      // tracks the CRUD queue draining down. This is the "both PowerSync upload state and the
+      // REST-queue state feed it" half of Mo6.1.
+      useSyncStore.getState().set({ psUploading: status.dataFlowStatus?.uploading === true });
+      void refreshSyncCounts();
+
       const nowOnline = status.connected === true;
       if (nowOnline === wasOnline) return;
       wasOnline = nowOnline;
