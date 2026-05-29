@@ -119,3 +119,49 @@ export interface VisitRow {
   created_at: string;
   updated_at: string;
 }
+
+export interface ContractRow {
+  id: string;
+  customer_id: string;
+  responsible_doctor_id: string | null;
+  period_start: string;
+  period_end: string | null;
+  total_price: number | null;
+  expected_visit_count: number | null;
+  animal_type: string | null;
+  animal_count: number | null;
+  status: string;
+  created_by: string | null;
+  activated_by: string | null;
+  activated_at: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface ContractMedicationPriceRow {
+  id: string;
+  contract_id: string;
+  product_id: string;
+  contract_price: number;
+  updated_at: string | null;
+}
+
+export interface BatchRow {
+  id: string;
+  contract_id: string | null;
+  customer_id: string;
+  responsible_doctor_id: string;
+  animal_count: number;
+  start_date: string;
+  end_date: string | null;
+  supervision_fee_model: string;
+  supervision_fee_value: number;
+  /** SQLite INTEGER 0/1; tri-state — `null` inherits the global entitlement setting (SCHEMA #4). */
+  entitlement_enabled: number | null;
+  entitlement_system: string | null;
+  doctor_share_percent: number | null;
+  doctor_share_ceiling: number | null;
+  status: string;
+  created_at: string | null;
+  updated_at: string | null;
+}

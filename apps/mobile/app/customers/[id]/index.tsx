@@ -129,6 +129,17 @@ export default function CustomerDetailScreen() {
           leadingIcon={<Paper size={18} color="#223D69" />}
           onPress={() => router.push(`/customers/${customer.id}/statement`)}
         />
+        {customer.type !== "home" ? (
+          <Button
+            label={t("finance.contracts.new")}
+            variant="ghost"
+            block
+            leadingIcon={<Briefcase size={18} color="#223D69" />}
+            onPress={() =>
+              router.push({ pathname: "/contracts/new", params: { customerId: customer.id } })
+            }
+          />
+        ) : null}
       </View>
 
       {(recentVisits ?? []).length > 0 ? (
