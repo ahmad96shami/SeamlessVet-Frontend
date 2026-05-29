@@ -33,16 +33,22 @@ export async function getAttachment(client: AxiosInstance, id: string): Promise<
 }
 
 /**
- * POST /attachments/presigned-upload — mints the client GUID v7 attachment `id` and returns a
- * signed PUT URL. The browser then uploads the file directly to R2 with that URL, and confirms via
- * {@link confirmAttachment}. Re-requesting for an existing id re-mints a URL (safe retry).
+ * POST /attachments/presigned-upload — returns a signed PUT URL for direct-to-R2 upload, then
+ * confirm via {@link confirmAttachment}. Re-requesting for an existing id re-mints a URL (safe
+ * retry).
+ *
+ * `id` defaults to a fresh client GUID v7 (the web one-shot path), but a caller that needs the id
+ * up-front — the mobile offline outbox, which persists the attachment id with the captured file so
+ * a reconnect re-presigns the **same** row instead of creating a duplicate — passes its own
+ * pre-minted id.
  */
 export async function presignAttachmentUpload(
   client: AxiosInstance,
   body: PresignedUploadRequest,
+  id: string = newGuidV7(),
 ): Promise<PresignedUploadResponse> {
   const payload = PresignedUploadRequestSchema.parse(body);
-  const res = await client.post("/attachments/presigned-upload", { ...payload, id: newGuidV7() });
+  const res = await client.post("/attachments/presigned-upload", { ...payload, id });
   return PresignedUploadResponseSchema.parse(res.data);
 }
 

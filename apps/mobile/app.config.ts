@@ -39,6 +39,15 @@ const config: ExpoConfig = {
         ios: { deploymentTarget: "16.4" },
       },
     ],
+    [
+      // Mo6 attachments: camera + gallery capture of X-rays / lab photos. Arabic
+      // permission strings (iOS Info.plist usage descriptions).
+      "expo-image-picker",
+      {
+        cameraPermission: "يستخدم التطبيق الكاميرا لتصوير الأشعة والمستندات وإرفاقها بالزيارة.",
+        photosPermission: "يصل التطبيق إلى صورك لإرفاق ملف بالزيارة.",
+      },
+    ],
     "@sentry/react-native/expo",
   ],
   experiments: {

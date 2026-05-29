@@ -1,6 +1,8 @@
 import { drainQueue } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
+import { countAttachmentConflicts, countAttachmentOutbox } from "@/services/attachmentOutbox";
+import { drainAttachmentOutbox } from "@/services/attachmentUploadEngine";
 import { offlineQueue } from "@/services/offlineQueue";
 import { countPowerSyncConflicts, dismissPowerSyncConflict as dropPowerSyncConflict } from "@/services/powerSyncConflicts";
 import { useSyncStore } from "@/stores/syncStore";
@@ -90,6 +92,8 @@ export async function refreshSyncCounts(): Promise<void> {
     conflictCount,
     psPendingCount: psStats.count,
     psConflictCount: countPowerSyncConflicts(),
+    attPendingCount: countAttachmentOutbox(),
+    attConflictCount: countAttachmentConflicts(),
   });
 }
 
@@ -178,7 +182,10 @@ export function startSyncEngine(): () => void {
   let wasOnline = isOnline();
   useSyncStore.getState().set({ online: wasOnline });
   void refreshSyncCounts();
-  if (wasOnline) void syncNow();
+  if (wasOnline) {
+    void syncNow();
+    void drainAttachmentOutbox();
+  }
 
   const dispose = powerSync.registerListener({
     statusChanged: (status) => {
@@ -197,6 +204,7 @@ export function startSyncEngine(): () => void {
         clearRetry();
         backoff = 0;
         void syncNow();
+        void drainAttachmentOutbox();
       } else {
         clearRetry();
       }

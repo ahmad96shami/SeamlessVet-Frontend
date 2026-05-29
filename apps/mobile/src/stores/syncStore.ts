@@ -18,6 +18,10 @@ export interface SyncSnapshot {
   psPendingCount: number;
   /** PowerSync CRUD uploads the server rejected (server-wins) and we parked for review (Mo6.2). */
   psConflictCount: number;
+  /** Captured attachments awaiting direct-to-R2 upload (the Mo6.3 outbox). */
+  attPendingCount: number;
+  /** Attachment uploads the server rejected, awaiting manual resolution. */
+  attConflictCount: number;
 }
 
 interface SyncStore extends SyncSnapshot {
@@ -40,17 +44,19 @@ export const useSyncStore = create<SyncStore>((set) => ({
   psUploading: false,
   psPendingCount: 0,
   psConflictCount: 0,
+  attPendingCount: 0,
+  attConflictCount: 0,
   set: (patch) => set(patch),
 }));
 
-/** Total unsynced items across both upload paths — drives the indicator's pending badge. */
+/** Total unsynced items across all three upload paths — drives the indicator's pending badge. */
 export function totalPending(s: SyncSnapshot): number {
-  return s.pendingCount + s.psPendingCount;
+  return s.pendingCount + s.psPendingCount + s.attPendingCount;
 }
 
-/** Total parked rejections across both paths — drives the "needs attention" conflict state. */
+/** Total parked rejections across all paths — drives the "needs attention" conflict state. */
 export function totalConflicts(s: SyncSnapshot): number {
-  return s.conflictCount + s.psConflictCount;
+  return s.conflictCount + s.psConflictCount + s.attConflictCount;
 }
 
 /** Priority: offline (can't sync) → syncing → conflict (needs action) → online. */
