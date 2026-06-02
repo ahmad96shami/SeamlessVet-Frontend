@@ -10,6 +10,7 @@ import { optionalText } from "./common";
 export const ReceiptVoucherResponseSchema = z.object({
   id: z.string(),
   customerId: z.string(),
+  farmId: z.string().nullish(),
   amount: z.number(),
   method: z.string(),
   issuedBy: z.string(),
@@ -34,6 +35,8 @@ export interface ReceiptVoucherListParams {
 export const ReceiptVoucherRequestSchema = z.object({
   id: z.string().optional(),
   customerId: z.string().min(1),
+  // M16: optional — credit a farm's ledger instead of the customer's own ledger (must belong to it).
+  farmId: z.string().min(1).optional(),
   amount: z.number().positive(),
   method: z.enum(["cash", "card", "bank_transfer", "credit"]),
   notes: optionalText,

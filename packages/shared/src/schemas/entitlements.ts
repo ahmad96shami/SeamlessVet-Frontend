@@ -48,12 +48,15 @@ export interface EntitlementListParams {
 }
 
 /**
- * Result of POST /customers/{id}/close-account (PRD §7.7): the now-closed ledger plus the entitlements
- * the settlement workflow produced/refreshed. Closing requires a **zero balance** (the settlement
- * lock — partial payments never release); the server rejects otherwise (409 `settlement_locked`).
+ * Result of POST /customers/{id}/close-account and (M16) POST /farms/{id}/close-account (PRD §7.7):
+ * the now-closed ledger plus the entitlements the settlement workflow produced/refreshed. Closing
+ * requires a **zero balance** (the settlement lock — partial payments never release); the server
+ * rejects otherwise (409 `settlement_locked`). `farmId` is set for a farm close (with `customerId`
+ * the owning customer), null for a customer close.
  */
 export const CloseAccountResponseSchema = z.object({
   customerId: z.string(),
+  farmId: z.string().nullish(),
   ledgerId: z.string(),
   status: z.string(),
   closedAt: z.string().nullish(),

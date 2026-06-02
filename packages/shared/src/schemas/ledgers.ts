@@ -20,13 +20,17 @@ export const LedgerEntryResponseSchema = z.object({
 export type LedgerEntryResponse = z.infer<typeof LedgerEntryResponseSchema>;
 
 /**
- * Account statement (GET /customers/{id}/statement) — everything the WhatsApp/print renderer needs.
- * `openingBalance` is the running balance just before `from` (0 when no `from`); `closingBalance` is
- * the balance after the last entry in range. Positive balances = the customer owes the clinic.
+ * Account statement (GET /customers/{id}/statement and, M16, GET /farms/{id}/statement) — everything
+ * the WhatsApp/print renderer needs. `openingBalance` is the running balance just before `from`
+ * (0 when no `from`); `closingBalance` is the balance after the last entry in range. Positive balances
+ * = the owner owes the clinic. `customerId`/`customerName` are the owning customer in both cases;
+ * `farmId`/`farmName` are set only for a farm statement (null for a customer statement).
  */
 export const StatementResponseSchema = z.object({
   customerId: z.string(),
   customerName: z.string(),
+  farmId: z.string().nullish(),
+  farmName: z.string().nullish(),
   ledgerId: z.string(),
   openingBalance: z.number(),
   closingBalance: z.number(),

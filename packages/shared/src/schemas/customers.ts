@@ -2,10 +2,23 @@ import { z } from "zod";
 
 import { optionalText } from "./common";
 
+/** M16 — one farm's ledger state in the customer-detail breakdown (`farmLedgers[]`). */
+export const CustomerFarmLedgerSchema = z.object({
+  farmId: z.string(),
+  farmName: z.string(),
+  ledgerId: z.string(),
+  balance: z.number(),
+  status: z.string(),
+  closedAt: z.string().nullish(),
+});
+export type CustomerFarmLedger = z.infer<typeof CustomerFarmLedgerSchema>;
+
 /**
- * A customer row (GET /customers[/{id}]). `balance` + `ledgerStatus` are joined from the 1:1 ledger
- * server-side (BACKEND_PREREQS §3) so the list shows account state without an N+1 statement call.
- * **Positive `balance` = the customer owes the clinic.** Both are read-only — the ledger is
+ * A customer row (GET /customers[/{id}]). **M16:** `balance` + `ledgerStatus` are the **aggregate**
+ * across the customer's own ledger and all its farm ledgers (own + Σ farms; `closed` only when every
+ * owning ledger is closed). `ownBalance` is the own (non-farm) ledger alone; `farmLedgers` is the
+ * per-farm breakdown — populated by the single-customer detail read, null on the list.
+ * **Positive `balance` = the customer owes the clinic.** All are read-only — the ledgers are
  * server-authoritative.
  */
 export const CustomerResponseSchema = z.object({
@@ -21,6 +34,8 @@ export const CustomerResponseSchema = z.object({
   assignedDoctorId: z.string().nullish(),
   balance: z.number(),
   ledgerStatus: z.string(),
+  ownBalance: z.number(),
+  farmLedgers: z.array(CustomerFarmLedgerSchema).nullish(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
