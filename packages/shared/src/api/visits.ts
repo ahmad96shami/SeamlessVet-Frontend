@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { idempotencyKey, newGuidV7 } from "../http/idempotency";
 import { sendRequest, type RequestDescriptor } from "../offline/queue";
+import { ScheduleFollowUpRequestSchema, type ScheduleFollowUpRequest } from "../schemas/appointments";
 import { IdentifierResponseSchema, type IdentifierResponse } from "../schemas/common";
 import {
   VisitCreateRequestSchema,
@@ -84,5 +85,19 @@ export async function completeVisit(client: AxiosInstance, id: string): Promise<
 /** POST /visits/{id}/cancel — terminal transition (idempotent); stamps `ended_at`. */
 export async function cancelVisit(client: AxiosInstance, id: string): Promise<IdentifierResponse> {
   const res = await client.post(`/visits/${id}/cancel`);
+  return IdentifierResponseSchema.parse(res.data);
+}
+
+/**
+ * POST /visits/{id}/schedule-follow-up — books a follow-up appointment from this visit (M17). Returns
+ * the new appointment's id; attending it later waives the checkup fee once per origin (PRD §18.8).
+ */
+export async function scheduleFollowUp(
+  client: AxiosInstance,
+  visitId: string,
+  body: ScheduleFollowUpRequest,
+): Promise<IdentifierResponse> {
+  const payload = ScheduleFollowUpRequestSchema.parse(body);
+  const res = await client.post(`/visits/${visitId}/schedule-follow-up`, { ...payload, id: newGuidV7() });
   return IdentifierResponseSchema.parse(res.data);
 }

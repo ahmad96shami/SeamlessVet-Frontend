@@ -37,6 +37,9 @@ export const VisitResponseSchema = z.object({
   severity: z.string().nullish(),
   icdVetCode: z.string().nullish(),
   examFeeApplied: z.number().nullish(),
+  // M17 — in-clinic checkup fee (رسوم الكشف) + follow-up origin (PRD §18.7/§18.8).
+  checkupFeeApplied: z.number().nullish(),
+  followUpOfVisitId: z.string().nullish(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -68,6 +71,9 @@ export const VisitCreateRequestSchema = z.object({
   severity: z.enum(["mild", "moderate", "severe", "critical"]).optional(),
   icdVetCode: optionalText,
   examFeeApplied: z.number().nonnegative().optional(),
+  // M17 — omit checkupFeeApplied to let an in-clinic visit auto-apply the settings default.
+  checkupFeeApplied: z.number().nonnegative().optional(),
+  followUpOfVisitId: z.string().optional(),
 });
 export type VisitCreateRequest = z.infer<typeof VisitCreateRequestSchema>;
 
@@ -91,6 +97,7 @@ export const VisitPatchRequestSchema = z.object({
   severity: z.enum(["mild", "moderate", "severe", "critical"]).optional(),
   icdVetCode: optionalText,
   examFeeApplied: z.number().nonnegative().optional(),
+  checkupFeeApplied: z.number().nonnegative().optional(),
 });
 export type VisitPatchRequest = z.infer<typeof VisitPatchRequestSchema>;
 

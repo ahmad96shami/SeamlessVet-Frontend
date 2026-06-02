@@ -14,6 +14,7 @@ export * from "./visits";
 export * from "./procedures";
 export * from "./prescriptions";
 export * from "./dailyFollowUps";
+export * from "./nightStays";
 export * from "./vaccinations";
 export * from "./attachments";
 export * from "./appointments";

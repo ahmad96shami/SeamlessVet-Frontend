@@ -189,7 +189,9 @@
     "service_fee": "رسوم خدمة",
     "exam_fee": "رسوم كشف",
     "receipt_voucher": "سند قبض",
-    "adjustment": "تسوية"
+    "adjustment": "تسوية",
+    "checkup_fee": "رسوم الكشف",
+    "night_stay": "مبيت"
   },
   "inventory": {
     "title": "المخزون",
@@ -416,6 +418,11 @@
   "dispenseType": {
     "administered_in_clinic": "داخل العيادة",
     "dispensed_to_owner": "يُصرف للمالك"
+  },
+  "careType": {
+    "medical": "مبيت علاجي",
+    "icu": "مبيت عناية مركزة",
+    "hotel": "مبيت فندقي"
   },
   "attachmentType": {
     "photo": "صورة",

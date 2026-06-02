@@ -7,6 +7,8 @@ import { z } from "zod";
 export const SystemSettingsResponseSchema = z.object({
   id: z.string(),
   defaultExamFee: z.number(),
+  // M17 — in-clinic checkup fee default (رسوم الكشف, PRD §18.7).
+  defaultCheckupFee: z.number(),
   entitlementEnabledGlobal: z.boolean(),
   lowStockThresholdPct: z.number(),
   expirationWarningDays: z.number().int(),
@@ -15,6 +17,11 @@ export const SystemSettingsResponseSchema = z.object({
   logoUrl: z.string().nullish(),
   invoiceTaxDetails: z.string().nullish(),
   extra: z.string().nullish(),
+  // M17 — night-stay per-night rates + checkout hour (مبيت, PRD §18.6), surfaced from `extra`.
+  nightStayRateMedical: z.number(),
+  nightStayRateIcu: z.number(),
+  nightStayRateHotel: z.number(),
+  nightStayCheckoutHour: z.number().int(),
   updatedAt: z.string(),
 });
 export type SystemSettingsResponse = z.infer<typeof SystemSettingsResponseSchema>;
@@ -25,6 +32,7 @@ export type SystemSettingsResponse = z.infer<typeof SystemSettingsResponseSchema
  */
 export const SystemSettingsPatchRequestSchema = z.object({
   defaultExamFee: z.number().min(0).optional(),
+  defaultCheckupFee: z.number().min(0).optional(),
   entitlementEnabledGlobal: z.boolean().optional(),
   lowStockThresholdPct: z.number().min(0).optional(),
   expirationWarningDays: z.number().int().min(0).optional(),
@@ -33,5 +41,10 @@ export const SystemSettingsPatchRequestSchema = z.object({
   logoUrl: z.string().nullable().optional(),
   invoiceTaxDetails: z.string().nullable().optional(),
   extra: z.string().nullable().optional(),
+  // M17 — merged into `extra.nightStay` server-side (other extra keys preserved).
+  nightStayRateMedical: z.number().min(0).optional(),
+  nightStayRateIcu: z.number().min(0).optional(),
+  nightStayRateHotel: z.number().min(0).optional(),
+  nightStayCheckoutHour: z.number().int().min(0).max(23).optional(),
 });
 export type SystemSettingsPatchRequest = z.infer<typeof SystemSettingsPatchRequestSchema>;

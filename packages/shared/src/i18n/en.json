@@ -177,7 +177,9 @@
     "service_fee": "Service fee",
     "exam_fee": "Exam fee",
     "receipt_voucher": "Receipt voucher",
-    "adjustment": "Adjustment"
+    "adjustment": "Adjustment",
+    "checkup_fee": "Checkup fee",
+    "night_stay": "Night stay"
   },
   "inventory": {
     "title": "Inventory",
@@ -404,6 +406,11 @@
   "dispenseType": {
     "administered_in_clinic": "In-clinic",
     "dispensed_to_owner": "Dispensed to owner"
+  },
+  "careType": {
+    "medical": "Medical stay",
+    "icu": "ICU stay",
+    "hotel": "Hotel stay"
   },
   "attachmentType": {
     "photo": "Photo",

@@ -128,6 +128,9 @@ export const LedgerEntryType = {
   ExamFee: "exam_fee",
   ReceiptVoucher: "receipt_voucher",
   Adjustment: "adjustment",
+  // M17 — in-clinic checkup fee (رسوم الكشف) + boarding charge (مبيت).
+  CheckupFee: "checkup_fee",
+  NightStay: "night_stay",
 } as const;
 export type LedgerEntryType = EnumValues<typeof LedgerEntryType>;
 export const LEDGER_ENTRY_TYPE_VALUES = values(LedgerEntryType);
@@ -221,6 +224,15 @@ export const Severity = {
 } as const;
 export type Severity = EnumValues<typeof Severity>;
 export const SEVERITY_VALUES = values(Severity);
+
+// M17 — boarding (مبيت) care type, each with its own per-night cost.
+export const CareType = {
+  Medical: "medical",
+  Icu: "icu",
+  Hotel: "hotel",
+} as const;
+export type CareType = EnumValues<typeof CareType>;
+export const CARE_TYPE_VALUES = values(CareType);
 
 export const DispenseType = {
   AdministeredInClinic: "administered_in_clinic",
