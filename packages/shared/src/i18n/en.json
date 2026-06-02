@@ -153,7 +153,14 @@
     "regular_farm": "General farm",
     "home": "Home",
     "cattle_farm": "Cattle farm",
-    "poultry_farm": "Poultry farm"
+    "poultry_farm": "Poultry farm",
+    "clinic_customer": "Clinic customer"
+  },
+  "farmKind": {
+    "poultry": "Poultry",
+    "cattle": "Cattle",
+    "mixed": "Mixed",
+    "other": "Other"
   },
   "petSex": {
     "male": "Male",

@@ -113,3 +113,29 @@ export const ContractMedicationPricePatchRequestSchema = z.object({
 export type ContractMedicationPricePatchRequest = z.infer<
   typeof ContractMedicationPricePatchRequestSchema
 >;
+
+// --- Contract <-> farm coverage (M15) ----------------------------------------
+
+/**
+ * A farm a contract covers (GET /contracts/{contractId}/farms). A contract covers 1+ farms of its
+ * owning customer; the same-customer rule is enforced server-side. Attached/detached only while the
+ * parent contract is `draft`.
+ */
+export const ContractFarmResponseSchema = z.object({
+  id: z.string(),
+  contractId: z.string(),
+  farmId: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type ContractFarmResponse = z.infer<typeof ContractFarmResponseSchema>;
+
+/**
+ * Attach (POST /contracts/{contractId}/farms) — the parent `contractId` comes from the route; the
+ * farm must belong to the contract's customer and the parent contract must be `draft`. The wrapper
+ * mints the client GUID v7 `id`.
+ */
+export const ContractFarmAttachRequestSchema = z.object({
+  farmId: z.string().min(1),
+});
+export type ContractFarmAttachRequest = z.infer<typeof ContractFarmAttachRequestSchema>;

@@ -91,9 +91,20 @@ export const CustomerType = {
   Home: "home",
   CattleFarm: "cattle_farm",
   PoultryFarm: "poultry_farm",
+  ClinicCustomer: "clinic_customer", // M15 — in-clinic account owner ("زبون عيادة")
 } as const;
 export type CustomerType = EnumValues<typeof CustomerType>;
 export const CUSTOMER_TYPE_VALUES = values(CustomerType);
+
+// M15 — a customer owns 1–N farms (attached like pets).
+export const FarmKind = {
+  Poultry: "poultry",
+  Cattle: "cattle",
+  Mixed: "mixed",
+  Other: "other",
+} as const;
+export type FarmKind = EnumValues<typeof FarmKind>;
+export const FARM_KIND_VALUES = values(FarmKind);
 
 export const PetSex = {
   Male: "male",

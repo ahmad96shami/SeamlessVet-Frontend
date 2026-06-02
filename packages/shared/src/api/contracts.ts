@@ -5,12 +5,16 @@ import { newGuidV7 } from "../http/idempotency";
 import { IdentifierResponseSchema, type IdentifierResponse } from "../schemas/common";
 import {
   ContractCreateRequestSchema,
+  ContractFarmAttachRequestSchema,
+  ContractFarmResponseSchema,
   ContractMedicationPriceCreateRequestSchema,
   ContractMedicationPricePatchRequestSchema,
   ContractMedicationPriceResponseSchema,
   ContractPatchRequestSchema,
   ContractResponseSchema,
   type ContractCreateRequest,
+  type ContractFarmAttachRequest,
+  type ContractFarmResponse,
   type ContractListParams,
   type ContractMedicationPriceCreateRequest,
   type ContractMedicationPricePatchRequest,
@@ -21,6 +25,7 @@ import {
 
 const ContractListSchema = z.array(ContractResponseSchema);
 const MedicationPriceListSchema = z.array(ContractMedicationPriceResponseSchema);
+const ContractFarmListSchema = z.array(ContractFarmResponseSchema);
 
 // Mutations carry the `Idempotency-Key` header automatically (the host apiClient injects it on
 // POST/PATCH/DELETE); the create wrappers mint the client GUID v7 `id` so screens never handle ids.
@@ -143,4 +148,38 @@ export async function deleteContractMedicationPrice(
   priceId: string,
 ): Promise<void> {
   await client.delete(`/contracts/${contractId}/medication-prices/${priceId}`);
+}
+
+// ---- Contract <-> farm coverage (M15) -------------------------------------
+
+/** GET /contracts/{contractId}/farms — the farms a contract covers (1+, same customer). */
+export async function listContractFarms(
+  client: AxiosInstance,
+  contractId: string,
+): Promise<ContractFarmResponse[]> {
+  const res = await client.get(`/contracts/${contractId}/farms`);
+  return ContractFarmListSchema.parse(res.data);
+}
+
+/**
+ * POST /contracts/{contractId}/farms — attach a farm of the contract's customer (parent must be
+ * `draft`; a different customer's farm is rejected). Mints a client GUID v7 id.
+ */
+export async function attachContractFarm(
+  client: AxiosInstance,
+  contractId: string,
+  body: ContractFarmAttachRequest,
+): Promise<IdentifierResponse> {
+  const payload = ContractFarmAttachRequestSchema.parse(body);
+  const res = await client.post(`/contracts/${contractId}/farms`, { ...payload, id: newGuidV7() });
+  return IdentifierResponseSchema.parse(res.data);
+}
+
+/** DELETE /contracts/{contractId}/farms/{farmId} — detach a farm (parent must be `draft`). */
+export async function detachContractFarm(
+  client: AxiosInstance,
+  contractId: string,
+  farmId: string,
+): Promise<void> {
+  await client.delete(`/contracts/${contractId}/farms/${farmId}`);
 }

@@ -9,6 +9,7 @@ export * from "./systemSettings";
 export * from "./inventory";
 export * from "./customers";
 export * from "./pets";
+export * from "./farms";
 export * from "./visits";
 export * from "./procedures";
 export * from "./prescriptions";

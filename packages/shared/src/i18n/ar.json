@@ -165,7 +165,14 @@
     "regular_farm": "مزرعة عامة",
     "home": "منزل",
     "cattle_farm": "مزرعة أبقار",
-    "poultry_farm": "مزرعة دواجن"
+    "poultry_farm": "مزرعة دواجن",
+    "clinic_customer": "زبون عيادة"
+  },
+  "farmKind": {
+    "poultry": "دواجن",
+    "cattle": "أبقار",
+    "mixed": "مختلطة",
+    "other": "أخرى"
   },
   "petSex": {
     "male": "ذكر",
