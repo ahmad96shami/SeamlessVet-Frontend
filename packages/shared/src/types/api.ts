@@ -852,6 +852,38 @@ export interface paths {
         patch: operations["Farms_Update"];
         trace?: never;
     };
+    "/farms/{id}/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Farms_Statement"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/farms/{id}/close-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Farms_CloseAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/doctor-entitlements": {
         parameters: {
             query?: never;
@@ -1870,7 +1902,7 @@ export interface components {
             idempotencyKey?: string;
             reason?: string | null;
         };
-        OfF__AnonymousType3OfString: {
+        OfF__AnonymousType5OfString: {
             status?: string | null;
         };
         PosInvoiceRequest: {
@@ -1933,6 +1965,8 @@ export interface components {
             id?: string | null;
             /** Format: guid */
             customerId?: string;
+            /** Format: guid */
+            farmId?: string | null;
             /** Format: decimal */
             amount?: number;
             method?: string;
@@ -2144,10 +2178,10 @@ export interface components {
         LogoutRequest: {
             refreshToken?: string;
         };
-        OfF__AnonymousType1OfIEnumerableOfOfF__AnonymousType2OfStringAndStringAndStringAndStringAndStringAndString: {
-            keys?: components["schemas"]["OfF__AnonymousType2OfStringAndStringAndStringAndStringAndStringAndString"][] | null;
+        OfF__AnonymousType3OfIEnumerableOfOfF__AnonymousType4OfStringAndStringAndStringAndStringAndStringAndString: {
+            keys?: components["schemas"]["OfF__AnonymousType4OfStringAndStringAndStringAndStringAndStringAndString"][] | null;
         };
-        OfF__AnonymousType2OfStringAndStringAndStringAndStringAndStringAndString: {
+        OfF__AnonymousType4OfStringAndStringAndStringAndStringAndStringAndString: {
             kty?: string | null;
             use?: string | null;
             alg?: string | null;
@@ -3626,7 +3660,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfF__AnonymousType3OfString"];
+                    "application/json": components["schemas"]["OfF__AnonymousType5OfString"];
                 };
             };
         };
@@ -3932,6 +3966,47 @@ export interface operations {
                 "application/json": components["schemas"]["FarmPatchRequest"];
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Farms_Statement: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Farms_CloseAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -4786,7 +4861,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfF__AnonymousType1OfIEnumerableOfOfF__AnonymousType2OfStringAndStringAndStringAndStringAndStringAndString"];
+                    "application/json": components["schemas"]["OfF__AnonymousType3OfIEnumerableOfOfF__AnonymousType4OfStringAndStringAndStringAndStringAndStringAndString"];
                 };
             };
         };
