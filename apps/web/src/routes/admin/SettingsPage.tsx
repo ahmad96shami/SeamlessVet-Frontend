@@ -65,7 +65,7 @@ export function SettingsPage() {
 
   return (
     <AdminPage title={t("admin.settings.title")} description={t("admin.settings.description")}>
-      <Card className="max-w-3xl">
+      <Card className="mx-auto max-w-3xl">
         <CardContent className="pt-6">
           {!query.data ? (
             <div className="flex justify-center py-10">

@@ -1,4 +1,4 @@
-import { formatDate, type AppointmentResponse } from "@vet/shared";
+import { formatDate, formatDateTime, type AppointmentResponse } from "@vet/shared";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -24,10 +24,6 @@ function todayBounds(): { from: string; to: string } {
   return { from: start.toISOString(), to: end.toISOString() };
 }
 
-function timeOf(scheduledAt: string): string {
-  const d = new Date(scheduledAt);
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
 
 /**
  * "Today's schedule" — the next N appointments scheduled for today. Optionally filtered to a
@@ -61,14 +57,17 @@ export function TodayScheduleCard({ doctorId, limit = 5 }: { doctorId?: string; 
           const tone = STATUS_TONE[a.status] ?? "gray";
           return (
             <Link key={a.id} to={`/operations/appointments`} className="row hover:bg-[var(--ink-50)]">
-              <div className="num strong" style={{ width: 60, fontSize: 14 }}>
-                {timeOf(a.scheduledAt)}
+              <div className="num strong text-center" style={{ minWidth: 80, fontSize: 14 }}>
+                {formatDateTime(a.scheduledAt, i18n.language, "h:mm a")}
+              </div>
+              <div className="num strong text-start" style={{ minWidth: 90, fontSize: 14 }}>
+                {formatDate(a.scheduledAt, i18n.language)}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="name truncate">{a.notes ?? formatDate(a.scheduledAt, i18n.language)}</div>
+                {a.notes ? <div className="name truncate">{a.notes}</div> : null}
               </div>
               <span className={cn("pill", tone)}>{t(`appointmentStatus.${a.status}`, { defaultValue: a.status })}</span>
-              <Icon.fwd size={16} />
+              <Icon.fwd size={16} className="rtl:-scale-x-100" />
             </Link>
           );
         })

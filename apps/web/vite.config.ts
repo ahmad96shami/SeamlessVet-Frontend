@@ -37,5 +37,21 @@ export default defineConfig({
       devOptions: { enabled: false },
     }),
   ],
-  server: { port: 5173 },
+  server: { 
+    port: 5173,
+    host: true,
+    allowedHosts: true,
+    proxy: {
+    '/api': {
+      target: 'http://localhost:5180', // your backend port
+      changeOrigin: true,
+      secure: false,
+      rewrite: (path) => path.replace(/^\/api/, ''), // strips /api prefix
+    },
+   },
+   },
 });
+
+//  server: { 
+//     port: 5173,},
+//    },

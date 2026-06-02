@@ -1,5 +1,5 @@
-import { formatCurrency, formatQuantity } from "@vet/shared";
-import { useState } from "react";
+import { formatQuantity } from "@vet/shared";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
 
@@ -13,11 +13,19 @@ import { useStock } from "@/queries/inventory";
 import { useServices } from "@/queries/services";
 import { usePosCartStore } from "@/stores/posCartStore";
 
-import { BarcodeScannerDialog } from "./BarcodeScannerDialog";
 import { ReceiptVoucherDialog } from "./ReceiptVoucherDialog";
 
 type Filter = "all" | "products" | "services";
 const FILTERS: Filter[] = ["all", "products", "services"];
+
+type LayoutMode = "list" | "grid2" | "grid3" | "grid4";
+const LAYOUT_KEY = "pos.catalogLayout";
+const LAYOUT_GRID_CLASS: Record<LayoutMode, string> = {
+  list: "grid-cols-1",
+  grid2: "grid-cols-2",
+  grid3: "grid-cols-2 lg:grid-cols-3",
+  grid4: "grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+};
 
 /** The POS left/end pane: search (name + barcode) + scanner, a kind filter, and a click-to-add grid
  *  of sellable products (from warehouse stock) and services. */
@@ -29,8 +37,14 @@ export function CatalogPanel() {
   const [search, setSearch] = useState("");
   const debounced = useDebouncedValue(search, 300);
   const [filter, setFilter] = useState<Filter>("all");
-  const [scanOpen, setScanOpen] = useState(false);
   const [voucherOpen, setVoucherOpen] = useState(false);
+  const [layout, setLayout] = useState<LayoutMode>(() => {
+    const stored = typeof window !== "undefined" ? window.localStorage.getItem(LAYOUT_KEY) : null;
+    return stored === "list" || stored === "grid2" || stored === "grid3" || stored === "grid4" ? stored : "list";
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(LAYOUT_KEY, layout);
+  }, [layout]);
 
   // Products come from warehouse stock (on-hand + low-stock flag + selling price); the search
   // matches name + barcode server-side. Services have no inventory.
@@ -55,30 +69,50 @@ export function CatalogPanel() {
             className="ps-9"
           />
         </div>
-        <Button type="button" variant="secondary" onClick={() => setScanOpen(true)}>
-          <Icon.box className="size-4" />
-          {t("pos.search.scan")}
-        </Button>
         <Button type="button" variant="secondary" onClick={() => setVoucherOpen(true)}>
           <Icon.paper className="size-4" />
           {t("pos.voucher.new")}
         </Button>
       </div>
 
-      <div className="flex flex-none gap-2 px-4 pt-3">
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            type="button"
-            onClick={() => setFilter(f)}
-            className={cn(
-              "rounded-full px-3 py-1 text-sm font-medium transition-colors",
-              filter === f ? "bg-teal-500 text-white" : "bg-ink-50 text-navy-900 hover:bg-ink-100",
-            )}
-          >
-            {t(`pos.search.${f}`)}
-          </button>
-        ))}
+      <div className="flex flex-none items-center justify-between gap-2 px-4 pt-3">
+        <div className="flex flex-wrap gap-2">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFilter(f)}
+              className={cn(
+                "rounded-full px-3 py-1 text-sm font-medium transition-colors",
+                filter === f ? "bg-teal-500 text-white" : "bg-ink-50 text-navy-900 hover:bg-ink-100",
+              )}
+            >
+              {t(`pos.search.${f}`)}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-none items-center rounded-lg border p-0.5">
+          {(["list", "grid2", "grid3", "grid4"] as const).map((mode) => {
+            const active = layout === mode;
+            return (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setLayout(mode)}
+                aria-pressed={active}
+                aria-label={t(`pos.layout.${mode}`)}
+                title={t(`pos.layout.${mode}`)}
+                className={cn(
+                  "flex h-7 items-center gap-1 rounded px-2 text-xs font-bold transition-colors",
+                  active ? "bg-navy-900 text-white" : "text-muted-foreground hover:bg-ink-50",
+                )}
+              >
+                {mode === "list" ? <Icon.list className="size-4" /> : <Icon.grid className="size-4" />}
+                {mode !== "list" ? <span className="tabular-nums">{mode.slice(-1)}</span> : null}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto p-4">
@@ -87,7 +121,7 @@ export function CatalogPanel() {
             {t("pos.search.noResults")}
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
+          <div className={cn("grid gap-3", LAYOUT_GRID_CLASS[layout])}>
             {products.map((p) => {
               const out = p.quantity <= 0;
               return (
@@ -106,27 +140,22 @@ export function CatalogPanel() {
                       available: p.quantity,
                     })
                   }
-                  className="flex flex-col rounded-xl border bg-card p-3 text-start transition-colors hover:border-teal-400 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center gap-3 rounded-xl border bg-card p-3 text-start transition-colors hover:border-teal-400 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <div className="mb-2 flex items-start justify-between gap-2">
-                    <span className="grid size-9 place-items-center rounded-lg bg-teal-50 text-teal-600">
-                      <Icon.pill className="size-4" />
-                    </span>
+                  <span className="grid size-12 flex-none place-items-center rounded-lg bg-teal-50 text-teal-600">
+                    <Icon.box className="size-5" />
+                  </span>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-sm font-semibold leading-tight text-navy-900">{p.nameAr}</span>
+                    <span className="mt-1 text-sm font-bold text-navy-900"><Money value={p.sellingPrice} /></span>
+                  </div>
+                  <div className="flex flex-none flex-col items-end gap-1">
                     {out ? (
                       <Badge variant="destructive">{t("pos.catalog.outOfStock")}</Badge>
                     ) : p.belowReorderPoint ? (
                       <Badge variant="warning">{t("pos.catalog.lowStock")}</Badge>
                     ) : null}
-                  </div>
-                  <span className="text-sm font-semibold leading-tight text-navy-900">{p.nameAr}</span>
-                  {p.barcode ? (
-                    <span className="mt-0.5 text-xs text-muted-foreground" dir="ltr">
-                      {p.barcode}
-                    </span>
-                  ) : null}
-                  <div className="mt-2 flex items-baseline justify-between">
-                    <span className="font-bold text-navy-900"><Money value={p.sellingPrice} /></span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {t("pos.catalog.available")}: {formatQuantity(p.quantity, lang)}
                     </span>
                   </div>
@@ -146,32 +175,22 @@ export function CatalogPanel() {
                     unitPrice: s.defaultPrice,
                   })
                 }
-                className="flex flex-col rounded-xl border bg-card p-3 text-start transition-colors hover:border-teal-400"
+                className="flex items-center gap-3 rounded-xl border bg-card p-3 text-start transition-colors hover:border-teal-400"
               >
-                <div className="mb-2 flex items-start justify-between gap-2">
-                  <span className="grid size-9 place-items-center rounded-lg bg-ink-100 text-navy-900">
-                    <Icon.stethoscope className="size-4" />
-                  </span>
-                  <Badge variant="secondary">{t("pos.catalog.service")}</Badge>
+                <span className="grid size-12 flex-none place-items-center rounded-lg bg-ink-100 text-navy-900">
+                  <Icon.stethoscope className="size-5" />
+                </span>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-sm font-semibold leading-tight text-navy-900">{s.nameAr}</span>
+                  <span className="mt-1 text-sm font-bold text-navy-900"><Money value={s.defaultPrice} /></span>
                 </div>
-                <span className="text-sm font-semibold leading-tight text-navy-900">{s.nameAr}</span>
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="font-bold text-navy-900"><Money value={s.defaultPrice} /></span>
-                </div>
+                <Badge variant="secondary" className="flex-none">{t("pos.catalog.service")}</Badge>
               </button>
             ))}
           </div>
         )}
       </div>
 
-      <BarcodeScannerDialog
-        open={scanOpen}
-        onClose={() => setScanOpen(false)}
-        onDetected={(text) => {
-          setSearch(text);
-          setScanOpen(false);
-        }}
-      />
       <ReceiptVoucherDialog open={voucherOpen} onClose={() => setVoucherOpen(false)} />
     </div>
   );

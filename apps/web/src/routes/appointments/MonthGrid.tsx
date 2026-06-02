@@ -78,7 +78,7 @@ export function MonthGrid({ days, month, appointments, labelFor, onSelectDay }: 
                       style={{ background: tone.bg, color: tone.text, border: `1px solid ${tone.border}` }}
                     >
                       <span className="tabular-nums opacity-80">
-                        {formatDate(new Date(a.scheduledAt), lang, "HH:mm")}
+                        {formatDate(new Date(a.scheduledAt), lang, "h:mm a")}
                       </span>{" "}
                       <span className={cn(a.status === "cancelled" && "line-through")}>
                         {labelFor(a).primary}

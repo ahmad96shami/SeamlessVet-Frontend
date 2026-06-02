@@ -13,17 +13,22 @@ export function Money({
   value,
   currency = DEFAULT_CURRENCY,
   className,
+  symbolPlacement = "trailing",
 }: {
   value: number;
   currency?: string;
   className?: string;
+  /** Where to render the currency symbol relative to the amount. Default trailing. */
+  symbolPlacement?: "leading" | "trailing";
 }) {
   const { i18n } = useTranslation();
   const { body, symbol } = formatCurrencyParts(value, i18n.language, currency);
+  const symbolNode = symbol ? <span className="money-symbol">{symbol}</span> : null;
   return (
     <span className={cn("money tabular-nums", className)}>
+      {symbolPlacement === "leading" ? symbolNode : null}
       <span className="money-body">{body}</span>
-      {symbol ? <span className="money-symbol">{symbol}</span> : null}
+      {symbolPlacement === "trailing" ? symbolNode : null}
     </span>
   );
 }

@@ -93,7 +93,7 @@ export function CustomerDetailPage() {
             </Badge>
           </div>
           {contactBits.length > 0 ? (
-            <p className="text-sm text-muted-foreground" dir="auto">
+            <p className="text-sm text-muted-foreground">
               {contactBits.join(" · ")}
             </p>
           ) : null}

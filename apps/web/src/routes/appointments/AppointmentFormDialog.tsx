@@ -437,7 +437,7 @@ export function AppointmentFormDialog({
                 }}
               >
                 {t("appointments.conflictWarning", {
-                  time: formatDate(new Date(conflict.scheduledAt), lang, "HH:mm"),
+                  time: formatDate(new Date(conflict.scheduledAt), lang, "h:mm a"),
                 })}
               </div>
             ) : null}

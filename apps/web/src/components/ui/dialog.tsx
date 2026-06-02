@@ -19,6 +19,19 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
+ * Stack of currently-open dialogs so that, when dialogs nest, only the top-most one handles Escape
+ * and the Tab focus-trap. Without this, every open dialog's document-level keydown listener fires:
+ * Escape would close them all at once and the outer trap would fight the inner one for focus.
+ */
+const dialogStack: symbol[] = [];
+const stackListeners = new Set<() => void>();
+const emitStack = () => stackListeners.forEach((l) => l());
+const subscribeStack = (l: () => void) => {
+  stackListeners.add(l);
+  return () => stackListeners.delete(l);
+};
+
+/**
  * Lightweight modal: portal + overlay, closes on Escape / overlay click, locks body scroll.
  * `role="dialog"` + `aria-modal`, with a focus-trap (W10 a11y pass): focus moves into the dialog on
  * open, Tab/Shift+Tab cycle within it, and focus returns to the previously-focused element on close.
@@ -26,6 +39,30 @@ const FOCUSABLE =
 export function Dialog({ open, onClose, title, description, children, className }: DialogProps) {
   const { t } = useTranslation();
   const contentRef = React.useRef<HTMLDivElement>(null);
+  const idRef = React.useRef<symbol>(undefined as unknown as symbol);
+  if (idRef.current === undefined) idRef.current = Symbol("dialog");
+
+  // Register in the open-dialog stack so only the top-most dialog reacts to keyboard events.
+  const topId = React.useSyncExternalStore(
+    subscribeStack,
+    () => dialogStack[dialogStack.length - 1],
+  );
+  React.useEffect(() => {
+    if (!open) return;
+    const id = idRef.current;
+    dialogStack.push(id);
+    emitStack();
+    return () => {
+      const i = dialogStack.lastIndexOf(id);
+      if (i !== -1) dialogStack.splice(i, 1);
+      emitStack();
+    };
+  }, [open]);
+  const isTop = topId === idRef.current;
+  // Read the latest isTop from inside the (stably-bound) keydown listener without rebinding it —
+  // rebinding the effect would re-run the focus-restore and steal focus whenever a child opens.
+  const isTopRef = React.useRef(isTop);
+  isTopRef.current = isTop;
 
   React.useEffect(() => {
     if (!open) return;
@@ -33,6 +70,7 @@ export function Dialog({ open, onClose, title, description, children, className 
     const previouslyFocused = document.activeElement as HTMLElement | null;
 
     const onKey = (e: KeyboardEvent) => {
+      if (!isTopRef.current) return;
       if (e.key === "Escape") {
         onClose();
         return;

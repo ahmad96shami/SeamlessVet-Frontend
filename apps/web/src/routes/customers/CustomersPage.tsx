@@ -87,7 +87,7 @@ export function CustomersPage() {
           <div>
             <div className="font-medium">{row.original.fullName}</div>
             {row.original.phonePrimary ? (
-              <div className="text-xs text-muted-foreground" dir="ltr">
+              <div className="text-end text-xs text-muted-foreground" dir="ltr">
                 {row.original.phonePrimary}
               </div>
             ) : null}
@@ -121,7 +121,7 @@ export function CustomersPage() {
             b > 0 ? "font-medium text-destructive" : b < 0 ? "font-medium text-success" : "text-muted-foreground";
           return (
             <span className={cls} dir="ltr">
-              <Money value={b} />
+              <Money value={b} symbolPlacement="leading" />
             </span>
           );
         },

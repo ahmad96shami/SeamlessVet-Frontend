@@ -103,7 +103,9 @@ export function VisitDetailPage() {
   const subBits = [
     customer.data ? `${t("visits.detail.owner")}: ${customer.data.fullName}` : null,
     `${t("visits.detail.visitNumber")} ${visitRef(v)}`,
-    v.startedAt ? `${t("visits.detail.startedAt")} ${formatDateTime(v.startedAt, lang)}` : null,
+    v.startedAt
+      ? `${t("visits.detail.startedAt")} ${formatDateTime(v.startedAt, lang, "yyyy/MM/dd h:mm a")}`
+      : null,
     doctorName,
   ].filter(Boolean) as string[];
 
@@ -150,8 +152,13 @@ export function VisitDetailPage() {
             {petMeta ? <span className="text-sm text-muted-foreground">{petMeta}</span> : null}
           </div>
           {subBits.length > 0 ? (
-            <p className="text-sm text-muted-foreground" dir="auto">
-              {subBits.join(" · ")}
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+              {subBits.map((bit, i) => (
+                <span key={i} className="flex items-center gap-x-2 whitespace-nowrap">
+                  {i > 0 ? <span aria-hidden className="text-ink-300">·</span> : null}
+                  <span>{bit}</span>
+                </span>
+              ))}
             </p>
           ) : null}
         </div>

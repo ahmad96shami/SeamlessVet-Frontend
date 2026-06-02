@@ -87,6 +87,16 @@ export function Select({
     setPos({ top, left: rect.left, width: rect.width });
   }, []);
 
+  // Callback ref: when the portalled menu attaches we have its real height, so re-run reposition
+  // — otherwise the first reposition uses the 280px fallback and flip-up lands too high.
+  const setMenuRef = React.useCallback(
+    (el: HTMLUListElement | null) => {
+      menuRef.current = el;
+      if (el) reposition();
+    },
+    [reposition],
+  );
+
   // Keep the portalled menu pinned to the trigger while open (page/dialog scroll, resize).
   React.useLayoutEffect(() => {
     if (!open) return;
@@ -182,7 +192,7 @@ export function Select({
       {open && pos
         ? createPortal(
             <ul
-              ref={menuRef}
+              ref={setMenuRef}
               role="listbox"
               className="select-menu"
               style={{ position: "fixed", top: pos.top, left: pos.left, width: pos.width }}

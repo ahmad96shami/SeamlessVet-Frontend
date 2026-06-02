@@ -52,7 +52,7 @@ export function RegistrationRequestsPage() {
         cell: ({ row }) => (
           <div>
             <div className="font-medium">{row.original.fullName}</div>
-            <div className="text-xs text-muted-foreground" dir="ltr">
+            <div className="text-end text-xs text-muted-foreground" dir="ltr">
               {row.original.phonePrimary}
             </div>
           </div>

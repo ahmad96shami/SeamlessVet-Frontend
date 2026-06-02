@@ -21,7 +21,7 @@ export function NotificationBell() {
   return (
     <>
       <button className="icon-pill" title={title} aria-label={title} onClick={() => setOpen(true)}>
-        <Icon.bell size={16} />
+        <Icon.bell size={20} />
         {unread > 0 ? <span className="badge neutral">{unread}</span> : null}
       </button>
       <NotificationPanel open={open} onClose={() => setOpen(false)} />

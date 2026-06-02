@@ -55,11 +55,8 @@ export function UpcomingVaccinationsPage() {
       {
         accessorKey: "nextDueDate",
         header: t("reports.vaccinations.colDue"),
-        cell: ({ row }) => (
-          <span className="font-semibold">
-            {row.original.nextDueDate ? formatDate(row.original.nextDueDate, lang) : "—"}
-          </span>
-        ),
+        cell: ({ row }) =>
+          row.original.nextDueDate ? formatDate(row.original.nextDueDate, lang) : "—",
       },
     ],
     [t, lang, customers.byId],

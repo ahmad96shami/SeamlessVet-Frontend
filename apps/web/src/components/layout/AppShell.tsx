@@ -49,12 +49,12 @@ export function AppShell() {
         </div>
 
         <nav className="sn-items">
-          {NAV_SECTION_ORDER.map((section) => {
+          {NAV_SECTION_ORDER.map((section, index) => {
             const sectionItems = items.filter((item) => item.section === section);
             if (sectionItems.length === 0) return null;
             return (
               <Fragment key={section}>
-                <div className="sn-section-label">{t(section)}</div>
+                {index > 0 ? <div className="sn-section-divider" role="separator" aria-label={t(section)} /> : null}
                 {sectionItems.map((item) => (
                   <NavLink
                     key={item.to}
@@ -102,7 +102,7 @@ export function AppShell() {
               </div>
             </div>
             <span className="sn-user-chev">
-              <Icon.fwd size={14} />
+              <Icon.fwd size={14} className="rtl:-scale-x-100" />
             </span>
           </div>
         </div>

@@ -47,7 +47,7 @@ export function OverviewPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           tone="teal"
-          icon={<Icon.stethoscope className="size-5" />}
+          icon={<Icon.clock className="size-5" />}
           value={formatNumber(kpi.data?.visitsToday ?? 0, lang)}
           label={t("reports.kpi.visitsToday")}
           isLoading={kpi.isLoading}

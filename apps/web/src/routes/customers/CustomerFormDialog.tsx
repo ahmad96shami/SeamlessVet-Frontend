@@ -38,10 +38,16 @@ export function CustomerFormDialog({
   open,
   customer,
   onClose,
+  defaultName,
+  onCreated,
 }: {
   open: boolean;
   customer: CustomerResponse | null;
   onClose: () => void;
+  /** Prefill the name when opening a fresh form (e.g. the text typed into a customer search). */
+  defaultName?: string;
+  /** Fired with the new customer's id after a create (not an edit) — lets callers select it inline. */
+  onCreated?: (id: string) => void;
 }) {
   const { t } = useTranslation();
   const create = useCreateCustomer();
@@ -71,9 +77,9 @@ export function CustomerFormDialog({
             notes: customer.notes ?? "",
             assignedDoctorId: customer.assignedDoctorId ?? "",
           }
-        : DEFAULTS,
+        : { ...DEFAULTS, fullName: defaultName ?? "" },
     );
-  }, [open, customer, reset]);
+  }, [open, customer, defaultName, reset]);
 
   const onSubmit = handleSubmit((values) => {
     const body = omitEmptyStrings(values); // empty optional text → omitted (stored as null)
@@ -92,8 +98,9 @@ export function CustomerFormDialog({
       );
     } else {
       create.mutate(body, {
-        onSuccess: () => {
+        onSuccess: (res) => {
           toast.success(t("admin.common.created"));
+          onCreated?.(res.id);
           onClose();
         },
         onError,

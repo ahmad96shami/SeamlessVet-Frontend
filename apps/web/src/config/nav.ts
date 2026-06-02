@@ -32,7 +32,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     to: "/operations/visits",
     labelKey: "nav.visits",
-    icon: Icon.stethoscope,
+    icon: Icon.clock,
     section: "navSection.operations",
     roles: ["admin", "receptionist", "vet_clinic", "vet_both"],
   },
@@ -67,7 +67,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     to: "/admin/services",
     labelKey: "nav.services",
-    icon: Icon.pill,
+    icon: Icon.stethoscope,
     section: "navSection.catalog",
     roles: ["admin"],
   },

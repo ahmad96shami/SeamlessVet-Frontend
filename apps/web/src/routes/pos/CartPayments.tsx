@@ -70,7 +70,8 @@ export function CartPayments({ total }: { total: number }) {
             min={0}
             step="0.01"
             dir="ltr"
-            value={p.amount}
+            placeholder="0"
+            value={p.amount || ""}
             onChange={(e) => updateLeg(p.key, { amount: Number(e.target.value) || 0 })}
             className="h-9 flex-1 text-end"
           />

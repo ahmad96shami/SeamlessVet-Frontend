@@ -125,7 +125,7 @@ export function TimeGrid({
                 style={{ height: HOUR_ROW_PX, borderTop: i === 0 ? 0 : "1px solid var(--ink-100)" }}
               >
                 <span className="text-[11px] font-semibold tabular-nums text-muted-foreground">
-                  {formatDate(new Date(2000, 0, 1, h), lang, "HH:mm")}
+                  {formatDate(new Date(2000, 0, 1, h), lang, "h a")}
                 </span>
               </div>
             ))}
@@ -259,7 +259,7 @@ function AppointmentBlock({
     >
       <div className="flex items-baseline gap-1">
         <span className="text-[10px] font-semibold tabular-nums opacity-80">
-          {formatDate(start, lang, "HH:mm")}
+          {formatDate(start, lang, "h:mm a")}
         </span>
         <span className={cn("truncate text-xs font-bold leading-tight", cancelled && "line-through")}>
           {label.primary}

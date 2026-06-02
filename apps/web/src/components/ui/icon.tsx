@@ -123,6 +123,24 @@ export const Icon = {
       <path d="M4 5h16l-6 8v6l-4-2v-4z" />
     </Svg>
   ),
+  list: (p: IconProps) => (
+    <Svg {...p}>
+      <line x1="8" y1="6" x2="20" y2="6" />
+      <line x1="8" y1="12" x2="20" y2="12" />
+      <line x1="8" y1="18" x2="20" y2="18" />
+      <circle cx="4" cy="6" r="1.2" />
+      <circle cx="4" cy="12" r="1.2" />
+      <circle cx="4" cy="18" r="1.2" />
+    </Svg>
+  ),
+  grid: (p: IconProps) => (
+    <Svg {...p}>
+      <rect x="4" y="4" width="7" height="7" rx="1" />
+      <rect x="13" y="4" width="7" height="7" rx="1" />
+      <rect x="4" y="13" width="7" height="7" rx="1" />
+      <rect x="13" y="13" width="7" height="7" rx="1" />
+    </Svg>
+  ),
   send: (p: IconProps) => (
     <Svg {...p}>
       <path d="M5 12l16-8-6 18-3-7z" />

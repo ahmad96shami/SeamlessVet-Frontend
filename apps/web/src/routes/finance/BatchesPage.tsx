@@ -84,7 +84,7 @@ export function BatchesPage() {
         cell: ({ row }) => (
           <div>
             <div className="text-sm">{t(`feeModel.${row.original.supervisionFeeModel}`)}</div>
-            <div className="text-xs text-muted-foreground" dir="ltr">
+            <div className="text-end text-xs text-muted-foreground" dir="ltr">
               {formatNumber(row.original.supervisionFeeValue, lang)}
             </div>
           </div>

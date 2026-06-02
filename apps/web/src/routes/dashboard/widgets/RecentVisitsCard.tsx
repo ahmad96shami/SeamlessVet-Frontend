@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Icon } from "@/components/ui/icon";
 import { useVisits } from "@/queries/visits";
 import { cn } from "@/lib/utils";
+import { visitRef } from "@/routes/visits/VisitsPage";
 
 const VISIT_STATUS_TONE: Record<string, string> = {
   completed: "green",
@@ -40,8 +41,8 @@ export function RecentVisitsCard({ doctorId, limit = 6 }: { doctorId?: string; l
           const when = v.startedAt ?? v.createdAt;
           return (
             <Link key={v.id} to={`/operations/visits/${v.id}`} className="row hover:bg-[var(--ink-50)]">
-              <div className="num strong" style={{ width: 90, fontSize: 13 }}>
-                {v.visitNumber ?? "—"}
+              <div className="num strong text-end" style={{ width: 90, fontSize: 13 }}>
+                {visitRef(v)}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="name truncate">{t(`visitType.${v.visitType}`, { defaultValue: v.visitType })}</div>
@@ -50,7 +51,7 @@ export function RecentVisitsCard({ doctorId, limit = 6 }: { doctorId?: string; l
                 </div>
               </div>
               <span className={cn("pill", tone)}>{t(`visitStatus.${v.status}`, { defaultValue: v.status })}</span>
-              <Icon.fwd size={16} />
+              <Icon.fwd size={16} className="rtl:-scale-x-100" />
             </Link>
           );
         })

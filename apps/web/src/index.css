@@ -333,7 +333,7 @@
   /* ── Icon pill (utility buttons) ────────────────────────── */
   .icon-pill { width: 38px; height: 38px; border-radius: 10px; background: var(--ink-50); display: grid; place-items: center; color: var(--ink-700); border: 0; cursor: pointer; position: relative; }
   .icon-pill:hover { background: var(--ink-100); }
-  .icon-pill .badge { position: absolute; top: 6px; inset-inline-start: 6px; background: var(--red); color: white; font-size: 10px; font-weight: 800; border-radius: 999px; padding: 2px 5px; line-height: 1; border: 2px solid var(--paper); }
+  .icon-pill .badge { position: absolute; top: -4px; inset-inline-start: -4px; background: var(--red); color: white; font-size: 9px; font-weight: 800; border-radius: 999px; min-width: 14px; height: 14px; padding: 0 4px; line-height: 14px; text-align: center; border: 2px solid var(--paper); pointer-events: none; }
 
   /* ── Form controls (inputs · textarea · custom select) ──── */
   .input, .textarea, .select-trigger {
@@ -366,6 +366,10 @@
   }
   /* file/number niceties */
   .input[type="number"] { font-variant-numeric: tabular-nums; }
+  /* Hide native number-input spinners app-wide (Chrome/Safari/Edge + Firefox). */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
   /* Custom select (drop-in for native <select>; menu is portalled to <body>) */
   .select-trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; text-align: start; }
@@ -423,11 +427,7 @@
   .sidenav .sn-brand-sub { font-size: 11px; color: var(--ink-500); margin-top: 2px; }
   .sidenav .sn-items { display: flex; flex-direction: column; gap: 1px; padding: 10px; flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
   .sidenav .sn-items::-webkit-scrollbar { width: 0; height: 0; display: none; }
-  .sidenav .sn-section-label { font-size: 10px; font-weight: 800; color: var(--ink-400); letter-spacing: 0.08em; padding: 12px 10px 4px; white-space: nowrap; opacity: 0; transition: opacity 0.18s; }
-  .sidenav:hover .sn-section-label { opacity: 1; }
-  .sidenav .sn-section-label::before { content: ""; display: block; height: 1px; background: var(--ink-100); margin-bottom: 8px; transition: opacity 0.18s; }
-  .sidenav .sn-section-label:first-child::before { display: none; }
-  .sidenav:hover .sn-section-label::before { opacity: 0; }
+  .sidenav .sn-section-divider { flex: 0 0 1px; min-height: 1px; background: var(--ink-100); margin: 5px 20px; max-width: 10px; }
   .sidenav .sn-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 10px; font-size: 13.5px; font-weight: 700; color: var(--ink-700); cursor: pointer; border: 0; background: transparent; font-family: inherit; text-align: start; position: relative; white-space: nowrap; width: 100%; }
   .sidenav .sn-item:hover { background: var(--ink-50); color: var(--fg-strong); }
   .sidenav .sn-item .sn-ico { width: 28px; height: 28px; border-radius: 8px; background: var(--ink-50); display: grid; place-items: center; color: var(--ink-700); flex: 0 0 auto; }
@@ -457,12 +457,15 @@
   /* <Money> — currency symbol de-emphasised next to the digit body. The body keeps the
      surrounding text's size/weight; the symbol drops to ~75% size and a muted colour so the
      amount reads cleanly without the ₪ glyph fighting the digits for visual weight. */
-  .money { display: inline-flex; align-items: baseline; gap: 3px; white-space: nowrap; }
+  .money { display: inline-flex; align-items: baseline; gap: 3px; white-space: nowrap; line-height: 1; }
+  /* Tajawal reserves descender space for Arabic diacritics, so Latin digits visually sit high in
+     their line-box — nudge the digit body up 1px so glyphs read as visually centered. */
+  .money-body { transform: translateY(-1px); }
   .money-symbol { font-size: 0.78em; font-weight: 600; color: var(--ink-500); }
   .sidenav .sn-user-chev { opacity: 0; transition: opacity 0.18s; }
   .sidenav:hover .sn-user-chev { opacity: 1; }
-  .sidenav .sn-utility { display: flex; flex-direction: column; gap: 6px; }
-  .sidenav:hover .sn-utility { flex-direction: row; }
+  .sidenav .sn-utility { display: none; gap: 6px; }
+  .sidenav:hover .sn-utility { display: flex; flex-direction: row; }
   .sidenav .sn-utility .icon-pill { width: 36px; height: 36px; border-radius: 8px; background: var(--ink-50); flex: 0 0 auto; }
   .sidenav .sn-utility .sn-utility-spacer { flex: 1; display: none; }
   .sidenav:hover .sn-utility .sn-utility-spacer { display: block; }

@@ -63,7 +63,7 @@ export function AlertsCard({ includeRegistrationRequests = false }: { includeReg
             const IconComp = it.icon === "user" ? Icon.user : it.icon === "shield" ? Icon.shield : Icon.warn;
             return (
               <Link key={i} to={it.to} className={cn("alert", it.tone, "block")}>
-                <div className="alert-ico">
+                <div className="alert-ico mb-1">
                   <IconComp size={18} />
                 </div>
                 <div>

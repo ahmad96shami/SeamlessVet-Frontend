@@ -130,6 +130,16 @@ export function DatePicker({
     setPos({ top, left: rect.left, width: rect.width, flipUp });
   }, []);
 
+  // Callback ref: re-measure once the portalled popup is in the DOM — first pass uses the 360px
+  // fallback so without this the flip-up math overshoots when the real popup is shorter.
+  const setPopupRef = React.useCallback(
+    (el: HTMLDivElement | null) => {
+      popupRef.current = el;
+      if (el) reposition();
+    },
+    [reposition],
+  );
+
   React.useLayoutEffect(() => {
     if (!open) return;
     reposition();
@@ -252,7 +262,7 @@ export function DatePicker({
 
   const display = selected
     ? withTime
-      ? formatDateTime(selected, locale)
+      ? formatDateTime(selected, locale, "yyyy/MM/dd h:mm a")
       : formatDate(selected, locale)
     : (placeholder ?? t(withTime ? "datepicker.placeholderDateTime" : "datepicker.placeholder"));
 
@@ -278,7 +288,7 @@ export function DatePicker({
       {open && pos
         ? createPortal(
             <div
-              ref={popupRef}
+              ref={setPopupRef}
               role="dialog"
               aria-label={ariaLabel}
               className="datepicker-popup"

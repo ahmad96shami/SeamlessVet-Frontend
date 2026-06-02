@@ -16,7 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useCustomers } from "@/queries/customers";
+import { useCustomer, useCustomers } from "@/queries/customers";
+import { CustomerFormDialog } from "@/routes/customers/CustomerFormDialog";
 import { useFieldInventories } from "@/queries/inventory";
 import { usePets } from "@/queries/pets";
 import { useCreateVisit } from "@/queries/visits";
@@ -49,6 +50,11 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
   const [visitType, setVisitType] = useState<"in_clinic" | "field">("in_clinic");
   const [chiefComplaint, setChiefComplaint] = useState("");
 
+  // Inline "add customer" — reuses the customers-page form; the new id is then auto-selected here.
+  const [addCustomerOpen, setAddCustomerOpen] = useState(false);
+  const [createdCustomerId, setCreatedCustomerId] = useState<string | null>(null);
+  const createdCustomerQuery = useCustomer(createdCustomerId);
+
   // Candidates for the customer picker (only queried while choosing).
   const customersQuery = useCustomers({ search: debouncedSearch || undefined, take: 20 });
   const candidates = customersQuery.data ?? [];
@@ -64,7 +70,19 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
     setDoctorId(isVet && me ? me.userId : "");
     setVisitType("in_clinic");
     setChiefComplaint("");
+    setAddCustomerOpen(false);
+    setCreatedCustomerId(null);
   }, [open, isVet, me]);
+
+  // Once the freshly-created customer is fetched, select it and clear the search.
+  useEffect(() => {
+    if (createdCustomerId && createdCustomerQuery.data) {
+      setCustomer(createdCustomerQuery.data);
+      setPetId("");
+      setSearch("");
+      setCreatedCustomerId(null);
+    }
+  }, [createdCustomerId, createdCustomerQuery.data]);
 
   const onConfirm = () => {
     if (!customer || !doctorId) return;
@@ -144,6 +162,17 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
                 ))
               )}
             </div>
+            {candidates.length === 0 ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => setAddCustomerOpen(true)}
+              >
+                {t("visits.create.addCustomer")}
+              </Button>
+            ) : null}
           </div>
         )}
 
@@ -207,6 +236,14 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
           </Button>
         </div>
       </div>
+
+      <CustomerFormDialog
+        open={addCustomerOpen}
+        customer={null}
+        defaultName={search.trim()}
+        onClose={() => setAddCustomerOpen(false)}
+        onCreated={(id) => setCreatedCustomerId(id)}
+      />
     </Dialog>
   );
 }
