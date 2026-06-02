@@ -36,6 +36,7 @@ export const AppSchema = new Schema({
   pets: new Table(
     {
       customer_id: column.text,
+      farm_id: column.text,
       name: column.text,
       species: column.text,
       breed: column.text,
@@ -50,6 +51,22 @@ export const AppSchema = new Schema({
       updated_at: column.text,
     },
     { indexes: { ix_pets_customer: ["customer_id"] } },
+  ),
+
+  // M15 — a customer owns 1–N farms (attached like pets; inherits the customer's doctor scope).
+  farms: new Table(
+    {
+      customer_id: column.text,
+      name: column.text,
+      kind: column.text,
+      location: column.text,
+      animal_type: column.text,
+      head_count: column.integer,
+      notes: column.text,
+      created_at: column.text,
+      updated_at: column.text,
+    },
+    { indexes: { ix_farms_customer: ["customer_id"] } },
   ),
 
   ledgers: new Table({
@@ -162,10 +179,22 @@ export const AppSchema = new Schema({
     { indexes: { ix_cmp_contract: ["contract_id"] } },
   ),
 
+  // M15 — which farms (of the contract's customer) a contract covers.
+  contract_farms: new Table(
+    {
+      contract_id: column.text,
+      farm_id: column.text,
+      created_at: column.text,
+      updated_at: column.text,
+    },
+    { indexes: { ix_contract_farms_contract: ["contract_id"] } },
+  ),
+
   batches: new Table(
     {
       contract_id: column.text,
       customer_id: column.text,
+      farm_id: column.text,
       responsible_doctor_id: column.text,
       animal_count: column.integer,
       start_date: column.text,
@@ -189,6 +218,7 @@ export const AppSchema = new Schema({
       visit_type: column.text,
       visit_number: column.text,
       customer_id: column.text,
+      farm_id: column.text,
       pet_id: column.text,
       batch_id: column.text,
       contract_id: column.text,
@@ -281,6 +311,7 @@ export const AppSchema = new Schema({
     {
       invoice_type: column.text,
       customer_id: column.text,
+      farm_id: column.text,
       visit_id: column.text,
       batch_id: column.text,
       number: column.text,
