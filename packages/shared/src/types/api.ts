@@ -820,6 +820,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/farms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Farms_List"];
+        put?: never;
+        post: operations["Farms_Create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/farms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Farms_Get"];
+        put?: never;
+        post?: never;
+        delete: operations["Farms_Delete"];
+        options?: never;
+        head?: never;
+        patch: operations["Farms_Update"];
+        trace?: never;
+    };
     "/doctor-entitlements": {
         parameters: {
             query?: never;
@@ -1010,6 +1042,38 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["Batches_Update"];
+        trace?: never;
+    };
+    "/contracts/{contractId}/farms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContractFarms_List"];
+        put?: never;
+        post: operations["ContractFarms_Attach"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contracts/{contractId}/farms/{farmId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ContractFarms_Detach"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/contracts/{contractId}/medication-prices": {
@@ -1568,6 +1632,8 @@ export interface components {
             /** Format: guid */
             customerId?: string;
             /** Format: guid */
+            farmId?: string | null;
+            /** Format: guid */
             petId?: string | null;
             /** Format: guid */
             doctorId?: string;
@@ -1596,6 +1662,8 @@ export interface components {
         };
         VisitPatchRequest: {
             status?: string | null;
+            /** Format: guid */
+            farmId?: string | null;
             chiefComplaint?: string | null;
             symptoms?: string | null;
             /** Format: decimal */
@@ -1802,7 +1870,7 @@ export interface components {
             idempotencyKey?: string;
             reason?: string | null;
         };
-        OfF__AnonymousType1OfString: {
+        OfF__AnonymousType3OfString: {
             status?: string | null;
         };
         PosInvoiceRequest: {
@@ -1871,6 +1939,28 @@ export interface components {
             notes?: string | null;
             idempotencyKey?: string;
         };
+        FarmRequest: {
+            /** Format: guid */
+            id?: string | null;
+            /** Format: guid */
+            customerId?: string;
+            name?: string;
+            kind?: string;
+            location?: string | null;
+            animalType?: string | null;
+            /** Format: int32 */
+            headCount?: number | null;
+            notes?: string | null;
+        };
+        FarmPatchRequest: {
+            name?: string | null;
+            kind?: string | null;
+            location?: string | null;
+            animalType?: string | null;
+            /** Format: int32 */
+            headCount?: number | null;
+            notes?: string | null;
+        };
         PayEntitlementRequest: {
             method?: string;
         };
@@ -1938,6 +2028,8 @@ export interface components {
             /** Format: guid */
             customerId?: string;
             /** Format: guid */
+            farmId?: string | null;
+            /** Format: guid */
             responsibleDoctorId?: string;
             /** Format: int32 */
             animalCount?: number;
@@ -1960,6 +2052,8 @@ export interface components {
             /** Format: guid */
             contractId?: string | null;
             /** Format: guid */
+            farmId?: string | null;
+            /** Format: guid */
             responsibleDoctorId?: string | null;
             /** Format: int32 */
             animalCount?: number | null;
@@ -1977,6 +2071,12 @@ export interface components {
             /** Format: decimal */
             doctorShareCeiling?: number | null;
             status?: string | null;
+        };
+        ContractFarmAttachRequest: {
+            /** Format: guid */
+            id?: string | null;
+            /** Format: guid */
+            farmId?: string;
         };
         ContractMedicationPriceCreateRequest: {
             /** Format: guid */
@@ -2044,64 +2144,16 @@ export interface components {
         LogoutRequest: {
             refreshToken?: string;
         };
-        OfF__AnonymousType0OfIReadOnlyListOfJsonWebKey: {
-            keys?: components["schemas"]["JsonWebKey"][] | null;
+        OfF__AnonymousType1OfIEnumerableOfOfF__AnonymousType2OfStringAndStringAndStringAndStringAndStringAndString: {
+            keys?: components["schemas"]["OfF__AnonymousType2OfStringAndStringAndStringAndStringAndStringAndString"][] | null;
         };
-        JsonWebKey: components["schemas"]["SecurityKey"] & ({
-            /** @description Gets or sets the 'alg' (KeyType). */
-            alg?: string | null;
-            /** @description Gets or sets the 'crv' (ECC - Curve). */
-            crv?: string | null;
-            /** @description Gets or sets the 'd' (ECC - Private Key OR RSA - Private Exponent). */
-            d?: string | null;
-            /** @description Gets or sets the 'dp' (RSA - First Factor CRT Exponent). */
-            dp?: string | null;
-            /** @description Gets or sets the 'dq' (RSA - Second Factor CRT Exponent). */
-            dq?: string | null;
-            /** @description Gets or sets the 'e' (RSA - Exponent). */
-            e?: string | null;
-            /** @description Gets or sets the 'k' (Symmetric - Key Value). */
-            k?: string | null;
-            /** @description Gets the 'key_ops' (Key Operations). */
-            key_ops?: string[] | null;
-            /** @description Gets or sets the 'kid' (Key ID).. */
-            kid?: string | null;
-            /** @description Gets or sets the 'kty' (Key Type). */
+        OfF__AnonymousType2OfStringAndStringAndStringAndStringAndStringAndString: {
             kty?: string | null;
-            /** @description Gets or sets the 'n' (RSA - Modulus). */
-            n?: string | null;
-            /** @description Gets or sets the 'oth' (RSA - Other Primes Info). */
-            oth?: string[] | null;
-            /** @description Gets or sets the 'p' (RSA - First Prime Factor).. */
-            p?: string | null;
-            /** @description Gets or sets the 'q' (RSA - Second  Prime Factor).. */
-            q?: string | null;
-            /** @description Gets or sets the 'qi' (RSA - First CRT Coefficient).. */
-            qi?: string | null;
-            /** @description Gets or sets the 'use' (Public Key Use).. */
             use?: string | null;
-            /** @description Gets or sets the 'x' (ECC - X Coordinate).. */
-            x?: string | null;
-            /** @description Gets the 'x5c' collection (X.509 Certificate Chain).. */
-            x5c?: string[] | null;
-            /** @description Gets or sets the 'x5t' (X.509 Certificate SHA-1 thumbprint).. */
-            x5t?: string | null;
-            /** @description Gets or sets the 'x5t#S256' (X.509 Certificate SHA-256 thumbprint).. */
-            "x5t#S256"?: string | null;
-            /** @description Gets or sets the 'x5u' (X.509 URL).. */
-            x5u?: string | null;
-            /** @description Gets or sets the 'y' (ECC - Y Coordinate).. */
-            y?: string | null;
-        } & {
-            [key: string]: unknown;
-        });
-        /** @description Base class for Security Key. */
-        SecurityKey: {
-            /**
-             * Format: int32
-             * @description This must be overridden to get the size of this SecurityKey.
-             */
-            keySize?: number;
+            alg?: string | null;
+            kid?: string | null;
+            n?: string | null;
+            e?: string | null;
         };
         PresignedUploadRequest: {
             /** Format: guid */
@@ -3574,7 +3626,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfF__AnonymousType1OfString"];
+                    "application/json": components["schemas"]["OfF__AnonymousType3OfString"];
                 };
             };
         };
@@ -3776,6 +3828,110 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Farms_List: {
+        parameters: {
+            query?: {
+                customerId?: string | null;
+                search?: string | null;
+                skip?: number | null;
+                take?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Farms_Create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FarmRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Farms_Get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Farms_Delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Farms_Update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FarmPatchRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -4224,6 +4380,68 @@ export interface operations {
             };
         };
     };
+    ContractFarms_List: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContractFarms_Attach: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContractFarmAttachRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ContractFarms_Detach: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractId: string;
+                farmId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ContractMedicationPrices_List: {
         parameters: {
             query?: never;
@@ -4568,7 +4786,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfF__AnonymousType0OfIReadOnlyListOfJsonWebKey"];
+                    "application/json": components["schemas"]["OfF__AnonymousType1OfIEnumerableOfOfF__AnonymousType2OfStringAndStringAndStringAndStringAndStringAndString"];
                 };
             };
         };
