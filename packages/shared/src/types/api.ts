@@ -548,6 +548,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/night-stays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NightStays_List"];
+        put?: never;
+        post: operations["NightStays_Create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/night-stays/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NightStays_Get"];
+        put?: never;
+        post?: never;
+        delete: operations["NightStays_Delete"];
+        options?: never;
+        head?: never;
+        patch: operations["NightStays_Update"];
+        trace?: never;
+    };
+    "/night-stays/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NightStays_Close"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/inventory/stock": {
         parameters: {
             query?: never;
@@ -1691,6 +1739,10 @@ export interface components {
             icdVetCode?: string | null;
             /** Format: decimal */
             examFeeApplied?: number | null;
+            /** Format: decimal */
+            checkupFeeApplied?: number | null;
+            /** Format: guid */
+            followUpOfVisitId?: string | null;
         };
         VisitPatchRequest: {
             status?: string | null;
@@ -1713,6 +1765,8 @@ export interface components {
             icdVetCode?: string | null;
             /** Format: decimal */
             examFeeApplied?: number | null;
+            /** Format: decimal */
+            checkupFeeApplied?: number | null;
         };
         VaccinationCreateRequest: {
             /** Format: guid */
@@ -1848,6 +1902,30 @@ export interface components {
             userId?: string | null;
             displayName?: string | null;
             notes?: string | null;
+        };
+        NightStayCreateRequest: {
+            /** Format: guid */
+            id?: string | null;
+            /** Format: guid */
+            visitId?: string;
+            careType?: string;
+            /** Format: date-time */
+            checkInAt?: string | null;
+            /** Format: decimal */
+            nightlyRate?: number | null;
+            notes?: string | null;
+        };
+        NightStayPatchRequest: {
+            careType?: string | null;
+            /** Format: date-time */
+            checkInAt?: string | null;
+            /** Format: decimal */
+            nightlyRate?: number | null;
+            notes?: string | null;
+        };
+        NightStayCloseRequest: {
+            /** Format: date-time */
+            checkOutAt?: string | null;
         };
         ReceiveStockRequest: {
             /** Format: guid */
@@ -2299,6 +2377,8 @@ export interface components {
         SystemSettingsPatchRequest: {
             /** Format: decimal */
             defaultExamFee?: number | null;
+            /** Format: decimal */
+            defaultCheckupFee?: number | null;
             entitlementEnabledGlobal?: boolean | null;
             /** Format: decimal */
             lowStockThresholdPct?: number | null;
@@ -2310,6 +2390,14 @@ export interface components {
             logoUrl?: string | null;
             invoiceTaxDetails?: string | null;
             extra?: string | null;
+            /** Format: decimal */
+            nightStayRateMedical?: number | null;
+            /** Format: decimal */
+            nightStayRateIcu?: number | null;
+            /** Format: decimal */
+            nightStayRateHotel?: number | null;
+            /** Format: int32 */
+            nightStayCheckoutHour?: number | null;
         };
         PermissionOverrideRequest: {
             permissionKey?: string;
@@ -3485,6 +3573,132 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NightStays_List: {
+        parameters: {
+            query?: {
+                visitId?: string | null;
+                skip?: number | null;
+                take?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NightStays_Create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NightStayCreateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NightStays_Get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NightStays_Delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NightStays_Update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NightStayPatchRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NightStays_Close: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["NightStayCloseRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {
