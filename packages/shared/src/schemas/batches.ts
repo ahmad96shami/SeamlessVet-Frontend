@@ -14,6 +14,8 @@ export const BatchResponseSchema = z.object({
   id: z.string(),
   contractId: z.string().nullish(),
   customerId: z.string(),
+  /** M16 — the specific farm this batch supervises (a farm of `customerId`); null = the customer at large. Drives per-farm ledger routing + settlement. */
+  farmId: z.string().nullish(),
   responsibleDoctorId: z.string(),
   animalCount: z.number(),
   startDate: z.string(),
@@ -39,6 +41,8 @@ export type BatchResponse = z.infer<typeof BatchResponseSchema>;
 export const BatchCreateRequestSchema = z.object({
   contractId: z.string().optional(),
   customerId: z.string().min(1),
+  /** Optional — restrict the batch to one farm of `customerId` (validated same-customer → 409 `farm_customer_mismatch`). */
+  farmId: z.string().optional(),
   responsibleDoctorId: z.string().min(1),
   animalCount: z.number().int().min(0),
   startDate: z.string().min(1),
@@ -60,6 +64,8 @@ export type BatchCreateRequest = z.infer<typeof BatchCreateRequestSchema>;
  */
 export const BatchPatchRequestSchema = z.object({
   contractId: z.string().optional(),
+  /** Re-target the batch's farm (same-customer rule enforced server-side). */
+  farmId: z.string().optional(),
   responsibleDoctorId: z.string().optional(),
   animalCount: z.number().int().min(0).optional(),
   startDate: z.string().min(1).optional(),

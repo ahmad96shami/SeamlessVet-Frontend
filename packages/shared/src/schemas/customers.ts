@@ -49,7 +49,7 @@ export type CustomerResponse = z.infer<typeof CustomerResponseSchema>;
  * patch only writes present fields — so a doctor/optional value can't yet be cleared via edit.
  */
 export const CustomerRequestSchema = z.object({
-  type: z.enum(["regular_farm", "home", "cattle_farm", "poultry_farm"]),
+  type: z.enum(["regular_farm", "home", "cattle_farm", "poultry_farm", "clinic_customer"]),
   fullName: z.string().trim().min(1).max(256),
   phonePrimary: z.string().trim().max(32).optional(),
   phoneSecondary: z.string().trim().max(32).optional(),

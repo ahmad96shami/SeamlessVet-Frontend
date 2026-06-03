@@ -350,6 +350,40 @@
       "transferSubmit": "Confirm transfer",
       "transferred": "Ownership transferred"
     },
+    "farms": {
+      "title": "Farms",
+      "new": "Add farm",
+      "newTitle": "New farm",
+      "editTitle": "Edit farm",
+      "empty": "No farms registered for this customer",
+      "name": "Farm name",
+      "kind": "Kind",
+      "location": "Location",
+      "animalType": "Animal type",
+      "headCount": "Head count",
+      "notes": "Notes",
+      "colName": "Farm name",
+      "colKind": "Kind",
+      "colAnimal": "Animal",
+      "colHead": "Head count",
+      "colBalance": "Balance",
+      "colStatus": "Status",
+      "deleteConfirm": "Farm \"{{name}}\" will be deleted.",
+      "account": "Statement"
+    },
+    "aggregate": {
+      "title": "Balance summary",
+      "ownBalance": "Customer direct balance",
+      "aggregateBalance": "Total balance",
+      "farmsBalance": "Farm balances",
+      "farmsLabel": "Farms"
+    },
+    "farmDetail": {
+      "backToCustomer": "Back to customer",
+      "notFound": "Farm not found",
+      "owner": "Customer",
+      "balance": "Farm balance"
+    },
     "statement": {
       "title": "Account statement",
       "transactions": "Transaction log (statement)",
@@ -1293,6 +1327,9 @@
       "responsibleDoctor": "Responsible doctor",
       "contract": "Linked contract",
       "noContract": "No contract",
+      "farm": "Farm",
+      "noFarm": "Whole customer",
+      "farmHint": "Pick the customer first to list its farms",
       "animalCount": "Animal count",
       "startDate": "Start date",
       "endDate": "End date",
@@ -1347,6 +1384,27 @@
       "closed": "Account closed",
       "resulting": "Resulting entitlements",
       "noEntitlements": "No entitlements were produced."
+    },
+    "closeFarmAccount": {
+      "action": "Close farm account & release settlement",
+      "title": "Close farm account",
+      "body": "This farm's account will close and its entitlements will be computed. It does not affect the customer's other farms or direct account. Requires a zero balance.",
+      "balanceMustBeZero": "Can't close while the farm has an outstanding balance ({{balance}}). Collect the remainder first.",
+      "confirm": "Close the farm account now",
+      "closed": "Farm account closed",
+      "resulting": "Resulting entitlements",
+      "noEntitlements": "No entitlements were produced."
+    },
+    "contractFarms": {
+      "title": "Covered farms",
+      "subtitle": "The farms this contract covers (from the same customer). Editable while draft only.",
+      "add": "Add farm",
+      "empty": "No farms added yet",
+      "pickFarm": "Choose a farm",
+      "draftOnly": "Covered farms can only be edited while the contract is a draft.",
+      "selectCustomerFirst": "Save the contract first to add farms.",
+      "noFarmsForCustomer": "This customer has no farms.",
+      "removeConfirm": "Remove this farm from the contract?"
     },
     "partners": {
       "title": "Partners & profit distribution",
