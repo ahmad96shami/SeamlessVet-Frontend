@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Alert, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,10 +14,16 @@ import { ChipSelect, FormField } from "@/components/forms";
 interface VaccinationFormProps {
   /** Customer the vaccination is recorded against — always set (visit's customer). */
   customerId: string;
-  /** Visit it's logged on (optional in DB; we always pass the active visit). */
+  /** Visit it's logged on (optional in DB; standalone records pass none — Mo9.2). */
   visitId?: string;
   /** Pets on the customer — lets the doctor pick one or fall back to a farm-group record. */
   pets: ReadonlyArray<{ id: string; name: string }>;
+  /**
+   * Freeze the recipient (edit mode). The `/sync/vaccinations` PATCH handler silently ignores
+   * `pet_id`/`customer_id` (immutable post-create, like web W13's dialog) — an editable selector
+   * here would change the local row only for the server to re-stream the original.
+   */
+  lockRecipient?: boolean;
   /** Edit defaults. */
   defaultValues?: {
     petId?: string | null;
@@ -45,6 +51,7 @@ export function VaccinationForm({
   customerId,
   visitId,
   pets,
+  lockRecipient,
   defaultValues,
   submitting,
   submitLabel,
@@ -79,9 +86,24 @@ export function VaccinationForm({
     }
   });
 
+  const lockedPetName = useMemo(() => {
+    const petId = defaultValues?.petId;
+    if (!petId) return null;
+    return pets.find((p) => p.id === petId)?.name ?? null;
+  }, [defaultValues?.petId, pets]);
+
   return (
     <View className="gap-4">
-      {pets.length > 0 ? (
+      {lockRecipient ? (
+        <View className="gap-1">
+          <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+            {t("vaccinations.form.recipient")}
+          </Text>
+          <Text className="text-navy-900 text-[15px] font-tajawal-extrabold">
+            {lockedPetName ?? t("vaccinations.recipientFarm")}
+          </Text>
+        </View>
+      ) : pets.length > 0 ? (
         <ChipSelect
           control={form.control}
           name="petId"

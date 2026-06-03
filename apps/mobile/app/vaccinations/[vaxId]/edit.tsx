@@ -7,19 +7,18 @@ import { Button } from "@/components/ui";
 import { VaccinationForm } from "@/components/forms/VaccinationForm";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
-import type { PetRow, VaccinationRow, VisitRow } from "@/sync/types";
+import type { PetRow, VaccinationRow } from "@/sync/types";
 import { syncDelete, syncUpdate } from "@/sync/writes";
 
 /**
- * Edit a vaccination on a field visit (Mo2.5). Mutable fields: vaccineType, dateGiven,
- * nextDueDate. The recipient (pet vs. farm group) is **locked** — the `/sync/vaccinations`
- * PATCH handler silently ignores `pet_id`, so the old editable selector only ever changed
- * the local row for the server to re-stream the original (fixed in Mo9.2, matching web W13).
+ * Edit a vaccination from the agenda (Mo9.2) — works for standalone *and* visit-logged rows.
+ * The recipient is **locked**: `/sync/vaccinations` PATCH ignores `pet_id`/`customer_id`
+ * (immutable post-create, like web W13). Mutable: vaccineType, dateGiven, nextDueDate.
  */
-export default function EditVaccinationScreen() {
+export default function EditAgendaVaccinationScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { id: visitId, vaxId } = useLocalSearchParams<{ id: string; vaxId: string }>();
+  const { vaxId } = useLocalSearchParams<{ vaxId: string }>();
   const [submitting, setSubmitting] = useState(false);
 
   const { data } = useQuery<VaccinationRow>(
@@ -28,25 +27,17 @@ export default function EditVaccinationScreen() {
   );
   const vax = data?.[0];
 
-  const { data: visits } = useQuery<VisitRow>(
-    `SELECT * FROM visits WHERE id = ?`,
-    [visitId ?? ""],
-  );
-  const visit = visits?.[0];
-
+  // Pet-scoped rows may carry no customer_id — resolve the owner through the pet so the
+  // locked-recipient line can name the pet.
   const { data: pets } = useQuery<PetRow>(
-    `SELECT * FROM pets WHERE customer_id = ? ORDER BY name`,
-    [visit?.customer_id ?? vax?.customer_id ?? ""],
+    `SELECT * FROM pets WHERE customer_id = COALESCE(?, (SELECT customer_id FROM pets WHERE id = ?)) ORDER BY name`,
+    [vax?.customer_id ?? null, vax?.pet_id ?? ""],
   );
 
   return (
     <ScreenShell
       header={
-        <TopBar
-          title={t("visits.vaccinations.editTitle")}
-          onBack={() => router.back()}
-          right={null}
-        />
+        <TopBar title={t("vaccinations.editTitle")} onBack={() => router.back()} right={null} />
       }
     >
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -59,8 +50,8 @@ export default function EditVaccinationScreen() {
             ) : (
               <>
                 <VaccinationForm
-                  customerId={vax.customer_id ?? visit?.customer_id ?? ""}
-                  visitId={vax.visit_id ?? visitId}
+                  customerId={vax.customer_id ?? ""}
+                  visitId={vax.visit_id ?? undefined}
                   pets={(pets ?? []).map((p) => ({ id: p.id, name: p.name }))}
                   lockRecipient
                   defaultValues={{
@@ -89,26 +80,22 @@ export default function EditVaccinationScreen() {
                   label={t("actions.delete")}
                   variant="soft"
                   onPress={() => {
-                    Alert.alert(
-                      t("visits.vaccinations.editTitle"),
-                      t("visits.vaccinations.deleteConfirm"),
-                      [
-                        { text: t("actions.cancel"), style: "cancel" },
-                        {
-                          text: t("actions.delete"),
-                          style: "destructive",
-                          onPress: async () => {
-                            setSubmitting(true);
-                            try {
-                              await syncDelete("vaccinations", vax.id);
-                              router.back();
-                            } finally {
-                              setSubmitting(false);
-                            }
-                          },
+                    Alert.alert(t("vaccinations.deleteTitle"), t("vaccinations.deleteConfirm"), [
+                      { text: t("actions.cancel"), style: "cancel" },
+                      {
+                        text: t("actions.delete"),
+                        style: "destructive",
+                        onPress: async () => {
+                          setSubmitting(true);
+                          try {
+                            await syncDelete("vaccinations", vax.id);
+                            router.back();
+                          } finally {
+                            setSubmitting(false);
+                          }
                         },
-                      ],
-                    );
+                      },
+                    ]);
                   }}
                   block
                 />

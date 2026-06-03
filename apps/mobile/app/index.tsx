@@ -3,7 +3,7 @@ import { Alert, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
-import { Briefcase, Paper, Stethoscope, User } from "@/components/icons";
+import { Briefcase, Paper, Stethoscope, Syringe, User } from "@/components/icons";
 import { NavBottomBar, ScreenShell } from "@/components/layout";
 import { NotificationBell } from "@/components/NotificationBell";
 import { SyncIndicator } from "@/components/SyncIndicator";
@@ -63,6 +63,11 @@ export default function Index() {
           label={t("nav.contracts")}
           icon={<Paper size={20} color="#0F7A8A" />}
           onPress={() => router.push("/contracts")}
+        />
+        <QuickAction
+          label={t("nav.vaccinations")}
+          icon={<Syringe size={20} color="#0F7A8A" />}
+          onPress={() => router.push("/vaccinations")}
         />
       </View>
 
