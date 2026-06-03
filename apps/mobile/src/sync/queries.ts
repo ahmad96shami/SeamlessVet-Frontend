@@ -11,8 +11,29 @@ import { powerSync } from "./database";
  * latest-updated, which matches the web's visit-create behaviour.
  */
 
-/** Returns the customer's current active contract id, or null. */
-export async function findActiveContractIdForCustomer(customerId: string): Promise<string | null> {
+/**
+ * Returns the customer's current active contract id, or null.
+ *
+ * M15 farm awareness: when the visit is at a specific farm, an active contract that
+ * *explicitly covers* that farm (a `contract_farms` row) wins over the plain
+ * latest-active fallback — so a customer running separate farm contracts links the
+ * right one. With no farm (or no covering contract) the pre-M15 behaviour holds.
+ */
+export async function findActiveContractIdForCustomer(
+  customerId: string,
+  farmId?: string | null,
+): Promise<string | null> {
+  if (farmId) {
+    const covered = await powerSync.getOptional<{ id: string }>(
+      `SELECT c.id FROM contracts c
+         JOIN contract_farms cf ON cf.contract_id = c.id
+         WHERE c.customer_id = ? AND c.status = 'active' AND cf.farm_id = ?
+         ORDER BY c.updated_at DESC
+         LIMIT 1`,
+      [customerId, farmId],
+    );
+    if (covered) return covered.id;
+  }
   const row = await powerSync.getOptional<{ id: string }>(
     `SELECT id FROM contracts
        WHERE customer_id = ? AND status = 'active'
@@ -23,8 +44,28 @@ export async function findActiveContractIdForCustomer(customerId: string): Promi
   return row?.id ?? null;
 }
 
-/** Returns the customer's currently open batch id (M8 entitlement gate), or null. */
-export async function findOpenBatchIdForCustomer(customerId: string): Promise<string | null> {
+/**
+ * Returns the customer's currently open batch id (M8 entitlement gate), or null.
+ *
+ * M15 farm awareness: a farm-scoped visit prefers that farm's open batch, then a
+ * whole-customer batch (`farm_id` NULL) — never another farm's (the invoice would
+ * route to the wrong ledger: Invoice.FarmId = visit ?? batch). With no farm picked
+ * the pre-M15 latest-open behaviour holds.
+ */
+export async function findOpenBatchIdForCustomer(
+  customerId: string,
+  farmId?: string | null,
+): Promise<string | null> {
+  if (farmId) {
+    const row = await powerSync.getOptional<{ id: string }>(
+      `SELECT id FROM batches
+         WHERE customer_id = ? AND status = 'open' AND (farm_id = ? OR farm_id IS NULL)
+         ORDER BY (CASE WHEN farm_id = ? THEN 0 ELSE 1 END), updated_at DESC
+         LIMIT 1`,
+      [customerId, farmId, farmId],
+    );
+    return row?.id ?? null;
+  }
   const row = await powerSync.getOptional<{ id: string }>(
     `SELECT id FROM batches
        WHERE customer_id = ? AND status = 'open'

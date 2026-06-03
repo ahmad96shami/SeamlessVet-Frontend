@@ -18,7 +18,7 @@ import {
   getDefaultExamFee,
   listLocalVisitNumbers,
 } from "@/sync/queries";
-import type { CustomerRow, PetRow } from "@/sync/types";
+import type { CustomerRow, FarmRow, PetRow } from "@/sync/types";
 import { syncInsert } from "@/sync/writes";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -55,6 +55,11 @@ export default function NewVisitScreen() {
     [customerId ?? ""],
   );
 
+  const { data: farms } = useQuery<FarmRow>(
+    `SELECT * FROM farms WHERE customer_id = ? ORDER BY name`,
+    [customerId ?? ""],
+  );
+
   const form = useForm<VisitCreateRequest>({
     resolver: zodResolver(VisitCreateRequestSchema),
     defaultValues: {
@@ -80,6 +85,16 @@ export default function NewVisitScreen() {
     // Only run on mount; we don't want to clobber the doctor's edits as settings refresh.
   }, []);
 
+  // M15 — a sole farm pre-selects itself (the common single-farm customer bills that farm's
+  // ledger without an extra tap; the M16 migration attributed history the same way). Multi-farm
+  // customers pick explicitly; "no farm" bills the customer's own ledger.
+  const soleFarmId = (farms ?? []).length === 1 ? farms![0]!.id : null;
+  useEffect(() => {
+    if (soleFarmId && form.getValues("farmId") == null) {
+      form.setValue("farmId", soleFarmId);
+    }
+  }, [soleFarmId]);
+
   const handleSubmit = form.handleSubmit(async (values) => {
     if (!customer || !user?.userId) {
       Alert.alert(t("visits.newTitle"), t("visits.create.pickCustomerFirst"));
@@ -88,8 +103,8 @@ export default function NewVisitScreen() {
     setSubmitting(true);
     try {
       const [contractId, batchId, prior] = await Promise.all([
-        findActiveContractIdForCustomer(customer.id),
-        findOpenBatchIdForCustomer(customer.id),
+        findActiveContractIdForCustomer(customer.id, values.farmId ?? null),
+        findOpenBatchIdForCustomer(customer.id, values.farmId ?? null),
         listLocalVisitNumbers(user.userId),
       ]);
       const visitNumber = nextVisitNumber(user.numberPrefix, prior);
@@ -98,6 +113,7 @@ export default function NewVisitScreen() {
         visit_type: "field",
         visit_number: visitNumber,
         customer_id: customer.id,
+        farm_id: payload.farmId ?? null,
         pet_id: payload.petId ?? null,
         doctor_id: user.userId,
         contract_id: contractId,
@@ -141,6 +157,17 @@ export default function NewVisitScreen() {
                 <Pill tone="teal" label={user.numberPrefix} />
               ) : null}
             </Card>
+
+            {(farms ?? []).length > 0 ? (
+              <ChipSelect
+                control={form.control}
+                name="farmId"
+                label={t("visits.create.farm")}
+                options={(farms ?? []).map((f) => ({ value: f.id, label: f.name }))}
+                allowClear
+                clearLabel={t("visits.create.noFarm")}
+              />
+            ) : null}
 
             {(pets ?? []).length > 0 ? (
               <ChipSelect
