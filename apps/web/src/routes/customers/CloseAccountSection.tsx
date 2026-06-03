@@ -14,48 +14,62 @@ import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { useCloseAccount } from "@/queries/entitlements";
+import { useCloseFarmAccount } from "@/queries/farms";
 import { entitlementStatusVariant } from "@/routes/finance/statusVariants";
 import { useAuthStore } from "@/stores/authStore";
 
 const SETTLEMENT_ROLES = ["admin", "accountant"];
 
 /**
- * Close-account action (M9 settlement workflow). Payout authority, so it's shown only to admin/
- * accountant. Closing requires a **zero balance** (the settlement lock — partial payments never
- * release); the button is disabled otherwise and the precondition is surfaced. On success the
- * resulting/refreshed doctor entitlements are listed. A 409 `settlement_locked` from the server
- * (e.g. a race) explains the balance precondition rather than showing a raw error.
+ * Close-account action (M9/M16 settlement workflow), for either a **customer** (its own ledger) or a
+ * single **farm** ledger. Payout authority, so shown only to admin/accountant. Closing requires a
+ * **zero balance** (the settlement lock — partial payments never release); the button is disabled
+ * otherwise and the precondition is surfaced. On success the resulting/refreshed doctor entitlements
+ * are listed. A 409 `settlement_locked` (e.g. a race) explains the balance precondition.
  */
-export function CloseAccountSection({ customer }: { customer: CustomerResponse }) {
+function CloseAccountBase({
+  kind,
+  ownerId,
+  balance,
+  isClosed,
+}: {
+  kind: "customer" | "farm";
+  ownerId: string;
+  balance: number;
+  isClosed: boolean;
+}) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const role = useAuthStore((s) => s.user?.role);
-  const close = useCloseAccount();
+  // Both hooks always run (React rules); only the matching mutation fires.
+  const closeCustomer = useCloseAccount();
+  const closeFarm = useCloseFarmAccount();
+  const close = kind === "farm" ? closeFarm : closeCustomer;
   const doctors = useDoctorOptions();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [result, setResult] = useState<CloseAccountResponse | null>(null);
 
   if (!role || !SETTLEMENT_ROLES.includes(role)) return null;
 
-  const isClosed = customer.ledgerStatus === "closed";
-  const canClose = customer.balance === 0;
+  const ns = kind === "farm" ? "finance.closeFarmAccount" : "finance.closeAccount";
+  const canClose = balance === 0;
   const doctorName = (id: string | null | undefined) =>
     (id ? doctors.byId.get(id) : undefined) ?? "—";
 
   const doClose = () =>
-    close.mutate(customer.id, {
+    close.mutate(ownerId, {
       onSuccess: (res) => {
         setConfirmOpen(false);
         setResult(res);
-        toast.success(t("finance.closeAccount.closed"));
+        toast.success(t(`${ns}.closed`));
       },
       onError: (e) => {
         setConfirmOpen(false);
+        // The close endpoint rejects a non-zero balance with `account_not_settled` (a race past the
+        // disabled button); `settlement_locked` is mapped too for safety.
         toast.error(
-          e.code === "settlement_locked"
-            ? t("finance.closeAccount.balanceMustBeZero", {
-                balance: formatCurrency(customer.balance, lang),
-              })
+          e.code === "account_not_settled" || e.code === "settlement_locked"
+            ? t(`${ns}.balanceMustBeZero`, { balance: formatCurrency(balance, lang) })
             : e.message,
         );
       },
@@ -66,54 +80,42 @@ export function CloseAccountSection({ customer }: { customer: CustomerResponse }
       {isClosed ? (
         <div className="flex items-center gap-2 rounded-2xl border p-4 text-sm">
           <Icon.shield className="size-4 text-success" />
-          <span className="font-medium">{t("finance.closeAccount.closed")}</span>
+          <span className="font-medium">{t(`${ns}.closed`)}</span>
         </div>
       ) : (
         <div className="space-y-3 rounded-2xl border p-4">
           <div>
-            <h3 className="text-sm font-semibold">{t("finance.closeAccount.title")}</h3>
-            <p className="text-sm text-muted-foreground">{t("finance.closeAccount.body")}</p>
+            <h3 className="text-sm font-semibold">{t(`${ns}.title`)}</h3>
+            <p className="text-sm text-muted-foreground">{t(`${ns}.body`)}</p>
           </div>
           {!canClose ? (
             <div className="alert amber">
               <Icon.shield className="alert-ico size-4" />
-              <span>
-                {t("finance.closeAccount.balanceMustBeZero", {
-                  balance: formatCurrency(customer.balance, lang),
-                })}
-              </span>
+              <span>{t(`${ns}.balanceMustBeZero`, { balance: formatCurrency(balance, lang) })}</span>
             </div>
           ) : null}
           <Button onClick={() => setConfirmOpen(true)} disabled={!canClose || close.isPending}>
             <Icon.shield className="size-4" />
-            {t("finance.closeAccount.action")}
+            {t(`${ns}.action`)}
           </Button>
         </div>
       )}
 
-      <Dialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        title={t("finance.closeAccount.title")}
-      >
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} title={t(`${ns}.title`)}>
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">{t("finance.closeAccount.body")}</p>
+          <p className="text-sm text-muted-foreground">{t(`${ns}.body`)}</p>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={close.isPending}>
               {t("admin.common.cancel")}
             </Button>
             <Button onClick={doClose} disabled={close.isPending}>
-              {t("finance.closeAccount.confirm")}
+              {t(`${ns}.confirm`)}
             </Button>
           </div>
         </div>
       </Dialog>
 
-      <Dialog
-        open={result !== null}
-        onClose={() => setResult(null)}
-        title={t("finance.closeAccount.resulting")}
-      >
+      <Dialog open={result !== null} onClose={() => setResult(null)} title={t(`${ns}.resulting`)}>
         <div className="space-y-3">
           {result && result.entitlements.length > 0 ? (
             <ul className="divide-y rounded-xl border">
@@ -128,7 +130,9 @@ export function CloseAccountSection({ customer }: { customer: CustomerResponse }
                     </span>
                   </span>
                   <span className="flex items-center gap-2">
-                    <span className="font-medium"><Money value={e.computedAmount} /></span>
+                    <span className="font-medium">
+                      <Money value={e.computedAmount} />
+                    </span>
                     <Badge variant={entitlementStatusVariant(e.status)}>
                       {t(`entitlementStatus.${e.status}`, { defaultValue: e.status })}
                     </Badge>
@@ -137,7 +141,7 @@ export function CloseAccountSection({ customer }: { customer: CustomerResponse }
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">{t("finance.closeAccount.noEntitlements")}</p>
+            <p className="text-sm text-muted-foreground">{t(`${ns}.noEntitlements`)}</p>
           )}
           <div className="flex justify-end">
             <Button variant="outline" onClick={() => setResult(null)}>
@@ -148,4 +152,29 @@ export function CloseAccountSection({ customer }: { customer: CustomerResponse }
       </Dialog>
     </>
   );
+}
+
+/** Customer close-account (the customer's own ledger). */
+export function CloseAccountSection({ customer }: { customer: CustomerResponse }) {
+  return (
+    <CloseAccountBase
+      kind="customer"
+      ownerId={customer.id}
+      balance={customer.ownBalance}
+      isClosed={customer.ledgerStatus === "closed"}
+    />
+  );
+}
+
+/** Single-farm close-account (M16). */
+export function CloseFarmAccountSection({
+  farmId,
+  balance,
+  isClosed,
+}: {
+  farmId: string;
+  balance: number;
+  isClosed: boolean;
+}) {
+  return <CloseAccountBase kind="farm" ownerId={farmId} balance={balance} isClosed={isClosed} />;
 }

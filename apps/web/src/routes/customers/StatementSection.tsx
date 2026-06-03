@@ -2,7 +2,6 @@ import {
   formatCurrency,
   formatDate,
   formatNumber,
-  type CustomerResponse,
   type StatementParams,
 } from "@vet/shared";
 import { useMemo, useRef, useState } from "react";
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { useStatement } from "@/queries/customers";
+import { useFarmStatement } from "@/queries/farms";
 import { StatementDocument } from "@/routes/customers/StatementDocument";
 
 type RangeKey = "all" | "90d" | "year" | "custom";
@@ -56,8 +56,24 @@ function rangeToParams(range: RangeKey, from: string, to: string): StatementPara
   return {}; // all
 }
 
-/** A customer's ledger statement — running balance, date filter, print + WhatsApp share. */
-export function StatementSection({ customer }: { customer: CustomerResponse }) {
+/**
+ * A ledger statement — running balance, date filter, print + WhatsApp share. Works for either a
+ * customer's **own** ledger (`customerId`) or a farm ledger (`farmId`) — exactly one is supplied
+ * (M16 split the ledger). The owner's name/phone drive the header, share text, and print document.
+ */
+export function StatementSection({
+  customerId,
+  farmId,
+  ownerName,
+  ownerPhone,
+  fallbackBalance,
+}: {
+  customerId?: string;
+  farmId?: string;
+  ownerName: string;
+  ownerPhone?: string | null;
+  fallbackBalance: number;
+}) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const [range, setRange] = useState<RangeKey>("all");
@@ -68,7 +84,11 @@ export function StatementSection({ customer }: { customer: CustomerResponse }) {
     () => rangeToParams(range, customFrom, customTo),
     [range, customFrom, customTo],
   );
-  const query = useStatement(customer.id, params);
+  // Both hooks are always called (React rules); the inactive one is disabled by a null id.
+  const isFarm = farmId != null;
+  const customerStmt = useStatement(isFarm ? null : (customerId ?? null), params);
+  const farmStmt = useFarmStatement(isFarm ? farmId : null, params);
+  const query = isFarm ? farmStmt : customerStmt;
   const stmt = query.data;
   const entries = stmt?.entries ?? [];
 
@@ -90,17 +110,17 @@ export function StatementSection({ customer }: { customer: CustomerResponse }) {
   const printRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `${t("customers.statement.reportTitle")} - ${customer.fullName}`,
+    documentTitle: `${t("customers.statement.reportTitle")} - ${ownerName}`,
   });
 
   const onShare = () => {
-    const phone = (customer.phonePrimary ?? "").replace(/\D/g, "");
+    const phone = (ownerPhone ?? "").replace(/\D/g, "");
     if (!phone) {
       toast.error(t("customers.statement.shareUnavailable"));
       return;
     }
     const lines = [
-      `${t("customers.statement.reportTitle")} — ${customer.fullName}`,
+      `${t("customers.statement.reportTitle")} — ${ownerName}`,
       periodLabel,
       "──────────",
       ...entries
@@ -110,7 +130,7 @@ export function StatementSection({ customer }: { customer: CustomerResponse }) {
             `${formatDate(e.createdAt, lang)}  ${t(`ledgerEntryType.${e.entryType}`, { defaultValue: e.entryType })}  ${formatCurrency(e.amount, lang)}`,
         ),
       "──────────",
-      `${t("customers.statement.closing")}: ${formatCurrency(stmt?.closingBalance ?? customer.balance, lang)}`,
+      `${t("customers.statement.closing")}: ${formatCurrency(stmt?.closingBalance ?? fallbackBalance, lang)}`,
     ];
     window.open(
       `https://wa.me/${phone}?text=${encodeURIComponent(lines.join("\n"))}`,
@@ -280,8 +300,8 @@ export function StatementSection({ customer }: { customer: CustomerResponse }) {
         {stmt ? (
           <StatementDocument
             ref={printRef}
-            customerName={customer.fullName}
-            customerPhone={customer.phonePrimary}
+            customerName={ownerName}
+            customerPhone={ownerPhone}
             periodLabel={periodLabel}
             entries={entries}
             openingBalance={stmt.openingBalance}
