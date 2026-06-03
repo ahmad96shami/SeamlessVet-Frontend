@@ -24,6 +24,7 @@ import { Select } from "@/components/ui/select";
 import type { DoctorOption } from "@/hooks/useDoctorOptions";
 import { useContracts } from "@/queries/contracts";
 import { useCreateBatch, useUpdateBatch } from "@/queries/batches";
+import { useFarms } from "@/queries/farms";
 import { CustomerPickerDialog } from "@/routes/pos/CustomerPickerDialog";
 
 /**
@@ -38,6 +39,7 @@ const FormSchema = z.object({
   customerId: z.string().min(1),
   responsibleDoctorId: z.string().min(1),
   contractId: z.string(),
+  farmId: z.string(),
   animalCount: z.string(),
   startDate: z.string().min(1),
   endDate: z.string(),
@@ -55,6 +57,7 @@ const DEFAULTS: FormValues = {
   customerId: "",
   responsibleDoctorId: "",
   contractId: "",
+  farmId: "",
   animalCount: "0",
   startDate: "",
   endDate: "",
@@ -97,9 +100,11 @@ export function BatchFormDialog({
   const customerId = watch("customerId");
   const status = watch("status");
 
-  // The contract dropdown is scoped to the chosen customer's contracts.
+  // The contract + farm dropdowns are scoped to the chosen customer.
   const contractsQuery = useContracts({ customerId: customerId || undefined, take: 200 });
   const contracts = customerId ? (contractsQuery.data ?? []) : [];
+  const farmsQuery = useFarms({ customerId: customerId || undefined, take: 200 });
+  const farms = customerId ? (farmsQuery.data ?? []) : [];
 
   useEffect(() => {
     if (!open) return;
@@ -108,6 +113,7 @@ export function BatchFormDialog({
         customerId: batch.customerId,
         responsibleDoctorId: batch.responsibleDoctorId,
         contractId: batch.contractId ?? "",
+        farmId: batch.farmId ?? "",
         animalCount: String(batch.animalCount),
         startDate: batch.startDate,
         endDate: batch.endDate ?? "",
@@ -132,6 +138,7 @@ export function BatchFormDialog({
     const shared = {
       responsibleDoctorId: values.responsibleDoctorId,
       contractId: text(values.contractId),
+      farmId: text(values.farmId),
       animalCount: Number(values.animalCount || 0),
       startDate: values.startDate,
       endDate: text(values.endDate),
@@ -232,6 +239,26 @@ export function BatchFormDialog({
                   {contracts.map((c) => (
                     <option key={c.id} value={c.id}>
                       {`${t(`contractStatus.${c.status}`)} · ${formatDate(c.periodStart, lang)}`}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            />
+          </Field>
+          <Field label={t("finance.batches.farm")} error={errors.farmId?.message}>
+            <Controller
+              name="farmId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  disabled={!customerId}
+                >
+                  <option value="">{t("finance.batches.noFarm")}</option>
+                  {farms.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name}
                     </option>
                   ))}
                 </Select>
@@ -356,7 +383,8 @@ export function BatchFormDialog({
         onClose={() => setPickerOpen(false)}
         onSelect={(c) => {
           setValue("customerId", c.id, { shouldValidate: true });
-          setValue("contractId", ""); // contract list is scoped to the customer
+          setValue("contractId", ""); // contract + farm lists are scoped to the customer
+          setValue("farmId", "");
           setCustomerName(c.fullName);
           setPickerOpen(false);
         }}

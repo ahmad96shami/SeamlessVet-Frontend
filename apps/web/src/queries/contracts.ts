@@ -1,18 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   activateContract,
+  attachContractFarm,
   cancelContract,
   completeContract,
   createContract,
   createContractMedicationPrice,
   deleteContractMedicationPrice,
+  detachContractFarm,
   getContract,
+  listContractFarms,
   listContractMedicationPrices,
   listContracts,
   updateContract,
   updateContractMedicationPrice,
   type ApiError,
   type ContractCreateRequest,
+  type ContractFarmResponse,
   type ContractListParams,
   type ContractMedicationPriceCreateRequest,
   type ContractMedicationPricePatchRequest,
@@ -26,6 +30,7 @@ import { apiClient } from "@/services/apiClient";
 
 const KEY = "contracts";
 const PRICES = "contract-medication-prices";
+const FARMS = "contract-farms";
 
 export function useContracts(params: ContractListParams) {
   return useQuery<ContractResponse[], ApiError>({
@@ -106,5 +111,31 @@ export function useDeleteContractMedicationPrice(contractId: string) {
   return useMutation<void, ApiError, string>({
     mutationFn: (priceId) => deleteContractMedicationPrice(apiClient, contractId, priceId),
     onSuccess: () => qc.invalidateQueries({ queryKey: [PRICES, contractId] }),
+  });
+}
+
+// ---- Contract <-> farm coverage (M15) — draft-gated attach/detach ----------
+
+export function useContractFarms(contractId: string | null) {
+  return useQuery<ContractFarmResponse[], ApiError>({
+    queryKey: [FARMS, contractId],
+    queryFn: () => listContractFarms(apiClient, contractId as string),
+    enabled: contractId !== null,
+  });
+}
+
+export function useAttachContractFarm(contractId: string) {
+  const qc = useQueryClient();
+  return useMutation<IdentifierResponse, ApiError, string>({
+    mutationFn: (farmId) => attachContractFarm(apiClient, contractId, { farmId }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [FARMS, contractId] }),
+  });
+}
+
+export function useDetachContractFarm(contractId: string) {
+  const qc = useQueryClient();
+  return useMutation<void, ApiError, string>({
+    mutationFn: (farmId) => detachContractFarm(apiClient, contractId, farmId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [FARMS, contractId] }),
   });
 }

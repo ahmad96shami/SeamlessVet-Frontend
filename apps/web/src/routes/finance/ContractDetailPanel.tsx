@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { ContractFarms } from "@/routes/finance/ContractFarms";
 import { ContractMedicationPrices } from "@/routes/finance/ContractMedicationPrices";
 import { contractStatusVariant } from "@/routes/finance/statusVariants";
 
@@ -76,6 +77,10 @@ export function ContractDetailPanel({
             value={<span dir="ltr">{formatDate(contract.activatedAt, lang)}</span>}
           />
         ) : null}
+      </div>
+
+      <div className="border-t pt-3">
+        <ContractFarms contractId={contract.id} customerId={contract.customerId} isDraft={isDraft} />
       </div>
 
       <div className="border-t pt-3">
