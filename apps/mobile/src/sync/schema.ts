@@ -280,6 +280,15 @@ export const AppSchema = new Schema({
       notes: column.text,
       dispense_type: column.text,
       quantity: column.real,
+      // M18 — recurring-dose reminder schedule (reminder_enabled is 0/1; timestamps ISO text;
+      // last_reminded_dose is server-managed — streamed for display, never written locally).
+      reminder_enabled: column.integer,
+      interval_minutes: column.integer,
+      lead_minutes: column.integer,
+      start_at: column.text,
+      end_at: column.text,
+      doses_count: column.integer,
+      last_reminded_dose: column.integer,
       created_at: column.text,
     },
     { indexes: { ix_prescriptions_visit: ["visit_id"] } },

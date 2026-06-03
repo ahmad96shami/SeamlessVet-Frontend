@@ -107,6 +107,14 @@ export interface PrescriptionRow {
   notes: string | null;
   dispense_type: string;
   quantity: number | null;
+  // M18 — recurring-dose reminder schedule (SQLite has no bool: 0/1).
+  reminder_enabled: number | null;
+  interval_minutes: number | null;
+  lead_minutes: number | null;
+  start_at: string | null;
+  end_at: string | null;
+  doses_count: number | null;
+  last_reminded_dose: number | null;
   created_at: string;
 }
 
