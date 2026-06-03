@@ -47,7 +47,18 @@ export function CartIssue({ total }: { total: number }) {
         unitPrice: l.unitPrice,
         discountAmount: l.discountAmount,
       })),
-      payments: s.payments.map((p) => ({ method: p.method, amount: p.amount })),
+      payments: s.payments.map((p) => ({
+        method: p.method,
+        amount: p.amount,
+        // M19 — carry cheque reference metadata only on a cheque leg (omit blanks).
+        ...(p.method === "cheque"
+          ? {
+              ...(p.chequeNumber?.trim() ? { chequeNumber: p.chequeNumber.trim() } : {}),
+              ...(p.chequeBank?.trim() ? { chequeBank: p.chequeBank.trim() } : {}),
+              ...(p.chequeDueDate ? { chequeDueDate: p.chequeDueDate } : {}),
+            }
+          : {}),
+      })),
     };
     issue.mutate(input, {
       onSuccess: (res) => {

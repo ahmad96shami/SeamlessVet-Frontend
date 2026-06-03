@@ -1,4 +1,4 @@
-import { formatCurrency, type PaymentMethod } from "@vet/shared";
+import { IMMEDIATE_PAYMENT_METHODS, type PaymentMethod } from "@vet/shared";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
@@ -7,6 +7,7 @@ import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,8 @@ import { useIssueReceiptVoucher, useReceiptVoucher } from "@/queries/receiptVouc
 
 import { VoucherDocument } from "./VoucherDocument";
 
-const METHODS: PaymentMethod[] = ["cash", "card", "bank_transfer"];
+// A voucher is money actually received, so only the immediate methods (incl. cheque — M19).
+const METHODS = IMMEDIATE_PAYMENT_METHODS;
 
 /**
  * Issue a receipt voucher (Sanad Qabd) — a payment received from a customer that posts a credit to
@@ -34,8 +36,7 @@ export function ReceiptVoucherDialog({
   onClose: () => void;
   presetCustomerId?: string | null;
 }) {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+  const { t } = useTranslation();
 
   const [customerId, setCustomerId] = useState<string | null>(presetCustomerId ?? null);
   const [search, setSearch] = useState("");
@@ -43,6 +44,9 @@ export function ReceiptVoucherDialog({
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const [notes, setNotes] = useState("");
+  const [chequeNumber, setChequeNumber] = useState("");
+  const [chequeBank, setChequeBank] = useState("");
+  const [chequeDueDate, setChequeDueDate] = useState("");
   const [issuedId, setIssuedId] = useState<string | null>(null);
 
   // Reset to a clean form each time the dialog (re)opens.
@@ -53,6 +57,9 @@ export function ReceiptVoucherDialog({
     setAmount("");
     setMethod("cash");
     setNotes("");
+    setChequeNumber("");
+    setChequeBank("");
+    setChequeDueDate("");
     setIssuedId(null);
   }, [open, presetCustomerId]);
 
@@ -73,8 +80,16 @@ export function ReceiptVoucherDialog({
 
   const onSubmit = () => {
     if (customerId === null || amountNum <= 0) return;
+    const cheque =
+      method === "cheque"
+        ? {
+            ...(chequeNumber.trim() ? { chequeNumber: chequeNumber.trim() } : {}),
+            ...(chequeBank.trim() ? { chequeBank: chequeBank.trim() } : {}),
+            ...(chequeDueDate ? { chequeDueDate } : {}),
+          }
+        : {};
     issue.mutate(
-      { customerId, amount: amountNum, method, notes: notes.trim() || undefined },
+      { customerId, amount: amountNum, method, notes: notes.trim() || undefined, ...cheque },
       {
         onSuccess: (res) => {
           setIssuedId(res.id);
@@ -184,6 +199,26 @@ export function ReceiptVoucherDialog({
               ))}
             </Select>
           </label>
+          {method === "cheque" ? (
+            <div className="grid gap-2 rounded-xl border bg-ink-50/60 p-3 sm:grid-cols-3">
+              <label className="block space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">{t("cheque.number")}</span>
+                <Input
+                  dir="ltr"
+                  value={chequeNumber}
+                  onChange={(e) => setChequeNumber(e.target.value)}
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">{t("cheque.bank")}</span>
+                <Input value={chequeBank} onChange={(e) => setChequeBank(e.target.value)} />
+              </label>
+              <label className="block space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">{t("cheque.dueDate")}</span>
+                <DatePicker value={chequeDueDate} onChange={(e) => setChequeDueDate(e.target.value)} />
+              </label>
+            </div>
+          ) : null}
           <label className="block space-y-1">
             <span className="text-sm font-medium">{t("pos.voucher.notes")}</span>
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />

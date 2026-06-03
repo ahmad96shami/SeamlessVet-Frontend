@@ -25,6 +25,10 @@ export interface PaymentLeg {
   key: string;
   method: PaymentMethod;
   amount: number;
+  // M19 — cheque reference metadata, set only when `method` is `cheque`.
+  chequeNumber?: string;
+  chequeBank?: string;
+  chequeDueDate?: string;
 }
 
 interface PosCartState {
