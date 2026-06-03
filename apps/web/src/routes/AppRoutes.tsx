@@ -20,6 +20,8 @@ import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
 import { PartnersPage } from "@/routes/finance/PartnersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
+import { SupplierDetailPage } from "@/routes/suppliers/SupplierDetailPage";
+import { SuppliersPage } from "@/routes/suppliers/SuppliersPage";
 import { ClinicProfitsPage } from "@/routes/reports/ClinicProfitsPage";
 import { DoctorEntitlementsReportPage } from "@/routes/reports/DoctorEntitlementsReportPage";
 import { DoctorIncomePage } from "@/routes/reports/DoctorIncomePage";
@@ -198,6 +200,23 @@ export function AppRoutes() {
           <Route path="entitlements" element={<EntitlementsPage />} />
           <Route path="partners" element={<PartnersPage />} />
         </Route>
+        {/* Suppliers & purchases — finance-section screens, standalone (not under the contracts tabs). */}
+        <Route
+          path="finance/suppliers"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <SuppliersPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="finance/suppliers/:id"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <SupplierDetailPage />
+            </RequireRole>
+          }
+        />
         <Route
           path="admin/registration-requests"
           element={
