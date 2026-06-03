@@ -22,6 +22,7 @@ export interface CustomerRow {
 export interface PetRow {
   id: string;
   customer_id: string;
+  farm_id: string | null;
   name: string;
   species: string | null;
   breed: string | null;
@@ -34,6 +35,56 @@ export interface PetRow {
   health_notes: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** M15 — a farm/site owned by a customer, attached the way pets are (shared FarmResponse mirror). */
+export interface FarmRow {
+  id: string;
+  customer_id: string;
+  name: string;
+  kind: string;
+  location: string | null;
+  animal_type: string | null;
+  head_count: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** M15 — which farms (of the contract's customer) a contract covers (shared ContractFarm mirror). */
+export interface ContractFarmRow {
+  id: string;
+  contract_id: string;
+  farm_id: string;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+/**
+ * M16 — polymorphic owner: exactly one of `customer_id` / `farm_id` is set (ck_ledgers_owner).
+ * Positive `balance` = the owner owes the clinic.
+ */
+export interface LedgerRow {
+  id: string;
+  customer_id: string | null;
+  farm_id: string | null;
+  balance: number;
+  status: string;
+  closed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LedgerEntryRow {
+  id: string;
+  ledger_id: string;
+  entry_type: string;
+  amount: number;
+  balance_after: number;
+  invoice_id: string | null;
+  receipt_voucher_id: string | null;
+  description: string | null;
+  created_at: string;
 }
 
 export interface ProcedureRow {
@@ -96,6 +147,7 @@ export interface VisitRow {
   visit_type: string;
   visit_number: string | null;
   customer_id: string;
+  farm_id: string | null;
   pet_id: string | null;
   batch_id: string | null;
   contract_id: string | null;

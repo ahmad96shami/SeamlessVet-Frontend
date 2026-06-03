@@ -10,27 +10,7 @@ import { Button, Card, Money } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { apiClient } from "@/services/apiClient";
 import { useQuery } from "@/sync/hooks";
-import type { CustomerRow } from "@/sync/types";
-
-interface LedgerRow {
-  id: string;
-  customer_id: string;
-  balance: number;
-  status: string;
-  updated_at: string;
-}
-
-interface LedgerEntryRow {
-  id: string;
-  ledger_id: string;
-  entry_type: string;
-  amount: number;
-  balance_after: number;
-  invoice_id: string | null;
-  receipt_voucher_id: string | null;
-  description: string | null;
-  created_at: string;
-}
+import type { CustomerRow, LedgerEntryRow, LedgerRow } from "@/sync/types";
 
 /**
  * Mo4.5 — customer statement.

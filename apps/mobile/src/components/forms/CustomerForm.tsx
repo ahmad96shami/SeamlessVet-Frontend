@@ -9,7 +9,7 @@ import {
   type CustomerType,
 } from "@vet/shared";
 
-import { Bird, Briefcase, Cow, House } from "@/components/icons";
+import { Bird, Briefcase, Cow, House, User } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { ChipSelect, FormField } from "@/components/forms";
 import { omitEmptyStrings } from "@/lib/forms";
@@ -19,6 +19,8 @@ const TYPE_ICONS: Record<CustomerType, React.ReactNode> = {
   cattle_farm: <Cow size={14} color="#0E1B2C" />,
   regular_farm: <Briefcase size={14} color="#0E1B2C" />,
   home: <House size={14} color="#0E1B2C" />,
+  // M15 — walk-in clinic client (no farm/home), added alongside farms.
+  clinic_customer: <User size={14} color="#0E1B2C" />,
 };
 
 interface CustomerFormProps {

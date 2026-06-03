@@ -2,26 +2,19 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 
-import { Add, Bird, Briefcase, Cow, Edit, Forward, House, Paper, Receipt, Stethoscope } from "@/components/icons";
+import { Add, Bird, Briefcase, Cow, Edit, Forward, House, Paper, Receipt, Stethoscope, User } from "@/components/icons";
 import { Button, Card, Money, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
-import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
+import type { CustomerRow, LedgerRow, PetRow, VisitRow } from "@/sync/types";
 import { formatDate } from "@vet/shared";
-
-interface LedgerRow {
-  id: string;
-  customer_id: string;
-  balance: number;
-  status: string;
-  updated_at: string;
-}
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   poultry_farm: <Bird size={20} color="#0F7A8A" />,
   cattle_farm: <Cow size={20} color="#0F7A8A" />,
   regular_farm: <Briefcase size={20} color="#0F7A8A" />,
   home: <House size={20} color="#0F7A8A" />,
+  clinic_customer: <User size={20} color="#0F7A8A" />,
 };
 
 export default function CustomerDetailScreen() {

@@ -69,14 +69,21 @@ export const AppSchema = new Schema({
     { indexes: { ix_farms_customer: ["customer_id"] } },
   ),
 
-  ledgers: new Table({
-    customer_id: column.text,
-    balance: column.real,
-    status: column.text,
-    closed_at: column.text,
-    created_at: column.text,
-    updated_at: column.text,
-  }),
+  // M16 — polymorphic owner: exactly one of customer_id / farm_id is set (ck_ledgers_owner).
+  // A customer's own ledger keys on customer_id; each farm carries its own ledger keyed on
+  // farm_id (streamed via the my_farms sync rule), powering Mo8's offline per-farm balances.
+  ledgers: new Table(
+    {
+      customer_id: column.text,
+      farm_id: column.text,
+      balance: column.real,
+      status: column.text,
+      closed_at: column.text,
+      created_at: column.text,
+      updated_at: column.text,
+    },
+    { indexes: { ix_ledgers_farm: ["farm_id"] } },
+  ),
 
   ledger_entries: new Table(
     {
