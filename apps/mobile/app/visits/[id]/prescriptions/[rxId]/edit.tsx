@@ -11,10 +11,11 @@ import type { PrescriptionRow } from "@/sync/types";
 import { syncDelete, syncUpdate } from "@/sync/writes";
 
 /**
- * Edit a prescription on a field visit (Mo2.4). Only the advisory text (dosage / frequency /
- * duration / notes) is mutable — product / quantity / dispense type are immutable post-create
- * (the server's `PrescriptionsSyncHandler.PatchAsync` enforces this, and they carry the
- * Mo4 billing meaning). The form's `lockClinical` flag reflects that.
+ * Edit a prescription on a field visit (Mo2.4). The advisory text (dosage / frequency /
+ * duration / notes) **and** the M18 recurring-dose reminder schedule (Mo9.5) are mutable —
+ * product / quantity / dispense type are immutable post-create (the server's
+ * `PrescriptionsSyncHandler.PatchAsync` enforces this, and they carry the Mo4 billing
+ * meaning). The form's `lockClinical` flag reflects that.
  */
 export default function EditPrescriptionScreen() {
   const router = useRouter();
@@ -60,18 +61,31 @@ export default function EditPrescriptionScreen() {
                     frequency: rx.frequency ?? "",
                     duration: rx.duration ?? "",
                     notes: rx.notes ?? "",
+                    reminderEnabled: rx.reminder_enabled === 1,
+                    intervalMinutes: rx.interval_minutes,
+                    leadMinutes: rx.lead_minutes,
+                    startAt: rx.start_at,
+                    endAt: rx.end_at,
+                    dosesCount: rx.doses_count,
                   }}
                   submitLabel={t("actions.save")}
                   submitting={submitting}
                   onSubmit={async (values) => {
                     setSubmitting(true);
                     try {
-                      // PATCH path — advisory text only; product/qty/dispense_type stay as-is.
+                      // PATCH path — advisory text + the reminder schedule; product/qty/
+                      // dispense_type stay as-is (SQLite has no bool: 0/1 ints).
                       await syncUpdate("prescriptions", rx.id, {
                         dosage: values.dosage ?? null,
                         frequency: values.frequency ?? null,
                         duration: values.duration ?? null,
                         notes: values.notes ?? null,
+                        reminder_enabled: values.reminderEnabled ? 1 : 0,
+                        interval_minutes: values.intervalMinutes ?? null,
+                        lead_minutes: values.leadMinutes ?? null,
+                        start_at: values.startAt ?? null,
+                        end_at: values.endAt ?? null,
+                        doses_count: values.dosesCount ?? null,
                       });
                       router.back();
                     } finally {

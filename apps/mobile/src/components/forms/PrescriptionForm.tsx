@@ -9,7 +9,7 @@ import {
 } from "@vet/shared";
 
 import { Search } from "@/components/icons";
-import { Button, Card, Input, Pill } from "@/components/ui";
+import { Button, Card, Chip, Input, Pill } from "@/components/ui";
 import { FormField, NumberFieldTransform } from "@/components/forms";
 import { useQuery } from "@/sync/hooks";
 import type { ProductRow } from "@/sync/types";
@@ -25,12 +25,55 @@ interface PrescriptionFormProps {
     frequency?: string;
     duration?: string;
     notes?: string;
+    /** M18 recurring-dose reminder schedule (editable post-create, unlike the clinical trio). */
+    reminderEnabled?: boolean;
+    intervalMinutes?: number | null;
+    leadMinutes?: number | null;
+    startAt?: string | null;
+    endAt?: string | null;
+    dosesCount?: number | null;
   };
   /** When true the product/qty fields are locked (edit mode). */
   lockClinical?: boolean;
   submitting?: boolean;
   submitLabel: string;
   onSubmit: (values: PrescriptionCreateRequest) => Promise<void> | void;
+}
+
+// ——— M18 reminder schedule (Mo9.5) — mirrors web W12's PrescriptionFormDialog model ———
+
+type IntervalUnit = "minutes" | "hours" | "days";
+const UNIT_MIN: Record<IntervalUnit, number> = { minutes: 1, hours: 60, days: 1440 };
+const INTERVAL_UNITS: ReadonlyArray<IntervalUnit> = ["minutes", "hours", "days"];
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_RE = /^\d{2}:\d{2}$/;
+
+/** Split a stored interval (minutes) back into the largest whole unit for display. */
+function splitInterval(minutes: number | null | undefined): { value: string; unit: IntervalUnit } {
+  if (!minutes || minutes <= 0) return { value: "", unit: "hours" };
+  if (minutes % 1440 === 0) return { value: String(minutes / 1440), unit: "days" };
+  if (minutes % 60 === 0) return { value: String(minutes / 60), unit: "hours" };
+  return { value: String(minutes), unit: "minutes" };
+}
+
+/** An ISO timestamp → local YYYY-MM-DD + HH:mm text-input parts (the mobile date pattern). */
+function toLocalParts(iso: string | null | undefined): { date: string; time: string } {
+  if (!iso) return { date: "", time: "" };
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return { date: "", time: "" };
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  };
+}
+
+/** Local date+time texts → UTC ISO (mirrors web's `new Date(input).toISOString()`); null = invalid/blank. */
+function composeIso(date: string, time: string): string | null {
+  if (!DATE_RE.test(date.trim()) || !TIME_RE.test(time.trim())) return null;
+  const d = new Date(`${date.trim()}T${time.trim()}:00`);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
 
 /**
@@ -57,6 +100,48 @@ export function PrescriptionForm({
 }: PrescriptionFormProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
+
+  // M18 reminder schedule — plain local state beside RHF (the web W12 dialog does the same):
+  // the clinical fields stay schema-validated, the schedule has its own validity rule below.
+  const initialInterval = splitInterval(defaultValues?.intervalMinutes);
+  const initialStart = toLocalParts(defaultValues?.startAt);
+  const initialEnd = toLocalParts(defaultValues?.endAt);
+  const [reminderEnabled, setReminderEnabled] = useState(defaultValues?.reminderEnabled ?? false);
+  const [intervalValue, setIntervalValue] = useState(initialInterval.value);
+  const [intervalUnit, setIntervalUnit] = useState<IntervalUnit>(initialInterval.unit);
+  const [startDate, setStartDate] = useState(initialStart.date);
+  const [startTime, setStartTime] = useState(initialStart.time);
+  const [endDate, setEndDate] = useState(initialEnd.date);
+  const [endTime, setEndTime] = useState(initialEnd.time);
+  const [dosesCount, setDosesCount] = useState(
+    defaultValues?.dosesCount != null ? String(defaultValues.dosesCount) : "",
+  );
+  const [leadMinutes, setLeadMinutes] = useState(
+    defaultValues?.leadMinutes != null ? String(defaultValues.leadMinutes) : "",
+  );
+
+  const intervalValid = intervalValue.trim() !== "" && Number(intervalValue) > 0;
+  const startIso = composeIso(startDate, startTime);
+  const endIso = composeIso(endDate, endTime);
+  const endBlank = endDate.trim() === "" && endTime.trim() === "";
+  // Enabled ⇒ a positive interval + a well-formed start; a non-blank end must parse too.
+  const reminderValid = !reminderEnabled || (intervalValid && startIso !== null && (endBlank || endIso !== null));
+
+  /** The M18 portion of the submitted body — `reminderEnabled:false` alone when off (like web). */
+  const reminderBody = (): Pick<
+    PrescriptionCreateRequest,
+    "reminderEnabled" | "intervalMinutes" | "startAt" | "endAt" | "dosesCount" | "leadMinutes"
+  > => {
+    if (!reminderEnabled) return { reminderEnabled: false };
+    return {
+      reminderEnabled: true,
+      intervalMinutes: Number(intervalValue) * UNIT_MIN[intervalUnit],
+      startAt: startIso ?? undefined,
+      endAt: endBlank ? undefined : (endIso ?? undefined),
+      dosesCount: dosesCount.trim() === "" ? undefined : Number(dosesCount),
+      leadMinutes: leadMinutes.trim() === "" ? undefined : Number(leadMinutes),
+    };
+  };
 
   const form = useForm<PrescriptionCreateRequest>({
     resolver: zodResolver(PrescriptionCreateRequestSchema),
@@ -103,7 +188,7 @@ export function PrescriptionForm({
 
   const handleSubmit = form.handleSubmit(async (values) => {
     try {
-      await onSubmit(values);
+      await onSubmit({ ...values, ...reminderBody() });
     } catch (err) {
       Alert.alert(t("visits.prescriptions.add"), (err as Error).message ?? "Save failed");
     }
@@ -219,8 +304,132 @@ export function PrescriptionForm({
         multiline
       />
 
+      {/* M18 — recurring-dose reminders (Mo9.5). Editable on create AND edit, unlike the
+          clinical trio: the schedule is retunable post-create on /sync/prescriptions PATCH. */}
+      <Card flat className="gap-3 p-3">
+        <View className="flex-row flex-wrap gap-2">
+          <Chip
+            label={t("visits.prescriptions.recurring.toggle")}
+            active={reminderEnabled ? "teal" : "off"}
+            onPress={() => setReminderEnabled((v) => !v)}
+          />
+        </View>
+
+        {reminderEnabled ? (
+          <View className="gap-3">
+            <Text className="text-ink-500 text-[12px] font-tajawal">
+              {t("visits.prescriptions.recurring.hint")}
+            </Text>
+
+            <View className="flex-row items-end gap-3">
+              <View className="w-20 gap-1.5">
+                <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+                  {t("visits.prescriptions.recurring.every")}
+                </Text>
+                <Input
+                  value={intervalValue}
+                  onChangeText={setIntervalValue}
+                  keyboardType="number-pad"
+                  placeholder="8"
+                />
+              </View>
+              <View className="flex-1 flex-row flex-wrap gap-2 pb-1">
+                {INTERVAL_UNITS.map((u) => (
+                  <Chip
+                    key={u}
+                    label={t(`visits.prescriptions.recurring.unit${u === "minutes" ? "Minutes" : u === "hours" ? "Hours" : "Days"}`)}
+                    active={intervalUnit === u ? "teal" : "off"}
+                    onPress={() => setIntervalUnit(u)}
+                  />
+                ))}
+              </View>
+            </View>
+
+            <View className="gap-1.5">
+              <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+                {t("visits.prescriptions.recurring.start")}
+              </Text>
+              <View className="flex-row gap-3">
+                <View className="flex-1">
+                  <Input
+                    value={startDate}
+                    onChangeText={setStartDate}
+                    placeholder="YYYY-MM-DD"
+                    autoCapitalize="none"
+                  />
+                </View>
+                <View className="w-24">
+                  <Input
+                    value={startTime}
+                    onChangeText={setStartTime}
+                    placeholder="HH:mm"
+                    autoCapitalize="none"
+                  />
+                </View>
+              </View>
+            </View>
+
+            <View className="gap-1.5">
+              <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+                {t("visits.prescriptions.recurring.end")}
+              </Text>
+              <View className="flex-row gap-3">
+                <View className="flex-1">
+                  <Input
+                    value={endDate}
+                    onChangeText={setEndDate}
+                    placeholder="YYYY-MM-DD"
+                    autoCapitalize="none"
+                  />
+                </View>
+                <View className="w-24">
+                  <Input
+                    value={endTime}
+                    onChangeText={setEndTime}
+                    placeholder="HH:mm"
+                    autoCapitalize="none"
+                  />
+                </View>
+              </View>
+            </View>
+
+            <View className="flex-row gap-3">
+              <View className="flex-1 gap-1.5">
+                <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+                  {t("visits.prescriptions.recurring.doses")}
+                </Text>
+                <Input
+                  value={dosesCount}
+                  onChangeText={setDosesCount}
+                  keyboardType="number-pad"
+                />
+              </View>
+              <View className="flex-1 gap-1.5">
+                <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+                  {t("visits.prescriptions.recurring.lead")}
+                </Text>
+                <Input
+                  value={leadMinutes}
+                  onChangeText={setLeadMinutes}
+                  keyboardType="number-pad"
+                />
+              </View>
+            </View>
+            <Text className="text-ink-500 text-[12px] font-tajawal">
+              {t("visits.prescriptions.recurring.leadHint")}
+            </Text>
+          </View>
+        ) : null}
+      </Card>
+
       <View className="mt-2">
-        <Button label={submitLabel} onPress={handleSubmit} loading={submitting} block />
+        <Button
+          label={submitLabel}
+          onPress={handleSubmit}
+          loading={submitting}
+          disabled={submitting || !reminderValid}
+          block
+        />
       </View>
     </View>
   );

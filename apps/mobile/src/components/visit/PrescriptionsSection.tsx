@@ -102,6 +102,9 @@ export function PrescriptionsSection({ visitId, isTerminal }: PrescriptionsSecti
                     {r.dosage ? <Pill tone="neutral" label={r.dosage} /> : null}
                     {r.frequency ? <Pill tone="neutral" label={r.frequency} /> : null}
                     {r.duration ? <Pill tone="neutral" label={r.duration} /> : null}
+                    {r.reminder_enabled === 1 ? (
+                      <Pill tone="amber" label={t("visits.prescriptions.recurring.badge")} />
+                    ) : null}
                   </View>
                 </View>
                 {!isTerminal ? <Forward size={18} color="#94A1B5" /> : null}

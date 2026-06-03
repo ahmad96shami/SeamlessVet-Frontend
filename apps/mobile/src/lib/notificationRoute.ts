@@ -51,6 +51,14 @@ export function notificationRoute(type: string, payload: unknown): Href | null {
       return visitId ? { pathname: "/visits/[id]", params: { id: visitId } } : null;
     }
 
+    // M18 medication-due (Mo9.5): the MedicationDueJob payload carries
+    // {PrescriptionId, VisitId, ProductId, DoseNumber, DoseAt} — land on the visit, where
+    // the prescription (and its reminder schedule) lives.
+    case NotificationType.MedicationDue: {
+      const visitId = strField(payload, "visitId");
+      return visitId ? { pathname: "/visits/[id]", params: { id: visitId } } : null;
+    }
+
     default:
       return null;
   }

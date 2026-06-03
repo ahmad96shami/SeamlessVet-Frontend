@@ -47,6 +47,13 @@ export default function NewPrescriptionScreen() {
                     frequency: values.frequency ?? null,
                     duration: values.duration ?? null,
                     notes: values.notes ?? null,
+                    // M18 reminder schedule (Mo9.5) — SQLite has no bool: 0/1 ints.
+                    reminder_enabled: values.reminderEnabled ? 1 : 0,
+                    interval_minutes: values.intervalMinutes ?? null,
+                    lead_minutes: values.leadMinutes ?? null,
+                    start_at: values.startAt ?? null,
+                    end_at: values.endAt ?? null,
+                    doses_count: values.dosesCount ?? null,
                   });
                   router.back();
                 } finally {
