@@ -20,6 +20,7 @@ import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
 import { PartnersPage } from "@/routes/finance/PartnersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
+import { PurchasesPage } from "@/routes/purchases/PurchasesPage";
 import { SupplierDetailPage } from "@/routes/suppliers/SupplierDetailPage";
 import { SuppliersPage } from "@/routes/suppliers/SuppliersPage";
 import { ClinicProfitsPage } from "@/routes/reports/ClinicProfitsPage";
@@ -214,6 +215,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "accountant"]}>
               <SupplierDetailPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="finance/purchases"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <PurchasesPage />
             </RequireRole>
           }
         />
