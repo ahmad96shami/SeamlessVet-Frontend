@@ -39,6 +39,7 @@ import { PosPage } from "@/routes/pos/PosPage";
 import { AlertsPage } from "@/routes/inventory/AlertsPage";
 import { MovementsPage } from "@/routes/inventory/MovementsPage";
 import { StockPage } from "@/routes/inventory/StockPage";
+import { VaccinationsListPage } from "@/routes/vaccinations/VaccinationsListPage";
 import { PetTimelinePage } from "@/routes/visits/PetTimelinePage";
 import { VisitDetailPage } from "@/routes/visits/VisitDetailPage";
 import { VisitsPage } from "@/routes/visits/VisitsPage";
@@ -132,6 +133,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "receptionist", "vet_clinic", "vet_both"]}>
               <AppointmentsPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="vaccinations"
+          element={
+            <RequireRole roles={["admin", "receptionist", "vet_clinic", "vet_field", "vet_both"]}>
+              <VaccinationsListPage />
             </RequireRole>
           }
         />

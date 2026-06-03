@@ -44,6 +44,13 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["admin", "receptionist", "vet_clinic", "vet_both"],
   },
   {
+    to: "/vaccinations",
+    labelKey: "nav.vaccinations",
+    icon: Icon.syringe,
+    section: "navSection.operations",
+    roles: ["admin", "receptionist", "vet_clinic", "vet_field", "vet_both"],
+  },
+  {
     to: "/pos",
     labelKey: "nav.pos",
     icon: Icon.receipt,
