@@ -646,6 +646,8 @@
       "selectCustomer": "اختر عميلًا",
       "pet": "الحيوان",
       "noPet": "بدون حيوان محدد",
+      "farm": "المزرعة",
+      "noFarm": "بدون مزرعة",
       "doctor": "الطبيب",
       "selectDoctor": "اختر طبيبًا",
       "currentUser": "أنا",

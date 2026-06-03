@@ -15,6 +15,8 @@ export const VisitResponseSchema = z.object({
   visitType: z.string(),
   visitNumber: z.string().nullish(),
   customerId: z.string(),
+  // M15 — the customer farm the visit took place at (drives per-farm invoice/ledger routing).
+  farmId: z.string().nullish(),
   petId: z.string().nullish(),
   batchId: z.string().nullish(),
   contractId: z.string().nullish(),
@@ -55,6 +57,9 @@ export type VisitResponse = z.infer<typeof VisitResponseSchema>;
 export const VisitCreateRequestSchema = z.object({
   visitType: z.enum(["in_clinic", "field"]),
   customerId: z.string().min(1),
+  // M15 — must be a farm of `customerId` (server enforces); routes the visit's invoices to
+  // that farm's ledger (M16).
+  farmId: z.string().optional(),
   petId: z.string().optional(),
   doctorId: z.string().min(1),
   receptionistId: z.string().optional(),
@@ -85,6 +90,7 @@ export type VisitCreateRequest = z.infer<typeof VisitCreateRequestSchema>;
  */
 export const VisitPatchRequestSchema = z.object({
   status: z.enum(["open", "in_progress"]).optional(),
+  farmId: z.string().optional(),
   chiefComplaint: optionalText,
   symptoms: optionalText,
   temperature: z.number().nonnegative().optional(),

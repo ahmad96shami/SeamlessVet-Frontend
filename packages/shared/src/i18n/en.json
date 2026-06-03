@@ -634,6 +634,8 @@
       "selectCustomer": "Select a customer",
       "pet": "Pet",
       "noPet": "No specific pet",
+      "farm": "Farm",
+      "noFarm": "No farm",
       "doctor": "Doctor",
       "selectDoctor": "Select a doctor",
       "currentUser": "Me",
