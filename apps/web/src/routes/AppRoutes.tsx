@@ -31,6 +31,7 @@ import { FieldVisitsPage } from "@/routes/reports/FieldVisitsPage";
 import { InventoryMovementPage } from "@/routes/reports/InventoryMovementPage";
 import { MyIncomePage } from "@/routes/reports/MyIncomePage";
 import { OverviewPage } from "@/routes/reports/OverviewPage";
+import { PharmacyProfitPage } from "@/routes/reports/PharmacyProfitPage";
 import { ProfitAndLossPage } from "@/routes/reports/ProfitAndLossPage";
 import { ProfitPerBatchPage } from "@/routes/reports/ProfitPerBatchPage";
 import { ReportsLayout } from "@/routes/reports/ReportsLayout";
@@ -279,6 +280,7 @@ export function AppRoutes() {
           <Route path="clinic-profits" element={<ClinicProfitsPage />} />
           <Route path="profit-per-batch" element={<ProfitPerBatchPage />} />
           <Route path="profit-and-loss" element={<ProfitAndLossPage />} />
+          <Route path="pharmacy-profit" element={<PharmacyProfitPage />} />
           <Route path="sales" element={<SalesPage />} />
           <Route path="inventory-movement" element={<InventoryMovementPage />} />
           <Route path="field-visits" element={<FieldVisitsPage />} />
