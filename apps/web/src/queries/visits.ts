@@ -5,9 +5,11 @@ import {
   completeVisit,
   getVisit,
   listVisits,
+  scheduleFollowUp,
   updateVisit,
   type ApiError,
   type IdentifierResponse,
+  type ScheduleFollowUpRequest,
   type VisitCreateRequest,
   type VisitListParams,
   type VisitPatchRequest,
@@ -94,5 +96,14 @@ export function useCancelVisit() {
   return useMutation<IdentifierResponse, ApiError, string>({
     mutationFn: (id) => cancelVisit(apiClient, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  });
+}
+
+/** POST /visits/{id}/schedule-follow-up — books a follow-up appointment from this visit (M17). */
+export function useScheduleFollowUp() {
+  const qc = useQueryClient();
+  return useMutation<IdentifierResponse, ApiError, { visitId: string; body: ScheduleFollowUpRequest }>({
+    mutationFn: ({ visitId, body }) => scheduleFollowUp(apiClient, visitId, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["appointments"] }),
   });
 }

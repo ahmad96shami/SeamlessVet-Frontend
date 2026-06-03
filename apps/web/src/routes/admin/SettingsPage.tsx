@@ -37,6 +37,7 @@ export function SettingsPage() {
     if (!query.data) return;
     reset({
       defaultExamFee: query.data.defaultExamFee,
+      defaultCheckupFee: query.data.defaultCheckupFee,
       entitlementEnabledGlobal: query.data.entitlementEnabledGlobal,
       lowStockThresholdPct: query.data.lowStockThresholdPct,
       expirationWarningDays: query.data.expirationWarningDays,
@@ -44,6 +45,11 @@ export function SettingsPage() {
       taxRate: query.data.taxRate,
       logoUrl: query.data.logoUrl ?? "",
       invoiceTaxDetails: query.data.invoiceTaxDetails ?? "",
+      nightStayRateMedical: query.data.nightStayRateMedical,
+      nightStayRateIcu: query.data.nightStayRateIcu,
+      nightStayRateHotel: query.data.nightStayRateHotel,
+      nightStayCheckoutHour: query.data.nightStayCheckoutHour,
+      medicationReminderLeadMinutes: query.data.medicationReminderLeadMinutes,
     });
   }, [query.data, reset]);
 
@@ -80,6 +86,17 @@ export function SettingsPage() {
                     step="0.01"
                     dir="ltr"
                     {...register("defaultExamFee", { valueAsNumber: true })}
+                  />
+                </Field>
+                <Field
+                  label={t("admin.settings.defaultCheckupFee")}
+                  error={errors.defaultCheckupFee?.message}
+                >
+                  <Input
+                    type="number"
+                    step="0.01"
+                    dir="ltr"
+                    {...register("defaultCheckupFee", { valueAsNumber: true })}
                   />
                 </Field>
                 <Field
@@ -142,6 +159,70 @@ export function SettingsPage() {
               >
                 <Textarea {...register("invoiceTaxDetails")} />
               </Field>
+
+              <div className="space-y-4 rounded-md border p-4">
+                <h3 className="text-sm font-semibold">{t("admin.settings.careSection")}</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field
+                    label={t("admin.settings.nightStayRateMedical")}
+                    error={errors.nightStayRateMedical?.message}
+                  >
+                    <Input
+                      type="number"
+                      step="0.01"
+                      dir="ltr"
+                      {...register("nightStayRateMedical", { valueAsNumber: true })}
+                    />
+                  </Field>
+                  <Field
+                    label={t("admin.settings.nightStayRateIcu")}
+                    error={errors.nightStayRateIcu?.message}
+                  >
+                    <Input
+                      type="number"
+                      step="0.01"
+                      dir="ltr"
+                      {...register("nightStayRateIcu", { valueAsNumber: true })}
+                    />
+                  </Field>
+                  <Field
+                    label={t("admin.settings.nightStayRateHotel")}
+                    error={errors.nightStayRateHotel?.message}
+                  >
+                    <Input
+                      type="number"
+                      step="0.01"
+                      dir="ltr"
+                      {...register("nightStayRateHotel", { valueAsNumber: true })}
+                    />
+                  </Field>
+                  <Field
+                    label={t("admin.settings.nightStayCheckoutHour")}
+                    error={errors.nightStayCheckoutHour?.message}
+                  >
+                    <Input
+                      type="number"
+                      step="1"
+                      min="0"
+                      max="23"
+                      dir="ltr"
+                      {...register("nightStayCheckoutHour", { valueAsNumber: true })}
+                    />
+                  </Field>
+                  <Field
+                    label={t("admin.settings.medicationReminderLeadMinutes")}
+                    error={errors.medicationReminderLeadMinutes?.message}
+                  >
+                    <Input
+                      type="number"
+                      step="1"
+                      min="0"
+                      dir="ltr"
+                      {...register("medicationReminderLeadMinutes", { valueAsNumber: true })}
+                    />
+                  </Field>
+                </div>
+              </div>
 
               <div className="flex justify-end">
                 <Button type="submit" disabled={update.isPending}>

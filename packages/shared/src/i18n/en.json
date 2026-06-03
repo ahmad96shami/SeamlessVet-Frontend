@@ -94,6 +94,10 @@
       "title": "Vaccination reminders",
       "empty": "Nothing due in the next 7 days."
     },
+    "medicationDue": {
+      "title": "Medication doses due",
+      "empty": "No doses due right now."
+    },
     "cashier": {
       "todaysSales": "Today's sales",
       "invoiceCount": "Invoice count",
@@ -543,7 +547,61 @@
       "prescriptions": "Prescriptions",
       "followups": "Daily follow-up",
       "vaccinations": "Vaccinations",
+      "nightStays": "Night stays",
       "files": "Files"
+    },
+    "checkupFee": {
+      "label": "Checkup fee",
+      "hint": "Applied when an in-clinic visit is completed. Defaults from settings; edit it or set 0 to waive.",
+      "fromSettings": "Settings default: {{amount}}",
+      "save": "Save fee",
+      "saved": "Checkup fee saved",
+      "fieldNa": "Checkup fee applies to in-clinic visits only."
+    },
+    "scheduleFollowUp": {
+      "action": "Schedule follow-up",
+      "title": "Schedule a follow-up visit",
+      "hint": "Books a follow-up appointment for the same customer and pet. Attending it waives the checkup fee once for the origin visit.",
+      "date": "Follow-up time",
+      "doctor": "Doctor",
+      "duration": "Duration",
+      "notes": "Notes",
+      "submit": "Schedule",
+      "created": "Follow-up scheduled",
+      "conflictWarning": "The doctor has an appointment at {{time}} — this may clash.",
+      "conflictError": "That slot is already booked for the doctor. Pick another time."
+    },
+    "nightStays": {
+      "title": "Night stays & boarding",
+      "add": "Record a night stay",
+      "empty": "No night stays",
+      "clinicOnly": "Night stays are for in-clinic visits only (hospitalised cases).",
+      "careType": "Care type",
+      "nightlyRate": "Nightly rate",
+      "rateHint": "Defaults from settings by care type; can be overridden.",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "notes": "Notes",
+      "nights": "Nights",
+      "total": "Total",
+      "statusOpen": "Open",
+      "statusClosed": "Closed",
+      "estimateHint": "Estimate so far — finalised on close (checkout-hour rule {{hour}}).",
+      "close": "Close stay",
+      "closeTitle": "Close night stay",
+      "closeBody": "{{nights}} night(s) will be charged and {{total}} posted to the customer's account. This can't be undone.",
+      "closed": "Night stay closed and charge posted",
+      "deleteConfirm": "This night stay will be deleted.",
+      "newTitle": "Record a night stay",
+      "editTitle": "Edit night stay",
+      "col": {
+        "careType": "Type",
+        "checkIn": "Check-in",
+        "nights": "Nights",
+        "rate": "Rate/night",
+        "total": "Total",
+        "status": "Status"
+      }
     },
     "assessment": {
       "title": "Initial assessment",
@@ -601,6 +659,20 @@
       "newTitle": "Add prescription",
       "editTitle": "Edit prescription",
       "deleteConfirm": "This prescription will be deleted.",
+      "recurring": {
+        "toggle": "Recurring-dose reminders",
+        "hint": "Sends a “medication due” alert ahead of each dose.",
+        "every": "Every",
+        "unitMinutes": "minutes",
+        "unitHours": "hours",
+        "unitDays": "days",
+        "start": "First dose",
+        "end": "Last dose (optional)",
+        "doses": "Number of doses (optional)",
+        "lead": "Alert ahead (minutes)",
+        "leadHint": "Leave blank to use the settings default.",
+        "badge": "Reminder"
+      },
       "col": {
         "product": "Medication",
         "dosage": "Dosage",
@@ -1045,7 +1117,8 @@
     "settings": {
       "title": "Settings",
       "description": "System settings for this environment.",
-      "defaultExamFee": "Default exam fee",
+      "defaultExamFee": "Default field exam fee",
+      "defaultCheckupFee": "Default in-clinic checkup fee",
       "entitlementEnabledGlobal": "Enable doctor entitlements (global)",
       "lowStockThresholdPct": "Low-stock alert threshold (%)",
       "expirationWarningDays": "Expiry warning lead time (days)",
@@ -1053,6 +1126,12 @@
       "taxRate": "Tax rate (%)",
       "logoUrl": "Logo URL",
       "invoiceTaxDetails": "Invoice tax details",
+      "careSection": "Night stays & reminders",
+      "nightStayRateMedical": "Medical stay rate/night",
+      "nightStayRateIcu": "ICU stay rate/night",
+      "nightStayRateHotel": "Hotel stay rate/night",
+      "nightStayCheckoutHour": "Checkout hour (0–23)",
+      "medicationReminderLeadMinutes": "Medication alert lead (minutes)",
       "saved": "Settings saved"
     },
     "products": {

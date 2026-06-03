@@ -22,6 +22,9 @@ export const SystemSettingsResponseSchema = z.object({
   nightStayRateIcu: z.number(),
   nightStayRateHotel: z.number(),
   nightStayCheckoutHour: z.number().int(),
+  // M18 — minutes before a dose to fire its `medication_due` reminder; a prescription's null
+  // `leadMinutes` falls back to this (PRD §18.9).
+  medicationReminderLeadMinutes: z.number().int(),
   updatedAt: z.string(),
 });
 export type SystemSettingsResponse = z.infer<typeof SystemSettingsResponseSchema>;
@@ -46,5 +49,7 @@ export const SystemSettingsPatchRequestSchema = z.object({
   nightStayRateIcu: z.number().min(0).optional(),
   nightStayRateHotel: z.number().min(0).optional(),
   nightStayCheckoutHour: z.number().int().min(0).max(23).optional(),
+  // M18 — default medication-reminder lead time (minutes).
+  medicationReminderLeadMinutes: z.number().int().min(0).optional(),
 });
 export type SystemSettingsPatchRequest = z.infer<typeof SystemSettingsPatchRequestSchema>;
