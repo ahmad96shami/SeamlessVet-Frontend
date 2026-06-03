@@ -15,6 +15,7 @@
     "customers": "Customers",
     "visits": "Visits",
     "appointments": "Appointments",
+    "vaccinations": "Vaccinations",
     "inventory": "Inventory",
     "pos": "Point of Sale",
     "users": "Users",
@@ -781,6 +782,47 @@
       "procedures": "procedures",
       "prescriptions": "prescriptions",
       "vaccinations": "vaccinations"
+    }
+  },
+  "vaccinations": {
+    "title": "Vaccinations",
+    "description": "Vaccination records and the upcoming due schedule",
+    "tabs": {
+      "list": "Records",
+      "calendar": "Calendar"
+    },
+    "new": "New vaccination",
+    "newTitle": "New vaccination",
+    "editTitle": "Edit vaccination",
+    "empty": "No vaccinations",
+    "col": {
+      "type": "Vaccine",
+      "recipient": "Recipient",
+      "given": "Date given",
+      "due": "Next due"
+    },
+    "recipientFarm": "Farm group",
+    "recipientUnknown": "Unknown",
+    "filterCustomer": "Filter by customer",
+    "allCustomers": "All customers",
+    "deleteTitle": "Delete vaccination",
+    "deleteConfirm": "This vaccination will be deleted.",
+    "form": {
+      "recipient": "Recipient",
+      "selectCustomer": "Select customer",
+      "searchCustomer": "Search by name or phone",
+      "change": "Change",
+      "pet": "Animal",
+      "wholeGroup": "Whole group (no specific animal)",
+      "vaccineType": "Vaccine type",
+      "dateGiven": "Date given",
+      "nextDueDate": "Next due",
+      "missingCustomer": "Select a customer first"
+    },
+    "calendar": {
+      "empty": "No vaccinations due in this period",
+      "more": "+{{count}}",
+      "due": "due"
     }
   },
   "billing": {

@@ -15,6 +15,7 @@
     "customers": "العملاء",
     "visits": "الزيارات",
     "appointments": "المواعيد",
+    "vaccinations": "التطعيمات",
     "inventory": "المخزون",
     "pos": "نقطة البيع",
     "users": "المستخدمون",
@@ -793,6 +794,47 @@
       "procedures": "إجراءات",
       "prescriptions": "وصفات",
       "vaccinations": "تطعيمات"
+    }
+  },
+  "vaccinations": {
+    "title": "التطعيمات",
+    "description": "سجل التطعيمات وجدول المواعيد القادمة",
+    "tabs": {
+      "list": "السجل",
+      "calendar": "التقويم"
+    },
+    "new": "تطعيم جديد",
+    "newTitle": "تطعيم جديد",
+    "editTitle": "تعديل التطعيم",
+    "empty": "لا توجد تطعيمات",
+    "col": {
+      "type": "اللقاح",
+      "recipient": "المُتلقّي",
+      "given": "تاريخ الإعطاء",
+      "due": "الجرعة القادمة"
+    },
+    "recipientFarm": "المجموعة (المزرعة)",
+    "recipientUnknown": "غير معروف",
+    "filterCustomer": "تصفية حسب العميل",
+    "allCustomers": "كل العملاء",
+    "deleteTitle": "حذف التطعيم",
+    "deleteConfirm": "سيتم حذف هذا التطعيم.",
+    "form": {
+      "recipient": "المُتلقّي",
+      "selectCustomer": "اختر العميل",
+      "searchCustomer": "ابحث بالاسم أو رقم الهاتف",
+      "change": "تغيير",
+      "pet": "الحيوان",
+      "wholeGroup": "المجموعة بالكامل (بدون حيوان محدد)",
+      "vaccineType": "نوع اللقاح",
+      "dateGiven": "تاريخ الإعطاء",
+      "nextDueDate": "الجرعة القادمة",
+      "missingCustomer": "اختر العميل أولاً"
+    },
+    "calendar": {
+      "empty": "لا توجد تطعيمات مستحقة في هذه الفترة",
+      "more": "+{{count}}",
+      "due": "مستحقة"
     }
   },
   "billing": {

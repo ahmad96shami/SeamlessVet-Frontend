@@ -52,3 +52,18 @@ export interface VaccinationListParams {
   skip?: number;
   take?: number;
 }
+
+/**
+ * GET /vaccinations/upcoming params (M18 task 6). Lists vaccinations whose `nextDueDate` falls in the
+ * range, soonest first; `from` defaults server-side to today. `from`/`to` are `DateOnly` ("yyyy-MM-dd")
+ * — drive a calendar view by passing the visible window. Auth-only (distinct from the admin-gated
+ * `/reports/upcoming-vaccinations`).
+ */
+export interface VaccinationUpcomingParams {
+  from?: string;
+  to?: string;
+  petId?: string;
+  customerId?: string;
+  skip?: number;
+  take?: number;
+}

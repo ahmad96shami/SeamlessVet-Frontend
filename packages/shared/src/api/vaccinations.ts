@@ -11,6 +11,7 @@ import {
   type VaccinationListParams,
   type VaccinationPatchRequest,
   type VaccinationResponse,
+  type VaccinationUpcomingParams,
 } from "../schemas/vaccinations";
 
 const VaccinationListSchema = z.array(VaccinationResponseSchema);
@@ -21,6 +22,18 @@ export async function listVaccinations(
   params?: VaccinationListParams,
 ): Promise<VaccinationResponse[]> {
   const res = await client.get("/vaccinations", { params });
+  return VaccinationListSchema.parse(res.data);
+}
+
+/**
+ * GET /vaccinations/upcoming — vaccinations due in a date range (soonest first), for the calendar.
+ * Auth-only; `from` defaults server-side to today.
+ */
+export async function listUpcomingVaccinations(
+  client: AxiosInstance,
+  params?: VaccinationUpcomingParams,
+): Promise<VaccinationResponse[]> {
+  const res = await client.get("/vaccinations/upcoming", { params });
   return VaccinationListSchema.parse(res.data);
 }
 

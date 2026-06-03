@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createVaccination,
   deleteVaccination,
+  listUpcomingVaccinations,
   listVaccinations,
   updateVaccination,
   type ApiError,
@@ -10,6 +11,7 @@ import {
   type VaccinationListParams,
   type VaccinationPatchRequest,
   type VaccinationResponse,
+  type VaccinationUpcomingParams,
 } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
@@ -21,6 +23,17 @@ export function useVaccinations(params: VaccinationListParams, enabled = true) {
     queryKey: [KEY, params],
     queryFn: () => listVaccinations(apiClient, params),
     enabled,
+    placeholderData: (prev) => prev,
+  });
+}
+
+/** GET /vaccinations/upcoming — drives the W13 calendar (distinct from the reports report). */
+export function useVaccinationCalendar(params: VaccinationUpcomingParams, enabled = true) {
+  return useQuery<VaccinationResponse[], ApiError>({
+    queryKey: [KEY, "upcoming", params],
+    queryFn: () => listUpcomingVaccinations(apiClient, params),
+    enabled,
+    placeholderData: (prev) => prev,
   });
 }
 
