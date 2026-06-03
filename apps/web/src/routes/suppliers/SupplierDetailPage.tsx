@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { balanceClass, statusVariant } from "@/routes/customers/ledgerStatus";
 import { useSupplier } from "@/queries/suppliers";
 import { SupplierFormDialog } from "@/routes/suppliers/SupplierFormDialog";
+import { SupplierPaymentsSection } from "@/routes/suppliers/SupplierPaymentsSection";
 import { SupplierStatementSection } from "@/routes/suppliers/SupplierStatementSection";
 
 export function SupplierDetailPage() {
@@ -73,6 +74,8 @@ export function SupplierDetailPage() {
           <Money value={s.balance} />
         </div>
       </div>
+
+      <SupplierPaymentsSection supplierId={s.id} />
 
       <SupplierStatementSection
         supplierId={s.id}

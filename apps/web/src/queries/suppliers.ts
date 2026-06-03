@@ -4,6 +4,7 @@ import {
   deleteSupplier,
   getSupplier,
   getSupplierStatement,
+  listSupplierPayments,
   listSuppliers,
   recordSupplierPayment,
   updateSupplier,
@@ -11,6 +12,8 @@ import {
   type IdentifierResponse,
   type SupplierListParams,
   type SupplierPaymentInput,
+  type SupplierPaymentListParams,
+  type SupplierPaymentResponse,
   type SupplierRequest,
   type SupplierResponse,
   type SupplierStatementParams,
@@ -21,6 +24,7 @@ import { apiClient } from "@/services/apiClient";
 
 const KEY = "suppliers";
 const STATEMENT = "supplier-statement";
+const PAYMENTS = "supplier-payments";
 
 export function useSuppliers(params: SupplierListParams) {
   return useQuery<SupplierResponse[], ApiError>({
@@ -71,7 +75,16 @@ export function useDeleteSupplier() {
   });
 }
 
-/** Record a payment to a supplier — reduces the balance, so refresh both the supplier + its statement. */
+export function useSupplierPayments(supplierId: string | null, params: SupplierPaymentListParams) {
+  return useQuery<SupplierPaymentResponse[], ApiError>({
+    queryKey: [PAYMENTS, supplierId, params],
+    queryFn: () => listSupplierPayments(apiClient, supplierId as string, params),
+    enabled: supplierId !== null,
+    placeholderData: (prev) => prev,
+  });
+}
+
+/** Record a payment to a supplier — reduces the balance, so refresh the supplier, statement & history. */
 export function useRecordSupplierPayment(supplierId: string) {
   const qc = useQueryClient();
   return useMutation<IdentifierResponse, ApiError, SupplierPaymentInput>({
@@ -79,6 +92,7 @@ export function useRecordSupplierPayment(supplierId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: [KEY] });
       qc.invalidateQueries({ queryKey: [STATEMENT, supplierId] });
+      qc.invalidateQueries({ queryKey: [PAYMENTS, supplierId] });
     },
   });
 }
