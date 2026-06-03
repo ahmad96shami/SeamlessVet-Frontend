@@ -6,7 +6,7 @@ import { Add, Bird, Briefcase, Cow, Edit, Forward, House, Paper, Receipt, Stetho
 import { Button, Card, Money, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
-import type { CustomerRow, LedgerRow, PetRow, VisitRow } from "@/sync/types";
+import type { CustomerRow, FarmRow, LedgerRow, PetRow, VisitRow } from "@/sync/types";
 import { formatDate } from "@vet/shared";
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
@@ -15,6 +15,13 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   regular_farm: <Briefcase size={20} color="#0F7A8A" />,
   home: <House size={20} color="#0F7A8A" />,
   clinic_customer: <User size={20} color="#0F7A8A" />,
+};
+
+const FARM_KIND_ICON: Record<string, React.ReactNode> = {
+  poultry: <Bird size={18} color="#0F7A8A" />,
+  cattle: <Cow size={18} color="#0F7A8A" />,
+  mixed: <Briefcase size={18} color="#0F7A8A" />,
+  other: <Briefcase size={18} color="#0F7A8A" />,
 };
 
 export default function CustomerDetailScreen() {
@@ -36,6 +43,10 @@ export default function CustomerDetailScreen() {
   );
   const { data: ledgers } = useQuery<LedgerRow>(
     `SELECT * FROM ledgers WHERE customer_id = ?`,
+    [id ?? ""],
+  );
+  const { data: farms } = useQuery<FarmRow>(
+    `SELECT * FROM farms WHERE customer_id = ? ORDER BY updated_at DESC`,
     [id ?? ""],
   );
 
@@ -166,6 +177,56 @@ export default function CustomerDetailScreen() {
           ))}
         </View>
       ) : null}
+
+      <View className="mt-6 flex-row items-center justify-between">
+        <Text className="text-navy-900 text-[15px] font-tajawal-extrabold">
+          {t("customers.farms.title")}
+        </Text>
+        <Pressable
+          onPress={() => router.push(`/customers/${customer.id}/farms/new`)}
+          className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
+        >
+          <Add size={14} color="#FFFFFF" />
+          <Text className="text-paper text-[12px] font-tajawal-bold">
+            {t("customers.farms.new")}
+          </Text>
+        </Pressable>
+      </View>
+
+      <View className="mt-3 gap-2">
+        {(farms ?? []).length === 0 ? (
+          <Card flat className="p-4">
+            <Text className="text-ink-500 text-center text-[13px] font-tajawal">
+              {t("customers.farms.empty")}
+            </Text>
+          </Card>
+        ) : (
+          (farms ?? []).map((farm) => (
+            <Pressable
+              key={farm.id}
+              onPress={() => router.push(`/customers/${customer.id}/farms/${farm.id}`)}
+            >
+              <Card className="flex-row items-center gap-3 p-3">
+                <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
+                  {FARM_KIND_ICON[farm.kind] ?? <Briefcase size={18} color="#0F7A8A" />}
+                </View>
+                <View className="flex-1 gap-1">
+                  <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
+                    {farm.name}
+                  </Text>
+                  <View className="flex-row flex-wrap gap-1.5">
+                    <Pill tone="teal" label={t(`farmKind.${farm.kind}`)} />
+                    {farm.head_count != null ? (
+                      <Pill tone="neutral" label={`${t("customers.farms.headCount")}: ${farm.head_count}`} />
+                    ) : null}
+                  </View>
+                </View>
+                <Forward size={18} color="#94A1B5" />
+              </Card>
+            </Pressable>
+          ))
+        )}
+      </View>
 
       <View className="mt-6 flex-row items-center justify-between">
         <Text className="text-navy-900 text-[15px] font-tajawal-extrabold">
