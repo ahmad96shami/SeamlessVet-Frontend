@@ -21,6 +21,7 @@ import { FollowUpsTab } from "@/routes/visits/FollowUpsTab";
 import { NightStaysTab } from "@/routes/visits/NightStaysTab";
 import { PrescriptionsTab } from "@/routes/visits/PrescriptionsTab";
 import { ProceduresTab } from "@/routes/visits/ProceduresTab";
+import { ScheduleFollowUpDialog } from "@/routes/visits/ScheduleFollowUpDialog";
 import { VaccinationsTab } from "@/routes/visits/VaccinationsTab";
 import { VisitReportButton } from "@/routes/visits/VisitReportButton";
 import { visitRef, visitStatusVariant } from "@/routes/visits/VisitsPage";
@@ -68,6 +69,7 @@ export function VisitDetailPage() {
 
   const [tab, setTab] = useState<TabId>("assessment");
   const [confirm, setConfirm] = useState<null | "complete" | "cancel">(null);
+  const [followUpOpen, setFollowUpOpen] = useState(false);
 
   const pet = useMemo(
     () => (v?.petId ? (pets.data ?? []).find((p) => p.id === v.petId) : undefined),
@@ -179,6 +181,12 @@ export function VisitDetailPage() {
             ownerName={customer.data?.fullName ?? null}
             doctorName={doctorName ?? null}
           />
+          {v.status !== "cancelled" ? (
+            <Button variant="secondary" onClick={() => setFollowUpOpen(true)}>
+              <Icon.clock className="size-4" />
+              {t("visits.scheduleFollowUp.action")}
+            </Button>
+          ) : null}
           {canBill ? (
             <Button
               variant="secondary"
@@ -244,6 +252,10 @@ export function VisitDetailPage() {
         <NightStaysTab visitId={v.id} readOnly={isTerminal} />
       ) : null}
       {tab === "files" ? <AttachmentsTab visitId={v.id} readOnly={isTerminal} /> : null}
+
+      {followUpOpen ? (
+        <ScheduleFollowUpDialog open visit={v} onClose={() => setFollowUpOpen(false)} />
+      ) : null}
 
       <Dialog
         open={confirm !== null}
