@@ -1,4 +1,4 @@
-import { formatCurrency, formatNumber } from "@vet/shared";
+import { formatNumber } from "@vet/shared";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Money } from "@/components/ui/money";
@@ -9,6 +9,7 @@ import { useKpiSummary } from "@/queries/reports";
 import { AlertsCard } from "@/routes/dashboard/widgets/AlertsCard";
 import { EntitlementsBreakdownCard } from "@/routes/dashboard/widgets/EntitlementsBreakdownCard";
 import { GreetingHeader } from "@/routes/dashboard/widgets/GreetingHeader";
+import { MedicationDueCard } from "@/routes/dashboard/widgets/MedicationDueCard";
 import { RecentVisitsCard } from "@/routes/dashboard/widgets/RecentVisitsCard";
 import { TodayScheduleCard } from "@/routes/dashboard/widgets/TodayScheduleCard";
 import { VaxRemindersCard } from "@/routes/dashboard/widgets/VaxRemindersCard";
@@ -80,6 +81,7 @@ export function AdminDashboard() {
         <div className="space-y-4">
           <AlertsCard includeRegistrationRequests />
           <EntitlementsBreakdownCard />
+          <MedicationDueCard limit={5} />
           <VaxRemindersCard limit={5} />
         </div>
       </div>

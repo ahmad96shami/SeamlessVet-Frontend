@@ -1,4 +1,3 @@
-import { formatCurrency } from "@vet/shared";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -8,6 +7,7 @@ import { Icon } from "@/components/ui/icon";
 import { useMyIncome } from "@/queries/reports";
 import { useAuthStore } from "@/stores/authStore";
 import { GreetingHeader } from "@/routes/dashboard/widgets/GreetingHeader";
+import { MedicationDueCard } from "@/routes/dashboard/widgets/MedicationDueCard";
 import { RecentVisitsCard } from "@/routes/dashboard/widgets/RecentVisitsCard";
 import { TodayScheduleCard } from "@/routes/dashboard/widgets/TodayScheduleCard";
 import { StatCard } from "@/routes/reports/StatCard";
@@ -21,7 +21,7 @@ function monthRange() {
 
 /** Doctor landing — schedule filtered to me, this-month income snapshot, my recent visits. */
 export function VetDashboard() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const doctorId = user?.userId;
   const range = useMemo(() => monthRange(), []);
@@ -52,7 +52,10 @@ export function VetDashboard() {
 
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
         <TodayScheduleCard doctorId={doctorId} limit={8} />
-        <RecentVisitsCard doctorId={doctorId} limit={6} />
+        <div className="space-y-4">
+          <RecentVisitsCard doctorId={doctorId} limit={6} />
+          <MedicationDueCard limit={5} />
+        </div>
       </div>
     </div>
   );
