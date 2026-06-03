@@ -349,6 +349,12 @@ export default function VisitDetailScreen() {
                 onPress={() => router.push(`/visits/${visit.id}/billing/exam`)}
                 block
               />
+              <Button
+                label={t("visits.scheduleFollowUp.action")}
+                variant="soft"
+                onPress={() => router.push(`/visits/${visit.id}/follow-up`)}
+                block
+              />
             </View>
           </View>
         </ScrollView>
