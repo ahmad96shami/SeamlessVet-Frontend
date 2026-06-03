@@ -12,6 +12,7 @@ import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
 import { CustomerDetailPage } from "@/routes/customers/CustomerDetailPage";
 import { CustomersPage } from "@/routes/customers/CustomersPage";
+import { FarmDetailPage } from "@/routes/customers/FarmDetailPage";
 import { DashboardPage } from "@/routes/dashboard/DashboardPage";
 import { BatchesPage } from "@/routes/finance/BatchesPage";
 import { ContractsPage } from "@/routes/finance/ContractsPage";
@@ -91,6 +92,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "accountant", "receptionist", "vet_clinic", "vet_both"]}>
               <CustomerDetailPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="operations/farms/:farmId"
+          element={
+            <RequireRole roles={["admin", "accountant", "receptionist", "vet_clinic", "vet_both"]}>
+              <FarmDetailPage />
             </RequireRole>
           }
         />
