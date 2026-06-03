@@ -9,6 +9,13 @@ import {
 } from "@vet/shared";
 
 import { Button, Card, Chip, Input, Money, Pill } from "@/components/ui";
+import {
+  ChequeFields,
+  chequeDetailsValid,
+  chequeRequestFields,
+  EMPTY_CHEQUE,
+  type ChequeDetails,
+} from "@/components/ChequeFields";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { sendOrQueue } from "@/services/sendOrQueue";
 import { useQuery } from "@/sync/hooks";
@@ -36,6 +43,7 @@ export default function ExamFeeInvoiceScreen() {
   const id = visitId ?? "";
 
   const [method, setMethod] = useState<PaymentMethod>("cash");
+  const [cheque, setCheque] = useState<ChequeDetails>(EMPTY_CHEQUE);
   const [amountText, setAmountText] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -86,7 +94,7 @@ export default function ExamFeeInvoiceScreen() {
       // the *previewed* total so server validation `payments <= total` holds.
       const descriptor = buildExamFeeInvoiceRequest(id, {
         amount: parsedAmount,
-        payments: [{ method, amount: previewTotal }],
+        payments: [{ method, amount: previewTotal, ...chequeRequestFields(method, cheque) }],
       });
       const result = await sendOrQueue(descriptor);
       Alert.alert(
@@ -146,10 +154,14 @@ export default function ExamFeeInvoiceScreen() {
                     key={m}
                     label={t(`paymentMethod.${m}`)}
                     active={method === m ? "teal" : "off"}
-                    onPress={() => setMethod(m)}
+                    onPress={() => {
+                      setMethod(m);
+                      if (m !== "cheque") setCheque(EMPTY_CHEQUE);
+                    }}
                   />
                 ))}
               </View>
+              {method === "cheque" ? <ChequeFields value={cheque} onChange={setCheque} /> : null}
             </Section>
 
             <Card flat className="gap-1.5 p-3">
@@ -163,7 +175,7 @@ export default function ExamFeeInvoiceScreen() {
               variant="teal"
               onPress={onSubmit}
               loading={submitting}
-              disabled={submitting || previewTotal <= 0}
+              disabled={submitting || previewTotal <= 0 || !chequeDetailsValid(method, cheque)}
               block
             />
           </View>

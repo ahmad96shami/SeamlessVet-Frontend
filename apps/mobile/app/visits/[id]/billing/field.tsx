@@ -5,6 +5,13 @@ import { useTranslation } from "react-i18next";
 import { buildFieldInvoiceRequest, PAYMENT_METHOD_VALUES, type PaymentMethod } from "@vet/shared";
 
 import { Button, Card, Chip, Money, Pill } from "@/components/ui";
+import {
+  ChequeFields,
+  chequeDetailsValid,
+  chequeRequestFields,
+  EMPTY_CHEQUE,
+  type ChequeDetails,
+} from "@/components/ChequeFields";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { sendOrQueue } from "@/services/sendOrQueue";
 import { checkFieldStockAvailability, type FieldStockGuardResult } from "@/sync/fieldInventory";
@@ -45,6 +52,7 @@ export default function FieldInvoiceScreen() {
   const id = visitId ?? "";
 
   const [method, setMethod] = useState<PaymentMethod>("cash");
+  const [cheque, setCheque] = useState<ChequeDetails>(EMPTY_CHEQUE);
   const [submitting, setSubmitting] = useState(false);
   const [guard, setGuard] = useState<FieldStockGuardResult | null>(null);
 
@@ -118,7 +126,7 @@ export default function FieldInvoiceScreen() {
 
   const hasBillableLines = (preview?.prescriptions.length ?? 0) + (preview?.procedures.length ?? 0) > 0;
   const stockOk = guard?.ok !== false;
-  const canSubmit = !submitting && hasBillableLines && stockOk;
+  const canSubmit = !submitting && hasBillableLines && stockOk && chequeDetailsValid(method, cheque);
 
   const onSubmit = async () => {
     if (!preview) return;
@@ -131,7 +139,7 @@ export default function FieldInvoiceScreen() {
       const descriptor = buildFieldInvoiceRequest(id, {
         items: [],
         discountAmount: 0,
-        payments: [{ method, amount: total }],
+        payments: [{ method, amount: total, ...chequeRequestFields(method, cheque) }],
       });
       const result = await sendOrQueue(descriptor);
       Alert.alert(
@@ -226,10 +234,14 @@ export default function FieldInvoiceScreen() {
                     key={m}
                     label={t(`paymentMethod.${m}`)}
                     active={method === m ? "teal" : "off"}
-                    onPress={() => setMethod(m)}
+                    onPress={() => {
+                      setMethod(m);
+                      if (m !== "cheque") setCheque(EMPTY_CHEQUE);
+                    }}
                   />
                 ))}
               </View>
+              {method === "cheque" ? <ChequeFields value={cheque} onChange={setCheque} /> : null}
             </Section>
 
             <Card flat className="gap-1.5 p-3">

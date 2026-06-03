@@ -9,6 +9,13 @@ import {
 } from "@vet/shared";
 
 import { Button, Card, Chip, Input, Money } from "@/components/ui";
+import {
+  ChequeFields,
+  chequeDetailsValid,
+  chequeRequestFields,
+  EMPTY_CHEQUE,
+  type ChequeDetails,
+} from "@/components/ChequeFields";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { sendOrQueue } from "@/services/sendOrQueue";
 import { useQuery } from "@/sync/hooks";
@@ -31,8 +38,9 @@ interface LedgerRow {
  * so the customer detail balance refreshes a moment after the server confirms.
  *
  * Voucher `method` mirrors PaymentMethod *minus* `credit` (a voucher records money
- * actually received). UI exposes cash/card/bank_transfer; `credit` is filtered out
- * before render.
+ * actually received). UI exposes cash/card/bank_transfer/cheque; `credit` is filtered
+ * out before render. Cheque (M19) settles immediately and reveals the reference trio
+ * (number/bank/due date) — Mo9.4, mirroring web W14.
  *
  * Print: deferred. PRD §8.5 step 7 / §16 calls out a Bluetooth thermal printer as an
  * Open Decision; system `expo-print` lands as a follow-up once that decision is made
@@ -49,6 +57,7 @@ export default function ReceiptVoucherScreen() {
 
   const [amountText, setAmountText] = useState<string>("");
   const [method, setMethod] = useState<PaymentMethod>("cash");
+  const [cheque, setCheque] = useState<ChequeDetails>(EMPTY_CHEQUE);
   const [notes, setNotes] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -95,6 +104,7 @@ export default function ReceiptVoucherScreen() {
         amount: parsedAmount,
         method,
         notes: notes.trim() || undefined,
+        ...chequeRequestFields(method, cheque),
       });
       const result = await sendOrQueue(descriptor);
       Alert.alert(
@@ -151,10 +161,14 @@ export default function ReceiptVoucherScreen() {
                     key={m}
                     label={t(`paymentMethod.${m}`)}
                     active={method === m ? "teal" : "off"}
-                    onPress={() => setMethod(m)}
+                    onPress={() => {
+                      setMethod(m);
+                      if (m !== "cheque") setCheque(EMPTY_CHEQUE);
+                    }}
                   />
                 ))}
               </View>
+              {method === "cheque" ? <ChequeFields value={cheque} onChange={setCheque} /> : null}
             </Section>
 
             <Section title={t("billing.voucher.notesLabel")}>
@@ -172,7 +186,7 @@ export default function ReceiptVoucherScreen() {
               variant="teal"
               onPress={onSubmit}
               loading={submitting}
-              disabled={submitting || parsedAmount <= 0}
+              disabled={submitting || parsedAmount <= 0 || !chequeDetailsValid(method, cheque)}
               block
             />
           </View>
