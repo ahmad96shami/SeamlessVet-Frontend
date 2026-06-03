@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { Alert, Pressable, Text, View } from "react-native";
 import { formatDate } from "@vet/shared";
 
-import { Bird, Box, Briefcase, Cow, Edit, Forward, Stethoscope, Trash } from "@/components/icons";
-import { Card, Pill } from "@/components/ui";
+import { Bird, Box, Briefcase, Cow, Edit, Forward, Paper, Stethoscope, Trash } from "@/components/icons";
+import { Button, Card, Money, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
-import type { CustomerRow, FarmRow, VisitRow } from "@/sync/types";
+import type { CustomerRow, FarmRow, LedgerRow, VisitRow } from "@/sync/types";
 import { syncDelete } from "@/sync/writes";
 
 const KIND_ICON: Record<string, React.ReactNode> = {
@@ -48,6 +48,13 @@ export default function FarmDetailScreen() {
     `SELECT * FROM visits WHERE farm_id = ? ORDER BY COALESCE(started_at, created_at) DESC LIMIT 25`,
     [farmId ?? ""],
   );
+
+  // Mo8.4 — the farm's own ledger (M16 polymorphic owner), streamed via the my_farms sync rule.
+  const { data: ledgers } = useQuery<LedgerRow>(
+    `SELECT * FROM ledgers WHERE farm_id = ?`,
+    [farmId ?? ""],
+  );
+  const ledger = ledgers?.[0];
 
   if (!farm) {
     return (
@@ -132,11 +139,37 @@ export default function FarmDetailScreen() {
         </View>
       </Card>
 
+      {ledger ? (
+        <Card flat className="mt-3 flex-row items-center justify-between p-3">
+          <View className="gap-0.5">
+            <Text className="text-ink-500 text-[12px] font-tajawal">
+              {t("customers.farmDetail.balance")} · {t(`ledgerStatus.${ledger.status}`)}
+            </Text>
+            <Money value={ledger.balance} />
+          </View>
+        </Card>
+      ) : null}
+
       <Card flat className="mt-3 gap-3 p-4">
         <InfoRow label={t("customers.farmDetail.owner")} value={owner?.full_name ?? "—"} />
         <InfoRow label={t("customers.farms.location")} value={farm.location ?? "—"} />
         {farm.notes ? <InfoRow label={t("customers.farms.notes")} value={farm.notes} /> : null}
       </Card>
+
+      <View className="mt-4">
+        <Button
+          label={t("customers.farms.account")}
+          variant="ghost"
+          block
+          leadingIcon={<Paper size={18} color="#223D69" />}
+          onPress={() =>
+            router.push({
+              pathname: "/customers/[id]/farms/[farmId]/statement",
+              params: { id: customerId ?? farm.customer_id, farmId: farm.id },
+            })
+          }
+        />
+      </View>
 
       <View className="mt-6 gap-2">
         <Text className="text-navy-900 text-[15px] font-tajawal-extrabold">{t("nav.visits")}</Text>

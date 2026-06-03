@@ -49,9 +49,17 @@ export default function CustomerDetailScreen() {
     `SELECT * FROM farms WHERE customer_id = ? ORDER BY updated_at DESC`,
     [id ?? ""],
   );
+  // Mo8.4 — the customer's farm ledgers (M16): joined to the farm rows for per-farm balance
+  // pills + the aggregate summary (aggregate = own + Σ farms, the W11 balance-summary card).
+  const { data: farmLedgers } = useQuery<LedgerRow>(
+    `SELECT l.* FROM ledgers l JOIN farms f ON f.id = l.farm_id WHERE f.customer_id = ?`,
+    [id ?? ""],
+  );
 
   const customer = customers?.[0];
   const ledger = ledgers?.[0];
+  const ledgerByFarm = new Map((farmLedgers ?? []).map((l) => [l.farm_id ?? "", l]));
+  const farmsTotal = (farmLedgers ?? []).reduce((sum, l) => sum + l.balance, 0);
 
   if (!customer) {
     return (
@@ -100,7 +108,32 @@ export default function CustomerDetailScreen() {
         </View>
       </Card>
 
-      {ledger ? (
+      {ledger && (farmLedgers ?? []).length > 0 ? (
+        // M16 — the customer settles own + farm ledgers separately; surface the breakdown.
+        <Card flat className="mt-3 gap-2 p-3">
+          <Text className="text-navy-900 text-[13px] font-tajawal-extrabold">
+            {t("customers.aggregate.title")}
+          </Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-ink-500 text-[12px] font-tajawal">
+              {t("customers.aggregate.ownBalance")} · {t(`ledgerStatus.${ledger.status}`)}
+            </Text>
+            <Money value={ledger.balance} />
+          </View>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-ink-500 text-[12px] font-tajawal">
+              {t("customers.aggregate.farmsBalance")}
+            </Text>
+            <Money value={farmsTotal} />
+          </View>
+          <View className="border-ink-100 flex-row items-center justify-between border-t pt-2">
+            <Text className="text-navy-900 text-[12px] font-tajawal-bold">
+              {t("customers.aggregate.aggregateBalance")}
+            </Text>
+            <Money value={ledger.balance + farmsTotal} />
+          </View>
+        </Card>
+      ) : ledger ? (
         <Card flat className="mt-3 flex-row items-center justify-between p-3">
           <View className="gap-0.5">
             <Text className="text-ink-500 text-[12px] font-tajawal">
@@ -201,30 +234,40 @@ export default function CustomerDetailScreen() {
             </Text>
           </Card>
         ) : (
-          (farms ?? []).map((farm) => (
-            <Pressable
-              key={farm.id}
-              onPress={() => router.push(`/customers/${customer.id}/farms/${farm.id}`)}
-            >
-              <Card className="flex-row items-center gap-3 p-3">
-                <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-                  {FARM_KIND_ICON[farm.kind] ?? <Briefcase size={18} color="#0F7A8A" />}
-                </View>
-                <View className="flex-1 gap-1">
-                  <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
-                    {farm.name}
-                  </Text>
-                  <View className="flex-row flex-wrap gap-1.5">
-                    <Pill tone="teal" label={t(`farmKind.${farm.kind}`)} />
-                    {farm.head_count != null ? (
-                      <Pill tone="neutral" label={`${t("customers.farms.headCount")}: ${farm.head_count}`} />
-                    ) : null}
+          (farms ?? []).map((farm) => {
+            const farmLedger = ledgerByFarm.get(farm.id);
+            return (
+              <Pressable
+                key={farm.id}
+                onPress={() => router.push(`/customers/${customer.id}/farms/${farm.id}`)}
+              >
+                <Card className="flex-row items-center gap-3 p-3">
+                  <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
+                    {FARM_KIND_ICON[farm.kind] ?? <Briefcase size={18} color="#0F7A8A" />}
                   </View>
-                </View>
-                <Forward size={18} color="#94A1B5" />
-              </Card>
-            </Pressable>
-          ))
+                  <View className="flex-1 gap-1">
+                    <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
+                      {farm.name}
+                    </Text>
+                    <View className="flex-row flex-wrap gap-1.5">
+                      <Pill tone="teal" label={t(`farmKind.${farm.kind}`)} />
+                      {farm.head_count != null ? (
+                        <Pill tone="neutral" label={`${t("customers.farms.headCount")}: ${farm.head_count}`} />
+                      ) : null}
+                      {farmLedger ? (
+                        <Pill
+                          tone={farmLedger.status === "has_debt" ? "amber" : "neutral"}
+                          label={t(`ledgerStatus.${farmLedger.status}`)}
+                        />
+                      ) : null}
+                    </View>
+                  </View>
+                  {farmLedger ? <Money value={farmLedger.balance} /> : null}
+                  <Forward size={18} color="#94A1B5" />
+                </Card>
+              </Pressable>
+            );
+          })
         )}
       </View>
 
