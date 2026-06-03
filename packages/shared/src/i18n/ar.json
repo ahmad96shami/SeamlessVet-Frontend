@@ -1412,7 +1412,10 @@
       "fieldVisits": "زيارات الميدان",
       "farmAccount": "حساب المزرعة",
       "vaccinations": "تطعيمات قادمة",
-      "entitlements": "مستحقات الأطباء"
+      "entitlements": "مستحقات الأطباء",
+      "pharmacyProfit": "أرباح الصيدلية",
+      "inClinicVisitProfit": "أرباح زيارات العيادة",
+      "fieldVisitProfit": "أرباح الزيارات الميدانية"
     },
     "period": {
       "last30": "آخر ٣٠ يوم",
@@ -1597,6 +1600,59 @@
       "revenue": "الإيراد",
       "share": "مستحقاتي المحتسبة",
       "empty": "لا توجد بيانات دخل لك في الفترة"
+    },
+    "pharmacyProfit": {
+      "title": "أرباح الصيدلية",
+      "subtitle": "إيراد الأدوية والمنتجات وتكلفتها وهامش الربح لكل منتج",
+      "revenue": "الإيراد",
+      "cost": "التكلفة",
+      "profit": "الربح",
+      "productCount": "عدد المنتجات",
+      "colProduct": "المنتج",
+      "colQuantity": "الكمية المباعة",
+      "colRevenue": "الإيراد",
+      "colCost": "التكلفة",
+      "colProfit": "الربح",
+      "reconcileHint": "التكلفة تطابق تكلفة البضاعة المباعة في تقرير أرباح المركز",
+      "empty": "لا مبيعات صيدلية في الفترة"
+    },
+    "inClinicVisitProfit": {
+      "title": "أرباح زيارات العيادة",
+      "subtitle": "الإيراد وتكلفة البضاعة وهامش الربح لكل زيارة داخل العيادة",
+      "revenue": "الإيراد",
+      "cogs": "تكلفة البضاعة المباعة",
+      "profit": "الربح",
+      "visitCount": "عدد الزيارات",
+      "scope": "النطاق",
+      "scopeAll": "الكل",
+      "scopeFarm": "مزرعة",
+      "scopeClinic": "عيادة",
+      "colVisit": "رقم الزيارة",
+      "colCustomer": "العميل",
+      "colFarm": "المزرعة",
+      "colRevenue": "الإيراد",
+      "colCogs": "التكلفة",
+      "colProfit": "الربح",
+      "empty": "لا زيارات عيادة في الفترة"
+    },
+    "fieldVisitProfit": {
+      "title": "أرباح الزيارات الميدانية",
+      "subtitle": "الإيراد وتكلفة البضاعة وهامش الربح لكل زيارة ميدانية",
+      "revenue": "الإيراد",
+      "cogs": "تكلفة البضاعة المباعة",
+      "profit": "الربح",
+      "visitCount": "عدد الزيارات",
+      "scope": "النطاق",
+      "scopeAll": "الكل",
+      "scopeFarm": "مزرعة",
+      "scopeClinic": "عيادة",
+      "colVisit": "رقم الزيارة",
+      "colCustomer": "العميل",
+      "colFarm": "المزرعة",
+      "colRevenue": "الإيراد",
+      "colCogs": "التكلفة",
+      "colProfit": "الربح",
+      "empty": "لا زيارات ميدانية في الفترة"
     }
   }
 }

@@ -12,10 +12,12 @@ import {
   FieldDoctorVisitsReportSchema,
   InventoryMovementReportSchema,
   KpiSummaryReportSchema,
+  PharmacyProfitReportSchema,
   ProfitAndLossReportSchema,
   ProfitPerBatchReportSchema,
   SalesReportSchema,
   UpcomingVaccinationsReportSchema,
+  VisitProfitReportSchema,
   type ClinicProfitsParams,
   type ClinicProfitsReport,
   type DoctorIncomeParams,
@@ -27,6 +29,8 @@ import {
   type KpiSummaryReport,
   type MyIncomeParams,
   type PeriodParams,
+  type PharmacyProfitParams,
+  type PharmacyProfitReport,
   type ProfitAndLossReport,
   type ProfitPerBatchReport,
   type ReportExportFormat,
@@ -34,6 +38,8 @@ import {
   type SalesReport,
   type UpcomingVaccinationsParams,
   type UpcomingVaccinationsReport,
+  type VisitProfitParams,
+  type VisitProfitReport,
 } from "../schemas/reports";
 import { z } from "zod";
 
@@ -126,6 +132,33 @@ export async function getUpcomingVaccinations(
 ): Promise<UpcomingVaccinationsReport> {
   const res = await client.get("/reports/upcoming-vaccinations", { params });
   return UpcomingVaccinationsReportSchema.parse(res.data);
+}
+
+/** GET /reports/pharmacy-profit — drug/product revenue, cost and gross margin per product (M20). */
+export async function getPharmacyProfit(
+  client: AxiosInstance,
+  params?: PharmacyProfitParams,
+): Promise<PharmacyProfitReport> {
+  const res = await client.get("/reports/pharmacy-profit", { params });
+  return PharmacyProfitReportSchema.parse(res.data);
+}
+
+/** GET /reports/in-clinic-visit-profit — revenue/COGS/margin per in-clinic visit, farm/clinic-sliceable (M20). */
+export async function getInClinicVisitProfit(
+  client: AxiosInstance,
+  params?: VisitProfitParams,
+): Promise<VisitProfitReport> {
+  const res = await client.get("/reports/in-clinic-visit-profit", { params });
+  return VisitProfitReportSchema.parse(res.data);
+}
+
+/** GET /reports/field-visit-profit — revenue/COGS/margin per field visit, farm/clinic-sliceable (M20). */
+export async function getFieldVisitProfit(
+  client: AxiosInstance,
+  params?: VisitProfitParams,
+): Promise<VisitProfitReport> {
+  const res = await client.get("/reports/field-visit-profit", { params });
+  return VisitProfitReportSchema.parse(res.data);
 }
 
 /** GET /reports/farm-account-status — a customer's full ledger statement (task 4; reuses M3). */

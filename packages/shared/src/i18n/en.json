@@ -1392,7 +1392,10 @@
       "fieldVisits": "Field visits",
       "farmAccount": "Farm account",
       "vaccinations": "Upcoming vaccinations",
-      "entitlements": "Doctor entitlements"
+      "entitlements": "Doctor entitlements",
+      "pharmacyProfit": "Pharmacy profit",
+      "inClinicVisitProfit": "In-clinic visit profit",
+      "fieldVisitProfit": "Field visit profit"
     },
     "period": {
       "last30": "Last 30 days",
@@ -1577,6 +1580,59 @@
       "revenue": "Revenue",
       "share": "My calculated entitlements",
       "empty": "No income data for you in the period"
+    },
+    "pharmacyProfit": {
+      "title": "Pharmacy profit",
+      "subtitle": "Drug/product revenue, cost and gross margin per product",
+      "revenue": "Revenue",
+      "cost": "Cost",
+      "profit": "Profit",
+      "productCount": "Products",
+      "colProduct": "Product",
+      "colQuantity": "Quantity sold",
+      "colRevenue": "Revenue",
+      "colCost": "Cost",
+      "colProfit": "Profit",
+      "reconcileHint": "Cost matches the clinic-profits COGS over the same period",
+      "empty": "No pharmacy sales in the period"
+    },
+    "inClinicVisitProfit": {
+      "title": "In-clinic visit profit",
+      "subtitle": "Revenue, COGS and gross margin per in-clinic visit",
+      "revenue": "Revenue",
+      "cogs": "COGS",
+      "profit": "Profit",
+      "visitCount": "Visits",
+      "scope": "Scope",
+      "scopeAll": "All",
+      "scopeFarm": "Farm",
+      "scopeClinic": "Clinic",
+      "colVisit": "Visit no.",
+      "colCustomer": "Customer",
+      "colFarm": "Farm",
+      "colRevenue": "Revenue",
+      "colCogs": "COGS",
+      "colProfit": "Profit",
+      "empty": "No in-clinic visits in the period"
+    },
+    "fieldVisitProfit": {
+      "title": "Field visit profit",
+      "subtitle": "Revenue, COGS and gross margin per field visit",
+      "revenue": "Revenue",
+      "cogs": "COGS",
+      "profit": "Profit",
+      "visitCount": "Visits",
+      "scope": "Scope",
+      "scopeAll": "All",
+      "scopeFarm": "Farm",
+      "scopeClinic": "Clinic",
+      "colVisit": "Visit no.",
+      "colCustomer": "Customer",
+      "colFarm": "Farm",
+      "colRevenue": "Revenue",
+      "colCogs": "COGS",
+      "colProfit": "Profit",
+      "empty": "No field visits in the period"
     }
   }
 }

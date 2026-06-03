@@ -271,6 +271,89 @@ export interface UpcomingVaccinationsParams {
   take?: number;
 }
 
+// ---- Pharmacy profit (M20) ------------------------------------------------
+
+/** One product's row in the pharmacy-profit report: the period totals for that product. */
+export const PharmacyProfitRowSchema = z.object({
+  productId: z.string(),
+  productName: z.string(),
+  quantitySold: z.number(),
+  revenue: z.number(),
+  cost: z.number(),
+  profit: z.number(),
+});
+export type PharmacyProfitRow = z.infer<typeof PharmacyProfitRowSchema>;
+
+/**
+ * Drug/product gross margin over the window's effective (non-void) invoices: Σ product-line revenue −
+ * Σ cost_price×qty, restricted to invoice_items that carry a `productId` (service lines excluded).
+ * `cost` reconciles to the clinic-profits `cogs` on the same window. Rows (offset-paged) break the
+ * margin down per product; the summary spans the whole window.
+ */
+export const PharmacyProfitReportSchema = z.object({
+  from: z.string().nullish(),
+  to: z.string().nullish(),
+  revenue: z.number(),
+  cost: z.number(),
+  profit: z.number(),
+  totalCount: z.number(),
+  rows: z.array(PharmacyProfitRowSchema),
+});
+export type PharmacyProfitReport = z.infer<typeof PharmacyProfitReportSchema>;
+
+export interface PharmacyProfitParams {
+  from?: string;
+  to?: string;
+  skip?: number;
+  take?: number;
+}
+
+// ---- Visit profit: in-clinic / field (M20) --------------------------------
+
+/** One visit's row in a visit-profit report: the visit's revenue, COGS and margin. */
+export const VisitProfitRowSchema = z.object({
+  visitId: z.string(),
+  visitNumber: z.string().nullish(),
+  customerId: z.string(),
+  farmId: z.string().nullish(),
+  revenue: z.number(),
+  cogs: z.number(),
+  profit: z.number(),
+});
+export type VisitProfitRow = z.infer<typeof VisitProfitRowSchema>;
+
+/**
+ * Gross margin of the invoices attributed to a visit, grouped by visit. `visitType` is the slice
+ * (`in_clinic` | `field`); `scope` optionally narrows by `Visit.farmId` (`farm` | `clinic` | absent =
+ * both). Per visit, `revenue` is the ex-tax total of its effective invoices and `cogs` the cost over
+ * their product lines — so the in-clinic and field reports together reconcile to the clinic-profits net
+ * once walk-ins (no visit) are set aside. The summary spans the whole filtered set; `rows` are paged.
+ */
+export const VisitProfitReportSchema = z.object({
+  from: z.string().nullish(),
+  to: z.string().nullish(),
+  visitType: z.string(),
+  scope: z.string().nullish(),
+  revenue: z.number(),
+  cogs: z.number(),
+  profit: z.number(),
+  visitCount: z.number(),
+  rows: z.array(VisitProfitRowSchema),
+});
+export type VisitProfitReport = z.infer<typeof VisitProfitReportSchema>;
+
+/** The farm/clinic slicer on the visit-profit reports. Omit for both. */
+export const VISIT_PROFIT_SCOPES = ["farm", "clinic"] as const;
+export type VisitProfitScope = (typeof VISIT_PROFIT_SCOPES)[number];
+
+export interface VisitProfitParams {
+  from?: string;
+  to?: string;
+  scope?: VisitProfitScope;
+  skip?: number;
+  take?: number;
+}
+
 // ---- KPI summary (task 1) -------------------------------------------------
 
 /** Snapshot as of `asOf` (UTC day): the four admin-dashboard headline figures. */
