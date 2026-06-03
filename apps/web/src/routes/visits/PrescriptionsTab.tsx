@@ -36,7 +36,12 @@ export function PrescriptionsTab({ visitId, readOnly }: { visitId: string; readO
         id: "product",
         header: t("visits.prescriptions.col.product"),
         cell: ({ row }) => (
-          <span className="font-medium">{productById.get(row.original.productId) ?? "—"}</span>
+          <span className="flex items-center gap-2">
+            <span className="font-medium">{productById.get(row.original.productId) ?? "—"}</span>
+            {row.original.reminderEnabled ? (
+              <Badge variant="warning">{t("visits.prescriptions.recurring.badge")}</Badge>
+            ) : null}
+          </span>
         ),
       },
       {
