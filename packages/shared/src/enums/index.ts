@@ -309,6 +309,7 @@ export const NotificationType = {
   AppointmentReminder: "appointment_reminder",
   FollowUpDue: "follow_up_due",
   VaccinationDue: "vaccination_due",
+  MedicationDue: "medication_due",
   LowStock: "low_stock",
   ExpiryWarning: "expiry_warning",
   RegistrationRequest: "registration_request",

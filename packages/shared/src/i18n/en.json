@@ -1167,6 +1167,7 @@
       "appointment_reminder": "Appointment reminder",
       "follow_up_due": "Follow-up due",
       "vaccination_due": "Vaccination due",
+      "medication_due": "Medication due",
       "low_stock": "Low stock",
       "expiry_warning": "Expiry warning",
       "registration_request": "New registration request",
