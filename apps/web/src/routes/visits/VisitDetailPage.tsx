@@ -17,6 +17,7 @@ import { AssessmentTab } from "@/routes/visits/AssessmentTab";
 import { AttachmentsTab } from "@/routes/visits/AttachmentsTab";
 import { DiagnosisTab } from "@/routes/visits/DiagnosisTab";
 import { FollowUpsTab } from "@/routes/visits/FollowUpsTab";
+import { NightStaysTab } from "@/routes/visits/NightStaysTab";
 import { PrescriptionsTab } from "@/routes/visits/PrescriptionsTab";
 import { ProceduresTab } from "@/routes/visits/ProceduresTab";
 import { VaccinationsTab } from "@/routes/visits/VaccinationsTab";
@@ -31,9 +32,12 @@ type TabId =
   | "prescriptions"
   | "followups"
   | "vaccinations"
+  | "nightStays"
   | "files";
 
-const TAB_IDS = [
+// `nightStays` is clinic-only (the backend rejects boarding on a field visit) — inserted for
+// in-clinic visits in `tabIds` below.
+const BASE_TAB_IDS = [
   "assessment",
   "diagnosis",
   "procedures",
@@ -41,7 +45,7 @@ const TAB_IDS = [
   "followups",
   "vaccinations",
   "files",
-] as const;
+] as const satisfies readonly TabId[];
 
 export function VisitDetailPage() {
   const { id = "" } = useParams();
@@ -91,6 +95,11 @@ export function VisitDetailPage() {
 
   const isTerminal = v.status === "completed" || v.status === "cancelled";
   const isOpen = v.status === "open";
+  const isClinic = v.visitType === "in_clinic";
+  // Night-stays are clinic-only; slot the tab in just before "files" for in-clinic visits.
+  const tabIds: readonly TabId[] = isClinic
+    ? ([...BASE_TAB_IDS.slice(0, -1), "nightStays", "files"] as const)
+    : BASE_TAB_IDS;
   // Hand off to the cashier surface (admin/cashier only); a cancelled visit has nothing to bill.
   const canBill = (role === "admin" || role === "cashier") && v.status !== "cancelled";
   const title = pet?.name ?? customer.data?.fullName ?? "—";
@@ -205,7 +214,7 @@ export function VisitDetailPage() {
 
       {/* Clinical-record tabs */}
       <div className="flex flex-wrap gap-1 border-b">
-        {TAB_IDS.map((id) => (
+        {tabIds.map((id) => (
           <button
             key={id}
             type="button"
@@ -228,6 +237,9 @@ export function VisitDetailPage() {
       {tab === "prescriptions" ? <PrescriptionsTab visitId={v.id} readOnly={isTerminal} /> : null}
       {tab === "followups" ? <FollowUpsTab visit={v} readOnly={isTerminal} /> : null}
       {tab === "vaccinations" ? <VaccinationsTab visit={v} readOnly={isTerminal} /> : null}
+      {tab === "nightStays" && isClinic ? (
+        <NightStaysTab visitId={v.id} readOnly={isTerminal} />
+      ) : null}
       {tab === "files" ? <AttachmentsTab visitId={v.id} readOnly={isTerminal} /> : null}
 
       <Dialog
