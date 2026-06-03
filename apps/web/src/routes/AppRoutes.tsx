@@ -37,6 +37,7 @@ import { ProfitPerBatchPage } from "@/routes/reports/ProfitPerBatchPage";
 import { ReportsLayout } from "@/routes/reports/ReportsLayout";
 import { SalesPage } from "@/routes/reports/SalesPage";
 import { UpcomingVaccinationsPage } from "@/routes/reports/UpcomingVaccinationsPage";
+import { FieldVisitProfitPage, InClinicVisitProfitPage } from "@/routes/reports/VisitProfitReportPage";
 import { InvoicesPage } from "@/routes/pos/InvoicesPage";
 import { PosLayout } from "@/routes/pos/PosLayout";
 import { PosPage } from "@/routes/pos/PosPage";
@@ -281,6 +282,8 @@ export function AppRoutes() {
           <Route path="profit-per-batch" element={<ProfitPerBatchPage />} />
           <Route path="profit-and-loss" element={<ProfitAndLossPage />} />
           <Route path="pharmacy-profit" element={<PharmacyProfitPage />} />
+          <Route path="in-clinic-visit-profit" element={<InClinicVisitProfitPage />} />
+          <Route path="field-visit-profit" element={<FieldVisitProfitPage />} />
           <Route path="sales" element={<SalesPage />} />
           <Route path="inventory-movement" element={<InventoryMovementPage />} />
           <Route path="field-visits" element={<FieldVisitsPage />} />

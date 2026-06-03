@@ -14,6 +14,8 @@ const TABS = [
   { to: "/reports/profit-per-batch", labelKey: "reports.tabs.profitPerBatch" },
   { to: "/reports/profit-and-loss", labelKey: "reports.tabs.profitAndLoss" },
   { to: "/reports/pharmacy-profit", labelKey: "reports.tabs.pharmacyProfit" },
+  { to: "/reports/in-clinic-visit-profit", labelKey: "reports.tabs.inClinicVisitProfit" },
+  { to: "/reports/field-visit-profit", labelKey: "reports.tabs.fieldVisitProfit" },
   { to: "/reports/sales", labelKey: "reports.tabs.sales" },
   { to: "/reports/inventory-movement", labelKey: "reports.tabs.inventoryMovement" },
   { to: "/reports/field-visits", labelKey: "reports.tabs.fieldVisits" },
