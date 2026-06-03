@@ -6,7 +6,6 @@ import { toast } from "sonner";
 
 import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
-import { AdminPage } from "@/components/layout/AdminPage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -131,10 +130,25 @@ export function VaccinationsListPage() {
   };
 
   return (
-    <AdminPage
-      title={t("vaccinations.title")}
-      description={t("vaccinations.description")}
-      actions={
+    <div className="space-y-4">
+      {/* Toolbar: customer filter + new */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-1">
+          <Button variant="outline" onClick={() => setPickerOpen(true)}>
+            <Icon.search className="size-4" />
+            {customer ? customer.fullName : t("vaccinations.allCustomers")}
+          </Button>
+          {customer ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t("vaccinations.allCustomers")}
+              onClick={() => setCustomer(null)}
+            >
+              <Icon.close className="size-4" />
+            </Button>
+          ) : null}
+        </div>
         <Button
           onClick={() => {
             setEditing(null);
@@ -145,24 +159,6 @@ export function VaccinationsListPage() {
           <Icon.plus className="size-4" />
           {t("vaccinations.new")}
         </Button>
-      }
-    >
-      {/* Customer filter */}
-      <div className="flex items-center gap-1">
-        <Button variant="outline" onClick={() => setPickerOpen(true)}>
-          <Icon.search className="size-4" />
-          {customer ? customer.fullName : t("vaccinations.allCustomers")}
-        </Button>
-        {customer ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={t("vaccinations.allCustomers")}
-            onClick={() => setCustomer(null)}
-          >
-            <Icon.close className="size-4" />
-          </Button>
-        ) : null}
       </div>
 
       <DataTable
@@ -216,6 +212,6 @@ export function VaccinationsListPage() {
           </div>
         ) : null}
       </Dialog>
-    </AdminPage>
+    </div>
   );
 }

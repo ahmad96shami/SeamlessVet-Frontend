@@ -39,6 +39,8 @@ import { PosPage } from "@/routes/pos/PosPage";
 import { AlertsPage } from "@/routes/inventory/AlertsPage";
 import { MovementsPage } from "@/routes/inventory/MovementsPage";
 import { StockPage } from "@/routes/inventory/StockPage";
+import { VaccinationCalendarPage } from "@/routes/vaccinations/VaccinationCalendarPage";
+import { VaccinationsLayout } from "@/routes/vaccinations/VaccinationsLayout";
 import { VaccinationsListPage } from "@/routes/vaccinations/VaccinationsListPage";
 import { PetTimelinePage } from "@/routes/visits/PetTimelinePage";
 import { VisitDetailPage } from "@/routes/visits/VisitDetailPage";
@@ -140,10 +142,13 @@ export function AppRoutes() {
           path="vaccinations"
           element={
             <RequireRole roles={["admin", "receptionist", "vet_clinic", "vet_field", "vet_both"]}>
-              <VaccinationsListPage />
+              <VaccinationsLayout />
             </RequireRole>
           }
-        />
+        >
+          <Route index element={<VaccinationsListPage />} />
+          <Route path="calendar" element={<VaccinationCalendarPage />} />
+        </Route>
         <Route
           path="pos"
           element={
