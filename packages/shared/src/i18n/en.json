@@ -701,7 +701,8 @@
       "submit": "Schedule",
       "created": "Follow-up scheduled",
       "conflictWarning": "The doctor has an appointment at {{time}} — this may clash.",
-      "conflictError": "That slot is already booked for the doctor. Pick another time."
+      "conflictError": "That slot is already booked for the doctor. Pick another time.",
+      "queued": "Saved locally; it will be sent when back online."
     },
     "nightStays": {
       "title": "Night stays & boarding",
@@ -1412,7 +1413,8 @@
       "fieldInvoice": "Field-visit invoice",
       "examFeeInvoice": "Exam-fee invoice",
       "receiptVoucher": "Receipt voucher",
-      "attachment": "Attachment upload"
+      "attachment": "Attachment upload",
+      "followUp": "Follow-up appointment"
     },
     "table": {
       "visits": "Visit",

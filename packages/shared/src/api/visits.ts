@@ -89,6 +89,30 @@ export async function cancelVisit(client: AxiosInstance, id: string): Promise<Id
 }
 
 /**
+ * Build the `POST /visits/{visitId}/schedule-follow-up` request (M17) — mints the appointment
+ * GUID v7 `id` once, so an offline replay is at-most-once: the endpoint doesn't dedupe on the
+ * idempotency header, but a re-send of the same `id` 409s (`appointment_id_collision`) instead
+ * of double-booking (it parks as a dismissable conflict, never a duplicate). A genuine slot
+ * clash parks the same way (`appointment_conflict`).
+ */
+export function buildScheduleFollowUpRequest(
+  visitId: string,
+  input: ScheduleFollowUpRequest,
+): RequestDescriptor {
+  const id = newGuidV7();
+  const body = { ...ScheduleFollowUpRequestSchema.parse(input), id };
+  return {
+    method: "POST",
+    url: `/visits/${visitId}/schedule-follow-up`,
+    body,
+    idempotencyKey: idempotencyKey(),
+    label: "sync.label.followUp",
+    entityKind: "appointment",
+    entityId: id,
+  };
+}
+
+/**
  * POST /visits/{id}/schedule-follow-up — books a follow-up appointment from this visit (M17). Returns
  * the new appointment's id; attending it later waives the checkup fee once per origin (PRD §18.8).
  */
@@ -97,7 +121,6 @@ export async function scheduleFollowUp(
   visitId: string,
   body: ScheduleFollowUpRequest,
 ): Promise<IdentifierResponse> {
-  const payload = ScheduleFollowUpRequestSchema.parse(body);
-  const res = await client.post(`/visits/${visitId}/schedule-follow-up`, { ...payload, id: newGuidV7() });
-  return IdentifierResponseSchema.parse(res.data);
+  const data = await sendRequest(client, buildScheduleFollowUpRequest(visitId, body));
+  return IdentifierResponseSchema.parse(data);
 }
