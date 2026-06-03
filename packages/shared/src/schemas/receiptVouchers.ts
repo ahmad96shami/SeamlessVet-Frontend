@@ -16,6 +16,10 @@ export const ReceiptVoucherResponseSchema = z.object({
   issuedBy: z.string(),
   issuedAt: z.string(),
   notes: z.string().nullish(),
+  // M19 — set only when `method` is `cheque`.
+  chequeNumber: z.string().nullish(),
+  chequeBank: z.string().nullish(),
+  chequeDueDate: z.string().nullish(),
   createdAt: z.string(),
 });
 export type ReceiptVoucherResponse = z.infer<typeof ReceiptVoucherResponseSchema>;
@@ -38,8 +42,12 @@ export const ReceiptVoucherRequestSchema = z.object({
   // M16: optional — credit a farm's ledger instead of the customer's own ledger (must belong to it).
   farmId: z.string().min(1).optional(),
   amount: z.number().positive(),
-  method: z.enum(["cash", "card", "bank_transfer", "credit"]),
+  method: z.enum(["cash", "card", "bank_transfer", "credit", "cheque"]),
   notes: optionalText,
+  // M19 — optional cheque reference metadata, stored when `method` is `cheque`.
+  chequeNumber: z.string().trim().max(64).optional(),
+  chequeBank: z.string().trim().max(128).optional(),
+  chequeDueDate: z.string().optional(),
   idempotencyKey: z.string().min(1).max(128),
 });
 export type ReceiptVoucherRequest = z.infer<typeof ReceiptVoucherRequestSchema>;

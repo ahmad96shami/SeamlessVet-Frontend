@@ -27,13 +27,19 @@ export const InvoiceItemResponseSchema = z.object({
 });
 export type InvoiceItemResponse = z.infer<typeof InvoiceItemResponseSchema>;
 
-/** A payment leg recorded against an invoice (a mixed payment → several rows). */
+/**
+ * A payment leg recorded against an invoice (a mixed payment → several rows). M19: a `cheque` leg
+ * carries optional reference metadata (null on other methods).
+ */
 export const PaymentResponseSchema = z.object({
   id: z.string(),
   invoiceId: z.string(),
   method: z.string(),
   amount: z.number(),
   paidAt: z.string(),
+  chequeNumber: z.string().nullish(),
+  chequeBank: z.string().nullish(),
+  chequeDueDate: z.string().nullish(),
 });
 export type PaymentResponse = z.infer<typeof PaymentResponseSchema>;
 
@@ -92,11 +98,18 @@ export const InvoiceLineRequestSchema = z.object({
 });
 export type InvoiceLineRequest = z.infer<typeof InvoiceLineRequestSchema>;
 
-/** A payment leg. `method` mirrors the PaymentMethod enum (cash | card | bank_transfer | credit). */
+/**
+ * A payment leg. `method` mirrors the PaymentMethod enum (cash | card | bank_transfer | credit |
+ * cheque). M19: a `cheque` leg settles immediately (like cash) and may carry optional reference
+ * metadata (number / bank / due date) — stored server-side, ignored on the other methods.
+ */
 export const PaymentRequestSchema = z.object({
   id: z.string().optional(),
-  method: z.enum(["cash", "card", "bank_transfer", "credit"]),
+  method: z.enum(["cash", "card", "bank_transfer", "credit", "cheque"]),
   amount: z.number().positive(),
+  chequeNumber: z.string().trim().max(64).optional(),
+  chequeBank: z.string().trim().max(128).optional(),
+  chequeDueDate: z.string().optional(),
 });
 export type PaymentRequest = z.infer<typeof PaymentRequestSchema>;
 

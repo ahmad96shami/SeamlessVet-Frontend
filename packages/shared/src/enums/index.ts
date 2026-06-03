@@ -291,9 +291,19 @@ export const PaymentMethod = {
   Card: "card",
   BankTransfer: "bank_transfer",
   Credit: "credit",
+  // M19 — settles immediately like cash; carries optional cheque reference metadata.
+  Cheque: "cheque",
 } as const;
 export type PaymentMethod = EnumValues<typeof PaymentMethod>;
 export const PAYMENT_METHOD_VALUES = values(PaymentMethod);
+
+/** Methods that settle on the spot (everything except `credit`). M19 added `cheque`. */
+export const IMMEDIATE_PAYMENT_METHODS = [
+  PaymentMethod.Cash,
+  PaymentMethod.Card,
+  PaymentMethod.BankTransfer,
+  PaymentMethod.Cheque,
+] as const;
 
 export const EntitlementStatus = {
   Pending: "pending",
