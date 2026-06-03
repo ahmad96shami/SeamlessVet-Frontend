@@ -15,6 +15,7 @@ import { usePets } from "@/queries/pets";
 import { useCancelVisit, useCompleteVisit, useUpdateVisit, useVisit } from "@/queries/visits";
 import { AssessmentTab } from "@/routes/visits/AssessmentTab";
 import { AttachmentsTab } from "@/routes/visits/AttachmentsTab";
+import { CheckupFeeCard } from "@/routes/visits/CheckupFeeCard";
 import { DiagnosisTab } from "@/routes/visits/DiagnosisTab";
 import { FollowUpsTab } from "@/routes/visits/FollowUpsTab";
 import { NightStaysTab } from "@/routes/visits/NightStaysTab";
@@ -211,6 +212,8 @@ export function VisitDetailPage() {
           {t("visits.detail.lockedHint")}
         </div>
       ) : null}
+
+      {isClinic ? <CheckupFeeCard visit={v} readOnly={isTerminal} /> : null}
 
       {/* Clinical-record tabs */}
       <div className="flex flex-wrap gap-1 border-b">
