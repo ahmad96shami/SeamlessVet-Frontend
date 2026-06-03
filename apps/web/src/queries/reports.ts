@@ -5,9 +5,12 @@ import {
   getDoctorIncome,
   getFarmAccountStatus,
   getFieldDoctorVisits,
+  getFieldVisitProfit,
+  getInClinicVisitProfit,
   getInventoryMovement,
   getKpiSummary,
   getMyIncome,
+  getPharmacyProfit,
   getProfitAndLoss,
   getProfitPerBatch,
   getSalesReport,
@@ -26,6 +29,8 @@ import {
   type KpiSummaryReport,
   type MyIncomeParams,
   type PeriodParams,
+  type PharmacyProfitParams,
+  type PharmacyProfitReport,
   type ProfitAndLossReport,
   type ProfitPerBatchReport,
   type SalesParams,
@@ -33,6 +38,8 @@ import {
   type StatementResponse,
   type UpcomingVaccinationsParams,
   type UpcomingVaccinationsReport,
+  type VisitProfitParams,
+  type VisitProfitReport,
 } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
@@ -122,6 +129,30 @@ export function useUpcomingVaccinations(params: UpcomingVaccinationsParams) {
   return useQuery<UpcomingVaccinationsReport, ApiError>({
     queryKey: [KEY, "upcoming-vaccinations", params],
     queryFn: () => getUpcomingVaccinations(apiClient, params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function usePharmacyProfit(params: PharmacyProfitParams) {
+  return useQuery<PharmacyProfitReport, ApiError>({
+    queryKey: [KEY, "pharmacy-profit", params],
+    queryFn: () => getPharmacyProfit(apiClient, params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useInClinicVisitProfit(params: VisitProfitParams) {
+  return useQuery<VisitProfitReport, ApiError>({
+    queryKey: [KEY, "in-clinic-visit-profit", params],
+    queryFn: () => getInClinicVisitProfit(apiClient, params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useFieldVisitProfit(params: VisitProfitParams) {
+  return useQuery<VisitProfitReport, ApiError>({
+    queryKey: [KEY, "field-visit-profit", params],
+    queryFn: () => getFieldVisitProfit(apiClient, params),
     placeholderData: (prev) => prev,
   });
 }
