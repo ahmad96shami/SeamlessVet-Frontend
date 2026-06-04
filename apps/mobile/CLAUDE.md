@@ -52,8 +52,11 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
   carry CSS variables, and a component whose class set flips across re-renders (flat↔shadowed Card,
   selected ListRow) makes css-interop "upgrade" it after first render — its dev warning then crashes
   with "Couldn't find a navigation context". The token objects carry iOS shadow* + Android elevation
-  together. Logical utilities only (`start`/`end`, `ps`/`pe`) — and since RTL is forced, use
-  `flex-row` (never `flex-row-reverse`; that double-reverses).
+  together. A styled component whose class set FLIPS across a conditional at the same tree
+  position (e.g. empty `Card flat` ↔ shadowed data `Card`) must carry distinct `key`s so React
+  REMOUNTS it — an in-place css-interop restyle can drop the background's border radius (and
+  once crashed dev). Logical utilities only (`start`/`end`, `ps`/`pe`) — and since RTL is
+  forced, use `flex-row` (never `flex-row-reverse`; that double-reverses).
 - **Audit gates** (keep green): `grep -rn '#[0-9A-Fa-f]\{6\}' app src` must hit only
   `theme/tokens.js` + `Icon3D.tsx`; `grep -rnP '[٠-٩]' app src` must return nothing;
   no `row-reverse`; every `Text` has a `font-tajawal*` class.

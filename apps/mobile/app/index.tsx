@@ -26,6 +26,7 @@ import {
   Pill,
   QuickAction,
   SectionTitle,
+  SkeletonList,
   Stat,
   TimeBox,
 } from "@/components/ui";
@@ -62,8 +63,8 @@ export default function Index() {
   const [reviewOpen, setReviewOpen] = useState(false);
 
   // -- Stat sources (A.1) -----------------------------------------------------
-  const { data: stockRows = [] } = useQuery<FieldStockRow>(FIELD_STOCK_SQL);
-  const { data: settingsRows = [] } = useQuery<{ expiration_warning_days: number | null }>(
+  const { data: stockRows = [], isLoading: stockLoading } = useQuery<FieldStockRow>(FIELD_STOCK_SQL);
+  const { data: settingsRows = [], isLoading: settingsLoading } = useQuery<{ expiration_warning_days: number | null }>(
     `SELECT expiration_warning_days FROM system_settings LIMIT 1`,
   );
   const expirationWarningDays = settingsRows[0]?.expiration_warning_days ?? null;
@@ -75,13 +76,13 @@ export default function Index() {
       }).length,
     [stockRows, expirationWarningDays],
   );
-  const { data: voucherRows = [] } = useQuery<{ n: number }>(
+  const { data: voucherRows = [], isLoading: vouchersLoading } = useQuery<{ n: number }>(
     `SELECT COUNT(*) AS n FROM receipt_vouchers
       WHERE date(issued_at, 'localtime') = date('now', 'localtime')`,
   );
 
   // -- Today's schedule = today's local visits (appointments are clinic-only) --
-  const { data: todayVisits = [] } = useQuery<ScheduleRow>(
+  const { data: todayVisits = [], isLoading: scheduleLoading } = useQuery<ScheduleRow>(
     `SELECT v.*, c.full_name AS customer_name, pe.name AS pet_name
        FROM visits v
        LEFT JOIN customers c ON c.id = v.customer_id
@@ -93,7 +94,7 @@ export default function Index() {
   const nextVisitId = todayVisits.find((v) => v.status === "open")?.id;
 
   // -- Vaccination reminders (Mo7's source, soonest 3) -------------------------
-  const { data: reminders = [] } = useQuery<ReminderRow>(
+  const { data: reminders = [], isLoading: remindersLoading } = useQuery<ReminderRow>(
     `SELECT vx.*, pe.name AS pet_name, c.full_name AS customer_name
        FROM vaccinations vx
        LEFT JOIN pets pe ON pe.id = vx.pet_id
@@ -116,18 +117,21 @@ export default function Index() {
         <Stat
           icon={<Box size={18} color={colors.teal[600]} />}
           value={stockRows.length}
+          loading={stockLoading}
           label={t("dashboard.stats.stockItems")}
         />
         <Stat
           icon={<Warn size={18} color={colors.amber.DEFAULT} />}
           tone="amber"
           value={lowCount}
+          loading={stockLoading || settingsLoading}
           label={t("dashboard.stats.belowThreshold")}
         />
         <Stat
           icon={<Receipt size={18} color={colors.emerald.ink} />}
           tone="green"
           value={voucherRows[0]?.n ?? 0}
+          loading={vouchersLoading}
           label={t("dashboard.stats.todayVouchers")}
         />
       </View>
@@ -194,8 +198,10 @@ export default function Index() {
         actionLabel={t("dashboard.viewAll")}
         onAction={() => router.push("/visits")}
       />
-      {todayVisits.length === 0 ? (
-        <Card flat className="items-center p-5">
+      {scheduleLoading ? (
+        <SkeletonList rows={2} />
+      ) : todayVisits.length === 0 ? (
+        <Card key="schedule-empty" flat className="items-center p-5">
           <Text className="text-ink-500 text-[13px] font-tajawal">
             {t("dashboard.todaySchedule.emptyField")}
           </Text>
@@ -243,14 +249,19 @@ export default function Index() {
         actionLabel={t("dashboard.viewAll")}
         onAction={() => router.push("/vaccinations")}
       />
-      {reminders.length === 0 ? (
-        <Card flat className="items-center p-5">
+      {remindersLoading ? (
+        <SkeletonList rows={2} />
+      ) : reminders.length === 0 ? (
+        // Distinct keys: the flat empty card must REMOUNT into the shadowed data
+        // card (same element type) — an in-place css-interop class flip here
+        // drops the background's border radius (and once crashed dev, see Card).
+        <Card key="vax-empty" flat className="items-center p-5">
           <Text className="text-ink-500 text-[13px] font-tajawal">
             {t("dashboard.vaxReminders.empty")}
           </Text>
         </Card>
       ) : (
-        <Card className="p-3.5">
+        <Card key="vax-data" className="p-3.5">
           {reminders.map((r, i) => {
             const days = daysUntil(r.next_due_date);
             const overdue = days !== null && days < 0;
