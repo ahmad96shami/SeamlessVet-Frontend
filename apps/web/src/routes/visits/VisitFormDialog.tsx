@@ -9,15 +9,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useCustomer, useCustomers } from "@/queries/customers";
-import { CustomerFormDialog } from "@/routes/customers/CustomerFormDialog";
+import { CustomerCombobox } from "@/routes/customers/CustomerCombobox";
 import { useFieldInventories } from "@/queries/inventory";
 import { usePets } from "@/queries/pets";
 import { useCreateVisit } from "@/queries/visits";
@@ -42,47 +38,24 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
   const fieldDocs = fieldInvs.data ?? [];
   const offerMe = isVet && !!me && !fieldDocs.some((d) => d.doctorId === me.userId);
 
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebouncedValue(search, 300);
   const [customer, setCustomer] = useState<CustomerResponse | null>(null);
   const [petId, setPetId] = useState("");
   const [doctorId, setDoctorId] = useState("");
   const [visitType, setVisitType] = useState<"in_clinic" | "field">("in_clinic");
   const [chiefComplaint, setChiefComplaint] = useState("");
 
-  // Inline "add customer" — reuses the customers-page form; the new id is then auto-selected here.
-  const [addCustomerOpen, setAddCustomerOpen] = useState(false);
-  const [createdCustomerId, setCreatedCustomerId] = useState<string | null>(null);
-  const createdCustomerQuery = useCustomer(createdCustomerId);
-
-  // Candidates for the customer picker (only queried while choosing).
-  const customersQuery = useCustomers({ search: debouncedSearch || undefined, take: 20 });
-  const candidates = customersQuery.data ?? [];
   // The chosen customer's pets (the visit's pet must belong to it).
   const petsQuery = usePets(customer ? { customerId: customer.id, take: 100 } : { take: 0 });
   const pets = customer ? (petsQuery.data ?? []) : [];
 
   useEffect(() => {
     if (!open) return;
-    setSearch("");
     setCustomer(null);
     setPetId("");
     setDoctorId(isVet && me ? me.userId : "");
     setVisitType("in_clinic");
     setChiefComplaint("");
-    setAddCustomerOpen(false);
-    setCreatedCustomerId(null);
   }, [open, isVet, me]);
-
-  // Once the freshly-created customer is fetched, select it and clear the search.
-  useEffect(() => {
-    if (createdCustomerId && createdCustomerQuery.data) {
-      setCustomer(createdCustomerQuery.data);
-      setPetId("");
-      setSearch("");
-      setCreatedCustomerId(null);
-    }
-  }, [createdCustomerId, createdCustomerQuery.data]);
 
   const onConfirm = () => {
     if (!customer || !doctorId) return;
@@ -114,67 +87,16 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
   return (
     <Dialog open={open} onClose={onClose} title={t("visits.newTitle")} className="max-w-xl">
       <div className="space-y-4">
-        {/* Step 1 — customer */}
-        {customer ? (
-          <div className="flex items-center justify-between gap-2 rounded-xl border bg-[var(--paper-soft)] p-3">
-            <span className="min-w-0">
-              <span className="text-xs text-muted-foreground">{t("visits.create.customer")}</span>
-              <span className="block truncate font-medium">{customer.fullName}</span>
-            </span>
-            <Button variant="ghost" size="sm" onClick={() => setCustomer(null)}>
-              {t("admin.common.edit")}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <Input
-              placeholder={t("visits.create.searchCustomer")}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              autoFocus
-            />
-            <div className="max-h-56 divide-y overflow-auto rounded-xl border">
-              {candidates.length === 0 ? (
-                <div className="p-3 text-sm text-muted-foreground">{t("customers.empty")}</div>
-              ) : (
-                candidates.map((c) => (
-                  <button
-                    type="button"
-                    key={c.id}
-                    onClick={() => {
-                      setCustomer(c);
-                      setPetId("");
-                    }}
-                    className="flex w-full items-center justify-between gap-2 p-3 text-start text-sm transition-colors hover:bg-muted"
-                  >
-                    <span className="min-w-0">
-                      <span className="font-medium">{c.fullName}</span>
-                      {c.phonePrimary ? (
-                        <span className="ms-2 text-xs text-muted-foreground" dir="ltr">
-                          {c.phonePrimary}
-                        </span>
-                      ) : null}
-                    </span>
-                    <Badge variant="secondary">
-                      {t(`customerType.${c.type}`, { defaultValue: c.type })}
-                    </Badge>
-                  </button>
-                ))
-              )}
-            </div>
-            {candidates.length === 0 ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={() => setAddCustomerOpen(true)}
-              >
-                {t("visits.create.addCustomer")}
-              </Button>
-            ) : null}
-          </div>
-        )}
+        {/* Step 1 — customer (server-searched combobox; "add new" creates + auto-selects) */}
+        <Field label={t("visits.create.customer")}>
+          <CustomerCombobox
+            value={customer}
+            onChange={(c) => {
+              setCustomer(c);
+              setPetId("");
+            }}
+          />
+        </Field>
 
         {/* Step 2 — visit details (revealed once a customer is chosen) */}
         {customer ? (
@@ -237,13 +159,6 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
         </div>
       </div>
 
-      <CustomerFormDialog
-        open={addCustomerOpen}
-        customer={null}
-        defaultName={search.trim()}
-        onClose={() => setAddCustomerOpen(false)}
-        onCreated={(id) => setCreatedCustomerId(id)}
-      />
     </Dialog>
   );
 }

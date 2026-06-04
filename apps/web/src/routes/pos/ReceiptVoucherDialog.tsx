@@ -5,7 +5,7 @@ import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
 import { Money } from "@/components/ui/money";
 
-import { Badge } from "@/components/ui/badge";
+import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
@@ -13,9 +13,9 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useCustomer, useCustomers } from "@/queries/customers";
+import { useCustomer } from "@/queries/customers";
 import { useIssueReceiptVoucher, useReceiptVoucher } from "@/queries/receiptVouchers";
+import { CustomerCombobox } from "@/routes/customers/CustomerCombobox";
 
 import { VoucherDocument } from "./VoucherDocument";
 
@@ -39,8 +39,6 @@ export function ReceiptVoucherDialog({
   const { t } = useTranslation();
 
   const [customerId, setCustomerId] = useState<string | null>(presetCustomerId ?? null);
-  const [search, setSearch] = useState("");
-  const debounced = useDebouncedValue(search, 300);
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const [notes, setNotes] = useState("");
@@ -53,7 +51,6 @@ export function ReceiptVoucherDialog({
   useEffect(() => {
     if (!open) return;
     setCustomerId(presetCustomerId ?? null);
-    setSearch("");
     setAmount("");
     setMethod("cash");
     setNotes("");
@@ -63,7 +60,6 @@ export function ReceiptVoucherDialog({
     setIssuedId(null);
   }, [open, presetCustomerId]);
 
-  const candidates = useCustomers({ search: debounced || undefined, take: 20 });
   const picked = useCustomer(customerId);
   const issue = useIssueReceiptVoucher();
   const issuedVoucher = useReceiptVoucher(issuedId);
@@ -121,61 +117,21 @@ export function ReceiptVoucherDialog({
             </Button>
           </div>
         </div>
-      ) : customerId === null ? (
-        <div className="space-y-2">
-          <Input
-            autoFocus
-            placeholder={t("pos.link.searchCustomer")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <div className="max-h-72 divide-y overflow-auto rounded-xl border">
-            {(candidates.data ?? []).length === 0 ? (
-              <div className="p-3 text-sm text-muted-foreground">{t("customers.empty")}</div>
-            ) : (
-              (candidates.data ?? []).map((c) => (
-                <button
-                  type="button"
-                  key={c.id}
-                  onClick={() => setCustomerId(c.id)}
-                  className="flex w-full items-center justify-between gap-2 p-3 text-start text-sm transition-colors hover:bg-muted"
-                >
-                  <span className="min-w-0">
-                    <span className="font-medium">{c.fullName}</span>
-                    {c.phonePrimary ? (
-                      <span className="ms-2 text-xs text-muted-foreground" dir="ltr">
-                        {c.phonePrimary}
-                      </span>
-                    ) : null}
-                  </span>
-                  {c.balance > 0 ? (
-                    <Badge variant="warning" className="tabular-nums">
-                      <Money value={c.balance} />
-                    </Badge>
-                  ) : null}
-                </button>
-              ))
-            )}
-          </div>
-        </div>
       ) : (
         <div className="space-y-3">
-          <div className="flex items-center justify-between rounded-xl border bg-ink-50/60 p-3">
-            <div className="min-w-0">
-              <div className="text-xs text-muted-foreground">{t("pos.voucher.customer")}</div>
-              <div className="truncate font-semibold text-navy-900">{picked.data?.fullName ?? "…"}</div>
-              {picked.data && picked.data.balance > 0 ? (
-                <div className="text-xs text-muted-foreground tabular-nums">
-                  <Money value={picked.data.balance} />
-                </div>
-              ) : null}
+          <Field label={t("pos.voucher.customer")}>
+            <CustomerCombobox
+              value={picked.data ?? null}
+              onChange={(c) => setCustomerId(c.id)}
+              showBalance
+              disabled={!!presetCustomerId}
+            />
+          </Field>
+          {picked.data && picked.data.balance > 0 ? (
+            <div className="text-xs text-muted-foreground tabular-nums">
+              <Money value={picked.data.balance} />
             </div>
-            {!presetCustomerId ? (
-              <Button type="button" variant="ghost" size="sm" onClick={() => setCustomerId(null)}>
-                {t("pos.link.change")}
-              </Button>
-            ) : null}
-          </div>
+          ) : null}
 
           <label className="block space-y-1">
             <span className="text-sm font-medium">{t("pos.voucher.amount")}</span>

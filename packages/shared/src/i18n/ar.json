@@ -465,7 +465,8 @@
       "generatedAt": "تاريخ الإصدار: {{date}}",
       "reportTitle": "كشف حساب",
       "shareUnavailable": "لا يوجد رقم هاتف لهذا العميل لإرسال الكشف."
-    }
+    },
+    "pickerPlaceholder": "اختر العميل"
   },
   "suppliers": {
     "title": "المورّدون",

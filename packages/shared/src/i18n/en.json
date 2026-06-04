@@ -449,7 +449,8 @@
       "generatedAt": "Generated: {{date}}",
       "reportTitle": "Account statement",
       "shareUnavailable": "This customer has no phone number to send the statement to."
-    }
+    },
+    "pickerPlaceholder": "Select a customer"
   },
   "suppliers": {
     "title": "Suppliers",

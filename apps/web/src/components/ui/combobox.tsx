@@ -27,6 +27,18 @@ export interface ComboboxProps {
    * The caller opens its create-dialog from this (the menu closes itself first).
    */
   onCreateNew?: (term: string) => void;
+  /**
+   * Server-searched mode: the options are already filtered for the current term, so the
+   * internal filter is skipped. Pair with {@link ComboboxProps.onTermChange}.
+   */
+  serverFiltered?: boolean;
+  /** Reports search-term changes — the caller debounces it into its query. */
+  onTermChange?: (term: string) => void;
+  /**
+   * Trigger label for the current value when the options list may not contain it (server-searched
+   * lists shrink to the matches, but the selection must keep its label).
+   */
+  selectedLabel?: string;
   className?: string;
   /** Sizes the trigger wrapper (e.g. `w-48`); defaults to full width. */
   containerClassName?: string;
@@ -46,12 +58,16 @@ export function Combobox({
   placeholder,
   disabled,
   onCreateNew,
+  serverFiltered,
+  onTermChange,
+  selectedLabel,
   className,
   containerClassName,
   "aria-label": ariaLabel,
 }: ComboboxProps) {
   const { t } = useTranslation();
   const selected = options.find((o) => o.value === value);
+  const triggerLabel = value ? (selectedLabel ?? selected?.label) : undefined;
 
   const [open, setOpen] = React.useState(false);
   const [term, setTerm] = React.useState("");
@@ -62,9 +78,10 @@ export function Combobox({
   const [pos, setPos] = React.useState<{ top: number; left: number; width: number } | null>(null);
 
   const needle = term.trim().toLowerCase();
-  const filtered = needle
-    ? options.filter((o) => `${o.label} ${o.sublabel ?? ""} ${o.keywords ?? ""}`.toLowerCase().includes(needle))
-    : options;
+  const filtered =
+    needle && !serverFiltered
+      ? options.filter((o) => `${o.label} ${o.sublabel ?? ""} ${o.keywords ?? ""}`.toLowerCase().includes(needle))
+      : options;
   // The "add new" row sits after the results; it participates in keyboard navigation.
   const createIndex = onCreateNew ? filtered.length : -1;
   const lastIndex = onCreateNew ? filtered.length : filtered.length - 1;
@@ -124,6 +141,7 @@ export function Combobox({
   const openMenu = () => {
     if (disabled) return;
     setTerm("");
+    onTermChange?.("");
     const current = options.findIndex((o) => o.value === value);
     setActiveIndex(current >= 0 ? current : 0);
     setOpen(true);
@@ -187,8 +205,8 @@ export function Combobox({
         onClick={() => (open ? close(true) : openMenu())}
         onKeyDown={onTriggerKeyDown}
       >
-        <span className={cn("select-value", !selected?.value && "placeholder")}>
-          {selected ? selected.label : (placeholder ?? "")}
+        <span className={cn("select-value", !triggerLabel && !selected && "placeholder")}>
+          {triggerLabel ?? selected?.label ?? placeholder ?? ""}
         </span>
         <Icon.chevronDown className="select-chev size-4" />
       </button>
@@ -206,6 +224,7 @@ export function Combobox({
                   value={term}
                   onChange={(e) => {
                     setTerm(e.target.value);
+                    onTermChange?.(e.target.value);
                     setActiveIndex(0);
                   }}
                   onKeyDown={onInputKeyDown}
@@ -232,7 +251,9 @@ export function Combobox({
                       <span className="min-w-0 truncate">
                         {opt.label}
                         {opt.sublabel ? (
-                          <span className="ms-1.5 text-xs text-muted-foreground">{opt.sublabel}</span>
+                          <span dir="auto" className="ms-1.5 text-xs text-muted-foreground">
+                            {opt.sublabel}
+                          </span>
                         ) : null}
                       </span>
                     </li>

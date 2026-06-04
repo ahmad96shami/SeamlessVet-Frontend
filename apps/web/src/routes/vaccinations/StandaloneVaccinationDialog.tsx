@@ -4,15 +4,13 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useCustomers } from "@/queries/customers";
 import { usePets } from "@/queries/pets";
+import { CustomerCombobox } from "@/routes/customers/CustomerCombobox";
 import { useCreateVaccination, useUpdateVaccination } from "@/queries/vaccinations";
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -40,8 +38,6 @@ export function StandaloneVaccinationDialog({
   const editing = vaccination !== null;
 
   // Recipient (create mode only)
-  const [search, setSearch] = useState("");
-  const debounced = useDebouncedValue(search, 300);
   const [customer, setCustomer] = useState<CustomerResponse | null>(null);
   const [petId, setPetId] = useState(""); // "" = the whole group (farm-group)
 
@@ -50,14 +46,11 @@ export function StandaloneVaccinationDialog({
   const [dateGiven, setDateGiven] = useState(todayISO());
   const [nextDueDate, setNextDueDate] = useState("");
 
-  const candidatesQuery = useCustomers({ search: debounced || undefined, take: 20 });
-  const candidates = candidatesQuery.data ?? [];
   const petsQuery = usePets(customer ? { customerId: customer.id, take: 100 } : { take: 0 });
   const pets = customer ? (petsQuery.data ?? []) : [];
 
   useEffect(() => {
     if (!open) return;
-    setSearch("");
     setCustomer(null);
     setPetId("");
     setVaccineType(vaccination?.vaccineType ?? "");
@@ -110,65 +103,31 @@ export function StandaloneVaccinationDialog({
               {recipientLabel ?? t("vaccinations.recipientUnknown")}
             </span>
           </div>
-        ) : customer ? (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between gap-2 rounded-xl border bg-[var(--paper-soft)] p-3">
-              <span className="min-w-0">
-                <span className="text-xs text-muted-foreground">{t("vaccinations.form.recipient")}</span>
-                <span className="block truncate font-medium">{customer.fullName}</span>
-              </span>
-              <Button variant="ghost" size="sm" onClick={() => { setCustomer(null); setPetId(""); }}>
-                {t("vaccinations.form.change")}
-              </Button>
-            </div>
-            <Field label={t("vaccinations.form.pet")}>
-              <Select value={petId} onChange={(e) => setPetId(e.target.value)}>
-                <option value="">{t("vaccinations.form.wholeGroup")}</option>
-                {pets.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                    {p.species ? ` · ${p.species}` : ""}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-          </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Field label={t("vaccinations.form.selectCustomer")}>
-              <Input
-                autoFocus
+              <CustomerCombobox
+                value={customer}
+                onChange={(c) => {
+                  setCustomer(c);
+                  setPetId("");
+                }}
                 placeholder={t("vaccinations.form.searchCustomer")}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
               />
             </Field>
-            <div className="max-h-56 divide-y overflow-auto rounded-xl border">
-              {candidates.length === 0 ? (
-                <div className="p-3 text-sm text-muted-foreground">{t("customers.empty")}</div>
-              ) : (
-                candidates.map((c) => (
-                  <button
-                    type="button"
-                    key={c.id}
-                    onClick={() => { setCustomer(c); setPetId(""); }}
-                    className="flex w-full items-center justify-between gap-2 p-3 text-start text-sm transition-colors hover:bg-muted"
-                  >
-                    <span className="min-w-0">
-                      <span className="font-medium">{c.fullName}</span>
-                      {c.phonePrimary ? (
-                        <span className="ms-2 text-xs text-muted-foreground" dir="ltr">
-                          {c.phonePrimary}
-                        </span>
-                      ) : null}
-                    </span>
-                    <Badge variant="secondary">
-                      {t(`customerType.${c.type}`, { defaultValue: c.type })}
-                    </Badge>
-                  </button>
-                ))
-              )}
-            </div>
+            {customer ? (
+              <Field label={t("vaccinations.form.pet")}>
+                <Select value={petId} onChange={(e) => setPetId(e.target.value)}>
+                  <option value="">{t("vaccinations.form.wholeGroup")}</option>
+                  {pets.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                      {p.species ? ` · ${p.species}` : ""}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            ) : null}
           </div>
         )}
 

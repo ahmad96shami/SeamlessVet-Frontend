@@ -15,11 +15,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useDoctorOptions } from "@/hooks/useDoctorOptions";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import {
   addDays,
   appointmentEnd,
@@ -35,9 +33,10 @@ import {
   useNoShowAppointment,
   useUpdateAppointment,
 } from "@/queries/appointments";
-import { useCustomer, useCustomers } from "@/queries/customers";
+import { useCustomer } from "@/queries/customers";
 import { usePets } from "@/queries/pets";
 import { useServices } from "@/queries/services";
+import { CustomerCombobox } from "@/routes/customers/CustomerCombobox";
 import { appointmentStatusVariant } from "@/routes/appointments/appointmentStatus";
 import { apiClient } from "@/services/apiClient";
 
@@ -85,8 +84,6 @@ export function AppointmentFormDialog({
   const services = useServices({ take: 200 });
   const editCustomer = useCustomer(editing ? (appointment?.customerId ?? null) : null);
 
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebouncedValue(search, 300);
   const [customer, setCustomer] = useState<CustomerResponse | null>(null);
   const [petId, setPetId] = useState("");
   const [doctorId, setDoctorId] = useState("");
@@ -98,8 +95,6 @@ export function AppointmentFormDialog({
   const [serverError, setServerError] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<LifecycleAction | null>(null);
 
-  const customersQuery = useCustomers({ search: debouncedSearch || undefined, take: 20 });
-  const candidates = customersQuery.data ?? [];
   const petsQuery = usePets(customer ? { customerId: customer.id, take: 100 } : { take: 0 });
   const pets = customer ? (petsQuery.data ?? []) : [];
 
@@ -115,7 +110,6 @@ export function AppointmentFormDialog({
       setStatus(appointment.status === "confirmed" ? "confirmed" : "scheduled");
       setNotes(appointment.notes ?? "");
     } else {
-      setSearch("");
       setPetId("");
       setServiceId("");
       setDoctorId(initialDoctorId ?? "");
@@ -298,54 +292,17 @@ export function AppointmentFormDialog({
               {customer?.fullName ?? editCustomer.data?.fullName ?? "…"}
             </span>
           </div>
-        ) : customer ? (
-          <div className="flex items-center justify-between gap-2 rounded-xl border bg-[var(--paper-soft)] p-3">
-            <span className="min-w-0">
-              <span className="text-xs text-muted-foreground">{t("appointments.customer")}</span>
-              <span className="block truncate font-medium">{customer.fullName}</span>
-            </span>
-            <Button variant="ghost" size="sm" onClick={() => setCustomer(null)}>
-              {t("admin.common.edit")}
-            </Button>
-          </div>
         ) : (
-          <div className="space-y-2">
-            <Input
+          <Field label={t("appointments.customer")}>
+            <CustomerCombobox
+              value={customer}
+              onChange={(c) => {
+                setCustomer(c);
+                setPetId("");
+              }}
               placeholder={t("appointments.searchCustomer")}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              autoFocus
             />
-            <div className="max-h-56 divide-y overflow-auto rounded-xl border">
-              {candidates.length === 0 ? (
-                <div className="p-3 text-sm text-muted-foreground">{t("customers.empty")}</div>
-              ) : (
-                candidates.map((c) => (
-                  <button
-                    type="button"
-                    key={c.id}
-                    onClick={() => {
-                      setCustomer(c);
-                      setPetId("");
-                    }}
-                    className="flex w-full items-center justify-between gap-2 p-3 text-start text-sm transition-colors hover:bg-muted"
-                  >
-                    <span className="min-w-0">
-                      <span className="font-medium">{c.fullName}</span>
-                      {c.phonePrimary ? (
-                        <span className="ms-2 text-xs text-muted-foreground" dir="ltr">
-                          {c.phonePrimary}
-                        </span>
-                      ) : null}
-                    </span>
-                    <Badge variant="secondary">
-                      {t(`customerType.${c.type}`, { defaultValue: c.type })}
-                    </Badge>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
+          </Field>
         )}
 
         {/* Step 2 — appointment details */}
