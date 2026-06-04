@@ -39,10 +39,16 @@ export function ProductFormDialog({
   open,
   product,
   onClose,
+  defaultName,
+  onCreated,
 }: {
   open: boolean;
   product: ProductResponse | null;
   onClose: () => void;
+  /** Prefill the Arabic name when opening a fresh form (e.g. the text typed into a picker search). */
+  defaultName?: string;
+  /** Fired with the new product's id after a create (not an edit) — lets callers select it inline. */
+  onCreated?: (id: string) => void;
 }) {
   const { t } = useTranslation();
   const create = useCreateProduct();
@@ -72,9 +78,9 @@ export function ProductFormDialog({
             expirationDate: product.expirationDate ?? "",
             reorderPoint: product.reorderPoint,
           }
-        : DEFAULTS,
+        : { ...DEFAULTS, nameAr: defaultName ?? "" },
     );
-  }, [open, product, reset]);
+  }, [open, product, defaultName, reset]);
 
   const onSubmit = handleSubmit((values) => {
     const body = omitEmptyStrings(values); // empty optional text → omitted (stored as null)
@@ -95,8 +101,9 @@ export function ProductFormDialog({
       create.mutate(
         { ...body, id: newGuidV7() },
         {
-          onSuccess: () => {
+          onSuccess: (res) => {
             toast.success(t("admin.common.created"));
+            onCreated?.(res.id);
             onClose();
           },
           onError,

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toDateTimeLocal } from "@/lib/calendar";
 import { useCreatePrescription, useUpdatePrescription } from "@/queries/prescriptions";
 import { useProducts } from "@/queries/products";
+import { ProductFormDialog } from "@/routes/admin/ProductFormDialog";
 
 type DispenseType = "administered_in_clinic" | "dispensed_to_owner";
 type IntervalUnit = "minutes" | "hours" | "days";
@@ -62,6 +64,11 @@ export function PrescriptionFormDialog({
 
   const isEdit = prescription !== null;
   const [productId, setProductId] = useState("");
+
+  // Inline "add medication" — reuses the catalog form; the new id is then auto-selected here.
+  const [addProductOpen, setAddProductOpen] = useState(false);
+  const [productDefaultName, setProductDefaultName] = useState("");
+  const [createdProductId, setCreatedProductId] = useState<string | null>(null);
   const [dosage, setDosage] = useState("");
   const [frequency, setFrequency] = useState("");
   const [duration, setDuration] = useState("");
@@ -95,7 +102,18 @@ export function PrescriptionFormDialog({
     setEndAt(prescription?.endAt ? toDateTimeLocal(new Date(prescription.endAt)) : "");
     setDosesCount(prescription?.dosesCount != null ? String(prescription.dosesCount) : "");
     setLeadMinutes(prescription?.leadMinutes != null ? String(prescription.leadMinutes) : "");
+    setAddProductOpen(false);
+    setCreatedProductId(null);
   }, [open, prescription]);
+
+  // Once the freshly-created medication lands in the (invalidated) catalog list, select it.
+  // (ProductFormDialog defaults category to "medication", so it passes the meds filter above.)
+  useEffect(() => {
+    if (createdProductId && meds.some((p) => p.id === createdProductId)) {
+      setProductId(createdProductId);
+      setCreatedProductId(null);
+    }
+  }, [createdProductId, meds]);
 
   const pending = create.isPending || update.isPending;
   const qtyValid = quantity.trim() !== "" && Number(quantity) > 0;
@@ -164,15 +182,22 @@ export function PrescriptionFormDialog({
     >
       <div className="space-y-4">
         <Field label={t("visits.prescriptions.product")}>
-          <Select value={productId} disabled={isEdit} onChange={(e) => setProductId(e.target.value)}>
-            <option value="">{t("visits.prescriptions.selectProduct")}</option>
-            {meds.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nameAr}
-                {p.unitOfMeasure ? ` · ${p.unitOfMeasure}` : ""}
-              </option>
-            ))}
-          </Select>
+          <Combobox
+            value={productId}
+            onChange={setProductId}
+            disabled={isEdit}
+            placeholder={t("visits.prescriptions.selectProduct")}
+            options={meds.map((p) => ({
+              value: p.id,
+              label: p.nameAr,
+              sublabel: p.unitOfMeasure ?? undefined,
+              keywords: p.nameLatin ?? undefined,
+            }))}
+            onCreateNew={(term) => {
+              setProductDefaultName(term);
+              setAddProductOpen(true);
+            }}
+          />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("visits.prescriptions.dispenseType")}>
@@ -287,6 +312,14 @@ export function PrescriptionFormDialog({
           </Button>
         </div>
       </div>
+
+      <ProductFormDialog
+        open={addProductOpen}
+        product={null}
+        defaultName={productDefaultName}
+        onClose={() => setAddProductOpen(false)}
+        onCreated={(id) => setCreatedProductId(id)}
+      />
     </Dialog>
   );
 }

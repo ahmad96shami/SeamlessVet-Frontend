@@ -2017,5 +2017,11 @@
       "colProfit": "Profit",
       "empty": "No field visits in the period"
     }
+  },
+  "combobox": {
+    "search": "Search…",
+    "noResults": "No results.",
+    "addNew": "Add new",
+    "addNamed": "Add \"{{term}}\""
   }
 }

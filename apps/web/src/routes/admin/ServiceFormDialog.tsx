@@ -30,10 +30,16 @@ export function ServiceFormDialog({
   open,
   service,
   onClose,
+  defaultName,
+  onCreated,
 }: {
   open: boolean;
   service: ServiceResponse | null;
   onClose: () => void;
+  /** Prefill the Arabic name when opening a fresh form (e.g. the text typed into a picker search). */
+  defaultName?: string;
+  /** Fired with the new service's id after a create (not an edit) — lets callers select it inline. */
+  onCreated?: (id: string) => void;
 }) {
   const { t } = useTranslation();
   const create = useCreateService();
@@ -55,9 +61,9 @@ export function ServiceFormDialog({
             category: service.category ?? "",
             defaultPrice: service.defaultPrice,
           }
-        : DEFAULTS,
+        : { ...DEFAULTS, nameAr: defaultName ?? "" },
     );
-  }, [open, service, reset]);
+  }, [open, service, defaultName, reset]);
 
   const onSubmit = handleSubmit((values) => {
     const body = omitEmptyStrings(values);
@@ -78,8 +84,9 @@ export function ServiceFormDialog({
       create.mutate(
         { ...body, id: newGuidV7() },
         {
-          onSuccess: () => {
+          onSuccess: (res) => {
             toast.success(t("admin.common.created"));
+            onCreated?.(res.id);
             onClose();
           },
           onError,

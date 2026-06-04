@@ -1,16 +1,17 @@
 import { type ApiError, type ProcedureResponse } from "@vet/shared";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateProcedure, useUpdateProcedure } from "@/queries/procedures";
 import { useServices } from "@/queries/services";
+import { ServiceFormDialog } from "@/routes/admin/ServiceFormDialog";
 
 /** Add / edit a procedure on a visit. Linked to a catalog service; price snapshots the service's. */
 export function ProcedureFormDialog({
@@ -33,11 +34,18 @@ export function ProcedureFormDialog({
   const [price, setPrice] = useState("");
   const [resultText, setResultText] = useState("");
 
+  // Inline "add service" — reuses the catalog form; the new id is then auto-selected here.
+  const [addServiceOpen, setAddServiceOpen] = useState(false);
+  const [serviceDefaultName, setServiceDefaultName] = useState("");
+  const [createdServiceId, setCreatedServiceId] = useState<string | null>(null);
+
   useEffect(() => {
     if (!open) return;
     setServiceId(procedure?.serviceId ?? "");
     setPrice(procedure ? String(procedure.price) : "");
     setResultText(procedure?.resultText ?? "");
+    setAddServiceOpen(false);
+    setCreatedServiceId(null);
   }, [open, procedure]);
 
   const onPickService = (id: string) => {
@@ -45,6 +53,29 @@ export function ProcedureFormDialog({
     const svc = (services.data ?? []).find((s) => s.id === id);
     if (svc) setPrice(String(svc.defaultPrice));
   };
+
+  // Once the freshly-created service lands in the (invalidated) catalog list, select it —
+  // through onPickService so its default price snapshots like any other pick.
+  useEffect(() => {
+    if (createdServiceId && (services.data ?? []).some((s) => s.id === createdServiceId)) {
+      onPickService(createdServiceId);
+      setCreatedServiceId(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createdServiceId, services.data]);
+
+  const serviceOptions = useMemo(
+    () => [
+      { value: "", label: t("visits.procedures.noService") },
+      ...(services.data ?? []).map((s) => ({
+        value: s.id,
+        label: s.nameAr,
+        sublabel: s.category ?? undefined,
+        keywords: s.nameLatin ?? undefined,
+      })),
+    ],
+    [services.data, t],
+  );
 
   const pending = create.isPending || update.isPending;
   const valid = resultText.trim().length > 0 && (price === "" || !Number.isNaN(Number(price)));
@@ -85,14 +116,16 @@ export function ProcedureFormDialog({
     >
       <div className="space-y-4">
         <Field label={t("visits.procedures.service")}>
-          <Select value={serviceId} onChange={(e) => onPickService(e.target.value)}>
-            <option value="">{t("visits.procedures.noService")}</option>
-            {(services.data ?? []).map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.nameAr}
-              </option>
-            ))}
-          </Select>
+          <Combobox
+            value={serviceId}
+            onChange={onPickService}
+            options={serviceOptions}
+            placeholder={t("visits.procedures.noService")}
+            onCreateNew={(term) => {
+              setServiceDefaultName(term);
+              setAddServiceOpen(true);
+            }}
+          />
         </Field>
         <Field label={t("visits.procedures.price")}>
           <Input
@@ -121,6 +154,14 @@ export function ProcedureFormDialog({
           </Button>
         </div>
       </div>
+
+      <ServiceFormDialog
+        open={addServiceOpen}
+        service={null}
+        defaultName={serviceDefaultName}
+        onClose={() => setAddServiceOpen(false)}
+        onCreated={(id) => setCreatedServiceId(id)}
+      />
     </Dialog>
   );
 }
