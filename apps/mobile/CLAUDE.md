@@ -32,9 +32,13 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
   - Layout: `ScreenShell` (bg + safe area + header/footer slots), `TopBar`, `StepHeader` (wizard),
     `Footer` (row INSIDE ScreenShell's footer slot — the shell owns bg/border/insets), `NavBottomBar`.
 - **NativeWind rules**: className-first; **never interpolate class names** (purge!) — tone maps are
-  `Record`s of full literal strings (see `Button`/`Pill`). Shadowed elements set BOTH `shadow-card`
-  (iOS) and Android `elevation` from `shadow.card.elevation`. Logical utilities only (`start`/`end`,
-  `ps`/`pe`) — and since RTL is forced, use `flex-row` (never `flex-row-reverse`; that double-reverses).
+  `Record`s of full literal strings (see `Button`/`Pill`). **Shadows via the token STYLE objects
+  (`style={shadow.card}`), NEVER the `shadow-card`/`shadow-pop` classes**: Tailwind shadow classes
+  carry CSS variables, and a component whose class set flips across re-renders (flat↔shadowed Card,
+  selected ListRow) makes css-interop "upgrade" it after first render — its dev warning then crashes
+  with "Couldn't find a navigation context". The token objects carry iOS shadow* + Android elevation
+  together. Logical utilities only (`start`/`end`, `ps`/`pe`) — and since RTL is forced, use
+  `flex-row` (never `flex-row-reverse`; that double-reverses).
 - **Audit gates** (keep green): `grep -rn '#[0-9A-Fa-f]\{6\}' app src` must hit only
   `theme/tokens.js` + `Icon3D.tsx`; no `row-reverse`; every `Text` has a `font-tajawal*` class.
 
@@ -45,7 +49,10 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
 - Money/inventory: shared `build*Request` descriptors via `sendOrQueue` (`src/services/sendOrQueue.ts`) —
   stable idempotency keys, business 4xx conflicts re-throw (surface them). The server assembles +
   prices field invoices (`items: []`); on-device totals are estimates ("تقديري").
-- The new-visit wizard (`app/visits/new/`, `visitWizardStore`) composes those writers only.
+- The new-visit wizard (`app/visits/new/`, `visitWizardStore`) composes those writers only. Its
+  confirm DRAINS PowerSync's upload queue before issuing invoices (or parks the descriptor in the
+  REST queue, which the engine replays PowerSync-first) — clinical rows must reach the server before
+  the invoice endpoint auto-assembles them, or it answers "nothing to bill".
 
 ## Gotchas
 
