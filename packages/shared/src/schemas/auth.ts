@@ -13,7 +13,8 @@ export type LoginRequest = z.infer<typeof LoginRequestSchema>;
  * `numberPrefix` is the admin-assigned per-environment prefix used to mint per-user
  * `{prefix}-{seq}` visit / invoice numbers client-side (Mo2 — the field doctor mints
  * `visit_number` for offline visits). Null when no prefix is assigned (admin/accountant
- * roles never get one).
+ * roles never get one). `fullName` powers the greeting / profile header (MoD) — the JWT
+ * carries no name claim.
  */
 export const LoginResponseSchema = z.object({
   accessToken: z.string().min(1),
@@ -22,6 +23,7 @@ export const LoginResponseSchema = z.object({
   refreshTokenExpiresAt: z.string(), // ISO-8601
   userId: z.string(),
   roleKey: z.string(),
+  fullName: z.string(),
   numberPrefix: z.string().nullish(),
 });
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
@@ -44,7 +46,7 @@ export const RefreshRequestSchema = z.object({
 });
 export type RefreshRequest = z.infer<typeof RefreshRequestSchema>;
 
-/** POST /auth/refresh response — a fresh token bundle (userId/roleKey/numberPrefix may or may not be echoed). */
+/** POST /auth/refresh response — a fresh token bundle (userId/roleKey/fullName/numberPrefix may or may not be echoed). */
 export const RefreshResponseSchema = z.object({
   accessToken: z.string().min(1),
   accessTokenExpiresAt: z.string(),
@@ -52,6 +54,7 @@ export const RefreshResponseSchema = z.object({
   refreshTokenExpiresAt: z.string(),
   userId: z.string().optional(),
   roleKey: z.string().optional(),
+  fullName: z.string().optional(),
   numberPrefix: z.string().nullish(),
 });
 export type RefreshResponse = z.infer<typeof RefreshResponseSchema>;
