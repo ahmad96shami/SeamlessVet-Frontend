@@ -3,7 +3,7 @@ import { toApiError } from "@vet/shared";
 
 // Mirrors apps/web/src/lib/queryClient.ts — same defaults, but mobile has no
 // global toast surface yet (web uses sonner). Surface non-field errors to the
-// console in dev; per-call sites can Alert.alert as needed (see auth screens).
+// console in dev; per-call sites raise dialog.alert as needed (see auth screens).
 function notify(error: unknown): void {
   const apiError = toApiError(error);
   if (apiError.fieldErrors) return;

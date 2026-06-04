@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { buildFieldInvoiceRequest, PAYMENT_METHOD_VALUES, type PaymentMethod } from "@vet/shared";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ChequeFields";
 import { Footer, ScreenShell, TopBar } from "@/components/layout";
 import { sendOrQueue } from "@/services/sendOrQueue";
+import { dialog } from "@/stores/dialogStore";
 import { checkFieldStockAvailability, type FieldStockGuardResult } from "@/sync/fieldInventory";
 import { powerSync } from "@/sync/database";
 import { useQuery } from "@/sync/hooks";
@@ -142,15 +143,15 @@ export default function FieldInvoiceScreen() {
         payments: [{ method, amount: total, ...chequeRequestFields(method, cheque) }],
       });
       const result = await sendOrQueue(descriptor);
-      Alert.alert(
+      void dialog.alert(
         t("billing.field.issuedTitle"),
         result.queued ? t("billing.field.queuedBody") : t("billing.field.issuedBody"),
-        [{ text: t("actions.close") }],
+        t("actions.close"),
       );
       router.back();
     } catch (err) {
       const message = (err as Error).message ?? "issuance failed";
-      Alert.alert(t("billing.field.failed"), message);
+      void dialog.alert(t("billing.field.failed"), message);
     } finally {
       setSubmitting(false);
     }

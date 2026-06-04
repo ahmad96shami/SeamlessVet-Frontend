@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { buildScheduleFollowUpRequest } from "@vet/shared";
@@ -7,6 +7,7 @@ import { buildScheduleFollowUpRequest } from "@vet/shared";
 import { Button, Card, Input, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { sendOrQueue } from "@/services/sendOrQueue";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
 
@@ -90,10 +91,10 @@ export default function ScheduleFollowUpScreen() {
         notes: notes.trim() || undefined,
       });
       const result = await sendOrQueue(descriptor);
-      Alert.alert(
+      void dialog.alert(
         t("visits.scheduleFollowUp.title"),
         result.queued ? t("visits.scheduleFollowUp.queued") : t("visits.scheduleFollowUp.created"),
-        [{ text: t("actions.close") }],
+        t("actions.close"),
       );
       router.back();
     } catch (err) {
@@ -102,7 +103,7 @@ export default function ScheduleFollowUpScreen() {
         code === "appointment_conflict"
           ? t("visits.scheduleFollowUp.conflictError")
           : ((err as Error).message ?? "Save failed");
-      Alert.alert(t("visits.scheduleFollowUp.title"), message);
+      void dialog.alert(t("visits.scheduleFollowUp.title"), message);
     } finally {
       setSubmitting(false);
     }

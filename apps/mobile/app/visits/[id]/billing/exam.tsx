@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -18,6 +18,7 @@ import {
 } from "@/components/ChequeFields";
 import { Footer, ScreenShell, TopBar } from "@/components/layout";
 import { sendOrQueue } from "@/services/sendOrQueue";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
 
@@ -97,15 +98,15 @@ export default function ExamFeeInvoiceScreen() {
         payments: [{ method, amount: previewTotal, ...chequeRequestFields(method, cheque) }],
       });
       const result = await sendOrQueue(descriptor);
-      Alert.alert(
+      void dialog.alert(
         t("billing.exam.issuedTitle"),
         result.queued ? t("billing.exam.queuedBody") : t("billing.exam.issuedBody"),
-        [{ text: t("actions.close") }],
+        t("actions.close"),
       );
       router.back();
     } catch (err) {
       const message = (err as Error).message ?? "issuance failed";
-      Alert.alert(t("billing.exam.failed"), message);
+      void dialog.alert(t("billing.exam.failed"), message);
     } finally {
       setSubmitting(false);
     }

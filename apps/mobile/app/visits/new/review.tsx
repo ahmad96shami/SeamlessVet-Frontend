@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -37,6 +37,7 @@ import { offlineQueue } from "@/services/offlineQueue";
 import { sendOrQueue } from "@/services/sendOrQueue";
 import { notifyEnqueued } from "@/services/syncEngine";
 import { useAuthStore } from "@/stores/authStore";
+import { dialog } from "@/stores/dialogStore";
 import { useVisitWizardStore } from "@/stores/visitWizardStore";
 import { powerSync } from "@/sync/database";
 import {
@@ -231,10 +232,10 @@ export default function WizardReviewScreen() {
     try {
       const { visitId } = await persistClinical();
       wizard.reset();
-      Alert.alert(t("visits.wizard.saveDraft"), t("visits.wizard.draftSaved"));
+      void dialog.alert(t("visits.wizard.saveDraft"), t("visits.wizard.draftSaved"));
       router.replace({ pathname: "/visits/[id]", params: { id: visitId } });
     } catch (err) {
-      Alert.alert(t("visits.wizard.saveDraft"), (err as Error).message ?? "save failed");
+      void dialog.alert(t("visits.wizard.saveDraft"), (err as Error).message ?? "save failed");
     } finally {
       setSubmitting(null);
     }
@@ -254,7 +255,7 @@ export default function WizardReviewScreen() {
       if (guardLines.length > 0) {
         const guard = await checkFieldStockAvailability(powerSync, guardLines);
         if (!guard.ok) {
-          Alert.alert(
+          void dialog.alert(
             t("billing.field.stockShortageTitle"),
             guard.shortages
               .map((s) =>
@@ -312,7 +313,7 @@ export default function WizardReviewScreen() {
       } catch (err) {
         // Business 4xx (negative_stock / settlement_locked) — the visit + clinical
         // rows are saved; billing can be retried from the visit detail screen.
-        Alert.alert(t("billing.field.failed"), (err as Error).message ?? "issuance failed");
+        void dialog.alert(t("billing.field.failed"), (err as Error).message ?? "issuance failed");
         wizard.reset();
         router.replace({ pathname: "/visits/[id]", params: { id: visitId } });
         return;
@@ -327,7 +328,7 @@ export default function WizardReviewScreen() {
       });
       router.replace("/visits/new/done" as never);
     } catch (err) {
-      Alert.alert(t("visits.wizard.confirm"), (err as Error).message ?? "save failed");
+      void dialog.alert(t("visits.wizard.confirm"), (err as Error).message ?? "save failed");
     } finally {
       setSubmitting(null);
     }

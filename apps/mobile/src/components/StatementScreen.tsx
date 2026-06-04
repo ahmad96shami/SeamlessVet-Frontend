@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Alert, ScrollView, Share, Text, View } from "react-native";
+import { ScrollView, Share, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useQuery as useApiQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -22,6 +22,7 @@ import {
 import { Footer, ScreenShell, TopBar } from "@/components/layout";
 import { formatAmount } from "@/lib/numerals";
 import { apiClient } from "@/services/apiClient";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, FarmRow, LedgerEntryRow, LedgerRow } from "@/sync/types";
 import { colors } from "@/theme";
@@ -171,12 +172,12 @@ export function StatementScreen({ scope }: { scope: StatementScope }) {
         : `https://wa.me/?text=${encodeURIComponent(message)}`;
       const ok = await Linking.canOpenURL(url);
       if (!ok) {
-        Alert.alert(t("statement.shareUnavailable"));
+        void dialog.alert(t("statement.shareUnavailable"));
         return;
       }
       await Linking.openURL(url);
     } catch (err) {
-      Alert.alert(t("statement.shareFailed"), (err as Error).message);
+      void dialog.alert(t("statement.shareFailed"), (err as Error).message);
     } finally {
       setSharing(null);
     }
@@ -189,7 +190,7 @@ export function StatementScreen({ scope }: { scope: StatementScope }) {
       const message = composeMessage(view, i18n.resolvedLanguage);
       await Share.share({ message });
     } catch (err) {
-      Alert.alert(t("statement.shareFailed"), (err as Error).message);
+      void dialog.alert(t("statement.shareFailed"), (err as Error).message);
     } finally {
       setSharing(null);
     }

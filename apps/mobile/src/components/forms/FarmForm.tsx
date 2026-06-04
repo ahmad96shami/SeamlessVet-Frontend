@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui";
 import { ChipSelect, FormField, NumberFieldTransform } from "@/components/forms";
 import { omitEmptyStrings } from "@/lib/forms";
+import { dialog } from "@/stores/dialogStore";
 
 interface FarmFormProps {
   customerId: string;
@@ -51,7 +52,7 @@ export function FarmForm({
     try {
       await onSubmit(omitEmptyStrings(values));
     } catch (err) {
-      Alert.alert(t("actions.save"), (err as Error).message ?? "Save failed");
+      void dialog.alert(t("actions.save"), (err as Error).message ?? "Save failed");
     }
   });
 

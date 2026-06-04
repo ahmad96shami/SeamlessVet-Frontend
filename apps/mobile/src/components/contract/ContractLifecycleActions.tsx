@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { activateContract, type ApiError } from "@vet/shared";
@@ -9,6 +9,7 @@ import { Button, Card } from "@/components/ui";
 import { canActivateContracts } from "@/lib/permissions";
 import { apiClient } from "@/services/apiClient";
 import { useAuthStore } from "@/stores/authStore";
+import { dialog } from "@/stores/dialogStore";
 import { useSyncStore } from "@/stores/syncStore";
 import type { ContractRow } from "@/sync/types";
 import { syncDelete } from "@/sync/writes";
@@ -42,43 +43,45 @@ export function ContractLifecycleActions({ contract }: { contract: ContractRow }
   const canActivate = canActivateContracts(role);
 
   const doActivate = () => {
-    Alert.alert(t("finance.lifecycle.activateTitle"), t("finance.lifecycle.activateBody"), [
-      { text: t("actions.cancel"), style: "cancel" },
-      {
-        text: t("finance.lifecycle.activate"),
-        onPress: async () => {
-          setBusy(true);
-          try {
-            // Online-only, server-confirmed (never queued); the server flips status→active and
-            // PowerSync streams the updated row back, refreshing the detail a moment later.
-            await activateContract(apiClient, contract.id);
-          } catch (err) {
-            Alert.alert(t("finance.lifecycle.activate"), (err as ApiError).message ?? "Failed");
-          } finally {
-            setBusy(false);
-          }
-        },
-      },
-    ]);
+    void dialog
+      .confirm({
+        title: t("finance.lifecycle.activateTitle"),
+        message: t("finance.lifecycle.activateBody"),
+        confirmLabel: t("finance.lifecycle.activate"),
+      })
+      .then(async (ok) => {
+        if (!ok) return;
+        setBusy(true);
+        try {
+          // Online-only, server-confirmed (never queued); the server flips status→active and
+          // PowerSync streams the updated row back, refreshing the detail a moment later.
+          await activateContract(apiClient, contract.id);
+        } catch (err) {
+          void dialog.alert(t("finance.lifecycle.activate"), (err as ApiError).message ?? "Failed");
+        } finally {
+          setBusy(false);
+        }
+      });
   };
 
   const doDiscard = () => {
-    Alert.alert(t("finance.lifecycle.discard"), t("finance.lifecycle.discardConfirm"), [
-      { text: t("actions.cancel"), style: "cancel" },
-      {
-        text: t("finance.lifecycle.discard"),
-        style: "destructive",
-        onPress: async () => {
-          setBusy(true);
-          try {
-            await syncDelete("contracts", contract.id);
-            router.back();
-          } finally {
-            setBusy(false);
-          }
-        },
-      },
-    ]);
+    void dialog
+      .confirm({
+        title: t("finance.lifecycle.discard"),
+        message: t("finance.lifecycle.discardConfirm"),
+        confirmLabel: t("finance.lifecycle.discard"),
+        destructive: true,
+      })
+      .then(async (ok) => {
+        if (!ok) return;
+        setBusy(true);
+        try {
+          await syncDelete("contracts", contract.id);
+          router.back();
+        } finally {
+          setBusy(false);
+        }
+      });
   };
 
   const proposeAmendment = () => {

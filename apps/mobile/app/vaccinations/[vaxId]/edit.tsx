@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui";
 import { VaccinationForm } from "@/components/forms/VaccinationForm";
 import { ScreenShell, TopBar } from "@/components/layout";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { PetRow, VaccinationRow } from "@/sync/types";
 import { syncDelete, syncUpdate } from "@/sync/writes";
@@ -80,22 +81,23 @@ export default function EditAgendaVaccinationScreen() {
                   label={t("actions.delete")}
                   variant="soft"
                   onPress={() => {
-                    Alert.alert(t("vaccinations.deleteTitle"), t("vaccinations.deleteConfirm"), [
-                      { text: t("actions.cancel"), style: "cancel" },
-                      {
-                        text: t("actions.delete"),
-                        style: "destructive",
-                        onPress: async () => {
-                          setSubmitting(true);
-                          try {
-                            await syncDelete("vaccinations", vax.id);
-                            router.back();
-                          } finally {
-                            setSubmitting(false);
-                          }
-                        },
-                      },
-                    ]);
+                    void dialog
+                      .confirm({
+                        title: t("vaccinations.deleteTitle"),
+                        message: t("vaccinations.deleteConfirm"),
+                        confirmLabel: t("actions.delete"),
+                        destructive: true,
+                      })
+                      .then(async (ok) => {
+                        if (!ok) return;
+                        setSubmitting(true);
+                        try {
+                          await syncDelete("vaccinations", vax.id);
+                          router.back();
+                        } finally {
+                          setSubmitting(false);
+                        }
+                      });
                   }}
                   block
                 />

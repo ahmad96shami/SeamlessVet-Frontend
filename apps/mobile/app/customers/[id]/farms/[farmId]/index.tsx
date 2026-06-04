@@ -1,11 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { formatDate } from "@vet/shared";
 
 import { Bird, Box, Briefcase, Cow, Edit, Forward, Paper, Stethoscope, Trash } from "@/components/icons";
 import { Button, Card, Money, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, FarmRow, LedgerRow, VisitRow } from "@/sync/types";
 import { syncDelete } from "@/sync/writes";
@@ -74,20 +75,16 @@ export default function FarmDetailScreen() {
   }
 
   const confirmDelete = () => {
-    Alert.alert(
-      t("customers.farms.title"),
-      t("customers.farms.deleteConfirm", { name: farm.name }),
-      [
-        { text: t("actions.cancel"), style: "cancel" },
-        {
-          text: t("actions.delete"),
-          style: "destructive",
-          onPress: () => {
-            void syncDelete("farms", farm.id).then(() => router.back());
-          },
-        },
-      ],
-    );
+    void dialog
+      .confirm({
+        title: t("customers.farms.title"),
+        message: t("customers.farms.deleteConfirm", { name: farm.name }),
+        confirmLabel: t("actions.delete"),
+        destructive: true,
+      })
+      .then((ok) => {
+        if (ok) void syncDelete("farms", farm.id).then(() => router.back());
+      });
   };
 
   return (

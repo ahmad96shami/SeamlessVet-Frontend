@@ -1,10 +1,11 @@
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@vet/shared";
 
 import { Add, Edit, Pill as PillIcon, Trash } from "@/components/icons";
 import { Card, Money } from "@/components/ui";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import { syncDelete } from "@/sync/writes";
 import type { ContractMedicationPriceRow } from "@/sync/types";
@@ -43,16 +44,16 @@ export function ContractMedicationPricesSection({ contractId, isDraft }: Props) 
   const rows = data ?? [];
 
   const confirmDelete = (row: RowWithProduct) => {
-    Alert.alert(t("finance.contracts.medPrices.title"), t("finance.contracts.medPrices.deleteConfirm"), [
-      { text: t("actions.cancel"), style: "cancel" },
-      {
-        text: t("actions.delete"),
-        style: "destructive",
-        onPress: () => {
-          void syncDelete("contract_medication_prices", row.id);
-        },
-      },
-    ]);
+    void dialog
+      .confirm({
+        title: t("finance.contracts.medPrices.title"),
+        message: t("finance.contracts.medPrices.deleteConfirm"),
+        confirmLabel: t("actions.delete"),
+        destructive: true,
+      })
+      .then((ok) => {
+        if (ok) void syncDelete("contract_medication_prices", row.id);
+      });
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +10,7 @@ import {
 
 import { Button } from "@/components/ui";
 import { ChipSelect, FormField } from "@/components/forms";
+import { dialog } from "@/stores/dialogStore";
 
 interface VaccinationFormProps {
   /** Customer the vaccination is recorded against — always set (visit's customer). */
@@ -82,7 +83,7 @@ export function VaccinationForm({
         nextDueDate: values.nextDueDate?.trim() ? values.nextDueDate : undefined,
       });
     } catch (err) {
-      Alert.alert(t("visits.vaccinations.add"), (err as Error).message ?? "Save failed");
+      void dialog.alert(t("visits.vaccinations.add"), (err as Error).message ?? "Save failed");
     }
   });
 

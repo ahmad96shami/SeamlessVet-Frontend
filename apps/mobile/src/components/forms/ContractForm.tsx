@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ContractCreateRequestSchema, type ContractCreateRequest } from "@vet/shared";
@@ -7,6 +7,7 @@ import { ContractCreateRequestSchema, type ContractCreateRequest } from "@vet/sh
 import { Button } from "@/components/ui";
 import { FormField, NumberFieldTransform } from "@/components/forms";
 import { omitEmptyStrings } from "@/lib/forms";
+import { dialog } from "@/stores/dialogStore";
 
 interface ContractFormProps {
   /** The customer this contract is for — fixed by the screen (picked or passed in) before the form renders. */
@@ -58,7 +59,7 @@ export function ContractForm({
     try {
       await onSubmit(omitEmptyStrings(values));
     } catch (err) {
-      Alert.alert(t("actions.save"), (err as Error).message ?? "Save failed");
+      void dialog.alert(t("actions.save"), (err as Error).message ?? "Save failed");
     }
   });
 

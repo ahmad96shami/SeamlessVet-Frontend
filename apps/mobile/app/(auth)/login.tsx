@@ -1,4 +1,4 @@
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useForm, Controller } from "react-hook-form";
@@ -13,6 +13,7 @@ import {
 import vetHero from "../../assets/images/vet-hero.png";
 import { Button, Card, Input } from "@/components/ui";
 import { useLogin } from "@/queries/auth";
+import { dialog } from "@/stores/dialogStore";
 
 export default function LoginScreen() {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ export default function LoginScreen() {
         const error = err as ApiError;
         applyFieldErrors(error, (name, e) => form.setError(name as never, e));
         if (!error.fieldErrors || Object.keys(error.fieldErrors).length === 0) {
-          Alert.alert(t("auth.login.title"), error.message ?? "Login failed");
+          void dialog.alert(t("auth.login.title"), error.message ?? "Login failed");
         }
       },
     });

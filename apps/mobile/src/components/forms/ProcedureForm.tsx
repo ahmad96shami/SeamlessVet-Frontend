@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Alert, FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,7 @@ import { formatCurrency, ProcedureCreateRequestSchema, type ProcedureCreateReque
 import { Search } from "@/components/icons";
 import { Button, Card, Input, Pill } from "@/components/ui";
 import { FormField, NumberFieldTransform } from "@/components/forms";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { ServiceRow } from "@/sync/types";
 import { colors } from "@/theme";
@@ -78,7 +79,7 @@ export function ProcedureForm({
     try {
       await onSubmit(values);
     } catch (err) {
-      Alert.alert(t("visits.procedures.add"), (err as Error).message ?? "Save failed");
+      void dialog.alert(t("visits.procedures.add"), (err as Error).message ?? "Save failed");
     }
   });
 

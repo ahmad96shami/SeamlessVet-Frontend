@@ -1,9 +1,10 @@
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 import { Add, Cow, Trash } from "@/components/icons";
 import { Card, Pill } from "@/components/ui";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import { syncDelete } from "@/sync/writes";
 import type { ContractFarmRow } from "@/sync/types";
@@ -41,16 +42,16 @@ export function ContractFarmsSection({ contractId, isDraft }: Props) {
   const rows = data ?? [];
 
   const confirmRemove = (row: RowWithFarm) => {
-    Alert.alert(t("finance.contractFarms.title"), t("finance.contractFarms.removeConfirm"), [
-      { text: t("actions.cancel"), style: "cancel" },
-      {
-        text: t("actions.delete"),
-        style: "destructive",
-        onPress: () => {
-          void syncDelete("contract_farms", row.id);
-        },
-      },
-    ]);
+    void dialog
+      .confirm({
+        title: t("finance.contractFarms.title"),
+        message: t("finance.contractFarms.removeConfirm"),
+        confirmLabel: t("actions.delete"),
+        destructive: true,
+      })
+      .then((ok) => {
+        if (ok) void syncDelete("contract_farms", row.id);
+      });
   };
 
   return (

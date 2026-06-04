@@ -1,14 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Controller, useForm } from "react-hook-form";
@@ -21,6 +12,7 @@ import { Button, Card, Input, Pill } from "@/components/ui";
 import { FormField, NumberFieldTransform } from "@/components/forms";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useAuthStore } from "@/stores/authStore";
+import { dialog } from "@/stores/dialogStore";
 import { powerSync } from "@/sync/database";
 import { useQuery } from "@/sync/hooks";
 import { colors } from "@/theme";
@@ -163,7 +155,7 @@ export default function NewReturnScreen() {
 
   const handleSubmit = form.handleSubmit(async (values) => {
     if (!fieldInventoryId) {
-      Alert.alert(
+      void dialog.alert(
         t("mobile.returns.title", { defaultValue: "تسجيل إرجاع" }),
         t("mobile.returns.noFieldInventory", {
           defaultValue: "لم يتم إعداد مخزون ميداني بعد. اطلب من المسؤول تحميل أول دفعة.",
@@ -172,7 +164,7 @@ export default function NewReturnScreen() {
       return;
     }
     if (!selectedCustomer?.ledger_id) {
-      Alert.alert(
+      void dialog.alert(
         t("mobile.returns.title", { defaultValue: "تسجيل إرجاع" }),
         t("mobile.returns.noLedger", {
           defaultValue:
@@ -238,7 +230,7 @@ export default function NewReturnScreen() {
       });
       router.back();
     } catch (err) {
-      Alert.alert(
+      void dialog.alert(
         t("mobile.returns.title", { defaultValue: "تسجيل إرجاع" }),
         (err as Error).message ?? "Save failed",
       );

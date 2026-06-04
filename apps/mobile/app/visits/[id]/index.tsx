@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
@@ -20,6 +20,7 @@ import { ProceduresSection } from "@/components/visit/ProceduresSection";
 import { PrescriptionsSection } from "@/components/visit/PrescriptionsSection";
 import { VaccinationsSection } from "@/components/visit/VaccinationsSection";
 import { omitEmptyStrings } from "@/lib/forms";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
 import { syncUpdate } from "@/sync/writes";
@@ -124,33 +125,34 @@ export default function VisitDetailScreen() {
         exam_fee_applied: v.examFeeApplied ?? null,
       });
     } catch (err) {
-      Alert.alert(t("visits.assessment.save"), (err as Error).message ?? "Save failed");
+      void dialog.alert(t("visits.assessment.save"), (err as Error).message ?? "Save failed");
     } finally {
       setSubmitting(null);
     }
   });
 
   const transitionTo = (next: "completed" | "cancelled", labelKey: "actions.completeTitle" | "actions.cancelTitle", bodyKey: "actions.completeBody" | "actions.cancelBody") => {
-    Alert.alert(t(`visits.${labelKey}`), t(`visits.${bodyKey}`), [
-      { text: t("actions.cancel"), style: "cancel" },
-      {
-        text: t(next === "completed" ? "visits.actions.complete" : "visits.actions.cancel"),
-        style: next === "cancelled" ? "destructive" : "default",
-        onPress: async () => {
-          setSubmitting(next === "completed" ? "complete" : "cancel");
-          try {
-            await syncUpdate("visits", visit.id, {
-              status: next,
-              ended_at: new Date().toISOString(),
-            });
-          } catch (err) {
-            Alert.alert(t("visits.actions.complete"), (err as Error).message ?? "Save failed");
-          } finally {
-            setSubmitting(null);
-          }
-        },
-      },
-    ]);
+    void dialog
+      .confirm({
+        title: t(`visits.${labelKey}`),
+        message: t(`visits.${bodyKey}`),
+        confirmLabel: t(next === "completed" ? "visits.actions.complete" : "visits.actions.cancel"),
+        destructive: next === "cancelled",
+      })
+      .then(async (ok) => {
+        if (!ok) return;
+        setSubmitting(next === "completed" ? "complete" : "cancel");
+        try {
+          await syncUpdate("visits", visit.id, {
+            status: next,
+            ended_at: new Date().toISOString(),
+          });
+        } catch (err) {
+          void dialog.alert(t("visits.actions.complete"), (err as Error).message ?? "Save failed");
+        } finally {
+          setSubmitting(null);
+        }
+      });
   };
 
   return (

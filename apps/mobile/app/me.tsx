@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { User } from "@/components/icons";
@@ -10,6 +10,7 @@ import { Card, Divider, IconTile, Pill, SectionTitle } from "@/components/ui";
 import { toggleLanguage } from "@/i18n";
 import { useNotifications } from "@/queries/notifications";
 import { useAuthStore } from "@/stores/authStore";
+import { dialog } from "@/stores/dialogStore";
 import { colors } from "@/theme";
 
 /**
@@ -30,16 +31,17 @@ export default function MeScreen() {
   const [reviewOpen, setReviewOpen] = useState(false);
 
   const confirmSignOut = () => {
-    Alert.alert(t("shell.signOut"), t("me.signOutConfirm"), [
-      { text: t("actions.cancel"), style: "cancel" },
-      {
-        text: t("shell.signOut"),
-        style: "destructive",
-        onPress: () => {
-          void logout().catch((e) => Alert.alert(t("shell.signOut"), (e as Error).message));
-        },
-      },
-    ]);
+    void dialog
+      .confirm({
+        title: t("shell.signOut"),
+        message: t("me.signOutConfirm"),
+        confirmLabel: t("shell.signOut"),
+        destructive: true,
+      })
+      .then((ok) => {
+        if (!ok) return;
+        void logout().catch((e) => dialog.alert(t("shell.signOut"), (e as Error).message));
+      });
   };
 
   return (

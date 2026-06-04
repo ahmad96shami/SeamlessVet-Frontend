@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -13,6 +13,7 @@ import { Bird, Briefcase, Cow, House, User } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { ChipSelect, FormField } from "@/components/forms";
 import { omitEmptyStrings } from "@/lib/forms";
+import { dialog } from "@/stores/dialogStore";
 import { colors } from "@/theme";
 
 const TYPE_ICONS: Record<CustomerType, React.ReactNode> = {
@@ -63,7 +64,7 @@ export function CustomerForm({
     try {
       await onSubmit(omitEmptyStrings(values));
     } catch (err) {
-      Alert.alert(t("actions.save"), (err as Error).message ?? "Save failed");
+      void dialog.alert(t("actions.save"), (err as Error).message ?? "Save failed");
     }
   });
 

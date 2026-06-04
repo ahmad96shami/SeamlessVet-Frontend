@@ -1,14 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Image as RNImage,
-  Linking,
-  Modal,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Image as RNImage, Linking, Modal, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import { formatDate, getAttachment } from "@vet/shared";
@@ -22,6 +13,7 @@ import {
   listAttachmentOutboxForVisit,
 } from "@/services/attachmentOutbox";
 import { drainAttachmentOutbox, refreshAttachmentCounts } from "@/services/attachmentUploadEngine";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { AttachmentRow } from "@/sync/types";
 import { useSyncStore } from "@/stores/syncStore";
@@ -75,7 +67,7 @@ export function AttachmentsSection({ visitId, isTerminal }: AttachmentsSectionPr
         ? await ImagePicker.requestCameraPermissionsAsync()
         : await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert(t("visits.files.permissionTitle"), t("visits.files.permissionBody"));
+      void dialog.alert(t("visits.files.permissionTitle"), t("visits.files.permissionBody"));
       return;
     }
     const result =
@@ -97,19 +89,22 @@ export function AttachmentsSection({ visitId, isTerminal }: AttachmentsSectionPr
   };
 
   const onAdd = () =>
-    Alert.alert(t("visits.files.add"), undefined, [
-      { text: t("visits.files.camera"), onPress: () => void capture("camera") },
-      { text: t("visits.files.gallery"), onPress: () => void capture("gallery") },
-      { text: t("actions.cancel"), style: "cancel" },
-    ]);
+    void dialog
+      .choose(t("visits.files.add"), [
+        { label: t("visits.files.camera"), value: "camera" },
+        { label: t("visits.files.gallery"), value: "gallery" },
+      ])
+      .then((source) => {
+        if (source) void capture(source as "camera" | "gallery");
+      });
 
   const viewSynced = async (row: AttachmentRow) => {
     if (row.upload_status !== "uploaded") {
-      Alert.alert(t("visits.files.title"), t("visits.files.pendingHint"));
+      void dialog.alert(t("visits.files.title"), t("visits.files.pendingHint"));
       return;
     }
     if (!online) {
-      Alert.alert(t("visits.files.title"), t("visits.files.viewOnlineOnly"));
+      void dialog.alert(t("visits.files.title"), t("visits.files.viewOnlineOnly"));
       return;
     }
     setBusyView(row.id);
@@ -117,13 +112,13 @@ export function AttachmentsSection({ visitId, isTerminal }: AttachmentsSectionPr
       const att = await getAttachment(apiClient, row.id);
       const url = att.downloadUrl;
       if (!url) {
-        Alert.alert(t("visits.files.title"), t("visits.files.pendingHint"));
+        void dialog.alert(t("visits.files.title"), t("visits.files.pendingHint"));
         return;
       }
       if (row.file_type === "pdf") await Linking.openURL(url);
       else setViewer({ uri: url, title: row.title ?? t("attachmentType.photo") });
     } catch {
-      Alert.alert(t("visits.files.title"), t("visits.files.viewOnlineOnly"));
+      void dialog.alert(t("visits.files.title"), t("visits.files.viewOnlineOnly"));
     } finally {
       setBusyView(null);
     }

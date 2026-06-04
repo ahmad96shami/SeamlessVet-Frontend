@@ -1,4 +1,4 @@
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Controller, useForm } from "react-hook-form";
@@ -14,6 +14,7 @@ import { Shield } from "@/components/icons";
 import { Button, Card, Divider, Input, StateHero } from "@/components/ui";
 import { omitEmptyStrings } from "@/lib/forms";
 import { useRegister } from "@/queries/auth";
+import { dialog } from "@/stores/dialogStore";
 import { colors } from "@/theme";
 
 // The mobile app is the field-doctor client; only vet_field self-registers here.
@@ -46,7 +47,7 @@ export default function RegisterScreen() {
         const error = err as ApiError;
         applyFieldErrors(error, (name, e) => form.setError(name as never, e));
         if (!error.fieldErrors || Object.keys(error.fieldErrors).length === 0) {
-          Alert.alert(t("auth.register.title"), error.message ?? "Registration failed");
+          void dialog.alert(t("auth.register.title"), error.message ?? "Registration failed");
         }
       },
     });

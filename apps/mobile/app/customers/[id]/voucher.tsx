@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -30,6 +30,7 @@ import {
 import { Footer, ScreenShell, TopBar } from "@/components/layout";
 import { formatAmount } from "@/lib/numerals";
 import { sendOrQueue } from "@/services/sendOrQueue";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow } from "@/sync/types";
 
@@ -106,7 +107,7 @@ export default function ReceiptVoucherScreen() {
 
   const onSubmit = async () => {
     if (parsedAmount <= 0) {
-      Alert.alert(t("billing.voucher.failed"), t("billing.voucher.amountPositive"));
+      void dialog.alert(t("billing.voucher.failed"), t("billing.voucher.amountPositive"));
       return;
     }
     setSubmitting(true);
@@ -119,15 +120,15 @@ export default function ReceiptVoucherScreen() {
         ...chequeRequestFields(method, cheque),
       });
       const result = await sendOrQueue(descriptor);
-      Alert.alert(
+      void dialog.alert(
         t("billing.voucher.issuedTitle"),
         result.queued ? t("billing.voucher.queuedBody") : t("billing.voucher.issuedBody"),
-        [{ text: t("actions.close") }],
+        t("actions.close"),
       );
       router.back();
     } catch (err) {
       const message = (err as Error).message ?? "voucher failed";
-      Alert.alert(t("billing.voucher.failed"), message);
+      void dialog.alert(t("billing.voucher.failed"), message);
     } finally {
       setSubmitting(false);
     }

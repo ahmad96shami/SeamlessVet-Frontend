@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Alert, FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,7 @@ import {
 import { Search } from "@/components/icons";
 import { Button, Card, Input, Pill } from "@/components/ui";
 import { FormField, NumberFieldTransform } from "@/components/forms";
+import { dialog } from "@/stores/dialogStore";
 import { useQuery } from "@/sync/hooks";
 import type { ProductRow } from "@/sync/types";
 import { colors } from "@/theme";
@@ -88,7 +89,7 @@ export function MedicationPriceForm({
     try {
       await onSubmit(values);
     } catch (err) {
-      Alert.alert(t("finance.contracts.medPrices.add"), (err as Error).message ?? "Save failed");
+      void dialog.alert(t("finance.contracts.medPrices.add"), (err as Error).message ?? "Save failed");
     }
   });
 

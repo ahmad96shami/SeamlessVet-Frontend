@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { QueuedRequest, QueuedRequestStatus } from "@vet/shared";
 
@@ -18,6 +18,7 @@ import {
   retryItem,
   syncNow,
 } from "@/services/syncEngine";
+import { dialog } from "@/stores/dialogStore";
 import { useSyncStore } from "@/stores/syncStore";
 
 import { Check, Send, Spinner, Trash } from "./icons";
@@ -80,10 +81,16 @@ export function SyncReviewSheet({ open, onClose }: { open: boolean; onClose: () 
   const isEmpty = rest.length === 0 && att.length === 0 && ps.length === 0;
 
   const confirmDiscard = (onConfirm: () => void) =>
-    Alert.alert(t("sync.discard"), t("sync.discardConfirm"), [
-      { text: t("actions.cancel"), style: "cancel" },
-      { text: t("sync.discard"), style: "destructive", onPress: onConfirm },
-    ]);
+    void dialog
+      .confirm({
+        title: t("sync.discard"),
+        message: t("sync.discardConfirm"),
+        confirmLabel: t("sync.discard"),
+        destructive: true,
+      })
+      .then((ok) => {
+        if (ok) onConfirm();
+      });
 
   return (
     <Sheet open={open} onClose={onClose}>
