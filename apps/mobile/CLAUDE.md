@@ -28,7 +28,7 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
 - **Primitives** (`src/components/ui` + `src/components/layout`) — compose these, don't hand-roll:
   - Rows/cards: `Card`, `ListRow` (leading `IconTile`/`Photo` → title 15/800 → sub 13 ink-500 →
     meta `Pill compact` row → trailing slot; `selected` = teal ring), `Voucher` (ticket cutouts).
-  - Controls: `Button` (primary navy / teal / soft / ghost), `Chip` (filter; navy/teal active),
+  - Controls: `Button` (primary navy / teal / soft / ghost / destructive rose), `Chip` (filter; navy/teal active),
     `SegmentedTabs`, `Stepper`+`AddButton`, `Input` (label/error built in), `AmountEntry`, `FieldLabel`.
   - Display: `Pill` (+`compact`), `Stat`, `IconTile` (sm 36 / md 44 / lg 64, tinted, optional warn `badge`),
     `Money`, `Divider` (+`dashed`), `InfoBanner` (teal/neutral), `StateHero` (success/pending/empty),
@@ -37,6 +37,10 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
     `Footer` (row INSIDE ScreenShell's footer slot — the shell owns bg/border/insets), `NavBottomBar`,
     `Sheet` (bottom-sheet shell: backdrop FADES in place, panel SLIDES — never use
     `Modal animationType="slide"`, it slides the whole subtree including the scrim).
+  - Popups: **never `Alert.alert`** (native chrome breaks the design + differs per platform) —
+    use the `dialog` service (`@/stores/dialogStore`, plain TS, works outside components):
+    `dialog.alert(title, msg?)`, `await dialog.confirm({ title, msg, confirmLabel, destructive? })`,
+    `dialog.choose(title, options)`. `DialogHost` is mounted once in the root layout.
 - **NativeWind rules**: className-first; **never interpolate class names** (purge!) — tone maps are
   `Record`s of full literal strings (see `Button`/`Pill`). **Shadows via the token STYLE objects
   (`style={shadow.card}`), NEVER the `shadow-card`/`shadow-pop` classes**: Tailwind shadow classes
