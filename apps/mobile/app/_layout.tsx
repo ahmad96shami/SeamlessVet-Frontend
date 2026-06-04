@@ -82,7 +82,10 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <PowerSyncContext.Provider value={powerSync}>
         <QueryClientProvider client={queryClient}>
-          <Stack screenOptions={{ headerShown: false }} />
+          {/* fade > slide: cheaper on Android, calmer feel. freezeOnBlur stops
+              blurred screens (home's watched queries!) re-rendering on every
+              PowerSync tick while you're screens deep. */}
+          <Stack screenOptions={{ headerShown: false, animation: "fade", freezeOnBlur: true }} />
           <AppServices />
           <DialogHost />
           <StatusBar style="auto" />
