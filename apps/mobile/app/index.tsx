@@ -258,17 +258,8 @@ export default function Index() {
               <View key={r.id}>
                 {i > 0 ? <Divider dashed /> : null}
                 <View className="flex-row items-center gap-3 py-1">
-                  <IconTile tone={overdue ? "red" : i === 0 ? "amber" : "teal"}>
-                    <Syringe
-                      size={20}
-                      color={
-                        overdue
-                          ? colors.rose.ink
-                          : i === 0
-                            ? colors.amber.ink
-                            : colors.teal[600]
-                      }
-                    />
+                  <IconTile tone={overdue ? "red" : "teal"}>
+                    <Syringe size={20} color={overdue ? colors.rose.ink : colors.teal[600]} />
                   </IconTile>
                   <View className="min-w-0 flex-1">
                     <Text

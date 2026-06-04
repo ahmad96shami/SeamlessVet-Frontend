@@ -11,8 +11,10 @@
 //
 // Palette lineage: the seamlessvet-v3 design archive, re-tuned in the MoD design-polish
 // milestone. Amber/rose are deliberately MUTED versus the prototype (#F4B400 / #E5484D
-// read too loud on device) — tune them HERE only and every pill, banner, icon and
-// Tailwind class follows.
+// read too loud on device) — and dusted down a second time on user review (2026-06-04:
+// "clean and easy on the eyes"). Tune them HERE only and every pill, banner, icon and
+// Tailwind class follows. `ink` shades carry text (keep ~4.5:1 on white/soft);
+// DEFAULTs are icon/accent duty.
 
 /** Brand + semantic palette. Keys mirror the Tailwind colour names 1:1. */
 const colors = {
@@ -46,12 +48,12 @@ const colors = {
     soft: "#F8FAFB",
   },
   canvas: "#129AAA",
-  // Muted semantics (vs prototype amber #F4B400 / red #E5484D — toned down per MoD).
+  // Muted semantics (vs prototype amber #F4B400 / red #E5484D — dusty, low saturation).
   amber: {
-    DEFAULT: "#D69E2E",
-    soft: "#FAF3E0",
-    ink: "#8A6A00",
-    border: "#E7D9AC",
+    DEFAULT: "#B5915A",
+    soft: "#F6F1E6",
+    ink: "#7C6840",
+    border: "#E6DDC8",
   },
   emerald: {
     DEFAULT: "#2BB673",
@@ -59,9 +61,9 @@ const colors = {
     ink: "#1F8A56",
   },
   rose: {
-    DEFAULT: "#CB5A5E",
-    soft: "#F6E7E8",
-    ink: "#A13E41",
+    DEFAULT: "#A96A6F",
+    soft: "#F4EDEE",
+    ink: "#8C585C",
   },
   white: "#FFFFFF",
 };
