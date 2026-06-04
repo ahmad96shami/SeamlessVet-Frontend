@@ -86,12 +86,14 @@ export const PERMISSION_KEY_VALUES = values(PermissionKey);
 
 // --- 2. Customers & Pets -----------------------------------------------------
 
+// Declaration order = dropdown order (CUSTOMER_TYPE_VALUES feeds the type selects as-is):
+// منزل، زبون عيادة، مزرعة عامة، مزرعة أبقار، مزرعة دواجن.
 export const CustomerType = {
-  RegularFarm: "regular_farm",
   Home: "home",
+  ClinicCustomer: "clinic_customer", // M15 — in-clinic account owner ("زبون عيادة")
+  RegularFarm: "regular_farm",
   CattleFarm: "cattle_farm",
   PoultryFarm: "poultry_farm",
-  ClinicCustomer: "clinic_customer", // M15 — in-clinic account owner ("زبون عيادة")
 } as const;
 export type CustomerType = EnumValues<typeof CustomerType>;
 export const CUSTOMER_TYPE_VALUES = values(CustomerType);
