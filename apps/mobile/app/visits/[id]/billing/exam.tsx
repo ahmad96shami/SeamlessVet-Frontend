@@ -16,7 +16,7 @@ import {
   EMPTY_CHEQUE,
   type ChequeDetails,
 } from "@/components/ChequeFields";
-import { ScreenShell, TopBar } from "@/components/layout";
+import { Footer, ScreenShell, TopBar } from "@/components/layout";
 import { sendOrQueue } from "@/services/sendOrQueue";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow, VisitRow } from "@/sync/types";
@@ -114,6 +114,22 @@ export default function ExamFeeInvoiceScreen() {
   return (
     <ScreenShell
       header={<TopBar title={t("billing.exam.title")} onBack={() => router.back()} right={null} />}
+      footer={
+        <Footer>
+          <View className="flex-1">
+            <Text className="text-ink-500 text-[12px] font-tajawal">
+              {t("billing.exam.totalLabel")}
+            </Text>
+            <Money value={previewTotal} className="text-[16px]" />
+          </View>
+          <Button
+            label={t("billing.exam.issue")}
+            onPress={onSubmit}
+            loading={submitting}
+            disabled={submitting || previewTotal <= 0 || !chequeDetailsValid(method, cheque)}
+          />
+        </Footer>
+      }
     >
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -169,15 +185,6 @@ export default function ExamFeeInvoiceScreen() {
                 <Money value={previewTotal} />
               </Row>
             </Card>
-
-            <Button
-              label={t("billing.exam.issue")}
-              variant="teal"
-              onPress={onSubmit}
-              loading={submitting}
-              disabled={submitting || previewTotal <= 0 || !chequeDetailsValid(method, cheque)}
-              block
-            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

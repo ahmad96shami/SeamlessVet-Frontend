@@ -12,7 +12,7 @@ import {
   EMPTY_CHEQUE,
   type ChequeDetails,
 } from "@/components/ChequeFields";
-import { ScreenShell, TopBar } from "@/components/layout";
+import { Footer, ScreenShell, TopBar } from "@/components/layout";
 import { sendOrQueue } from "@/services/sendOrQueue";
 import { checkFieldStockAvailability, type FieldStockGuardResult } from "@/sync/fieldInventory";
 import { powerSync } from "@/sync/database";
@@ -159,6 +159,22 @@ export default function FieldInvoiceScreen() {
   return (
     <ScreenShell
       header={<TopBar title={t("billing.field.title")} onBack={() => router.back()} right={null} />}
+      footer={
+        <Footer>
+          <View className="flex-1">
+            <Text className="text-ink-500 text-[12px] font-tajawal">
+              {t("billing.field.totalLabel")}
+            </Text>
+            <Money value={total} className="text-[16px]" />
+          </View>
+          <Button
+            label={t("billing.field.issue")}
+            onPress={onSubmit}
+            loading={submitting}
+            disabled={!canSubmit}
+          />
+        </Footer>
+      }
     >
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -252,15 +268,6 @@ export default function FieldInvoiceScreen() {
                 <Money value={total} />
               </Row>
             </Card>
-
-            <Button
-              label={t("billing.field.issue")}
-              variant="teal"
-              onPress={onSubmit}
-              loading={submitting}
-              disabled={!canSubmit}
-              block
-            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -279,7 +286,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function LineRow({ label, qty, total }: { label: string; qty: number; total: number }) {
   return (
-    <View className="border-ink-100 flex-row items-center justify-between border-b py-1.5">
+    <View className="border-ink-200 flex-row items-center justify-between border-b border-dashed py-1.5">
       <View className="flex-1 pe-2">
         <Text className="text-navy-900 text-[14px] font-tajawal-bold" numberOfLines={1}>
           {label}

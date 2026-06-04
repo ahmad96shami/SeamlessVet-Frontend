@@ -8,7 +8,18 @@ import {
   type PaymentMethod,
 } from "@vet/shared";
 
-import { Button, Card, Chip, Input, Money } from "@/components/ui";
+import {
+  AmountEntry,
+  Button,
+  Card,
+  Chip,
+  Divider,
+  FieldLabel,
+  Input,
+  Money,
+  Photo,
+  photoKindForCustomerType,
+} from "@/components/ui";
 import {
   ChequeFields,
   chequeDetailsValid,
@@ -16,7 +27,8 @@ import {
   EMPTY_CHEQUE,
   type ChequeDetails,
 } from "@/components/ChequeFields";
-import { ScreenShell, TopBar } from "@/components/layout";
+import { Footer, ScreenShell, TopBar } from "@/components/layout";
+import { formatArabicNumber } from "@/lib/numerals";
 import { sendOrQueue } from "@/services/sendOrQueue";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow } from "@/sync/types";
@@ -121,86 +133,113 @@ export default function ReceiptVoucherScreen() {
     }
   };
 
+  const balance = ledger?.balance ?? 0;
+  const balanceAfter = Math.round((balance - parsedAmount) * 100) / 100;
+
   return (
     <ScreenShell
+      staticBody
       header={<TopBar title={t("billing.voucher.title")} onBack={() => router.back()} right={null} />}
+      footer={
+        <Footer>
+          <Button
+            label={t("billing.voucher.issue")}
+            onPress={onSubmit}
+            loading={submitting}
+            disabled={submitting || parsedAmount <= 0 || !chequeDetailsValid(method, cheque)}
+            style={{ flex: 1 }}
+          />
+        </Footer>
+      }
     >
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        className="flex-1"
+      >
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <View className="gap-4 pb-8">
-            <Card className="gap-2 p-4">
-              <Text className="text-ink-500 text-[12px] font-tajawal">
-                {t("nav.customers")}
-              </Text>
-              <Text className="text-navy-900 text-[16px] font-tajawal-extrabold" numberOfLines={1}>
-                {customer.full_name}
-              </Text>
-              {ledger ? (
-                <View className="flex-row items-center justify-between pt-2">
-                  <Text className="text-ink-500 text-[12px] font-tajawal">
-                    {t("billing.voucher.amountLabel")}
+          <View className="gap-3 pb-6">
+            <FieldLabel className="mb-0">{t("nav.customers")}</FieldLabel>
+            <Card className="p-3.5">
+              <View className="flex-row items-center gap-3">
+                <Photo kind={photoKindForCustomerType(customer.type)} size={48} />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
+                    {customer.full_name}
                   </Text>
-                  <Money value={ledger.balance} />
+                  <Text className="text-ink-500 mt-0.5 text-[12px] font-tajawal">
+                    {t(`customerType.${customer.type}`, { defaultValue: customer.type })}
+                  </Text>
                 </View>
+              </View>
+              {ledger ? (
+                <>
+                  <Divider dashed />
+                  <View className="flex-row items-center justify-between">
+                    <Text className="text-ink-500 text-[13px] font-tajawal">
+                      {t("billing.voucher.currentBalance")}
+                    </Text>
+                    {balance > 0 ? (
+                      <Text className="text-rose text-[14px] font-tajawal-bold">
+                        {t("visits.wizard.debt", { amount: formatArabicNumber(balance) })}
+                      </Text>
+                    ) : (
+                      <Money value={balance} />
+                    )}
+                  </View>
+                </>
               ) : null}
             </Card>
 
-            <Section title={t("billing.voucher.amountLabel")}>
-              <Input
-                value={amountText}
-                onChangeText={setAmountText}
-                keyboardType="decimal-pad"
-                placeholder="0"
-              />
-            </Section>
-
-            <Section title={t("billing.voucher.methodTitle")}>
-              <View className="flex-row flex-wrap gap-2">
-                {VOUCHER_METHODS.map((m) => (
-                  <Chip
-                    key={m}
-                    label={t(`paymentMethod.${m}`)}
-                    active={method === m ? "teal" : "off"}
-                    onPress={() => {
-                      setMethod(m);
-                      if (m !== "cheque") setCheque(EMPTY_CHEQUE);
-                    }}
-                  />
-                ))}
-              </View>
-              {method === "cheque" ? <ChequeFields value={cheque} onChange={setCheque} /> : null}
-            </Section>
-
-            <Section title={t("billing.voucher.notesLabel")}>
-              <Input
-                value={notes}
-                onChangeText={setNotes}
-                multiline
-                numberOfLines={3}
-                style={{ minHeight: 80, textAlignVertical: "top" }}
-              />
-            </Section>
-
-            <Button
-              label={t("billing.voucher.issue")}
-              variant="teal"
-              onPress={onSubmit}
-              loading={submitting}
-              disabled={submitting || parsedAmount <= 0 || !chequeDetailsValid(method, cheque)}
-              block
+            <FieldLabel className="mb-0 mt-1.5">{t("billing.voucher.amountLabel")}</FieldLabel>
+            <AmountEntry
+              value={amountText}
+              onChangeText={setAmountText}
+              presets={["100", "250", "500", "1000", t("billing.voucher.remaining")]}
+              onPreset={(label) => {
+                if (label === t("billing.voucher.remaining")) {
+                  setAmountText(balance > 0 ? String(balance) : "");
+                } else {
+                  setAmountText(label);
+                }
+              }}
             />
+
+            <FieldLabel className="mb-0 mt-1.5">{t("billing.voucher.methodTitle")}</FieldLabel>
+            <View className="flex-row flex-wrap gap-2">
+              {VOUCHER_METHODS.map((m) => (
+                <Chip
+                  key={m}
+                  label={t(`paymentMethod.${m}`)}
+                  active={method === m ? "navy" : "off"}
+                  onPress={() => {
+                    setMethod(m);
+                    if (m !== "cheque") setCheque(EMPTY_CHEQUE);
+                  }}
+                />
+              ))}
+            </View>
+            {method === "cheque" ? <ChequeFields value={cheque} onChange={setCheque} /> : null}
+
+            <FieldLabel className="mb-0 mt-1.5">{t("billing.voucher.notesLabel")}</FieldLabel>
+            <Input
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              numberOfLines={3}
+              style={{ minHeight: 80, textAlignVertical: "top" }}
+            />
+
+            <Card flat className="bg-teal-50 border-teal-100 mt-1.5 p-3">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-teal-700 text-[13px] font-tajawal-bold">
+                  {t("billing.voucher.balanceAfter")}
+                </Text>
+                <Money value={balanceAfter} className="text-teal-700" />
+              </View>
+            </Card>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </ScreenShell>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <View className="gap-3">
-      <Text className="text-navy-900 text-[15px] font-tajawal-extrabold">{title}</Text>
-      <Card className="gap-3 p-4">{children}</Card>
-    </View>
   );
 }
