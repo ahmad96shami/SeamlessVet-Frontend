@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Alert, Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { QueuedRequest, QueuedRequestStatus } from "@vet/shared";
 
-import { Button, Card, Pill } from "@/components/ui";
+import { Button, Card, Pill, Sheet } from "@/components/ui";
 import {
   type AttachmentOutboxItem,
   listAttachmentOutbox,
@@ -86,93 +86,89 @@ export function SyncReviewSheet({ open, onClose }: { open: boolean; onClose: () 
     ]);
 
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable className="flex-1 justify-end bg-ink-900/50" onPress={onClose}>
-        <Pressable className="bg-paper rounded-t-card max-h-[80%] px-5 pb-8 pt-4" onPress={() => {}}>
-          <View className="flex-row items-center justify-between pb-1">
-            <Text className="text-navy-900 text-[17px] font-tajawal-extrabold">
-              {t("sync.panelTitle")}
-            </Text>
-            <Pressable onPress={onClose} accessibilityRole="button" hitSlop={8}>
-              <Text className="text-teal-700 text-[14px] font-tajawal-bold">{t("actions.close")}</Text>
-            </Pressable>
-          </View>
-          <Text className="text-ink-500 pb-3 text-[12px] font-tajawal">{t("sync.reviewHint")}</Text>
-
-          <View className="flex-row gap-2 pb-3">
-            <Button
-              label={t("sync.syncNow")}
-              variant="soft"
-              size="sm"
-              leadingIcon={<Send size={14} color={colors.navy[900]} />}
-              disabled={!online}
-              onPress={() => void syncNow()}
-            />
-            {conflictCount > 0 ? (
-              <Button
-                label={t("sync.retryAll")}
-                variant="soft"
-                size="sm"
-                disabled={!online}
-                onPress={() => void retryAll()}
-              />
-            ) : null}
-          </View>
-
-          {isEmpty ? (
-            <Text className="text-ink-500 py-8 text-center text-[13px] font-tajawal">
-              {t("sync.panelEmpty")}
-            </Text>
-          ) : (
-            <ScrollView showsVerticalScrollIndicator={false} className="grow-0">
-              {rest.length > 0 ? (
-                <Section title={t("sync.restSection")}>
-                  {rest.map((req) => (
-                    <RestRow
-                      key={req.id}
-                      title={t(req.label)}
-                      status={req.status}
-                      code={req.lastCode}
-                      error={req.lastError}
-                      attempts={req.attempts}
-                      online={online}
-                      onRetry={() => void retryItem(req.id)}
-                      onDiscard={() => confirmDiscard(() => void discardItem(req.id))}
-                    />
-                  ))}
-                </Section>
-              ) : null}
-
-              {att.length > 0 ? (
-                <Section title={t("sync.attachmentsSection")}>
-                  {att.map((item) => (
-                    <RestRow
-                      key={item.id}
-                      title={item.title || t("sync.label.attachment")}
-                      status={item.status}
-                      code={item.lastCode}
-                      error={item.lastError}
-                      attempts={item.attempts}
-                      online={online}
-                      onRetry={() => void retryAttachment(item.id)}
-                      onDiscard={() => confirmDiscard(() => discardAttachment(item.id))}
-                    />
-                  ))}
-                </Section>
-              ) : null}
-
-              {ps.length > 0 ? (
-                <Section title={t("sync.psSection")}>
-                  {ps.map((c) => (
-                    <PsRow key={c.id} conflict={c} onDismiss={() => void dismissPowerSyncConflict(c.id)} />
-                  ))}
-                </Section>
-              ) : null}
-            </ScrollView>
-          )}
+    <Sheet open={open} onClose={onClose}>
+      <View className="flex-row items-center justify-between pb-1">
+        <Text className="text-navy-900 text-[17px] font-tajawal-extrabold">
+          {t("sync.panelTitle")}
+        </Text>
+        <Pressable onPress={onClose} accessibilityRole="button" hitSlop={8}>
+          <Text className="text-teal-700 text-[14px] font-tajawal-bold">{t("actions.close")}</Text>
         </Pressable>
-      </Pressable>
-    </Modal>
+      </View>
+      <Text className="text-ink-500 pb-3 text-[12px] font-tajawal">{t("sync.reviewHint")}</Text>
+
+      <View className="flex-row gap-2 pb-3">
+        <Button
+          label={t("sync.syncNow")}
+          variant="soft"
+          size="sm"
+          leadingIcon={<Send size={14} color={colors.navy[900]} />}
+          disabled={!online}
+          onPress={() => void syncNow()}
+        />
+        {conflictCount > 0 ? (
+          <Button
+            label={t("sync.retryAll")}
+            variant="soft"
+            size="sm"
+            disabled={!online}
+            onPress={() => void retryAll()}
+          />
+        ) : null}
+      </View>
+
+      {isEmpty ? (
+        <Text className="text-ink-500 py-8 text-center text-[13px] font-tajawal">
+          {t("sync.panelEmpty")}
+        </Text>
+      ) : (
+        <ScrollView showsVerticalScrollIndicator={false} className="grow-0">
+          {rest.length > 0 ? (
+            <Section title={t("sync.restSection")}>
+              {rest.map((req) => (
+                <RestRow
+                  key={req.id}
+                  title={t(req.label)}
+                  status={req.status}
+                  code={req.lastCode}
+                  error={req.lastError}
+                  attempts={req.attempts}
+                  online={online}
+                  onRetry={() => void retryItem(req.id)}
+                  onDiscard={() => confirmDiscard(() => void discardItem(req.id))}
+                />
+              ))}
+            </Section>
+          ) : null}
+
+          {att.length > 0 ? (
+            <Section title={t("sync.attachmentsSection")}>
+              {att.map((item) => (
+                <RestRow
+                  key={item.id}
+                  title={item.title || t("sync.label.attachment")}
+                  status={item.status}
+                  code={item.lastCode}
+                  error={item.lastError}
+                  attempts={item.attempts}
+                  online={online}
+                  onRetry={() => void retryAttachment(item.id)}
+                  onDiscard={() => confirmDiscard(() => discardAttachment(item.id))}
+                />
+              ))}
+            </Section>
+          ) : null}
+
+          {ps.length > 0 ? (
+            <Section title={t("sync.psSection")}>
+              {ps.map((c) => (
+                <PsRow key={c.id} conflict={c} onDismiss={() => void dismissPowerSyncConflict(c.id)} />
+              ))}
+            </Section>
+          ) : null}
+        </ScrollView>
+      )}
+    </Sheet>
   );
 }
 

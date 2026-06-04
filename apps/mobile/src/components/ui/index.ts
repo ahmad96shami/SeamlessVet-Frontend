@@ -15,6 +15,7 @@ export { Pill } from "./Pill";
 export { QuickAction } from "./QuickAction";
 export { SectionTitle } from "./SectionTitle";
 export { SegmentedTabs } from "./SegmentedTabs";
+export { Sheet } from "./Sheet";
 export { Stat } from "./Stat";
 export { StateHero } from "./StateHero";
 export { AddButton, Stepper } from "./Stepper";

@@ -1,9 +1,9 @@
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate, type NotificationResponse } from "@vet/shared";
 
-import { Button, Card, Pill } from "@/components/ui";
+import { Button, Card, Pill, Sheet } from "@/components/ui";
 import { notificationRoute } from "@/lib/notificationRoute";
 import { useMarkNotificationRead, useNotifications } from "@/queries/notifications";
 
@@ -37,53 +37,49 @@ export function NotificationPanel({ open, onClose }: { open: boolean; onClose: (
   };
 
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable className="flex-1 justify-end bg-ink-900/50" onPress={onClose}>
-        <Pressable className="bg-paper rounded-t-card max-h-[80%] px-5 pb-8 pt-4" onPress={() => {}}>
-          <View className="flex-row items-center justify-between pb-1">
-            <Text className="text-navy-900 text-[17px] font-tajawal-extrabold">
-              {t("notifications.title")}
-            </Text>
-            <Pressable onPress={onClose} accessibilityRole="button" hitSlop={8}>
-              <Text className="text-teal-700 text-[14px] font-tajawal-bold">{t("actions.close")}</Text>
-            </Pressable>
-          </View>
-
-          {unread.length > 0 ? (
-            <View className="flex-row items-center justify-between gap-2 pb-1">
-              <Text className="text-ink-500 text-[12px] font-tajawal">
-                {t("notifications.unread", { count: unread.length })}
-              </Text>
-              <Button
-                label={t("notifications.markAllRead")}
-                variant="ghost"
-                size="sm"
-                disabled={markRead.isPending}
-                onPress={markAllRead}
-              />
-            </View>
-          ) : null}
-
-          {isLoading ? (
-            <Text className="text-ink-500 py-8 text-center text-[13px] font-tajawal">
-              {t("actions.loading")}
-            </Text>
-          ) : items.length === 0 ? (
-            <Text className="text-ink-500 py-8 text-center text-[13px] font-tajawal">
-              {t("notifications.empty")}
-            </Text>
-          ) : (
-            <ScrollView showsVerticalScrollIndicator={false} className="grow-0">
-              <View className="gap-2 pt-2">
-                {items.map((n) => (
-                  <NotificationItem key={n.id} n={n} onOpen={openItem} />
-                ))}
-              </View>
-            </ScrollView>
-          )}
+    <Sheet open={open} onClose={onClose}>
+      <View className="flex-row items-center justify-between pb-1">
+        <Text className="text-navy-900 text-[17px] font-tajawal-extrabold">
+          {t("notifications.title")}
+        </Text>
+        <Pressable onPress={onClose} accessibilityRole="button" hitSlop={8}>
+          <Text className="text-teal-700 text-[14px] font-tajawal-bold">{t("actions.close")}</Text>
         </Pressable>
-      </Pressable>
-    </Modal>
+      </View>
+
+      {unread.length > 0 ? (
+        <View className="flex-row items-center justify-between gap-2 pb-1">
+          <Text className="text-ink-500 text-[12px] font-tajawal">
+            {t("notifications.unread", { count: unread.length })}
+          </Text>
+          <Button
+            label={t("notifications.markAllRead")}
+            variant="ghost"
+            size="sm"
+            disabled={markRead.isPending}
+            onPress={markAllRead}
+          />
+        </View>
+      ) : null}
+
+      {isLoading ? (
+        <Text className="text-ink-500 py-8 text-center text-[13px] font-tajawal">
+          {t("actions.loading")}
+        </Text>
+      ) : items.length === 0 ? (
+        <Text className="text-ink-500 py-8 text-center text-[13px] font-tajawal">
+          {t("notifications.empty")}
+        </Text>
+      ) : (
+        <ScrollView showsVerticalScrollIndicator={false} className="grow-0">
+          <View className="gap-2 pt-2">
+            {items.map((n) => (
+              <NotificationItem key={n.id} n={n} onOpen={openItem} />
+            ))}
+          </View>
+        </ScrollView>
+      )}
+    </Sheet>
   );
 }
 

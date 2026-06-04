@@ -34,7 +34,9 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
     `Money`, `Divider` (+`dashed`), `InfoBanner` (teal/neutral), `StateHero` (success/pending/empty),
     `QuickAction`, `TimeBox`, `Photo`/`Icon3D` (clay avatars via `photoKindForCustomerType`/`photoKindForFarmKind`).
   - Layout: `ScreenShell` (bg + safe area + header/footer slots), `TopBar`, `StepHeader` (wizard),
-    `Footer` (row INSIDE ScreenShell's footer slot — the shell owns bg/border/insets), `NavBottomBar`.
+    `Footer` (row INSIDE ScreenShell's footer slot — the shell owns bg/border/insets), `NavBottomBar`,
+    `Sheet` (bottom-sheet shell: backdrop FADES in place, panel SLIDES — never use
+    `Modal animationType="slide"`, it slides the whole subtree including the scrim).
 - **NativeWind rules**: className-first; **never interpolate class names** (purge!) — tone maps are
   `Record`s of full literal strings (see `Button`/`Pill`). **Shadows via the token STYLE objects
   (`style={shadow.card}`), NEVER the `shadow-card`/`shadow-pop` classes**: Tailwind shadow classes
