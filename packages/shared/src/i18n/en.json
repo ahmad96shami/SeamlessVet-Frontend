@@ -37,6 +37,11 @@
     "finance": "Finance",
     "system": "System"
   },
+  "authExtra": {
+    "pendingTitle": "Your account is under review",
+    "pendingBody": "We received your activation request. You'll get a notification as soon as an administrator approves it, so you can start field visits and stock tracking.",
+    "roleLabel": "Role"
+  },
   "me": {
     "title": "My account",
     "general": "General",
