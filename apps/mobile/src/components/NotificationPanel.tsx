@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate, type NotificationResponse } from "@vet/shared";
 
-import { Button, Card, Pill, Sheet } from "@/components/ui";
+import { Button, Card, Pill, Sheet, SkeletonList } from "@/components/ui";
 import { notificationRoute } from "@/lib/notificationRoute";
 import { useMarkNotificationRead, useNotifications } from "@/queries/notifications";
 
@@ -63,9 +63,9 @@ export function NotificationPanel({ open, onClose }: { open: boolean; onClose: (
       ) : null}
 
       {isLoading ? (
-        <Text className="text-ink-500 py-8 text-center text-[13px] font-tajawal">
-          {t("actions.loading")}
-        </Text>
+        <View className="py-3">
+          <SkeletonList rows={4} avatar={false} />
+        </View>
       ) : items.length === 0 ? (
         <Text className="text-ink-500 py-8 text-center text-[13px] font-tajawal">
           {t("notifications.empty")}

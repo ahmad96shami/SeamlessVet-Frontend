@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 
 import { Add, Bird, Briefcase, Cow, Forward, House, Search } from "@/components/icons";
-import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill } from "@/components/ui";
+import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill, SkeletonList } from "@/components/ui";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow } from "@/sync/types";
@@ -118,11 +118,15 @@ export default function CustomersListScreen() {
         keyExtractor={(c) => c.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          <View className="mt-12 items-center">
-            <Text className="text-ink-500 text-[14px] font-tajawal">
-              {isLoading ? t("actions.loading") : t("customers.empty")}
-            </Text>
-          </View>
+          isLoading ? (
+            <SkeletonList />
+          ) : (
+            <View className="mt-12 items-center">
+              <Text className="text-ink-500 text-[14px] font-tajawal">
+                {t("customers.empty")}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <CustomerRow

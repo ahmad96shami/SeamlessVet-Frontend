@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
 
 import { Add, Forward } from "@/components/icons";
-import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill } from "@/components/ui";
+import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill, SkeletonList } from "@/components/ui";
 import { Search } from "@/components/icons";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
@@ -118,11 +118,15 @@ export default function VisitsListScreen() {
         keyExtractor={(v) => v.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          <View className="mt-12 items-center">
-            <Text className="text-ink-500 text-[14px] font-tajawal">
-              {isLoading ? t("actions.loading") : t("visits.empty", { defaultValue: "لا توجد زيارات" })}
-            </Text>
-          </View>
+          isLoading ? (
+            <SkeletonList />
+          ) : (
+            <View className="mt-12 items-center">
+              <Text className="text-ink-500 text-[14px] font-tajawal">
+                {t("visits.empty", { defaultValue: "لا توجد زيارات" })}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <ListRow

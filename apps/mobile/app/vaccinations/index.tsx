@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
 
 import { Add, Forward, Search, Syringe } from "@/components/icons";
-import { IconTile, Input, ListRow, Pill } from "@/components/ui";
+import { IconTile, Input, ListRow, Pill, SkeletonList } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { VaccinationRow } from "@/sync/types";
@@ -114,11 +114,15 @@ export default function VaccinationsAgendaScreen() {
         ItemSeparatorComponent={() => <View className="h-2" />}
         SectionSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          <View className="mt-12 items-center">
-            <Text className="text-ink-500 text-[14px] font-tajawal">
-              {isLoading ? t("actions.loading") : t("vaccinations.calendar.empty")}
-            </Text>
-          </View>
+          isLoading ? (
+            <SkeletonList />
+          ) : (
+            <View className="mt-12 items-center">
+              <Text className="text-ink-500 text-[14px] font-tajawal">
+                {t("vaccinations.calendar.empty")}
+              </Text>
+            </View>
+          )
         }
         renderSectionHeader={({ section }) => (
           <View className="flex-row items-center gap-2 pb-1 pt-2">

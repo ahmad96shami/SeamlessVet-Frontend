@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
 
 import { ArrowDown, ArrowUp, Pill as PillIcon, Truck, Warn } from "@/components/icons";
-import { Card, Chip, Pill } from "@/components/ui";
+import { Card, Chip, Pill, SkeletonList } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import { colors } from "@/theme";
@@ -119,11 +119,15 @@ export default function MovementsScreen() {
         keyExtractor={(r) => r.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          <View className="mt-12 items-center">
-            <Text className="text-ink-500 text-[14px] font-tajawal">
-              {isLoading ? t("actions.loading") : t("inventory.movements.empty")}
-            </Text>
-          </View>
+          isLoading ? (
+            <SkeletonList />
+          ) : (
+            <View className="mt-12 items-center">
+              <Text className="text-ink-500 text-[14px] font-tajawal">
+                {t("inventory.movements.empty")}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <Pressable

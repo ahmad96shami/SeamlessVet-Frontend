@@ -6,7 +6,7 @@ import { formatDate, formatQuantity } from "@vet/shared";
 
 import { ArrowDown, Pill as PillIcon, Search, Truck, Warn } from "@/components/icons";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
-import { Card, IconTile, Input, ListRow, Pill, SegmentedTabs } from "@/components/ui";
+import { Card, IconTile, Input, ListRow, Pill, SegmentedTabs, SkeletonList } from "@/components/ui";
 import {
   classifyStock,
   FIELD_STOCK_SQL,
@@ -208,17 +208,19 @@ export default function InventoryScreen() {
         keyExtractor={(r) => r.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          <View className="mt-12 items-center">
-            <Text className="text-ink-500 text-[14px] font-tajawal">
-              {isLoading
-                ? t("actions.loading")
-                : tab === "low"
+          isLoading ? (
+            <SkeletonList />
+          ) : (
+            <View className="mt-12 items-center">
+              <Text className="text-ink-500 text-[14px] font-tajawal">
+                {tab === "low"
                   ? t("inventory.alerts.noLowStock")
                   : tab === "expiring"
                     ? t("inventory.alerts.noExpiring")
                     : t("inventory.empty")}
-            </Text>
-          </View>
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => <StockRow row={item} i18nLang={i18n.resolvedLanguage} />}
       />

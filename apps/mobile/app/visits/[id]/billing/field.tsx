@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { buildFieldInvoiceRequest, PAYMENT_METHOD_VALUES, type PaymentMethod } from "@vet/shared";
 
-import { Button, Card, Chip, Money, Pill } from "@/components/ui";
+import { Button, Card, Chip, Money, Pill, SkeletonList } from "@/components/ui";
 import {
   ChequeFields,
   chequeDetailsValid,
@@ -200,7 +200,7 @@ export default function FieldInvoiceScreen() {
 
             <Section title={t("billing.field.linesTitle")}>
               {!preview ? (
-                <Text className="text-ink-500 text-[13px] font-tajawal">{t("actions.loading")}</Text>
+                <SkeletonList rows={3} avatar={false} />
               ) : !hasBillableLines ? (
                 <Text className="text-ink-500 text-[13px] font-tajawal">
                   {t("billing.field.noLines")}

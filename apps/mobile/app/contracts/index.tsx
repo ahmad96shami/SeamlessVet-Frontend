@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
 
 import { Add, Forward, Paper, Search } from "@/components/icons";
-import { Chip, IconTile, Input, ListRow, Money, Pill } from "@/components/ui";
+import { Chip, IconTile, Input, ListRow, Money, Pill, SkeletonList } from "@/components/ui";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
 import { useAuthStore } from "@/stores/authStore";
 import { useQuery } from "@/sync/hooks";
@@ -123,11 +123,15 @@ export default function ContractsListScreen() {
         keyExtractor={(c) => c.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          <View className="mt-12 items-center">
-            <Text className="text-ink-500 text-[14px] font-tajawal">
-              {isLoading ? t("actions.loading") : t("finance.contracts.empty")}
-            </Text>
-          </View>
+          isLoading ? (
+            <SkeletonList />
+          ) : (
+            <View className="mt-12 items-center">
+              <Text className="text-ink-500 text-[14px] font-tajawal">
+                {t("finance.contracts.empty")}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <ListRow

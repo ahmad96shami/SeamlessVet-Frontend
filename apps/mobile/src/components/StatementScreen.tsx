@@ -7,18 +7,7 @@ import * as Linking from "expo-linking";
 import { formatDate, getFarmStatement, getStatement, type StatementResponse } from "@vet/shared";
 
 import { Send } from "@/components/icons";
-import {
-  Button,
-  Card,
-  Divider,
-  InfoBanner,
-  Money,
-  Photo,
-  photoKindForCustomerType,
-  photoKindForFarmKind,
-  Pill,
-  Voucher,
-} from "@/components/ui";
+import { Button, Card, Divider, InfoBanner, Money, Photo, photoKindForCustomerType, photoKindForFarmKind, Pill, SkeletonList, Voucher } from "@/components/ui";
 import { Footer, ScreenShell, TopBar } from "@/components/layout";
 import { formatAmount } from "@/lib/numerals";
 import { apiClient } from "@/services/apiClient";
@@ -302,7 +291,9 @@ export function StatementScreen({ scope }: { scope: StatementScope }) {
               {t("statement.entriesTitle")}
             </Text>
             {!view ? (
-              <Text className="text-ink-500 text-[13px] font-tajawal">{t("actions.loading")}</Text>
+              <View className="py-2">
+                <SkeletonList rows={4} avatar={false} />
+              </View>
             ) : view.entries.length === 0 ? (
               <Text className="text-ink-500 py-3 text-[13px] font-tajawal">
                 {t("statement.empty")}
