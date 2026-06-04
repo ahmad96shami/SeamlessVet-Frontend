@@ -2,6 +2,7 @@ export { AmountEntry } from "./AmountEntry";
 export { Button } from "./Button";
 export { Card } from "./Card";
 export { Chip } from "./Chip";
+export { DialogHost } from "./Dialog";
 export { Divider } from "./Divider";
 export { FieldLabel } from "./FieldLabel";
 export { IconTile } from "./IconTile";

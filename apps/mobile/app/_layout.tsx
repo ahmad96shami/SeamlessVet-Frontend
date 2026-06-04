@@ -10,6 +10,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AppServices } from "@/components/AppServices";
+import { DialogHost } from "@/components/ui";
 import { useAppFonts } from "@/lib/fonts";
 import { queryClient } from "@/lib/queryClient";
 import { ensureArabicRTL } from "@/lib/rtl";
@@ -83,6 +84,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <Stack screenOptions={{ headerShown: false }} />
           <AppServices />
+          <DialogHost />
           <StatusBar style="auto" />
         </QueryClientProvider>
       </PowerSyncContext.Provider>

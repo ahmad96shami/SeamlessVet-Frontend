@@ -3,17 +3,18 @@ import { ActivityIndicator, Pressable, Text, View, type PressableProps } from "r
 import { colors } from "@/theme";
 
 /**
- * The four button shapes from the design's `.btn` system:
+ * The button shapes from the design's `.btn` system:
  * - `primary` — navy CTA, white text (the dominant action on a screen).
  * - `teal` — teal CTA for confirmations / continue (visit flow + receipt).
  * - `soft` — neutral grey for secondary actions inside cards (e.g. "schedule").
  * - `ghost` — text-only navy on transparent for tertiary actions ("logout").
+ * - `destructive` — dusty rose for delete / discard / sign-out confirms (Dialog).
  *
  * `size` matches the design's `.btn-sm` modifier (the 28pt-tall chip-style
  * button used inline). All variants stack `block`-wide by default unless wrapped
  * in a row.
  */
-type Variant = "primary" | "teal" | "soft" | "ghost";
+type Variant = "primary" | "teal" | "soft" | "ghost" | "destructive";
 type Size = "md" | "sm";
 
 interface ButtonProps extends Omit<PressableProps, "children"> {
@@ -30,6 +31,7 @@ const TONE: Record<Variant, { bg: string; text: string; spinner: string }> = {
   teal: { bg: "bg-teal-500 active:bg-teal-600", text: "text-paper", spinner: colors.white },
   soft: { bg: "bg-ink-100 active:bg-ink-200", text: "text-navy-900", spinner: colors.navy[900] },
   ghost: { bg: "bg-transparent active:bg-ink-100", text: "text-navy-900", spinner: colors.navy[900] },
+  destructive: { bg: "bg-rose active:bg-rose-ink", text: "text-paper", spinner: colors.white },
 };
 
 export function Button({
