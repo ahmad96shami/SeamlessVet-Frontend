@@ -12,6 +12,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useSyncStore } from "@/stores/syncStore";
 import type { ContractRow } from "@/sync/types";
 import { syncDelete } from "@/sync/writes";
+import { colors } from "@/theme";
 
 /**
  * Lifecycle actions for a contract (Mo5.4). Mirrors the web's gate but adapted to the field app:
@@ -102,7 +103,7 @@ export function ContractLifecycleActions({ contract }: { contract: ContractRow }
         <>
           <Card flat className="bg-amber-soft gap-1.5 p-3">
             <View className="flex-row items-center gap-2">
-              <Shield size={16} color="#8A6A00" />
+              <Shield size={16} color={colors.amber.ink} />
               <Text className="text-amber-ink text-[13px] font-tajawal-extrabold">
                 {t("finance.lifecycle.gateTitle")}
               </Text>
@@ -122,7 +123,7 @@ export function ContractLifecycleActions({ contract }: { contract: ContractRow }
               label={t("finance.lifecycle.activate")}
               variant="primary"
               block
-              leadingIcon={<Shield size={18} color="#FFFFFF" />}
+              leadingIcon={<Shield size={18} color={colors.white} />}
               onPress={doActivate}
               loading={busy}
               disabled={!online}
@@ -148,7 +149,7 @@ export function ContractLifecycleActions({ contract }: { contract: ContractRow }
             label={t("finance.contracts.proposeAmendment")}
             variant="soft"
             block
-            leadingIcon={<Send size={18} color="#223D69" />}
+            leadingIcon={<Send size={18} color={colors.navy[900]} />}
             onPress={proposeAmendment}
           />
         </Card>

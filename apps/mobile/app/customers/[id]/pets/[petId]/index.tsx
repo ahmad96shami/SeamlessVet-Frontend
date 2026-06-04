@@ -8,6 +8,7 @@ import { Card, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { PetRow, PrescriptionRow, VaccinationRow, VisitRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 const STATUS_TONE: Record<string, "teal" | "amber" | "green" | "red" | "neutral"> = {
   open: "teal",
@@ -94,7 +95,7 @@ export default function PetDetailScreen() {
               accessibilityRole="button"
               className="h-9 w-9 items-center justify-center"
             >
-              <Edit size={20} color="#223D69" />
+              <Edit size={20} color={colors.navy[900]} />
             </Pressable>
           }
         />
@@ -135,7 +136,7 @@ export default function PetDetailScreen() {
           >
             <Card className="flex-row items-center gap-3 p-3">
               <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-                <Stethoscope size={18} color="#0F7A8A" />
+                <Stethoscope size={18} color={colors.teal[600]} />
               </View>
               <View className="flex-1 gap-1">
                 <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
@@ -157,7 +158,7 @@ export default function PetDetailScreen() {
                   ) : null}
                 </View>
               </View>
-              <Forward size={18} color="#94A1B5" />
+              <Forward size={18} color={colors.ink[400]} />
             </Card>
           </Pressable>
         ))}
@@ -170,7 +171,7 @@ export default function PetDetailScreen() {
         {(vaccinations ?? []).map((vx) => (
           <Card key={vx.id} className="flex-row items-center gap-3 p-3">
             <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-              <Syringe size={18} color="#0F7A8A" />
+              <Syringe size={18} color={colors.teal[600]} />
             </View>
             <View className="flex-1 gap-1">
               <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
@@ -200,7 +201,7 @@ export default function PetDetailScreen() {
         {(prescriptions ?? []).map((p) => (
           <Card key={p.id} className="flex-row items-center gap-3 p-3">
             <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-              <PillIcon size={18} color="#0F7A8A" />
+              <PillIcon size={18} color={colors.teal[600]} />
             </View>
             <View className="flex-1 gap-1">
               <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>

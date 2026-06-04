@@ -11,9 +11,10 @@ import {
 } from "@vet/shared";
 
 import { Shield } from "@/components/icons";
-import { Button, Input } from "@/components/ui";
+import { Button, Card, Divider, Input, StateHero } from "@/components/ui";
 import { omitEmptyStrings } from "@/lib/forms";
 import { useRegister } from "@/queries/auth";
+import { colors } from "@/theme";
 
 // The mobile app is the field-doctor client; only vet_field self-registers here.
 // Admin/accountant/center-staff accounts are created by an admin (web).
@@ -51,21 +52,42 @@ export default function RegisterScreen() {
     });
   });
 
+  // The design's "حسابك قيد المراجعة" pending state — accounts stay inactive
+  // until an admin approves the registration request.
   if (registerMut.isSuccess) {
+    const submitted = form.getValues();
     return (
-      <View className="bg-paper flex-1 items-center justify-center px-6">
-        <View className="bg-amber-soft mb-4 h-16 w-16 items-center justify-center rounded-card">
-          <Shield size={32} color="#8A6A00" />
+      <View className="bg-ink-50 flex-1 px-7 pt-16">
+        <StateHero
+          tone="teal"
+          icon={<Shield size={52} color={colors.teal[600]} />}
+          title={t("authExtra.pendingTitle")}
+          body={t("authExtra.pendingBody")}
+        />
+        <Card className="mt-6 w-full p-4">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-ink-500 text-[13px] font-tajawal">
+              {t("auth.register.fullName")}
+            </Text>
+            <Text className="text-ink-900 text-[13px] font-tajawal-bold" numberOfLines={1}>
+              {submitted.fullName}
+            </Text>
+          </View>
+          <Divider dashed />
+          <View className="flex-row items-center justify-between">
+            <Text className="text-ink-500 text-[13px] font-tajawal">
+              {t("authExtra.roleLabel")}
+            </Text>
+            <Text className="text-ink-900 text-[13px] font-tajawal-bold">
+              {t("roles.vet_field")}
+            </Text>
+          </View>
+        </Card>
+        <View className="mt-auto pb-8">
+          <Link href="/(auth)/login" asChild>
+            <Button label={t("auth.register.signIn")} block />
+          </Link>
         </View>
-        <Text className="text-navy-900 mb-2 text-[20px] font-tajawal-extrabold">
-          {t("auth.register.title")}
-        </Text>
-        <Text className="text-ink-500 mb-6 text-center text-[14px] font-tajawal">
-          {t("auth.register.pending")}
-        </Text>
-        <Link href="/(auth)/login" className="text-teal-700 text-[15px] font-tajawal-bold">
-          {t("auth.register.signIn")}
-        </Link>
       </View>
     );
   }

@@ -1,4 +1,4 @@
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useForm, Controller } from "react-hook-form";
@@ -10,8 +10,8 @@ import {
   type LoginRequest,
 } from "@vet/shared";
 
-import { Stethoscope } from "@/components/icons";
-import { Button, Input } from "@/components/ui";
+import vetHero from "../../assets/images/vet-hero.png";
+import { Button, Card, Input } from "@/components/ui";
 import { useLogin } from "@/queries/auth";
 
 export default function LoginScreen() {
@@ -43,67 +43,73 @@ export default function LoginScreen() {
         contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingHorizontal: 24, paddingVertical: 32 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="mb-8 items-center">
-          <View className="bg-teal-50 mb-4 h-16 w-16 items-center justify-center rounded-card">
-            <Stethoscope size={32} color="#0F7A8A" />
-          </View>
-          <Text className="text-navy-900 text-[24px] font-tajawal-extrabold">
+        <View className="items-center">
+          {/* The design's hero illustration (vendored from the prototype assets). */}
+          <Image
+            source={vetHero}
+            style={{ width: 180, height: 180 }}
+            resizeMode="contain"
+            accessibilityIgnoresInvertColors
+          />
+          <Text className="text-navy-900 mt-1 text-[26px] font-tajawal-extrabold">
             {t("auth.login.title")}
           </Text>
-          <Text className="text-ink-500 mt-1 text-[14px] font-tajawal">{t("appName")}</Text>
+          <Text className="text-ink-500 mb-5 mt-1.5 text-[13px] font-tajawal">{t("appName")}</Text>
         </View>
 
-        <View className="gap-3.5">
-          <Controller
-            control={form.control}
-            name="phonePrimary"
-            render={({ field, fieldState }) => (
-              <Input
-                label={t("auth.login.phone")}
-                error={fieldState.error?.message}
-                value={field.value}
-                onChangeText={field.onChange}
-                onBlur={field.onBlur}
-                keyboardType="phone-pad"
-                autoComplete="tel"
-                autoCapitalize="none"
-              />
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="password"
-            render={({ field, fieldState }) => (
-              <Input
-                label={t("auth.login.password")}
-                error={fieldState.error?.message}
-                value={field.value}
-                onChangeText={field.onChange}
-                onBlur={field.onBlur}
-                secureTextEntry
-                autoComplete="password"
-              />
-            )}
-          />
-        </View>
+        <Card className="p-5">
+          <View className="gap-3.5">
+            <Controller
+              control={form.control}
+              name="phonePrimary"
+              render={({ field, fieldState }) => (
+                <Input
+                  label={t("auth.login.phone")}
+                  error={fieldState.error?.message}
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  keyboardType="phone-pad"
+                  autoComplete="tel"
+                  autoCapitalize="none"
+                />
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="password"
+              render={({ field, fieldState }) => (
+                <Input
+                  label={t("auth.login.password")}
+                  error={fieldState.error?.message}
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  secureTextEntry
+                  autoComplete="password"
+                />
+              )}
+            />
+          </View>
 
-        <View className="mt-6">
-          <Button
-            label={t("auth.login.submit")}
-            onPress={onSubmit}
-            loading={loginMut.isPending}
-            block
-          />
-        </View>
+          <View className="mt-5">
+            <Button
+              label={t("auth.login.submit")}
+              onPress={onSubmit}
+              loading={loginMut.isPending}
+              block
+            />
+          </View>
 
-        <View className="mt-6 flex-row items-center justify-center gap-1">
-          <Text className="text-ink-500 text-[13px] font-tajawal">
-            {t("auth.login.noAccount")}
-          </Text>
-          <Link href="/(auth)/register" className="text-teal-700 text-[13px] font-tajawal-bold">
-            {t("auth.login.createOne")}
-          </Link>
-        </View>
+          <View className="mt-4 flex-row items-center justify-center gap-1">
+            <Text className="text-ink-500 text-[13px] font-tajawal">
+              {t("auth.login.noAccount")}
+            </Text>
+            <Link href="/(auth)/register" className="text-teal-600 text-[13px] font-tajawal-extrabold">
+              {t("auth.login.createOne")}
+            </Link>
+          </View>
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );

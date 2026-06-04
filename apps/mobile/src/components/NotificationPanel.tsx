@@ -38,7 +38,7 @@ export function NotificationPanel({ open, onClose }: { open: boolean; onClose: (
 
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable className="flex-1 justify-end bg-[rgba(8,16,30,0.45)]" onPress={onClose}>
+      <Pressable className="flex-1 justify-end bg-ink-900/50" onPress={onClose}>
         <Pressable className="bg-paper rounded-t-card max-h-[80%] px-5 pb-8 pt-4" onPress={() => {}}>
           <View className="flex-row items-center justify-between pb-1">
             <Text className="text-navy-900 text-[17px] font-tajawal-extrabold">

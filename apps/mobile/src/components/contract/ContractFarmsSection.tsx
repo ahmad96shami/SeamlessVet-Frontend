@@ -7,6 +7,7 @@ import { Card, Pill } from "@/components/ui";
 import { useQuery } from "@/sync/hooks";
 import { syncDelete } from "@/sync/writes";
 import type { ContractFarmRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 interface Props {
   contractId: string;
@@ -65,7 +66,7 @@ export function ContractFarmsSection({ contractId, isDraft }: Props) {
             }
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
           >
-            <Add size={14} color="#FFFFFF" />
+            <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">
               {t("finance.contractFarms.add")}
             </Text>
@@ -89,7 +90,7 @@ export function ContractFarmsSection({ contractId, isDraft }: Props) {
         rows.map((row) => (
           <Card key={row.id} className="flex-row items-center gap-3 p-3">
             <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-              <Cow size={18} color="#0F7A8A" />
+              <Cow size={18} color={colors.teal[600]} />
             </View>
             <View className="flex-1 gap-1">
               <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
@@ -107,7 +108,7 @@ export function ContractFarmsSection({ contractId, isDraft }: Props) {
                 accessibilityRole="button"
                 className="h-9 w-9 items-center justify-center"
               >
-                <Trash size={18} color="#B33235" />
+                <Trash size={18} color={colors.rose.ink} />
               </Pressable>
             ) : null}
           </Card>

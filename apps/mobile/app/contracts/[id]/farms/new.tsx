@@ -9,6 +9,7 @@ import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { ContractRow, FarmRow } from "@/sync/types";
 import { syncInsert } from "@/sync/writes";
+import { colors } from "@/theme";
 
 /**
  * Attach a farm to a draft contract (Mo8.3). Lists the contract customer's farms that aren't
@@ -69,7 +70,7 @@ export default function AttachContractFarmScreen() {
             <Pressable key={farm.id} onPress={() => void attach(farm)} disabled={attaching != null}>
               <Card className="flex-row items-center gap-3 p-3">
                 <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-                  <Cow size={18} color="#0F7A8A" />
+                  <Cow size={18} color={colors.teal[600]} />
                 </View>
                 <View className="flex-1 gap-1">
                   <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
@@ -82,7 +83,7 @@ export default function AttachContractFarmScreen() {
                     ) : null}
                   </View>
                 </View>
-                <Add size={18} color="#223D69" />
+                <Add size={18} color={colors.navy[900]} />
               </Card>
             </Pressable>
           ))

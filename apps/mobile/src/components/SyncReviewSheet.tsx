@@ -21,6 +21,7 @@ import {
 import { useSyncStore } from "@/stores/syncStore";
 
 import { Check, Send, Spinner, Trash } from "./icons";
+import { colors } from "@/theme";
 
 const STATUS_TONE: Record<QueuedRequestStatus, "neutral" | "amber" | "red"> = {
   pending: "neutral",
@@ -86,7 +87,7 @@ export function SyncReviewSheet({ open, onClose }: { open: boolean; onClose: () 
 
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable className="flex-1 justify-end bg-[rgba(8,16,30,0.45)]" onPress={onClose}>
+      <Pressable className="flex-1 justify-end bg-ink-900/50" onPress={onClose}>
         <Pressable className="bg-paper rounded-t-card max-h-[80%] px-5 pb-8 pt-4" onPress={() => {}}>
           <View className="flex-row items-center justify-between pb-1">
             <Text className="text-navy-900 text-[17px] font-tajawal-extrabold">
@@ -103,7 +104,7 @@ export function SyncReviewSheet({ open, onClose }: { open: boolean; onClose: () 
               label={t("sync.syncNow")}
               variant="soft"
               size="sm"
-              leadingIcon={<Send size={14} color="#223D69" />}
+              leadingIcon={<Send size={14} color={colors.navy[900]} />}
               disabled={!online}
               onPress={() => void syncNow()}
             />
@@ -229,10 +230,10 @@ function RestRow({
         {actionable ? (
           <View className="flex-row gap-1">
             <IconBtn label={t("sync.retry")} disabled={!online} onPress={onRetry}>
-              <Spinner size={16} color={online ? "#0B6573" : "#9AA6B8"} />
+              <Spinner size={16} color={online ? colors.teal[700] : colors.ink[400]} />
             </IconBtn>
             <IconBtn label={t("sync.discard")} onPress={onDiscard}>
-              <Trash size={16} color="#B42318" />
+              <Trash size={16} color={colors.rose.ink} />
             </IconBtn>
           </View>
         ) : null}
@@ -260,7 +261,7 @@ function PsRow({ conflict, onDismiss }: { conflict: PowerSyncConflict; onDismiss
           <Text className="text-ink-400 text-[11px] font-tajawal">{t("sync.serverWinsHint")}</Text>
         </View>
         <IconBtn label={t("sync.dismiss")} onPress={onDismiss}>
-          <Check size={16} color="#0B6573" />
+          <Check size={16} color={colors.teal[700]} />
         </IconBtn>
       </View>
     </Card>

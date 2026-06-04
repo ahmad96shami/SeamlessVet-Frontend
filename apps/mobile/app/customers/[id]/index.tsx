@@ -8,20 +8,21 @@ import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, FarmRow, LedgerRow, PetRow, VisitRow } from "@/sync/types";
 import { formatDate } from "@vet/shared";
+import { colors } from "@/theme";
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
-  poultry_farm: <Bird size={20} color="#0F7A8A" />,
-  cattle_farm: <Cow size={20} color="#0F7A8A" />,
-  regular_farm: <Briefcase size={20} color="#0F7A8A" />,
-  home: <House size={20} color="#0F7A8A" />,
-  clinic_customer: <User size={20} color="#0F7A8A" />,
+  poultry_farm: <Bird size={20} color={colors.teal[600]} />,
+  cattle_farm: <Cow size={20} color={colors.teal[600]} />,
+  regular_farm: <Briefcase size={20} color={colors.teal[600]} />,
+  home: <House size={20} color={colors.teal[600]} />,
+  clinic_customer: <User size={20} color={colors.teal[600]} />,
 };
 
 const FARM_KIND_ICON: Record<string, React.ReactNode> = {
-  poultry: <Bird size={18} color="#0F7A8A" />,
-  cattle: <Cow size={18} color="#0F7A8A" />,
-  mixed: <Briefcase size={18} color="#0F7A8A" />,
-  other: <Briefcase size={18} color="#0F7A8A" />,
+  poultry: <Bird size={18} color={colors.teal[600]} />,
+  cattle: <Cow size={18} color={colors.teal[600]} />,
+  mixed: <Briefcase size={18} color={colors.teal[600]} />,
+  other: <Briefcase size={18} color={colors.teal[600]} />,
 };
 
 export default function CustomerDetailScreen() {
@@ -85,7 +86,7 @@ export default function CustomerDetailScreen() {
               accessibilityRole="button"
               className="h-9 w-9 items-center justify-center"
             >
-              <Edit size={20} color="#223D69" />
+              <Edit size={20} color={colors.navy[900]} />
             </Pressable>
           }
         />
@@ -93,7 +94,7 @@ export default function CustomerDetailScreen() {
     >
       <Card className="flex-row items-center gap-3 p-4">
         <View className="bg-teal-50 h-14 w-14 items-center justify-center rounded-card">
-          {TYPE_ICON[customer.type] ?? <House size={22} color="#0F7A8A" />}
+          {TYPE_ICON[customer.type] ?? <House size={22} color={colors.teal[600]} />}
         </View>
         <View className="flex-1 gap-1.5">
           <Text className="text-navy-900 text-[17px] font-tajawal-extrabold" numberOfLines={1}>
@@ -149,21 +150,21 @@ export default function CustomerDetailScreen() {
           label={t("visits.new")}
           variant="teal"
           block
-          leadingIcon={<Stethoscope size={18} color="#FFFFFF" />}
+          leadingIcon={<Stethoscope size={18} color={colors.white} />}
           onPress={() => router.push({ pathname: "/visits/new", params: { customerId: customer.id } })}
         />
         <Button
           label={t("billing.actions.openVoucher")}
           variant="soft"
           block
-          leadingIcon={<Receipt size={18} color="#223D69" />}
+          leadingIcon={<Receipt size={18} color={colors.navy[900]} />}
           onPress={() => router.push(`/customers/${customer.id}/voucher`)}
         />
         <Button
           label={t("billing.actions.openStatement")}
           variant="ghost"
           block
-          leadingIcon={<Paper size={18} color="#223D69" />}
+          leadingIcon={<Paper size={18} color={colors.navy[900]} />}
           onPress={() => router.push(`/customers/${customer.id}/statement`)}
         />
         {customer.type !== "home" ? (
@@ -171,7 +172,7 @@ export default function CustomerDetailScreen() {
             label={t("finance.contracts.new")}
             variant="ghost"
             block
-            leadingIcon={<Briefcase size={18} color="#223D69" />}
+            leadingIcon={<Briefcase size={18} color={colors.navy[900]} />}
             onPress={() =>
               router.push({ pathname: "/contracts/new", params: { customerId: customer.id } })
             }
@@ -191,7 +192,7 @@ export default function CustomerDetailScreen() {
             >
               <Card className="flex-row items-center gap-3 p-3">
                 <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-                  <Stethoscope size={18} color="#0F7A8A" />
+                  <Stethoscope size={18} color={colors.teal[600]} />
                 </View>
                 <View className="flex-1 gap-1">
                   <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
@@ -204,7 +205,7 @@ export default function CustomerDetailScreen() {
                     ) : null}
                   </View>
                 </View>
-                <Forward size={18} color="#94A1B5" />
+                <Forward size={18} color={colors.ink[400]} />
               </Card>
             </Pressable>
           ))}
@@ -219,7 +220,7 @@ export default function CustomerDetailScreen() {
           onPress={() => router.push(`/customers/${customer.id}/farms/new`)}
           className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
         >
-          <Add size={14} color="#FFFFFF" />
+          <Add size={14} color={colors.white} />
           <Text className="text-paper text-[12px] font-tajawal-bold">
             {t("customers.farms.new")}
           </Text>
@@ -243,7 +244,7 @@ export default function CustomerDetailScreen() {
               >
                 <Card className="flex-row items-center gap-3 p-3">
                   <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-                    {FARM_KIND_ICON[farm.kind] ?? <Briefcase size={18} color="#0F7A8A" />}
+                    {FARM_KIND_ICON[farm.kind] ?? <Briefcase size={18} color={colors.teal[600]} />}
                   </View>
                   <View className="flex-1 gap-1">
                     <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
@@ -263,7 +264,7 @@ export default function CustomerDetailScreen() {
                     </View>
                   </View>
                   {farmLedger ? <Money value={farmLedger.balance} /> : null}
-                  <Forward size={18} color="#94A1B5" />
+                  <Forward size={18} color={colors.ink[400]} />
                 </Card>
               </Pressable>
             );
@@ -279,7 +280,7 @@ export default function CustomerDetailScreen() {
           onPress={() => router.push(`/customers/${customer.id}/pets/new`)}
           className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
         >
-          <Add size={14} color="#FFFFFF" />
+          <Add size={14} color={colors.white} />
           <Text className="text-paper text-[12px] font-tajawal-bold">
             {t("customers.pets.new")}
           </Text>
@@ -315,7 +316,7 @@ export default function CustomerDetailScreen() {
                     {pet.sex ? <Pill tone="teal" label={t(`petSex.${pet.sex}`)} /> : null}
                   </View>
                 </View>
-                <Forward size={18} color="#94A1B5" />
+                <Forward size={18} color={colors.ink[400]} />
               </Card>
             </Pressable>
           ))

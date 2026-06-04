@@ -6,6 +6,7 @@ import { Box } from "@/components/icons";
 import { Card, Pill } from "@/components/ui";
 import { useQuery } from "@/sync/hooks";
 import type { BatchRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 interface Props {
   contractId: string;
@@ -57,7 +58,7 @@ export function ContractBatchesSection({ contractId }: Props) {
               <View className="flex-row items-center justify-between gap-2">
                 <View className="flex-row items-center gap-2">
                   <View className="bg-teal-50 h-9 w-9 items-center justify-center rounded-card">
-                    <Box size={16} color="#0F7A8A" />
+                    <Box size={16} color={colors.teal[600]} />
                   </View>
                   <Pill tone={STATUS_TONE[b.status] ?? "neutral"} label={t(`batchStatus.${b.status}`)} />
                 </View>

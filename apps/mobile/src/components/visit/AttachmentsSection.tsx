@@ -25,6 +25,7 @@ import { drainAttachmentOutbox, refreshAttachmentCounts } from "@/services/attac
 import { useQuery } from "@/sync/hooks";
 import type { AttachmentRow } from "@/sync/types";
 import { useSyncStore } from "@/stores/syncStore";
+import { colors } from "@/theme";
 
 interface AttachmentsSectionProps {
   visitId: string;
@@ -139,7 +140,7 @@ export function AttachmentsSection({ visitId, isTerminal }: AttachmentsSectionPr
             onPress={onAdd}
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
           >
-            <Camera size={14} color="#FFFFFF" />
+            <Camera size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">{t("visits.files.add")}</Text>
           </Pressable>
         ) : null}
@@ -156,7 +157,7 @@ export function AttachmentsSection({ visitId, isTerminal }: AttachmentsSectionPr
           {pendingOnly.map((o) => (
             <Row
               key={o.id}
-              icon={<ImageIcon size={18} color="#0F7A8A" />}
+              icon={<ImageIcon size={18} color={colors.teal[600]} />}
               title={o.title || t(`attachmentType.${o.fileType}`)}
               pill={outboxPill(o.status)}
               viewLabel={t("visits.files.view")}
@@ -168,9 +169,9 @@ export function AttachmentsSection({ visitId, isTerminal }: AttachmentsSectionPr
               key={r.id}
               icon={
                 r.file_type === "pdf" ? (
-                  <Paper size={18} color="#0F7A8A" />
+                  <Paper size={18} color={colors.teal[600]} />
                 ) : (
-                  <ImageIcon size={18} color="#0F7A8A" />
+                  <ImageIcon size={18} color={colors.teal[600]} />
                 )
               }
               title={r.title || t(`attachmentType.${r.file_type}`, { defaultValue: r.file_type })}
@@ -242,7 +243,7 @@ function Row({
           viewDisabled ? "opacity-50" : ""
         }`}
       >
-        {busy ? <ActivityIndicator size="small" color="#0B6573" /> : <Search size={16} color="#0B6573" />}
+        {busy ? <ActivityIndicator size="small" color={colors.teal[700]} /> : <Search size={16} color={colors.teal[700]} />}
       </Pressable>
     </Card>
   );
@@ -261,13 +262,13 @@ function ImageViewer({
   const [loading, setLoading] = useState(true);
   return (
     <Modal visible={viewer !== null} transparent animationType="fade" onRequestClose={onClose}>
-      <View className="flex-1 bg-[rgba(8,16,30,0.95)]">
+      <View className="flex-1 bg-ink-900/95">
         <View className="flex-row items-center justify-between px-5 pb-3 pt-12">
           <Text className="text-paper flex-1 text-[14px] font-tajawal-bold" numberOfLines={1}>
             {viewer?.title ?? ""}
           </Text>
           <Pressable onPress={onClose} accessibilityRole="button" hitSlop={8}>
-            <Text className="text-[14px] font-tajawal-bold" style={{ color: "#5EE6D0" }}>
+            <Text className="text-[14px] font-tajawal-bold" style={{ color: colors.teal[200] }}>
               {closeLabel}
             </Text>
           </Pressable>
@@ -284,7 +285,7 @@ function ImageViewer({
           ) : null}
           {loading && viewer ? (
             <View className="absolute">
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={colors.white} />
             </View>
           ) : null}
         </View>

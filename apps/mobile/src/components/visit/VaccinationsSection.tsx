@@ -7,6 +7,7 @@ import { Add, Forward, Syringe } from "@/components/icons";
 import { Card, Pill } from "@/components/ui";
 import { useQuery } from "@/sync/hooks";
 import type { VaccinationRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 interface VaccinationsSectionProps {
   visitId: string;
@@ -55,7 +56,7 @@ export function VaccinationsSection({ visitId, isTerminal }: VaccinationsSection
             }
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
           >
-            <Add size={14} color="#FFFFFF" />
+            <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">
               {t("visits.vaccinations.add")}
             </Text>
@@ -83,7 +84,7 @@ export function VaccinationsSection({ visitId, isTerminal }: VaccinationsSection
           >
             <Card className="flex-row items-center gap-3 p-3">
               <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-                <Syringe size={18} color="#0F7A8A" />
+                <Syringe size={18} color={colors.teal[600]} />
               </View>
               <View className="flex-1 gap-1">
                 <Text
@@ -112,7 +113,7 @@ export function VaccinationsSection({ visitId, isTerminal }: VaccinationsSection
                   />
                 </View>
               </View>
-              {!isTerminal ? <Forward size={18} color="#94A1B5" /> : null}
+              {!isTerminal ? <Forward size={18} color={colors.ink[400]} /> : null}
             </Card>
           </Pressable>
         ))

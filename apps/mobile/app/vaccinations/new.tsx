@@ -18,6 +18,7 @@ import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow } from "@/sync/types";
 import { syncInsert } from "@/sync/writes";
+import { colors } from "@/theme";
 
 /**
  * Create a **standalone** vaccination (Mo9.2) — no visit. The recipient is a customer picked
@@ -142,7 +143,7 @@ function CustomerPicker({ onPick }: { onPick: (id: string) => void }) {
         placeholder={t("vaccinations.form.searchCustomer")}
         value={search}
         onChangeText={setSearch}
-        leading={<Search size={18} color="#94A1B5" />}
+        leading={<Search size={18} color={colors.ink[400]} />}
         autoCapitalize="none"
       />
       <FlatList
@@ -166,7 +167,7 @@ function CustomerPicker({ onPick }: { onPick: (id: string) => void }) {
                   <Text className="text-ink-500 text-[12px] font-tajawal">{item.phone_primary}</Text>
                 ) : null}
               </View>
-              <Forward size={20} color="#94A1B5" />
+              <Forward size={20} color={colors.ink[400]} />
             </Card>
           </Pressable>
         )}

@@ -14,6 +14,7 @@ import { Button, Card, Input, Pill } from "@/components/ui";
 import { FormField, NumberFieldTransform } from "@/components/forms";
 import { useQuery } from "@/sync/hooks";
 import type { ProductRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 interface MedicationPriceFormProps {
   /** Products already overridden on this contract — hidden from the create picker (one row per product). */
@@ -115,7 +116,7 @@ export function MedicationPriceForm({
             placeholder={t("customers.searchPlaceholder")}
             value={search}
             onChangeText={setSearch}
-            leading={<Search size={18} color="#94A1B5" />}
+            leading={<Search size={18} color={colors.ink[400]} />}
             autoCapitalize="none"
           />
           <FlatList
@@ -129,7 +130,7 @@ export function MedicationPriceForm({
                   className="flex-row items-center gap-3 p-3"
                   style={
                     selectedProductId === item.id
-                      ? { borderColor: "#0F7A8A", borderWidth: 1.5 }
+                      ? { borderColor: colors.teal[600], borderWidth: 1.5 }
                       : undefined
                   }
                 >

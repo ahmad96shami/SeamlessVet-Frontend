@@ -13,14 +13,15 @@ import { Bird, Briefcase, Cow, House, User } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { ChipSelect, FormField } from "@/components/forms";
 import { omitEmptyStrings } from "@/lib/forms";
+import { colors } from "@/theme";
 
 const TYPE_ICONS: Record<CustomerType, React.ReactNode> = {
-  poultry_farm: <Bird size={14} color="#0E1B2C" />,
-  cattle_farm: <Cow size={14} color="#0E1B2C" />,
-  regular_farm: <Briefcase size={14} color="#0E1B2C" />,
-  home: <House size={14} color="#0E1B2C" />,
+  poultry_farm: <Bird size={14} color={colors.ink[900]} />,
+  cattle_farm: <Cow size={14} color={colors.ink[900]} />,
+  regular_farm: <Briefcase size={14} color={colors.ink[900]} />,
+  home: <House size={14} color={colors.ink[900]} />,
   // M15 — walk-in clinic client (no farm/home), added alongside farms.
-  clinic_customer: <User size={14} color="#0E1B2C" />,
+  clinic_customer: <User size={14} color={colors.ink[900]} />,
 };
 
 interface CustomerFormProps {

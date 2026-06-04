@@ -12,6 +12,7 @@ import { ContractMedicationPricesSection } from "@/components/contract/ContractM
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { ContractRow, CustomerRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 const STATUS_TONE: Record<string, "teal" | "amber" | "green" | "red" | "neutral"> = {
   draft: "amber",
@@ -68,7 +69,7 @@ export default function ContractDetailScreen() {
                 accessibilityRole="button"
                 className="h-9 w-9 items-center justify-center"
               >
-                <Edit size={20} color="#223D69" />
+                <Edit size={20} color={colors.navy[900]} />
               </Pressable>
             ) : null
           }
@@ -77,7 +78,7 @@ export default function ContractDetailScreen() {
     >
       <Card className="flex-row items-center gap-3 p-4">
         <View className="bg-teal-50 h-14 w-14 items-center justify-center rounded-card">
-          <Paper size={22} color="#0F7A8A" />
+          <Paper size={22} color={colors.teal[600]} />
         </View>
         <View className="flex-1 gap-1.5">
           <Text className="text-navy-900 text-[17px] font-tajawal-extrabold" numberOfLines={1}>

@@ -9,12 +9,13 @@ import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, FarmRow, LedgerRow, VisitRow } from "@/sync/types";
 import { syncDelete } from "@/sync/writes";
+import { colors } from "@/theme";
 
 const KIND_ICON: Record<string, React.ReactNode> = {
-  poultry: <Bird size={22} color="#0F7A8A" />,
-  cattle: <Cow size={22} color="#0F7A8A" />,
-  mixed: <Briefcase size={22} color="#0F7A8A" />,
-  other: <Box size={22} color="#0F7A8A" />,
+  poultry: <Bird size={22} color={colors.teal[600]} />,
+  cattle: <Cow size={22} color={colors.teal[600]} />,
+  mixed: <Briefcase size={22} color={colors.teal[600]} />,
+  other: <Box size={22} color={colors.teal[600]} />,
 };
 
 const STATUS_TONE: Record<string, "teal" | "amber" | "green" | "red" | "neutral"> = {
@@ -107,14 +108,14 @@ export default function FarmDetailScreen() {
                 accessibilityRole="button"
                 className="h-9 w-9 items-center justify-center"
               >
-                <Edit size={20} color="#223D69" />
+                <Edit size={20} color={colors.navy[900]} />
               </Pressable>
               <Pressable
                 onPress={confirmDelete}
                 accessibilityRole="button"
                 className="h-9 w-9 items-center justify-center"
               >
-                <Trash size={20} color="#B33235" />
+                <Trash size={20} color={colors.rose.ink} />
               </Pressable>
             </View>
           }
@@ -123,7 +124,7 @@ export default function FarmDetailScreen() {
     >
       <Card className="flex-row items-center gap-3 p-4">
         <View className="bg-teal-50 h-14 w-14 items-center justify-center rounded-card">
-          {KIND_ICON[farm.kind] ?? <Box size={22} color="#0F7A8A" />}
+          {KIND_ICON[farm.kind] ?? <Box size={22} color={colors.teal[600]} />}
         </View>
         <View className="flex-1 gap-1.5">
           <Text className="text-navy-900 text-[17px] font-tajawal-extrabold" numberOfLines={1}>
@@ -161,7 +162,7 @@ export default function FarmDetailScreen() {
           label={t("customers.farms.account")}
           variant="ghost"
           block
-          leadingIcon={<Paper size={18} color="#223D69" />}
+          leadingIcon={<Paper size={18} color={colors.navy[900]} />}
           onPress={() =>
             router.push({
               pathname: "/customers/[id]/farms/[farmId]/statement",
@@ -187,7 +188,7 @@ export default function FarmDetailScreen() {
             >
               <Card className="flex-row items-center gap-3 p-3">
                 <View className="bg-teal-50 h-10 w-10 items-center justify-center rounded-card">
-                  <Stethoscope size={18} color="#0F7A8A" />
+                  <Stethoscope size={18} color={colors.teal[600]} />
                 </View>
                 <View className="flex-1 gap-1">
                   <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>
@@ -200,7 +201,7 @@ export default function FarmDetailScreen() {
                     ) : null}
                   </View>
                 </View>
-                <Forward size={18} color="#94A1B5" />
+                <Forward size={18} color={colors.ink[400]} />
               </Card>
             </Pressable>
           ))

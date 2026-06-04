@@ -12,6 +12,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow } from "@/sync/types";
 import { syncInsert } from "@/sync/writes";
+import { colors } from "@/theme";
 
 /** Parse a numeric route param ("" / undefined / non-numeric → undefined). */
 function numParam(v: string | undefined): number | undefined {
@@ -164,7 +165,7 @@ function CustomerPicker({ onPick }: { onPick: (id: string) => void }) {
         placeholder={t("customers.searchPlaceholder")}
         value={search}
         onChangeText={setSearch}
-        leading={<Search size={18} color="#94A1B5" />}
+        leading={<Search size={18} color={colors.ink[400]} />}
         autoCapitalize="none"
       />
       <FlatList
@@ -188,7 +189,7 @@ function CustomerPicker({ onPick }: { onPick: (id: string) => void }) {
                   <Text className="text-ink-500 text-[12px] font-tajawal">{item.phone_primary}</Text>
                 ) : null}
               </View>
-              <Forward size={20} color="#94A1B5" />
+              <Forward size={20} color={colors.ink[400]} />
             </Card>
           </Pressable>
         )}

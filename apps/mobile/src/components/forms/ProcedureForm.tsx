@@ -10,6 +10,7 @@ import { Button, Card, Input, Pill } from "@/components/ui";
 import { FormField, NumberFieldTransform } from "@/components/forms";
 import { useQuery } from "@/sync/hooks";
 import type { ServiceRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 interface ProcedureFormProps {
   visitId: string;
@@ -90,7 +91,7 @@ export function ProcedureForm({
         placeholder={t("customers.searchPlaceholder")}
         value={search}
         onChangeText={setSearch}
-        leading={<Search size={18} color="#94A1B5" />}
+        leading={<Search size={18} color={colors.ink[400]} />}
         autoCapitalize="none"
       />
 
@@ -104,7 +105,7 @@ export function ProcedureForm({
             <Pressable onPress={() => form.setValue("serviceId", item.id)}>
               <Card
                 className="flex-row items-center gap-3 p-3"
-                style={selectedServiceId === item.id ? { borderColor: "#0F7A8A", borderWidth: 1.5 } : undefined}
+                style={selectedServiceId === item.id ? { borderColor: colors.teal[600], borderWidth: 1.5 } : undefined}
               >
                 <View className="flex-1 gap-1">
                   <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>

@@ -13,6 +13,7 @@ import { Button, Card, Chip, Input, Pill } from "@/components/ui";
 import { FormField, NumberFieldTransform } from "@/components/forms";
 import { useQuery } from "@/sync/hooks";
 import type { ProductRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 interface PrescriptionFormProps {
   visitId: string;
@@ -217,7 +218,7 @@ export function PrescriptionForm({
             placeholder={t("customers.searchPlaceholder")}
             value={search}
             onChangeText={setSearch}
-            leading={<Search size={18} color="#94A1B5" />}
+            leading={<Search size={18} color={colors.ink[400]} />}
             autoCapitalize="none"
           />
 
@@ -232,7 +233,7 @@ export function PrescriptionForm({
                   className="flex-row items-center gap-3 p-3"
                   style={
                     selectedProductId === item.id
-                      ? { borderColor: "#0F7A8A", borderWidth: 1.5 }
+                      ? { borderColor: colors.teal[600], borderWidth: 1.5 }
                       : undefined
                   }
                 >

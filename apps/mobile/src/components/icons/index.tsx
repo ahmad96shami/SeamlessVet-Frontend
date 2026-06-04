@@ -1,4 +1,5 @@
 import Svg, { Circle, Ellipse, G, Path, Rect, type SvgProps } from "react-native-svg";
+import { colors } from "@/theme";
 
 /**
  * SeamlessVet line-icon set — 24×24 viewport, 1.8 stroke, round caps/joins,
@@ -16,7 +17,7 @@ export interface IconProps extends Omit<SvgProps, "viewBox" | "fill" | "stroke">
 
 // Default stroke colour matches token `ink-900` — the design's body-ink. Callers
 // override via `color` to tint icons (navy, teal, amber, etc.).
-const DEFAULT_STROKE = "#0E1B2C";
+const DEFAULT_STROKE = colors.ink[900];
 
 function Frame({
   size = 22,
