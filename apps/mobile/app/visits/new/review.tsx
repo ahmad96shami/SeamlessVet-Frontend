@@ -32,7 +32,6 @@ import {
   photoKindForCustomerType,
   Pill,
 } from "@/components/ui";
-import { toArabicDigits } from "@/lib/numerals";
 import { nextVisitNumber } from "@/lib/visitNumber";
 import { offlineQueue } from "@/services/offlineQueue";
 import { sendOrQueue } from "@/services/sendOrQueue";
@@ -335,9 +334,9 @@ export default function WizardReviewScreen() {
   };
 
   const now = new Date();
-  const timeLabel = `${formatDate(now.toISOString(), i18n.resolvedLanguage)} · ${toArabicDigits(
-    `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`,
-  )}`;
+  const timeLabel = `${formatDate(now.toISOString(), i18n.resolvedLanguage)} · ${String(
+    now.getHours(),
+  ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
   return (
     <ScreenShell
@@ -415,7 +414,7 @@ export default function WizardReviewScreen() {
                     {i > 0 ? <Divider dashed /> : null}
                     <LineItem
                       name={l.name}
-                      qty={`${toArabicDigits(l.qty)} × ${l.unit ?? "—"}`}
+                      qty={`${l.qty} × ${l.unit ?? "—"}`}
                       total={l.lineTotal}
                     />
                   </View>

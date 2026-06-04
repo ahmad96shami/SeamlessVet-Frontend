@@ -15,7 +15,7 @@ import {
   photoKindForCustomerType,
   Pill,
 } from "@/components/ui";
-import { formatArabicNumber } from "@/lib/numerals";
+import { formatAmount } from "@/lib/numerals";
 import { useVisitWizardStore } from "@/stores/visitWizardStore";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, FarmRow, PetRow } from "@/sync/types";
@@ -250,7 +250,7 @@ export default function WizardClientScreen() {
                           tone="red"
                           compact
                           label={t("visits.wizard.debt", {
-                            amount: formatArabicNumber(item.total_balance ?? 0),
+                            amount: formatAmount(item.total_balance ?? 0),
                           })}
                         />
                       </View>

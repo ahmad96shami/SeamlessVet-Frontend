@@ -28,7 +28,7 @@ import {
   type ChequeDetails,
 } from "@/components/ChequeFields";
 import { Footer, ScreenShell, TopBar } from "@/components/layout";
-import { formatArabicNumber } from "@/lib/numerals";
+import { formatAmount } from "@/lib/numerals";
 import { sendOrQueue } from "@/services/sendOrQueue";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow } from "@/sync/types";
@@ -180,7 +180,7 @@ export default function ReceiptVoucherScreen() {
                     </Text>
                     {balance > 0 ? (
                       <Text className="text-rose text-[14px] font-tajawal-bold">
-                        {t("visits.wizard.debt", { amount: formatArabicNumber(balance) })}
+                        {t("visits.wizard.debt", { amount: formatAmount(balance) })}
                       </Text>
                     ) : (
                       <Money value={balance} />

@@ -17,7 +17,6 @@ import {
   Pill,
   Stepper,
 } from "@/components/ui";
-import { toArabicDigits } from "@/lib/numerals";
 import { useVisitWizardStore } from "@/stores/visitWizardStore";
 import {
   classifyStock,
@@ -200,7 +199,7 @@ export default function WizardMedsScreen() {
                   <Pill
                     compact
                     tone={out ? "red" : "neutral"}
-                    label={t("visits.wizard.available", { n: toArabicDigits(item.quantity) })}
+                    label={t("visits.wizard.available", { n: item.quantity })}
                   />
                   {isLow ? (
                     <Pill

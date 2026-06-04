@@ -1,13 +1,12 @@
 import { Pressable, Text, View } from "react-native";
 
 import { colors } from "@/theme";
-import { toArabicDigits } from "@/lib/numerals";
 
 import { Add } from "../icons";
 
 /**
  * The design's quantity stepper — a pill track (ink-50) holding two 28-px paper
- * buttons around an Arabic-Indic count. Used wherever a quantity is picked
+ * buttons around the count. Used wherever a quantity is picked
  * (inventory load/return, the visit wizard's meds step).
  *
  * Under the app's forced RTL, `flex-row` already renders first-child-on-the-right,
@@ -34,7 +33,7 @@ export function Stepper({ value, onIncrement, onDecrement, disableIncrement }: S
         <Text className="text-navy-900 text-[16px] font-tajawal-extrabold">−</Text>
       </Pressable>
       <Text className="text-navy-900 min-w-[24px] text-center text-[14px] font-tajawal-extrabold">
-        {toArabicDigits(value)}
+        {value}
       </Text>
       <Pressable
         onPress={onIncrement}

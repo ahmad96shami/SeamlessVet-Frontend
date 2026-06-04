@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { formatDate } from "@vet/shared";
+import { formatDate, formatQuantity } from "@vet/shared";
 
 import { ArrowDown, Pill as PillIcon, Search, Truck, Warn } from "@/components/icons";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
@@ -16,7 +16,6 @@ import {
   totalUnits,
 } from "@/sync/fieldInventory";
 import { useQuery } from "@/sync/hooks";
-import { toArabicDigits } from "@/lib/numerals";
 import { colors } from "@/theme";
 
 type Tab = "all" | "low" | "expiring";
@@ -105,7 +104,7 @@ export default function InventoryScreen() {
             </Text>
             <View className="flex-row items-baseline gap-1.5">
               <Text className="text-navy-900 text-[22px] font-tajawal-extrabold">
-                {toArabicDigits(counts.total)}
+                {counts.total}
               </Text>
               <Text className="text-ink-700 text-[13px] font-tajawal-bold">
                 {t("mobile.inventory.unit", { defaultValue: "وحدة" })}
@@ -181,9 +180,9 @@ export default function InventoryScreen() {
       <View className="mt-4">
         <SegmentedTabs<Tab>
           options={[
-            { key: "all", label: `${t("common.all", { defaultValue: "الكل" })} (${toArabicDigits(classified.length)})` },
-            { key: "low", label: `${t("inventory.status.low")} (${toArabicDigits(counts.low)})` },
-            { key: "expiring", label: `${t("inventory.status.expiringSoon")} (${toArabicDigits(counts.expiring)})` },
+            { key: "all", label: `${t("common.all", { defaultValue: "الكل" })} (${classified.length})` },
+            { key: "low", label: `${t("inventory.status.low")} (${counts.low})` },
+            { key: "expiring", label: `${t("inventory.status.expiringSoon")} (${counts.expiring})` },
           ]}
           value={tab}
           onChange={setTab}
@@ -272,11 +271,11 @@ function StockRow({ row, i18nLang }: StockRowProps) {
             isOut ? "text-rose-ink" : "text-navy-900"
           }`}
         >
-          {toArabicDigits(Math.round(row.quantity * 1000) / 1000)}
+          {formatQuantity(row.quantity)}
         </Text>
         {(row.reorder_point ?? 0) > 0 ? (
           <Text className="text-ink-500 text-[11px] font-tajawal">
-            {t("inventory.col.reorderPoint")} {toArabicDigits(row.reorder_point ?? 0)}
+            {t("inventory.col.reorderPoint")} {formatQuantity(row.reorder_point ?? 0)}
           </Text>
         ) : null}
       </View>

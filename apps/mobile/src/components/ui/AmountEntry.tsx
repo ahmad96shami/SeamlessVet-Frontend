@@ -8,7 +8,7 @@ import { Chip } from "./Chip";
 /**
  * The design's big-amount entry card (the سند قبض "المبلغ المستلم" block) — a
  * 32-px centred numeric field with the currency trailing, plus a row of quick
- * preset chips (١٠٠ / ٢٥٠ / ٥٠٠ / ١٠٠٠ / المتبقي).
+ * preset chips (100 / 250 / 500 / 1000 / المتبقي).
  *
  * Presets are plain labels; the caller maps a tapped label to a value (e.g.,
  * "المتبقي" → the customer's outstanding balance).

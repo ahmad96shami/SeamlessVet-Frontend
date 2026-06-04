@@ -29,7 +29,6 @@ import {
   Stat,
   TimeBox,
 } from "@/components/ui";
-import { toArabicDigits } from "@/lib/numerals";
 import { useAuthStore } from "@/stores/authStore";
 import {
   classifyStock,
@@ -116,19 +115,19 @@ export default function Index() {
       <View className="flex-row gap-2.5">
         <Stat
           icon={<Box size={18} color={colors.teal[600]} />}
-          value={toArabicDigits(stockRows.length)}
+          value={stockRows.length}
           label={t("dashboard.stats.stockItems")}
         />
         <Stat
           icon={<Warn size={18} color={colors.amber.DEFAULT} />}
           tone="amber"
-          value={toArabicDigits(lowCount)}
+          value={lowCount}
           label={t("dashboard.stats.belowThreshold")}
         />
         <Stat
           icon={<Receipt size={18} color={colors.emerald.ink} />}
           tone="green"
-          value={toArabicDigits(voucherRows[0]?.n ?? 0)}
+          value={voucherRows[0]?.n ?? 0}
           label={t("dashboard.stats.todayVouchers")}
         />
       </View>
@@ -290,7 +289,7 @@ export default function Index() {
   );
 }
 
-/** "HH:MM" in device-local time from an ISO timestamp (TimeBox renders the digits Arabic-Indic). */
+/** "HH:MM" in device-local time from an ISO timestamp. */
 function timeOf(iso: string | null): string {
   if (!iso) return "—";
   const d = new Date(iso);

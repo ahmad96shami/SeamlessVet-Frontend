@@ -20,7 +20,7 @@ import {
   Voucher,
 } from "@/components/ui";
 import { Footer, ScreenShell, TopBar } from "@/components/layout";
-import { formatArabicNumber } from "@/lib/numerals";
+import { formatAmount } from "@/lib/numerals";
 import { apiClient } from "@/services/apiClient";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, FarmRow, LedgerEntryRow, LedgerRow } from "@/sync/types";
@@ -326,7 +326,7 @@ export function StatementScreen({ scope }: { scope: StatementScope }) {
                       }`}
                     >
                       {e.amount >= 0 ? "−" : "+"}
-                      {formatArabicNumber(Math.abs(e.amount))}
+                      {formatAmount(Math.abs(e.amount))}
                     </Text>
                   </View>
                 </View>
