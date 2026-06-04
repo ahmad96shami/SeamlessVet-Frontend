@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
@@ -77,7 +77,13 @@ export default function MovementsScreen() {
         />
       }
     >
-      <View className="mb-3 flex-row flex-wrap gap-2">
+      {/* One row, never wraps — full-bleed horizontal scroll (RTL starts right). */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="-mx-5 mb-3 grow-0"
+        contentContainerStyle={{ gap: 8, paddingHorizontal: 20 }}
+      >
         <Chip
           label={t("common.all", { defaultValue: "الكل" }) + ` (${rows.length})`}
           active={filter === "all" ? "navy" : "off"}
@@ -103,7 +109,7 @@ export default function MovementsScreen() {
           active={filter === "unload_from_field" ? "navy" : "off"}
           onPress={() => setFilter("unload_from_field")}
         />
-      </View>
+      </ScrollView>
 
       <FlatList
         // Full-bleed: see the FlatList note in visits/index — shadows clip otherwise.

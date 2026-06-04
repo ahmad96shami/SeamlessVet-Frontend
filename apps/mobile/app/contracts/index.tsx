@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
@@ -81,7 +81,13 @@ export default function ContractsListScreen() {
           autoCapitalize="none"
         />
 
-        <View className="flex-row flex-wrap gap-2">
+        {/* One row, never wraps — full-bleed horizontal scroll (RTL starts right). */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="-mx-5 grow-0"
+          contentContainerStyle={{ gap: 8, paddingHorizontal: 20 }}
+        >
           {STATUS_FILTERS.map((s) => (
             <Chip
               key={s}
@@ -90,12 +96,9 @@ export default function ContractsListScreen() {
               onPress={() => setStatus(s)}
             />
           ))}
-        </View>
+        </ScrollView>
 
         <View className="mt-1 flex-row items-center justify-between">
-          <Text className="text-ink-700 text-[13px] font-tajawal-bold">
-            {filtered.length} / {(data ?? []).length}
-          </Text>
           <Pressable
             onPress={() => router.push("/contracts/new")}
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
@@ -105,6 +108,9 @@ export default function ContractsListScreen() {
               {t("finance.contracts.new")}
             </Text>
           </Pressable>
+          <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+            {filtered.length} / {(data ?? []).length}
+          </Text>
         </View>
       </View>
 

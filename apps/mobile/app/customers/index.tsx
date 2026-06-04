@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 
 import { Add, Bird, Briefcase, Cow, Forward, House, Search } from "@/components/icons";
 import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill } from "@/components/ui";
@@ -77,7 +77,13 @@ export default function CustomersListScreen() {
           autoCapitalize="none"
         />
 
-        <View className="flex-row flex-wrap gap-2">
+        {/* One row, never wraps — full-bleed horizontal scroll (RTL starts right). */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="-mx-5 grow-0"
+          contentContainerStyle={{ gap: 8, paddingHorizontal: 20 }}
+        >
           {TYPE_FILTERS.map((f) => (
             <Chip
               key={f.key}
@@ -87,12 +93,9 @@ export default function CustomersListScreen() {
               onPress={() => setType(f.key)}
             />
           ))}
-        </View>
+        </ScrollView>
 
         <View className="flex-row items-center justify-between mt-1">
-          <Text className="text-ink-700 text-[13px] font-tajawal-bold">
-            {filtered.length} / {(data ?? []).length}
-          </Text>
           <Pressable
             onPress={() => router.push("/customers/new")}
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
@@ -100,6 +103,9 @@ export default function CustomersListScreen() {
             <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">{t("customers.new")}</Text>
           </Pressable>
+          <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+            {filtered.length} / {(data ?? []).length}
+          </Text>
         </View>
       </View>
 

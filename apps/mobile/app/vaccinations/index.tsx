@@ -91,9 +91,6 @@ export default function VaccinationsAgendaScreen() {
         />
 
         <View className="mt-1 flex-row items-center justify-between">
-          <Text className="text-ink-700 text-[13px] font-tajawal-bold">
-            {(data ?? []).length > 0 ? `${sections.reduce((n, s) => n + s.data.length, 0)} / ${(data ?? []).length}` : ""}
-          </Text>
           <Pressable
             onPress={() => router.push("/vaccinations/new")}
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
@@ -101,6 +98,9 @@ export default function VaccinationsAgendaScreen() {
             <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">{t("vaccinations.new")}</Text>
           </Pressable>
+          <Text className="text-ink-700 text-[13px] font-tajawal-bold">
+            {(data ?? []).length > 0 ? `${sections.reduce((n, s) => n + s.data.length, 0)} / ${(data ?? []).length}` : ""}
+          </Text>
         </View>
       </View>
 
