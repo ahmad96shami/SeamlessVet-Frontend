@@ -105,7 +105,9 @@ export default function VaccinationsAgendaScreen() {
       </View>
 
       <SectionList
-        className="mt-3 flex-1"
+        // Full-bleed: see the FlatList note in visits/index — shadows clip otherwise.
+        className="-mx-5 mt-3 flex-1"
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 8 }}
         sections={sections}
         keyExtractor={(v) => v.id}
         stickySectionHeadersEnabled={false}

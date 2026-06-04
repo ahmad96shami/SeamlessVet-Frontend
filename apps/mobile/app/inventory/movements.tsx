@@ -106,7 +106,9 @@ export default function MovementsScreen() {
       </View>
 
       <FlatList
-        className="flex-1"
+        // Full-bleed: see the FlatList note in visits/index — shadows clip otherwise.
+        className="-mx-5 flex-1"
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 8 }}
         data={filtered}
         keyExtractor={(r) => r.id}
         ItemSeparatorComponent={() => <View className="h-2" />}

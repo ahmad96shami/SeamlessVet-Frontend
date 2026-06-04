@@ -200,7 +200,10 @@ export default function InventoryScreen() {
       </View>
 
       <FlatList
-        className="mt-3 flex-1"
+        // Full-bleed: ScrollViews clip children on Android, so the horizontal
+        // body padding lives INSIDE the scroll content or card shadows get cut.
+        className="-mx-5 mt-3 flex-1"
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 8 }}
         data={filtered}
         keyExtractor={(r) => r.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
