@@ -63,11 +63,23 @@
       "newCustomer": "عميل جديد",
       "openPos": "فتح نقطة البيع",
       "openInventory": "إدارة المخزون",
-      "todayReport": "تقرير اليوم"
+      "todayReport": "تقرير اليوم",
+      "loadInventory": "تحميل المخزون",
+      "receiptVoucher": "سند قبض",
+      "statement": "كشف حساب",
+      "stockAlerts": "تنبيهات المخزون"
+    },
+    "quickActionsTitle": "إجراءات سريعة",
+    "next": "القادمة",
+    "stats": {
+      "stockItems": "صنف في مخزونك",
+      "belowThreshold": "تحت حد الإنذار",
+      "todayVouchers": "سندات اليوم"
     },
     "viewAll": "عرض الكل",
     "todaySchedule": {
       "title": "جدول اليوم",
+      "emptyField": "لا توجد زيارات اليوم بعد.",
       "subtitle_one": "موعد واحد",
       "subtitle_two": "موعدان",
       "subtitle_few": "{{count}} مواعيد",
@@ -104,7 +116,14 @@
     },
     "vaxReminders": {
       "title": "تذكيرات تطعيمات",
-      "empty": "لا توجد تذكيرات للأسبوع القادم."
+      "empty": "لا توجد تذكيرات للأسبوع القادم.",
+      "dueToday": "مستحق اليوم",
+      "overdue": "متأخر",
+      "dueIn_one": "بعد يوم واحد",
+      "dueIn_two": "بعد يومين",
+      "dueIn_few": "بعد {{count}} أيام",
+      "dueIn_many": "بعد {{count}} يومًا",
+      "dueIn_other": "بعد {{count}} يوم"
     },
     "medicationDue": {
       "title": "جرعات دواء مستحقة",

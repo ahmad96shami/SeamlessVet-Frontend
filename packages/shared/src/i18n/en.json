@@ -63,11 +63,23 @@
       "newCustomer": "New customer",
       "openPos": "Open POS",
       "openInventory": "Manage inventory",
-      "todayReport": "Today's report"
+      "todayReport": "Today's report",
+      "loadInventory": "Load inventory",
+      "receiptVoucher": "Receipt voucher",
+      "statement": "Statement",
+      "stockAlerts": "Stock alerts"
+    },
+    "quickActionsTitle": "Quick actions",
+    "next": "Next",
+    "stats": {
+      "stockItems": "Items in your stock",
+      "belowThreshold": "Below alert threshold",
+      "todayVouchers": "Today's vouchers"
     },
     "viewAll": "View all",
     "todaySchedule": {
       "title": "Today's schedule",
+      "emptyField": "No visits today yet.",
       "subtitle_one": "1 appointment",
       "subtitle_other": "{{count}} appointments",
       "empty": "Nothing scheduled today."
@@ -95,7 +107,11 @@
     },
     "vaxReminders": {
       "title": "Vaccination reminders",
-      "empty": "Nothing due in the next 7 days."
+      "empty": "Nothing due in the next 7 days.",
+      "dueToday": "Due today",
+      "overdue": "Overdue",
+      "dueIn_one": "in 1 day",
+      "dueIn_other": "in {{count}} days"
     },
     "medicationDue": {
       "title": "Medication doses due",
