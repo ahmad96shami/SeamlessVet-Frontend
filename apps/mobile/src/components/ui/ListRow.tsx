@@ -21,14 +21,12 @@ interface ListRowProps extends Omit<PressableProps, "children"> {
 }
 
 export function ListRow({ flat, selected, onPress, className, children, ...rest }: ListRowProps) {
-  const tone = selected
-    ? "border-2 border-teal-200"
-    : flat
-      ? "border border-ink-100"
-      : "shadow-card";
+  const tone = selected ? "border-2 border-teal-200" : flat ? "border border-ink-100" : "";
   const base = `bg-paper rounded-card flex-row items-center gap-3 p-3.5 ${tone} ${className ?? ""}`;
-  // Android side of shadow-card (iOS-only in RN) — see src/theme/tokens.js.
-  const lift = flat || selected ? undefined : { elevation: shadow.card.elevation };
+  // Shadow via the token STYLE object, never the `shadow-card` class — rows flip
+  // selected↔shadowed at runtime (wizard steppers) and a class-borne shadow would
+  // trigger css-interop's late-upgrade warning crash (see Card.tsx).
+  const lift = flat || selected ? undefined : shadow.card;
 
   if (!onPress) {
     return (

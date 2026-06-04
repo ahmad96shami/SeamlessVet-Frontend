@@ -13,13 +13,17 @@ interface CardProps extends ViewProps {
 }
 
 export function Card({ flat, className, style, children, ...rest }: CardProps) {
-  const tone = flat ? "border border-ink-100" : "shadow-card";
+  // The shadow comes from the token STYLE object (iOS shadow* + Android elevation),
+  // NOT the `shadow-card` class: Tailwind shadow classes carry CSS variables, and a
+  // Card that flips flat↔shadowed across re-renders (e.g. an empty-state Card being
+  // reconciled into a data Card at the same tree position) would make css-interop
+  // "upgrade" the View after first render — its dev warning then crashes the screen
+  // ("Couldn't find a navigation context", MoD smoke). Style objects never upgrade.
+  const tone = flat ? "border border-ink-100" : "";
   return (
     <View
       className={`bg-paper rounded-card ${tone} ${className ?? ""}`}
-      // RN can't render the design's compound shadow at runtime; the elevation
-      // prop is the Android counterpart of the iOS shadow set by `shadow-card`.
-      style={[flat ? undefined : { elevation: shadow.card.elevation }, style]}
+      style={[flat ? undefined : shadow.card, style]}
       {...rest}
     >
       {children}

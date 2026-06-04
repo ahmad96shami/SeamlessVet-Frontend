@@ -1,5 +1,7 @@
 import { View, type ViewProps } from "react-native";
 
+import { shadow } from "@/theme";
+
 /**
  * The design's tinted icon square — the leading element of nearly every row and
  * card (list rows, stat cards, info sections, the home avatar…).
@@ -49,7 +51,12 @@ export function IconTile({
     >
       {children}
       {badge ? (
-        <View className="bg-paper shadow-card absolute -end-1 -top-1 h-[18px] w-[18px] items-center justify-center rounded-pill">
+        <View
+          className="bg-paper absolute -end-1 -top-1 h-[18px] w-[18px] items-center justify-center rounded-pill"
+          // Token style, not the shadow class — badges mount/unmount with stock
+          // status and a class-borne shadow can late-upgrade (see Card.tsx).
+          style={shadow.card}
+        >
           {badge}
         </View>
       ) : null}

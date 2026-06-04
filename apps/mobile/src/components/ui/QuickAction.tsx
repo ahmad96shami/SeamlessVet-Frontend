@@ -21,10 +21,11 @@ export function QuickAction({ label, icon, onPress, primary }: QuickActionProps)
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      className={`rounded-card shadow-card min-h-[116px] flex-1 items-center justify-center gap-2 p-3.5 active:opacity-90 ${
+      className={`rounded-card min-h-[116px] flex-1 items-center justify-center gap-2 p-3.5 active:opacity-90 ${
         primary ? "bg-navy-900" : "bg-paper"
       }`}
-      style={{ elevation: shadow.card.elevation }}
+      // Token style, not the `shadow-card` class (css-interop late-upgrade — see Card.tsx).
+      style={shadow.card}
     >
       <View
         className={`h-9 w-9 items-center justify-center rounded-chip ${
