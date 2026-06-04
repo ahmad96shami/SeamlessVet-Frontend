@@ -93,6 +93,7 @@
     "todaySchedule": {
       "title": "جدول اليوم",
       "emptyField": "لا توجد زيارات اليوم بعد.",
+      "subtitle_zero": "لا مواعيد اليوم",
       "subtitle_one": "موعد واحد",
       "subtitle_two": "موعدان",
       "subtitle_few": "{{count}} مواعيد",
