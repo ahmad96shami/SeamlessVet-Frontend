@@ -1045,7 +1045,10 @@
       "issuedBody": "Customer balance decreased.",
       "queuedBody": "Saved locally; it'll send when you're back online.",
       "failed": "Could not record the payment",
-      "amountPositive": "Enter an amount greater than zero."
+      "amountPositive": "Enter an amount greater than zero.",
+      "currentBalance": "Current balance",
+      "balanceAfter": "Balance after payment",
+      "remaining": "Remaining"
     },
     "actions": {
       "openField": "Issue field invoice",
@@ -1066,7 +1069,11 @@
     "share": "Share",
     "shareHeader": "Account statement — {{name}}",
     "shareUnavailable": "WhatsApp could not be opened on this device.",
-    "shareFailed": "Sharing failed"
+    "shareFailed": "Sharing failed",
+    "totalDebit": "Total debits",
+    "totalCredit": "Total credits",
+    "balance": "Balance",
+    "settlementNote": "Note: doctor entitlements only pay out after the customer account closes and all invoices settle."
   },
   "appointments": {
     "title": "Appointments",

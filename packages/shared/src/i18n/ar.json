@@ -1060,7 +1060,10 @@
       "issuedBody": "تم تخفيض رصيد العميل.",
       "queuedBody": "تم حفظ الدفعة محليًا؛ ستُرسل عند عودة الاتصال.",
       "failed": "تعذّر تسجيل الدفعة",
-      "amountPositive": "أدخل مبلغًا أكبر من صفر."
+      "amountPositive": "أدخل مبلغًا أكبر من صفر.",
+      "currentBalance": "الرصيد الحالي",
+      "balanceAfter": "الرصيد بعد القبض",
+      "remaining": "المتبقي"
     },
     "actions": {
       "openField": "إصدار فاتورة زيارة",
@@ -1081,7 +1084,11 @@
     "share": "مشاركة",
     "shareHeader": "كشف حساب — {{name}}",
     "shareUnavailable": "تعذّر فتح واتساب على الجهاز.",
-    "shareFailed": "تعذّرت المشاركة"
+    "shareFailed": "تعذّرت المشاركة",
+    "totalDebit": "إجمالي مدين",
+    "totalCredit": "إجمالي دائن",
+    "balance": "الرصيد",
+    "settlementNote": "ملاحظة: لا تُصرف مستحقات الطبيب إلا بعد إغلاق حساب العميل وسداد جميع الفواتير."
   },
   "appointments": {
     "title": "المواعيد",
