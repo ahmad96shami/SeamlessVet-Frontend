@@ -37,6 +37,11 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
     `Footer` (row INSIDE ScreenShell's footer slot — the shell owns bg/border/insets), `NavBottomBar`,
     `Sheet` (bottom-sheet shell: backdrop FADES in place, panel SLIDES — never use
     `Modal animationType="slide"`, it slides the whole subtree including the scrim).
+  - Animations: **react-native-reanimated only** (shared value + `useAnimatedStyle` worklets,
+    `runOnJS` for post-animation state) — never RN `Animated`. Reanimated `Animated.View`s stay
+    className-free (style-only); plain inner Views carry the design classes. Navigation stacks
+    use `animation: "fade"` + `freezeOnBlur: true` (blurred watched-query screens must not
+    re-render on sync ticks).
   - Popups: **never `Alert.alert`** (native chrome breaks the design + differs per platform) —
     use the `dialog` service (`@/stores/dialogStore`, plain TS, works outside components):
     `dialog.alert(title, msg?)`, `await dialog.confirm({ title, msg, confirmLabel, destructive? })`,
