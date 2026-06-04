@@ -8,6 +8,7 @@ import {
   formatDate,
   PAYMENT_METHOD_VALUES,
   type PaymentMethod,
+  type RequestDescriptor,
 } from "@vet/shared";
 
 import {
@@ -33,7 +34,9 @@ import {
 } from "@/components/ui";
 import { toArabicDigits } from "@/lib/numerals";
 import { nextVisitNumber } from "@/lib/visitNumber";
+import { offlineQueue } from "@/services/offlineQueue";
 import { sendOrQueue } from "@/services/sendOrQueue";
+import { notifyEnqueued } from "@/services/syncEngine";
 import { useAuthStore } from "@/stores/authStore";
 import { useVisitWizardStore } from "@/stores/visitWizardStore";
 import { powerSync } from "@/sync/database";
@@ -55,6 +58,26 @@ import type { CustomerRow, ServiceRow } from "@/sync/types";
 import { colors } from "@/theme";
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
+
+/**
+ * Wait for PowerSync's CRUD upload queue to drain so the server has the visit's
+ * clinical rows (visit / prescriptions / procedures via /sync) BEFORE the invoice
+ * endpoint tries to auto-assemble them. Without this barrier an online confirm
+ * races the async upload and the server answers "nothing to bill" (MoD smoke).
+ */
+async function waitForClinicalUpload(timeoutMs = 12_000): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const stats = await powerSync.getUploadQueueStats(false);
+      if (stats.count === 0) return true;
+    } catch {
+      /* stats unavailable — keep polling until the deadline */
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  return false;
+}
 
 /**
  * Wizard review + confirm (MoD.5). Totals here are CATALOG/CONTRACT ESTIMATES —
@@ -250,25 +273,42 @@ export default function WizardReviewScreen() {
 
       const { visitId, visitNumber } = await persistClinical();
 
+      // The clinical rows ride PowerSync's ASYNC upload queue; the invoice must not
+      // reach the server first. Online → wait for the queue to drain, then send
+      // inline (conflicts surface immediately). Offline or slow → park the intent in
+      // the REST queue: the sync engine replays it only after PowerSync's queue is
+      // empty (Mo4's PowerSync-first ordering), preserving the same guarantee.
+      const drained = powerSync.currentStatus.connected ? await waitForClinicalUpload() : false;
+      const issue = async (descriptor: RequestDescriptor) => {
+        if (drained) {
+          await sendOrQueue(descriptor);
+        } else {
+          await offlineQueue.enqueue(descriptor);
+          await notifyEnqueued();
+        }
+      };
+
       try {
         if (hasAnyLine) {
           // items=[] → the server auto-assembles unbilled dispensed_to_owner
           // prescriptions + procedures and applies contract pricing (M7 task 8).
           // One payment leg at the estimated total — exactly Mo4's field.tsx.
-          const descriptor = buildFieldInvoiceRequest(visitId, {
-            items: [],
-            discountAmount: 0,
-            payments: [{ method, amount: fieldTotal, ...chequeRequestFields(method, cheque) }],
-          });
-          await sendOrQueue(descriptor);
+          await issue(
+            buildFieldInvoiceRequest(visitId, {
+              items: [],
+              discountAmount: 0,
+              payments: [{ method, amount: fieldTotal, ...chequeRequestFields(method, cheque) }],
+            }),
+          );
         }
         if (wizard.examFeeEnabled) {
           // amount undefined → server falls back to the visit's applied fee.
-          const descriptor = buildExamFeeInvoiceRequest(visitId, {
-            amount: wizard.examFee ?? undefined,
-            payments: [{ method, amount: examFee, ...chequeRequestFields(method, cheque) }],
-          });
-          await sendOrQueue(descriptor);
+          await issue(
+            buildExamFeeInvoiceRequest(visitId, {
+              amount: wizard.examFee ?? undefined,
+              payments: [{ method, amount: examFee, ...chequeRequestFields(method, cheque) }],
+            }),
+          );
         }
       } catch (err) {
         // Business 4xx (negative_stock / settlement_locked) — the visit + clinical
