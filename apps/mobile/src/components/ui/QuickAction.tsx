@@ -7,6 +7,9 @@ import { shadow } from "@/theme";
  * a two-line 12/800 label. `primary` is the navy hero tile (the screen's main
  * CTA, e.g. "زيارة جديدة") with a translucent white icon square.
  *
+ * Width comes from the parent (home's QuickActionsGrid sizes tiles to the
+ * available space) — the tile itself only fixes its min height.
+ *
  * Pick the icon colour to match: white on `primary`, teal-600 otherwise.
  */
 interface QuickActionProps {
@@ -21,7 +24,7 @@ export function QuickAction({ label, icon, onPress, primary }: QuickActionProps)
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      className={`rounded-card min-h-[116px] flex-1 items-center justify-center gap-2 p-3.5 active:opacity-90 ${
+      className={`rounded-card min-h-[116px] items-center justify-center gap-2 p-3.5 active:opacity-90 ${
         primary ? "bg-navy-900" : "bg-paper"
       }`}
       // Token style, not the `shadow-card` class (css-interop late-upgrade — see Card.tsx).

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
@@ -134,53 +134,59 @@ export default function Index() {
 
       {/* Quick actions */}
       <SectionTitle title={t("dashboard.quickActionsTitle")} />
-      <View className="gap-2.5">
-        <View className="flex-row gap-2.5">
-          <QuickAction
-            label={t("dashboard.actions.newVisit")}
-            icon={<Add size={20} color={colors.white} />}
-            primary
-            onPress={() => router.push("/visits/new")}
-          />
-          <QuickAction
-            label={t("dashboard.actions.loadInventory")}
-            icon={<Truck size={20} color={colors.teal[600]} />}
-            onPress={() => router.push("/inventory")}
-          />
-          <QuickAction
-            label={t("dashboard.actions.receiptVoucher")}
-            icon={<Receipt size={20} color={colors.teal[600]} />}
-            onPress={() => router.push("/customers")}
-          />
-          <QuickAction
-            label={t("dashboard.actions.statement")}
-            icon={<Paper size={20} color={colors.teal[600]} />}
-            onPress={() => router.push("/customers")}
-          />
-        </View>
-        <View className="flex-row gap-2.5">
-          <QuickAction
-            label={t("nav.customers")}
-            icon={<User size={20} color={colors.teal[600]} />}
-            onPress={() => router.push("/customers")}
-          />
-          <QuickAction
-            label={t("nav.contracts")}
-            icon={<Briefcase size={20} color={colors.teal[600]} />}
-            onPress={() => router.push("/contracts")}
-          />
-          <QuickAction
-            label={t("nav.vaccinations")}
-            icon={<Syringe size={20} color={colors.teal[600]} />}
-            onPress={() => router.push("/vaccinations")}
-          />
-          <QuickAction
-            label={t("dashboard.actions.stockAlerts")}
-            icon={<Warn size={20} color={colors.teal[600]} />}
-            onPress={() => router.push("/inventory/alerts")}
-          />
-        </View>
-      </View>
+      <QuickActionsGrid
+        items={[
+          {
+            key: "new-visit",
+            label: t("dashboard.actions.newVisit"),
+            icon: <Add size={20} color={colors.white} />,
+            primary: true,
+            onPress: () => router.push("/visits/new"),
+          },
+          {
+            key: "load-inventory",
+            label: t("dashboard.actions.loadInventory"),
+            icon: <Truck size={20} color={colors.teal[600]} />,
+            onPress: () => router.push("/inventory"),
+          },
+          {
+            key: "receipt-voucher",
+            label: t("dashboard.actions.receiptVoucher"),
+            icon: <Receipt size={20} color={colors.teal[600]} />,
+            onPress: () => router.push("/customers"),
+          },
+          {
+            key: "statement",
+            label: t("dashboard.actions.statement"),
+            icon: <Paper size={20} color={colors.teal[600]} />,
+            onPress: () => router.push("/customers"),
+          },
+          {
+            key: "customers",
+            label: t("nav.customers"),
+            icon: <User size={20} color={colors.teal[600]} />,
+            onPress: () => router.push("/customers"),
+          },
+          {
+            key: "contracts",
+            label: t("nav.contracts"),
+            icon: <Briefcase size={20} color={colors.teal[600]} />,
+            onPress: () => router.push("/contracts"),
+          },
+          {
+            key: "vaccinations",
+            label: t("nav.vaccinations"),
+            icon: <Syringe size={20} color={colors.teal[600]} />,
+            onPress: () => router.push("/vaccinations"),
+          },
+          {
+            key: "stock-alerts",
+            label: t("dashboard.actions.stockAlerts"),
+            icon: <Warn size={20} color={colors.teal[600]} />,
+            onPress: () => router.push("/inventory/alerts"),
+          },
+        ]}
+      />
 
       {/* Today's schedule */}
       <SectionTitle
@@ -303,6 +309,43 @@ function dueLabel(t: (key: string, opts?: Record<string, unknown>) => string, da
   if (days < 0) return t("dashboard.vaxReminders.overdue");
   if (days === 0) return t("dashboard.vaxReminders.dueToday");
   return t("dashboard.vaxReminders.dueIn", { count: days });
+}
+
+// -- Quick-action grid --------------------------------------------------------
+const ACTION_GAP = 10; // = gap-2.5
+const ACTION_MIN_WIDTH = 96; // narrowest tile that still fits the longest one-word label
+
+interface QuickActionItem {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  primary?: boolean;
+  onPress: () => void;
+}
+
+/**
+ * Wrapping quick-action grid — no fixed column count: as many ACTION_MIN_WIDTH
+ * tiles as the measured width allows (never fewer than 2), every tile sharing
+ * one width so long labels (التطعيمات) get room instead of breaking mid-word.
+ */
+function QuickActionsGrid({ items }: { items: QuickActionItem[] }) {
+  const { width: windowWidth } = useWindowDimensions();
+  // ScreenShell's body padding is 20/side — a close first frame until onLayout lands.
+  const [width, setWidth] = useState(windowWidth - 40);
+  const cols = Math.max(2, Math.floor((width + ACTION_GAP) / (ACTION_MIN_WIDTH + ACTION_GAP)));
+  const tileWidth = Math.floor((width - ACTION_GAP * (cols - 1)) / cols);
+  return (
+    <View
+      className="flex-row flex-wrap gap-2.5"
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+    >
+      {items.map(({ key, ...action }) => (
+        <View key={key} style={{ width: tileWidth }}>
+          <QuickAction {...action} />
+        </View>
+      ))}
+    </View>
+  );
 }
 
 /** The design's greeting header — avatar tile, greeting + name, live sync pill + bell. */
