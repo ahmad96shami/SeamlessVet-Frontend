@@ -49,16 +49,17 @@ function Frame({
   );
 }
 
+// SVG paths do NOT bidi-mirror — these are drawn for the app's forced RTL:
+// "back" points → (toward where you came from), "forward"/drill-in points ←.
 export const Back = (p: IconProps) => (
-  // RTL: chevron pointing right (back in RTL goes →)
   <Frame {...p}>
-    <Path d="M15 6l-6 6 6 6" />
+    <Path d="M9 6l6 6-6 6" />
   </Frame>
 );
 
 export const Forward = (p: IconProps) => (
   <Frame {...p}>
-    <Path d="M9 6l6 6-6 6" />
+    <Path d="M15 6l-6 6 6 6" />
   </Frame>
 );
 

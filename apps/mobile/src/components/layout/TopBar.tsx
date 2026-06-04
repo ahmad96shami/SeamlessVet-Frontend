@@ -2,7 +2,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { colors } from "@/theme";
 
-import { Forward, More } from "../icons";
+import { Back, More } from "../icons";
 
 /**
  * The design's `.sv-topbar` — a 3-column header with a centred title. In RTL the
@@ -35,7 +35,7 @@ export function TopBar({ title, onBack, right, solid = true }: TopBarProps) {
           hitSlop={8}
           className="h-[38px] w-[38px] items-center justify-center"
         >
-          <Forward size={22} color={colors.navy[900]} />
+          <Back size={22} color={colors.navy[900]} />
         </Pressable>
       ) : (
         <View className="w-[38px]" />
