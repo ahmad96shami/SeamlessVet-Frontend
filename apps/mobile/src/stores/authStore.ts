@@ -27,6 +27,12 @@ export interface AuthUser {
    * the prefix (it's not used for authz).
    */
   numberPrefix: string | null;
+  /**
+   * Display name for the greeting / حسابي profile header (MoD). Sourced from the
+   * LoginResponse (the JWT carries no name claim) and cached in MMKV exactly like
+   * {@link numberPrefix} so a cold start shows the name without a network round-trip.
+   */
+  fullName: string | null;
 }
 
 interface AuthState {
@@ -47,6 +53,7 @@ interface AuthState {
 }
 
 const NUMBER_PREFIX_KEY = "auth.numberPrefix";
+const FULL_NAME_KEY = "auth.fullName";
 
 /** True when the access token's `exp` is in the past (UX-only — the server is authoritative). */
 function isAccessTokenExpired(accessToken: string | undefined): boolean {
@@ -57,7 +64,7 @@ function isAccessTokenExpired(accessToken: string | undefined): boolean {
 
 function userFromAccessToken(
   accessToken: string,
-  fallback?: { role?: string; numberPrefix?: string | null },
+  fallback?: { role?: string; numberPrefix?: string | null; fullName?: string | null },
 ): AuthUser | null {
   const claims = decodeJwt(accessToken);
   if (!claims?.sub) return null;
@@ -66,6 +73,7 @@ function userFromAccessToken(
     role: claims.role ?? fallback?.role ?? "",
     environmentId: claims.environment_id ?? "",
     numberPrefix: fallback?.numberPrefix ?? null,
+    fullName: fallback?.fullName ?? null,
   };
 }
 
@@ -80,12 +88,15 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     // has it for client-side visit-number minting.
     if (res.numberPrefix) prefs.set(NUMBER_PREFIX_KEY, res.numberPrefix);
     else prefs.remove(NUMBER_PREFIX_KEY);
+    if (res.fullName) prefs.set(FULL_NAME_KEY, res.fullName);
+    else prefs.remove(FULL_NAME_KEY);
     set({
       status: "authenticated",
       sessionExpired: false,
       user: userFromAccessToken(res.accessToken, {
         role: res.roleKey,
         numberPrefix: res.numberPrefix ?? null,
+        fullName: res.fullName ?? null,
       }),
     });
     // Fire-and-forget: PowerSync connects in the background; the UI is not blocked on the
@@ -97,8 +108,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   restore: async () => {
     const tokens = await tokenStorage.getTokens();
     const numberPrefix = prefs.getString(NUMBER_PREFIX_KEY) ?? null;
+    const fullName = prefs.getString(FULL_NAME_KEY) ?? null;
     const user = tokens?.accessToken
-      ? userFromAccessToken(tokens.accessToken, { numberPrefix })
+      ? userFromAccessToken(tokens.accessToken, { numberPrefix, fullName })
       : null;
     // An expired access token is fine here — the first request's 401 triggers refresh-or-logout.
     // Surface read-only mode up front if the cached token is already past `exp` (e.g. the app was
@@ -125,6 +137,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     await disconnectAndWipePowerSync();
     await tokenStorage.clear();
     prefs.remove(NUMBER_PREFIX_KEY);
+    prefs.remove(FULL_NAME_KEY);
     set({ status: "unauthenticated", user: null, sessionExpired: false });
   },
 
