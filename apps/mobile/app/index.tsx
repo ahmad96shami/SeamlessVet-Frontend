@@ -141,9 +141,7 @@ export default function Index() {
             label={t("dashboard.actions.newVisit")}
             icon={<Add size={20} color={colors.white} />}
             primary
-            // MoD.5 lands the guided wizard at /visits/new; until then the flow
-            // starts from the customer picker exactly like the old home.
-            onPress={() => router.push("/customers")}
+            onPress={() => router.push("/visits/new")}
           />
           <QuickAction
             label={t("dashboard.actions.loadInventory")}
