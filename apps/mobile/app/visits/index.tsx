@@ -4,12 +4,13 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
 
-import { Add, Forward, Stethoscope } from "@/components/icons";
-import { Card, Chip, Input, Pill } from "@/components/ui";
+import { Add, Forward } from "@/components/icons";
+import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill } from "@/components/ui";
 import { Search } from "@/components/icons";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { VisitRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 type StatusFilter = "all" | "open" | "in_progress" | "completed" | "cancelled";
 const STATUS_FILTERS: ReadonlyArray<StatusFilter> = ["all", "open", "in_progress", "completed", "cancelled"];
@@ -23,6 +24,7 @@ const STATUS_TONE: Record<string, "teal" | "amber" | "green" | "red" | "neutral"
 
 interface RowWithCustomer extends VisitRow {
   customer_name: string | null;
+  customer_type: string | null;
   pet_name: string | null;
 }
 
@@ -40,7 +42,7 @@ export default function VisitsListScreen() {
   const [status, setStatus] = useState<StatusFilter>("all");
 
   const { data, isLoading } = useQuery<RowWithCustomer>(
-    `SELECT v.*, c.full_name AS customer_name, pe.name AS pet_name
+    `SELECT v.*, c.full_name AS customer_name, c.type AS customer_type, pe.name AS pet_name
        FROM visits v
        LEFT JOIN customers c ON c.id = v.customer_id
        LEFT JOIN pets pe ON pe.id = v.pet_id
@@ -72,7 +74,7 @@ export default function VisitsListScreen() {
           placeholder={t("customers.searchPlaceholder")}
           value={search}
           onChangeText={setSearch}
-          leading={<Search size={18} color="#94A1B5" />}
+          leading={<Search size={18} color={colors.ink[400]} />}
           autoCapitalize="none"
         />
 
@@ -92,10 +94,10 @@ export default function VisitsListScreen() {
             {filtered.length} / {(data ?? []).length}
           </Text>
           <Pressable
-            onPress={() => router.push("/customers")}
+            onPress={() => router.push("/visits/new")}
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
           >
-            <Add size={14} color="#FFFFFF" />
+            <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">{t("visits.new")}</Text>
           </Pressable>
         </View>
@@ -114,37 +116,37 @@ export default function VisitsListScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <Pressable
+          <ListRow
             onPress={() => router.push({ pathname: "/visits/[id]", params: { id: item.id } })}
           >
-            <Card className="flex-row items-center gap-3 p-3">
-              <View className="bg-teal-50 h-12 w-12 items-center justify-center rounded-card">
-                <Stethoscope size={20} color="#0F7A8A" />
-              </View>
-              <View className="flex-1 gap-1">
-                <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
-                  {item.customer_name ?? "—"}
-                  {item.pet_name ? ` · ${item.pet_name}` : ""}
+            <Photo kind={photoKindForCustomerType(item.customer_type)} size={56} />
+            <View className="min-w-0 flex-1 gap-1">
+              <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
+                {item.customer_name ?? "—"}
+              </Text>
+              {item.chief_complaint || item.pet_name ? (
+                <Text className="text-ink-500 text-[13px] font-tajawal" numberOfLines={1}>
+                  {[item.pet_name, item.chief_complaint].filter(Boolean).join(" · ")}
                 </Text>
-                <View className="flex-row flex-wrap gap-1.5">
+              ) : null}
+              <View className="flex-row flex-wrap gap-1.5">
+                <Pill
+                  compact
+                  tone={STATUS_TONE[item.status] ?? "neutral"}
+                  label={t(`visitStatus.${item.status}`)}
+                />
+                {item.visit_number ? <Pill compact tone="neutral" label={item.visit_number} /> : null}
+                {item.started_at ? (
                   <Pill
-                    tone={STATUS_TONE[item.status] ?? "neutral"}
-                    label={t(`visitStatus.${item.status}`)}
+                    compact
+                    tone="neutral"
+                    label={formatDate(item.started_at, i18n.resolvedLanguage)}
                   />
-                  {item.visit_number ? (
-                    <Pill tone="neutral" label={item.visit_number} />
-                  ) : null}
-                  {item.started_at ? (
-                    <Pill
-                      tone="neutral"
-                      label={formatDate(item.started_at, i18n.resolvedLanguage)}
-                    />
-                  ) : null}
-                </View>
+                ) : null}
               </View>
-              <Forward size={20} color="#94A1B5" />
-            </Card>
-          </Pressable>
+            </View>
+            <Forward size={20} color={colors.ink[400]} />
+          </ListRow>
         )}
       />
     </ScreenShell>

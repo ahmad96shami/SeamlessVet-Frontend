@@ -4,26 +4,27 @@ import { useTranslation } from "react-i18next";
 import { FlatList, Pressable, Text, View } from "react-native";
 
 import { Add, Bird, Briefcase, Cow, Forward, House, Search } from "@/components/icons";
-import { Card, Chip, Input, Pill } from "@/components/ui";
+import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill } from "@/components/ui";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 type TypeFilter = "all" | "regular_farm" | "home" | "cattle_farm" | "poultry_farm";
 
 const TYPE_FILTERS: Array<{ key: TypeFilter; icon?: React.ReactNode }> = [
   { key: "all" },
-  { key: "poultry_farm", icon: <Bird size={14} color="#0E1B2C" /> },
-  { key: "cattle_farm", icon: <Cow size={14} color="#0E1B2C" /> },
-  { key: "regular_farm", icon: <Briefcase size={14} color="#0E1B2C" /> },
-  { key: "home", icon: <House size={14} color="#0E1B2C" /> },
+  { key: "poultry_farm", icon: <Bird size={14} color={colors.ink[900]} /> },
+  { key: "cattle_farm", icon: <Cow size={14} color={colors.ink[900]} /> },
+  { key: "regular_farm", icon: <Briefcase size={14} color={colors.ink[900]} /> },
+  { key: "home", icon: <House size={14} color={colors.ink[900]} /> },
 ];
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
-  poultry_farm: <Bird size={12} color="#0E1B2C" />,
-  cattle_farm: <Cow size={12} color="#0E1B2C" />,
-  regular_farm: <Briefcase size={12} color="#0E1B2C" />,
-  home: <House size={12} color="#0E1B2C" />,
+  poultry_farm: <Bird size={12} color={colors.ink[900]} />,
+  cattle_farm: <Cow size={12} color={colors.ink[900]} />,
+  regular_farm: <Briefcase size={12} color={colors.ink[900]} />,
+  home: <House size={12} color={colors.ink[900]} />,
 };
 
 interface CustomerWithPetCount extends CustomerRow {
@@ -72,7 +73,7 @@ export default function CustomersListScreen() {
           placeholder={t("customers.searchPlaceholder")}
           value={search}
           onChangeText={setSearch}
-          leading={<Search size={18} color="#94A1B5" />}
+          leading={<Search size={18} color={colors.ink[400]} />}
           autoCapitalize="none"
         />
 
@@ -96,7 +97,7 @@ export default function CustomersListScreen() {
             onPress={() => router.push("/customers/new")}
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
           >
-            <Add size={14} color="#FFFFFF" />
+            <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">{t("customers.new")}</Text>
           </Pressable>
         </View>
@@ -133,27 +134,28 @@ interface CustomerRowProps {
 function CustomerRow({ customer, onPress }: CustomerRowProps) {
   const { t } = useTranslation();
   return (
-    <Pressable onPress={onPress}>
-      <Card className="flex-row items-center gap-3 p-3">
-        <View className="bg-teal-50 h-12 w-12 items-center justify-center rounded-card">
-          {TYPE_ICON[customer.type] ?? <House size={20} color="#0F7A8A" />}
+    <ListRow onPress={onPress}>
+      <Photo kind={photoKindForCustomerType(customer.type)} size={56} />
+      <View className="min-w-0 flex-1 gap-1">
+        <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
+          {customer.full_name}
+        </Text>
+        <View className="flex-row flex-wrap gap-1.5">
+          <Pill
+            compact
+            tone="neutral"
+            label={t(`customerType.${customer.type}`)}
+            leadingIcon={TYPE_ICON[customer.type]}
+          />
+          {customer.pet_count > 0 ? (
+            <Pill compact tone="teal" label={`${customer.pet_count} ${t("customers.pets.title")}`} />
+          ) : null}
+          {customer.phone_primary ? (
+            <Pill compact tone="neutral" label={customer.phone_primary} />
+          ) : null}
         </View>
-        <View className="flex-1 gap-1">
-          <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
-            {customer.full_name}
-          </Text>
-          <View className="flex-row flex-wrap gap-1.5">
-            <Pill tone="neutral" label={t(`customerType.${customer.type}`)} leadingIcon={TYPE_ICON[customer.type]} />
-            {customer.pet_count > 0 ? (
-              <Pill tone="teal" label={`${customer.pet_count} ${t("customers.pets.title")}`} />
-            ) : null}
-            {customer.phone_primary ? (
-              <Pill tone="neutral" label={customer.phone_primary} />
-            ) : null}
-          </View>
-        </View>
-        <Forward size={20} color="#94A1B5" />
-      </Card>
-    </Pressable>
+      </View>
+      <Forward size={20} color={colors.ink[400]} />
+    </ListRow>
   );
 }

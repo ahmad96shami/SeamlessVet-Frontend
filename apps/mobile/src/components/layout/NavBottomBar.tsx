@@ -13,8 +13,8 @@ type TabKey = "home" | "visits" | "inv" | "me";
 const ROUTE: Record<TabKey, string> = {
   home: "/",
   visits: "/visits", // Mo2.6 lands the local visits list behind the Visits tab.
-  inv: "/inventory",    // Mo3 will populate the inventory route — placeholder until then.
-  me: "/profile",       // future "حسابي" — not yet implemented; tap is a no-op.
+  inv: "/inventory",
+  me: "/me", // MoD.7 — profile + general settings (sign-out lives here).
 };
 
 interface NavBottomBarProps {

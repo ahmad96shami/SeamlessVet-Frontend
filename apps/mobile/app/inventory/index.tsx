@@ -6,7 +6,7 @@ import { formatDate } from "@vet/shared";
 
 import { ArrowDown, Pill as PillIcon, Search, Truck, Warn } from "@/components/icons";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
-import { Card, Chip, Input, Pill } from "@/components/ui";
+import { Card, IconTile, Input, ListRow, Pill, SegmentedTabs } from "@/components/ui";
 import {
   classifyStock,
   FIELD_STOCK_SQL,
@@ -16,6 +16,8 @@ import {
   totalUnits,
 } from "@/sync/fieldInventory";
 import { useQuery } from "@/sync/hooks";
+import { toArabicDigits } from "@/lib/numerals";
+import { colors } from "@/theme";
 
 type Tab = "all" | "low" | "expiring";
 
@@ -103,7 +105,7 @@ export default function InventoryScreen() {
             </Text>
             <View className="flex-row items-baseline gap-1.5">
               <Text className="text-navy-900 text-[22px] font-tajawal-extrabold">
-                {counts.total}
+                {toArabicDigits(counts.total)}
               </Text>
               <Text className="text-ink-700 text-[13px] font-tajawal-bold">
                 {t("mobile.inventory.unit", { defaultValue: "وحدة" })}
@@ -113,7 +115,7 @@ export default function InventoryScreen() {
               {lastLoadedAt ? (
                 <Pill
                   tone="teal"
-                  leadingIcon={<Truck size={12} color="#0B6573" />}
+                  leadingIcon={<Truck size={12} color={colors.teal[700]} />}
                   label={t("mobile.inventory.lastLoaded", {
                     defaultValue: "آخر تحميل {{date}}",
                     date: formatDate(lastLoadedAt, i18n.resolvedLanguage),
@@ -126,7 +128,7 @@ export default function InventoryScreen() {
                 <Pressable onPress={() => router.push("/inventory/alerts" as never)}>
                   <Pill
                     tone="amber"
-                    leadingIcon={<Warn size={12} color="#7A4F00" />}
+                    leadingIcon={<Warn size={12} color={colors.amber.ink} />}
                     label={t("inventory.kpi.lowStock") + ` · ${counts.low}`}
                   />
                 </Pressable>
@@ -135,16 +137,16 @@ export default function InventoryScreen() {
                 <Pressable onPress={() => router.push("/inventory/alerts" as never)}>
                   <Pill
                     tone="amber"
-                    leadingIcon={<Warn size={12} color="#7A4F00" />}
+                    leadingIcon={<Warn size={12} color={colors.amber.ink} />}
                     label={t("inventory.kpi.expiring") + ` · ${counts.expiring}`}
                   />
                 </Pressable>
               ) : null}
             </View>
           </View>
-          <View className="bg-teal-50 h-16 w-16 items-center justify-center rounded-card">
-            <PillIcon size={28} color="#0F7A8A" />
-          </View>
+          <IconTile size="lg">
+            <PillIcon size={28} color={colors.teal[600]} />
+          </IconTile>
         </View>
 
         <View className="mt-3 flex-row gap-2">
@@ -157,7 +159,7 @@ export default function InventoryScreen() {
             className="bg-navy-900 active:bg-navy-800 flex-1 flex-row items-center justify-center gap-1.5 rounded-pill px-3 py-2.5"
             accessibilityRole="button"
           >
-            <ArrowDown size={14} color="#FFFFFF" />
+            <ArrowDown size={14} color={colors.white} />
             <Text className="text-paper text-[13px] font-tajawal-bold">
               {t("mobile.inventory.recordReturn", { defaultValue: "تسجيل إرجاع" })}
             </Text>
@@ -168,7 +170,7 @@ export default function InventoryScreen() {
             className="bg-paper border-ink-100 flex-1 flex-row items-center justify-center gap-1.5 rounded-pill border px-3 py-2.5"
             accessibilityRole="button"
           >
-            <Truck size={14} color="#0B6573" />
+            <Truck size={14} color={colors.teal[700]} />
             <Text className="text-navy-900 text-[13px] font-tajawal-bold">
               {t("inventory.movements.title", { defaultValue: "سجل الحركات" })}
             </Text>
@@ -176,21 +178,15 @@ export default function InventoryScreen() {
         </View>
       </Card>
 
-      <View className="mt-4 flex-row flex-wrap gap-2">
-        <Chip
-          label={t("common.all", { defaultValue: "الكل" }) + ` (${classified.length})`}
-          active={tab === "all" ? "navy" : "off"}
-          onPress={() => setTab("all")}
-        />
-        <Chip
-          label={t("inventory.status.low") + ` (${counts.low})`}
-          active={tab === "low" ? "navy" : "off"}
-          onPress={() => setTab("low")}
-        />
-        <Chip
-          label={t("inventory.status.expiringSoon") + ` (${counts.expiring})`}
-          active={tab === "expiring" ? "navy" : "off"}
-          onPress={() => setTab("expiring")}
+      <View className="mt-4">
+        <SegmentedTabs<Tab>
+          options={[
+            { key: "all", label: `${t("common.all", { defaultValue: "الكل" })} (${toArabicDigits(classified.length)})` },
+            { key: "low", label: `${t("inventory.status.low")} (${toArabicDigits(counts.low)})` },
+            { key: "expiring", label: `${t("inventory.status.expiringSoon")} (${toArabicDigits(counts.expiring)})` },
+          ]}
+          value={tab}
+          onChange={setTab}
         />
       </View>
 
@@ -199,7 +195,7 @@ export default function InventoryScreen() {
           placeholder={t("inventory.searchPlaceholder")}
           value={search}
           onChangeText={setSearch}
-          leading={<Search size={18} color="#94A1B5" />}
+          leading={<Search size={18} color={colors.ink[400]} />}
           autoCapitalize="none"
         />
       </View>
@@ -238,16 +234,16 @@ function StockRow({ row, i18nLang }: StockRowProps) {
   const tone = STATUS_TONE[row.status];
   const isOut = row.status === "out";
 
+  const isLow = row.status === "low";
   return (
-    <Card className="flex-row items-center gap-3 p-3">
-      <View
-        className={`h-12 w-12 items-center justify-center rounded-card ${
-          isOut ? "bg-rose-soft" : "bg-teal-50"
-        }`}
+    <ListRow>
+      <IconTile
+        tone={isOut ? "red" : "teal"}
+        badge={isLow ? <Warn size={11} color={colors.amber.DEFAULT} /> : undefined}
       >
-        <PillIcon size={22} color={isOut ? "#B33235" : "#0F7A8A"} />
-      </View>
-      <View className="flex-1 gap-1">
+        <PillIcon size={20} color={isOut ? colors.rose.ink : colors.teal[600]} />
+      </IconTile>
+      <View className="min-w-0 flex-1 gap-1">
         <Text
           className="text-navy-900 text-[15px] font-tajawal-extrabold"
           numberOfLines={1}
@@ -256,13 +252,14 @@ function StockRow({ row, i18nLang }: StockRowProps) {
         </Text>
         <View className="flex-row flex-wrap items-center gap-1.5">
           {row.unit_of_measure ? (
-            <Pill tone="neutral" label={row.unit_of_measure} />
+            <Pill compact tone="neutral" label={row.unit_of_measure} />
           ) : null}
           {row.status !== "ok" ? (
-            <Pill tone={tone} label={t(`inventory.status.${row.status}`)} />
+            <Pill compact tone={tone} label={t(`inventory.status.${row.status}`)} />
           ) : null}
           {row.expiration_date ? (
             <Pill
+              compact
               tone={row.status === "expired" || row.status === "expiringSoon" ? "amber" : "neutral"}
               label={formatDate(row.expiration_date, i18nLang)}
             />
@@ -275,14 +272,14 @@ function StockRow({ row, i18nLang }: StockRowProps) {
             isOut ? "text-rose-ink" : "text-navy-900"
           }`}
         >
-          {Math.round(row.quantity * 1000) / 1000}
+          {toArabicDigits(Math.round(row.quantity * 1000) / 1000)}
         </Text>
         {(row.reorder_point ?? 0) > 0 ? (
           <Text className="text-ink-500 text-[11px] font-tajawal">
-            {t("inventory.col.reorderPoint")} {row.reorder_point}
+            {t("inventory.col.reorderPoint")} {toArabicDigits(row.reorder_point ?? 0)}
           </Text>
         ) : null}
       </View>
-    </Card>
+    </ListRow>
   );
 }

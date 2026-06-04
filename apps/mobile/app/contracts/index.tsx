@@ -5,11 +5,12 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
 
 import { Add, Forward, Paper, Search } from "@/components/icons";
-import { Card, Chip, Input, Money, Pill } from "@/components/ui";
+import { Chip, IconTile, Input, ListRow, Money, Pill } from "@/components/ui";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
 import { useAuthStore } from "@/stores/authStore";
 import { useQuery } from "@/sync/hooks";
 import type { ContractRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 type StatusFilter = "all" | "draft" | "active" | "completed" | "cancelled";
 const STATUS_FILTERS: ReadonlyArray<StatusFilter> = [
@@ -76,7 +77,7 @@ export default function ContractsListScreen() {
           placeholder={t("customers.searchPlaceholder")}
           value={search}
           onChangeText={setSearch}
-          leading={<Search size={18} color="#94A1B5" />}
+          leading={<Search size={18} color={colors.ink[400]} />}
           autoCapitalize="none"
         />
 
@@ -99,7 +100,7 @@ export default function ContractsListScreen() {
             onPress={() => router.push("/contracts/new")}
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
           >
-            <Add size={14} color="#FFFFFF" />
+            <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">
               {t("finance.contracts.new")}
             </Text>
@@ -120,36 +121,36 @@ export default function ContractsListScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <Pressable
+          <ListRow
             onPress={() => router.push({ pathname: "/contracts/[id]", params: { id: item.id } })}
           >
-            <Card className="flex-row items-center gap-3 p-3">
-              <View className="bg-teal-50 h-12 w-12 items-center justify-center rounded-card">
-                <Paper size={20} color="#0F7A8A" />
-              </View>
-              <View className="flex-1 gap-1">
-                <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
-                  {item.customer_name ?? "—"}
-                </Text>
-                <View className="flex-row flex-wrap items-center gap-1.5">
+            <IconTile>
+              <Paper size={20} color={colors.teal[600]} />
+            </IconTile>
+            <View className="min-w-0 flex-1 gap-1">
+              <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
+                {item.customer_name ?? "—"}
+              </Text>
+              <View className="flex-row flex-wrap items-center gap-1.5">
+                <Pill
+                  compact
+                  tone={STATUS_TONE[item.status] ?? "neutral"}
+                  label={t(`contractStatus.${item.status}`)}
+                />
+                {item.period_start ? (
                   <Pill
-                    tone={STATUS_TONE[item.status] ?? "neutral"}
-                    label={t(`contractStatus.${item.status}`)}
+                    compact
+                    tone="neutral"
+                    label={formatDate(item.period_start, i18n.resolvedLanguage)}
                   />
-                  {item.period_start ? (
-                    <Pill
-                      tone="neutral"
-                      label={formatDate(item.period_start, i18n.resolvedLanguage)}
-                    />
-                  ) : null}
-                  {item.total_price != null ? (
-                    <Money value={item.total_price} className="text-[13px]" />
-                  ) : null}
-                </View>
+                ) : null}
+                {item.total_price != null ? (
+                  <Money value={item.total_price} className="text-[13px]" />
+                ) : null}
               </View>
-              <Forward size={20} color="#94A1B5" />
-            </Card>
-          </Pressable>
+            </View>
+            <Forward size={20} color={colors.ink[400]} />
+          </ListRow>
         )}
       />
     </ScreenShell>

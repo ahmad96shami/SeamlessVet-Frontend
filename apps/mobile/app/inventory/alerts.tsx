@@ -15,6 +15,7 @@ import {
   type StockStatus,
 } from "@/sync/fieldInventory";
 import { useQuery } from "@/sync/hooks";
+import { colors } from "@/theme";
 
 interface Group {
   key: "out" | "low" | "expired" | "expiringSoon";
@@ -113,7 +114,7 @@ export default function AlertsScreen() {
           <Card flat className="p-4">
             <View className="items-center gap-2">
               <View className="bg-emerald-soft h-12 w-12 items-center justify-center rounded-card">
-                <Warn size={20} color="#1F6B4A" />
+                <Warn size={20} color={colors.emerald.ink} />
               </View>
               <Text className="text-navy-900 text-center text-[15px] font-tajawal-extrabold">
                 {t("mobile.inventory.allClear", { defaultValue: "كل شيء بخير في سيارتك" })}
@@ -202,7 +203,7 @@ function AlertRow({ row, kind, i18nLang }: AlertRowProps) {
           isOut ? "bg-rose-soft" : "bg-amber-soft"
         }`}
       >
-        <PillIcon size={20} color={isOut ? "#B33235" : "#7A4F00"} />
+        <PillIcon size={20} color={isOut ? colors.rose.ink : colors.amber.ink} />
       </View>
       <View className="flex-1 gap-1">
         <Text className="text-navy-900 text-[14px] font-tajawal-extrabold" numberOfLines={1}>

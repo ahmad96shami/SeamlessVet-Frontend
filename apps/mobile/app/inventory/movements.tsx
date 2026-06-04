@@ -8,6 +8,7 @@ import { ArrowDown, ArrowUp, Pill as PillIcon, Truck, Warn } from "@/components/
 import { Card, Chip, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
+import { colors } from "@/theme";
 
 type FilterKey = "all" | "load_to_field" | "sale_deduct" | "return_add" | "unload_from_field";
 
@@ -150,7 +151,7 @@ function MovementRowView({ row, i18nLang }: MovementRowViewProps) {
   // so we sign it for display based on the direction relative to field stock.
   const signedDelta = direction === "in" ? row.quantity_delta : -row.quantity_delta;
   const tintBg = direction === "in" ? "bg-emerald-soft" : "bg-rose-soft";
-  const tintFg = direction === "in" ? "#1F6B4A" : "#B33235";
+  const tintFg = direction === "in" ? colors.emerald.ink : colors.rose.ink;
 
   return (
     <Card className="flex-row items-center gap-3 p-3">
@@ -201,7 +202,7 @@ function MovementRowView({ row, i18nLang }: MovementRowViewProps) {
         ) : null}
         {row.movement_type === "load_to_field" || row.movement_type === "unload_from_field" ? (
           <View className="mt-0.5 flex-row items-center gap-1">
-            <Warn size={11} color="#94A1B5" />
+            <Warn size={11} color={colors.ink[400]} />
             <Text className="text-ink-400 text-[10px] font-tajawal">
               {t("inventory.location.warehouse")}
             </Text>

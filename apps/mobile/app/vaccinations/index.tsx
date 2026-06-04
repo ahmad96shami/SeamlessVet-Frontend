@@ -5,10 +5,11 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
 
 import { Add, Forward, Search, Syringe } from "@/components/icons";
-import { Card, Input, Pill } from "@/components/ui";
+import { IconTile, Input, ListRow, Pill } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { VaccinationRow } from "@/sync/types";
+import { colors } from "@/theme";
 
 interface RowWithNames extends VaccinationRow {
   customer_name: string | null;
@@ -85,7 +86,7 @@ export default function VaccinationsAgendaScreen() {
           placeholder={t("vaccinations.form.searchCustomer")}
           value={search}
           onChangeText={setSearch}
-          leading={<Search size={18} color="#94A1B5" />}
+          leading={<Search size={18} color={colors.ink[400]} />}
           autoCapitalize="none"
         />
 
@@ -97,7 +98,7 @@ export default function VaccinationsAgendaScreen() {
             onPress={() => router.push("/vaccinations/new")}
             className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
           >
-            <Add size={14} color="#FFFFFF" />
+            <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">{t("vaccinations.new")}</Text>
           </Pressable>
         </View>
@@ -120,36 +121,34 @@ export default function VaccinationsAgendaScreen() {
         renderSectionHeader={({ section }) => (
           <View className="flex-row items-center gap-2 pb-1 pt-2">
             <Text
-              className={`text-[13px] font-tajawal-extrabold ${section.overdue ? "text-red-600" : "text-ink-700"}`}
+              className={`text-[13px] font-tajawal-extrabold ${section.overdue ? "text-rose-ink" : "text-ink-700"}`}
             >
               {formatDate(section.title, i18n.resolvedLanguage)}
             </Text>
-            {section.overdue ? <Pill tone="red" label={t("vaccinations.calendar.due")} /> : null}
+            {section.overdue ? <Pill compact tone="red" label={t("vaccinations.calendar.due")} /> : null}
           </View>
         )}
         renderItem={({ item }) => (
-          <Pressable
+          <ListRow
             onPress={() =>
               router.push({ pathname: "/vaccinations/[vaxId]/edit", params: { vaxId: item.id } })
             }
           >
-            <Card className="flex-row items-center gap-3 p-3">
-              <View className="bg-teal-50 h-12 w-12 items-center justify-center rounded-card">
-                <Syringe size={20} color="#0F7A8A" />
-              </View>
-              <View className="flex-1 gap-1">
-                <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
-                  {item.vaccine_type}
-                </Text>
-                <Text className="text-ink-500 text-[12px] font-tajawal" numberOfLines={1}>
-                  {item.customer_name ?? t("vaccinations.recipientUnknown")}
-                  {" · "}
-                  {item.pet_name ?? t("vaccinations.recipientFarm")}
-                </Text>
-              </View>
-              <Forward size={20} color="#94A1B5" />
-            </Card>
-          </Pressable>
+            <IconTile>
+              <Syringe size={20} color={colors.teal[600]} />
+            </IconTile>
+            <View className="min-w-0 flex-1 gap-1">
+              <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
+                {item.vaccine_type}
+              </Text>
+              <Text className="text-ink-500 text-[12px] font-tajawal" numberOfLines={1}>
+                {item.customer_name ?? t("vaccinations.recipientUnknown")}
+                {" · "}
+                {item.pet_name ?? t("vaccinations.recipientFarm")}
+              </Text>
+            </View>
+            <Forward size={20} color={colors.ink[400]} />
+          </ListRow>
         )}
       />
     </ScreenShell>

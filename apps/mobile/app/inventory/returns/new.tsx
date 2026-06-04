@@ -23,6 +23,7 @@ import { ScreenShell, TopBar } from "@/components/layout";
 import { useAuthStore } from "@/stores/authStore";
 import { powerSync } from "@/sync/database";
 import { useQuery } from "@/sync/hooks";
+import { colors } from "@/theme";
 
 interface CustomerWithLedger {
   id: string;
@@ -269,7 +270,7 @@ export default function NewReturnScreen() {
               {selectedCustomer ? (
                 <Card className="flex-row items-center gap-3 p-3">
                   <View className="bg-teal-50 h-11 w-11 items-center justify-center rounded-card">
-                    <Briefcase size={20} color="#0F7A8A" />
+                    <Briefcase size={20} color={colors.teal[600]} />
                   </View>
                   <View className="flex-1 gap-1">
                     <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
@@ -296,7 +297,7 @@ export default function NewReturnScreen() {
                     placeholder={t("customers.searchPlaceholder")}
                     value={customerSearch}
                     onChangeText={setCustomerSearch}
-                    leading={<Search size={18} color="#94A1B5" />}
+                    leading={<Search size={18} color={colors.ink[400]} />}
                     autoCapitalize="none"
                   />
                   <FlatList
@@ -344,7 +345,7 @@ export default function NewReturnScreen() {
               {selectedProduct ? (
                 <Card className="flex-row items-center gap-3 p-3">
                   <View className="bg-teal-50 h-11 w-11 items-center justify-center rounded-card">
-                    <PillIcon size={20} color="#0F7A8A" />
+                    <PillIcon size={20} color={colors.teal[600]} />
                   </View>
                   <View className="flex-1 gap-1">
                     <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
@@ -378,7 +379,7 @@ export default function NewReturnScreen() {
                     placeholder={t("inventory.searchPlaceholder")}
                     value={productSearch}
                     onChangeText={setProductSearch}
-                    leading={<Search size={18} color="#94A1B5" />}
+                    leading={<Search size={18} color={colors.ink[400]} />}
                     autoCapitalize="none"
                   />
                   <FlatList
@@ -452,7 +453,7 @@ export default function NewReturnScreen() {
             {selectedProduct && quantity && quantity > 0 ? (
               <Card flat className="bg-emerald-soft border-emerald-soft p-3">
                 <View className="flex-row items-center gap-2">
-                  <ArrowDown size={16} color="#1F6B4A" />
+                  <ArrowDown size={16} color={colors.emerald.ink} />
                   <Text className="text-emerald-ink text-[13px] font-tajawal-bold">
                     {t("mobile.returns.creditPreview", {
                       defaultValue: "سيُخفّض حساب العميل بمقدار {{amount}}",
@@ -466,7 +467,7 @@ export default function NewReturnScreen() {
             {!fieldInventoryId ? (
               <Card flat className="bg-rose-soft border-rose-soft p-3">
                 <View className="flex-row items-center gap-2">
-                  <Warn size={16} color="#B33235" />
+                  <Warn size={16} color={colors.rose.ink} />
                   <Text className="text-rose-ink text-[12px] font-tajawal-bold">
                     {t("mobile.returns.noFieldInventory", {
                       defaultValue: "لم يتم إعداد مخزون ميداني بعد. اطلب من المسؤول تحميل أول دفعة.",
