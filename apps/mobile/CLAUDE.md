@@ -13,14 +13,18 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
   `src/components/icons/Icon3D.tsx`. Tuning a colour (e.g. the muted amber/rose) is a
   one-line change in tokens.js.
 - **Palette**: navy 900 `#223D69` (primary/CTA/headings), teal 500 `#1A8FA1` (accent/confirm),
-  ink greyscale (text/borders/canvas `ink-50`), paper white, MUTED semantics
-  (amber `#D69E2E`, emerald `#2BB673`, rose `#CB5A5E` + `soft`/`ink` variants).
-  Locked: no runtime theme switching.
+  ink greyscale (text/borders/canvas `ink-50`), paper white, DUSTY semantics
+  (amber `#B5915A`, emerald `#2BB673`, rose `#A96A6F` + `soft`/`ink` variants — `ink` carries
+  text, DEFAULT is icon/accent duty). Semantic colour is for MEANING only (warning/overdue/
+  destructive/debit) — never decorative highlights. Locked: no runtime theme switching.
 - **Typography**: Tajawal only — classes `font-tajawal` / `font-tajawal-bold` / `font-tajawal-extrabold`.
   Scale: 11 tab · 12 meta/pill · 13 sub/labels · 14 body · 15 row-title/button · 16 greeting ·
   18 TopBar/headline · 22 stat/state-hero · 26 login · 32 amount entry. Every `Text` carries a font class.
-- **Numerals**: Arabic-Indic for quantities/money/times via `src/lib/numerals.ts`
-  (`toArabicDigits`, `formatArabicNumber`) and the `Money` primitive. SKUs/batch codes/phones stay Latin.
+- **Numerals**: **Latin digits APPWIDE, in both languages — no Arabic-Indic (٠-٩) anywhere**
+  (money, counts, quantities, times, dates). Money-ish amounts via `formatAmount`
+  (`src/lib/numerals.ts` → shared `formatNumber`), quantities via shared `formatQuantity`,
+  dates via shared `formatDate`/`formatDateTime` (already `-u-nu-latn`-pinned); plain counts
+  render the number directly.
 - **Primitives** (`src/components/ui` + `src/components/layout`) — compose these, don't hand-roll:
   - Rows/cards: `Card`, `ListRow` (leading `IconTile`/`Photo` → title 15/800 → sub 13 ink-500 →
     meta `Pill compact` row → trailing slot; `selected` = teal ring), `Voucher` (ticket cutouts).
@@ -40,7 +44,8 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
   together. Logical utilities only (`start`/`end`, `ps`/`pe`) — and since RTL is forced, use
   `flex-row` (never `flex-row-reverse`; that double-reverses).
 - **Audit gates** (keep green): `grep -rn '#[0-9A-Fa-f]\{6\}' app src` must hit only
-  `theme/tokens.js` + `Icon3D.tsx`; no `row-reverse`; every `Text` has a `font-tajawal*` class.
+  `theme/tokens.js` + `Icon3D.tsx`; `grep -rnP '[٠-٩]' app src` must return nothing;
+  no `row-reverse`; every `Text` has a `font-tajawal*` class.
 
 ## Data & writes (don't bypass)
 
