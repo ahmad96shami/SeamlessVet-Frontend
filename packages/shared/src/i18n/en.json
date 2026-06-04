@@ -1448,7 +1448,8 @@
       "accountSuspended": "This account has been suspended"
     },
     "session": {
-      "expiredBanner": "Session expired — reconnect to sync your changes. Your data is kept."
+      "expiredBanner": "Session expired — reconnect to sync your changes. Your data is kept.",
+      "expiredToast": "Your session has expired. Please sign in again."
     }
   },
   "sync": {

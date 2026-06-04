@@ -1,6 +1,13 @@
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
+  /**
+   * ISO-8601 expiry of the refresh token (login/refresh responses carry it). Lets a client
+   * decide at boot that the session is unrecoverable — straight to login, no doomed network
+   * round-trip. Optional: tokens persisted before this field existed simply fall back to the
+   * 401 → refresh → onAuthError path.
+   */
+  refreshTokenExpiresAt?: string;
 }
 
 /**
