@@ -8,16 +8,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-/**
- * Pulsing list placeholder shown while a query's first result loads — rows
- * mirror ListRow's anatomy (leading tile, title/sub bars, pill bar) as flat
- * bordered cards, so the layout doesn't jump when real rows land.
- *
- * One Reanimated pulse drives the whole list on the UI thread; the
- * Animated.View stays className-free per the design-system rule. `avatar`
- * drops the leading tile for text-only surfaces (notifications, statements).
- */
-export function SkeletonList({ rows = 6, avatar = true }: { rows?: number; avatar?: boolean }) {
+/** The skeletons' shared opacity pulse (Reanimated, UI thread). */
+function usePulseStyle() {
   const pulse = useSharedValue(0);
   useEffect(() => {
     pulse.value = withRepeat(
@@ -26,8 +18,33 @@ export function SkeletonList({ rows = 6, avatar = true }: { rows?: number; avata
       true,
     );
   }, [pulse]);
-  const style = useAnimatedStyle(() => ({ opacity: 1 - pulse.value * 0.45 }));
+  return useAnimatedStyle(() => ({ opacity: 1 - pulse.value * 0.45 }));
+}
 
+/**
+ * Single pulsing placeholder block — size/shape via className on the inner
+ * View (e.g. "h-6 w-10 rounded-chip"); the Animated.View stays className-free
+ * per the design-system rule. For whole lists use SkeletonList.
+ */
+export function Skeleton({ className }: { className?: string }) {
+  const style = usePulseStyle();
+  return (
+    <Animated.View style={style}>
+      <View className={`bg-ink-100 ${className ?? ""}`} />
+    </Animated.View>
+  );
+}
+
+/**
+ * Pulsing list placeholder shown while a query's first result loads — rows
+ * mirror ListRow's anatomy (leading tile, title/sub bars, pill bar) as flat
+ * bordered cards, so the layout doesn't jump when real rows land.
+ *
+ * One pulse drives the whole list. `avatar` drops the leading tile for
+ * text-only surfaces (notifications, statements).
+ */
+export function SkeletonList({ rows = 6, avatar = true }: { rows?: number; avatar?: boolean }) {
+  const style = usePulseStyle();
   return (
     <Animated.View style={style}>
       <View className="gap-2">
