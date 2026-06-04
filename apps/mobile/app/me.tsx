@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
-import { User } from "@/components/icons";
+import { Forward, User } from "@/components/icons";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
 import { NotificationPanel } from "@/components/NotificationPanel";
 import { SyncReviewSheet } from "@/components/SyncReviewSheet";
@@ -124,9 +124,7 @@ function MenuRow({
         </Text>
         {sub ? <Text className="text-ink-500 mt-0.5 text-[12px] font-tajawal">{sub}</Text> : null}
       </View>
-      {!destructive ? (
-        <Text className="text-ink-300 text-[20px] font-tajawal">‹</Text>
-      ) : null}
+      {!destructive ? <Forward size={18} color={colors.ink[300]} /> : null}
     </Pressable>
   );
 }
