@@ -20,7 +20,11 @@ const tokenProvider: TokenProvider = {
     if (!refreshToken) return null;
     try {
       const { data } = await refreshClient.post("/auth/refresh", { refreshToken });
-      const next: AuthTokens = { accessToken: data.accessToken, refreshToken: data.refreshToken };
+      const next: AuthTokens = {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        refreshTokenExpiresAt: data.refreshTokenExpiresAt,
+      };
       tokenStorage.setTokens(next);
       return next;
     } catch {

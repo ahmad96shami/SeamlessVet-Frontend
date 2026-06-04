@@ -26,8 +26,11 @@ export function Providers({ children }: { children: ReactNode }) {
           dehydrateOptions: { shouldDehydrateQuery: (q) => q.state.status === "success" && shouldDehydrateQuery(q.queryKey) },
         }}
       >
-        {children}
+        {/* Before {children}: passive effects run in JSX order, so the Toaster's ToastState
+            subscription must beat any boot-time toast fired from the app's mount effects
+            (e.g. the session-expired notice) — sonner drops toasts published pre-subscribe. */}
         <Toaster position="top-center" richColors closeButton />
+        {children}
       </PersistQueryClientProvider>
     </ErrorBoundary>
   );

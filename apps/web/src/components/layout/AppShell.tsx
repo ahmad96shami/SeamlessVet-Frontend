@@ -82,7 +82,7 @@ export function AppShell() {
               <Icon.globe size={16} />
             </button>
             <span className="sn-utility-spacer" />
-            <button className="icon-pill" title={t("shell.signOut")} onClick={() => void logout()}>
+            <button className="icon-pill" title={t("shell.signOut")} onClick={logout}>
               <Icon.logout size={16} />
             </button>
           </div>

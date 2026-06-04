@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { applyFieldErrors, LoginRequestSchema, type ApiError, type LoginRequest } from "@vet/shared";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
@@ -10,10 +12,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { useLogin } from "@/queries/auth";
 import { AuthLayout } from "@/routes/auth/AuthLayout";
+import { useAuthStore } from "@/stores/authStore";
 
 export function LoginPage() {
   const { t } = useTranslation();
   const login = useLogin();
+  const sessionExpired = useAuthStore((s) => s.sessionExpired);
+
+  useEffect(() => {
+    // Landed here because a session ended on its own (expired at boot / failed refresh)?
+    // Explain why. Subscribed (not read-once): when the page boots directly on /login, this
+    // mounts BEFORE App's effect runs restore(), so the flag is set after the first run.
+    // One-shot consume + a stable toast id keep StrictMode's double effect to a single toast.
+    if (sessionExpired && useAuthStore.getState().consumeSessionExpired()) {
+      // Longer than the default 4s — it explains a surprising event (involuntary sign-out).
+      toast.error(t("auth.session.expiredToast"), { id: "session-expired", duration: 8000 });
+    }
+  }, [sessionExpired, t]);
   const form = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestSchema),
     defaultValues: { phonePrimary: "", password: "" },
