@@ -14,6 +14,8 @@ interface PillProps extends ViewProps {
   label: React.ReactNode;
   tone?: Tone;
   leadingIcon?: React.ReactNode;
+  /** The design's tighter `.pill.compact` (2×8 padding) for dense meta rows. */
+  compact?: boolean;
 }
 
 const TONE: Record<Tone, { bg: string; text: string }> = {
@@ -25,11 +27,12 @@ const TONE: Record<Tone, { bg: string; text: string }> = {
   navy: { bg: "bg-navy-900", text: "text-paper" },
 };
 
-export function Pill({ label, tone = "neutral", leadingIcon, className, ...rest }: PillProps) {
+export function Pill({ label, tone = "neutral", leadingIcon, compact, className, ...rest }: PillProps) {
   const palette = TONE[tone];
+  const padding = compact ? "px-2 py-0.5" : "px-2.5 py-[5px]";
   return (
     <View
-      className={`${palette.bg} self-start flex-row items-center gap-1.5 rounded-pill px-2.5 py-1 ${className ?? ""}`}
+      className={`${palette.bg} ${padding} self-start flex-row items-center gap-1.5 rounded-pill ${className ?? ""}`}
       {...rest}
     >
       {leadingIcon}

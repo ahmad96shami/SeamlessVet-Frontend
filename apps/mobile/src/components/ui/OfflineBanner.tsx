@@ -1,5 +1,7 @@
 import { Text, View } from "react-native";
 
+import { colors } from "@/theme";
+
 import { WifiOff } from "../icons";
 
 /**
@@ -9,9 +11,9 @@ import { WifiOff } from "../icons";
  */
 export function OfflineBanner({ message }: { message: string }) {
   return (
-    <View className="bg-amber-soft mx-4 mb-2 flex-row items-center gap-2 rounded-chip border border-[#F1D989] px-3 py-2">
-      <WifiOff size={14} color="#8A6A00" />
-      <Text className="text-amber-ink text-[12px] font-tajawal-bold">{message}</Text>
+    <View className="bg-amber-soft border-amber-border mx-4 mb-2 flex-row items-center gap-2 rounded-chip border px-3 py-2">
+      <WifiOff size={14} color={colors.amber.ink} />
+      <Text className="text-amber-ink flex-1 text-[12px] font-tajawal-bold">{message}</Text>
     </View>
   );
 }

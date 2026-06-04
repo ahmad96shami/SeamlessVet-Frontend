@@ -1,12 +1,14 @@
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { colors } from "@/theme";
+
 import { Box, Calendar, Home, User } from "../icons";
 
 /**
  * The design's `.tabbar` — a 4-column primary navigation pinned to the bottom.
- * Each tab is icon + label + a 5-px "active" dot under the label that fills in
- * teal when selected.
+ * Each tab is icon + label; the active tab simply tints both navy (the MoD
+ * prototype dropped the old teal "active dot").
  *
  * The design archive also documents a 5-column variant with a centre FAB; we
  * skip it for the foundation pass because the field doctor's primary CTA
@@ -36,7 +38,7 @@ export function BottomBar({ active = "home", onSelect }: BottomBarProps) {
     >
       {TABS.map(({ key, label, Icon }) => {
         const isActive = key === active;
-        const tint = isActive ? "#223D69" : "#94A1B5";
+        const tint = isActive ? colors.navy[900] : colors.ink[400];
         return (
           <Pressable
             key={key}
@@ -51,9 +53,6 @@ export function BottomBar({ active = "home", onSelect }: BottomBarProps) {
             >
               {label}
             </Text>
-            <View
-              className={`mt-0.5 h-1.5 w-1.5 rounded-pill ${isActive ? "bg-teal-500" : "bg-transparent"}`}
-            />
           </Pressable>
         );
       })}

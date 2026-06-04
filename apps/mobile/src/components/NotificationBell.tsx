@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Bell } from "@/components/icons";
 import { NotificationPanel } from "@/components/NotificationPanel";
 import { useNotifications } from "@/queries/notifications";
+import { colors } from "@/theme";
 
 /**
  * Mo7.3 — the home-header notification bell. Badges the unread count (feed rows with a null
@@ -25,7 +26,7 @@ export function NotificationBell() {
         accessibilityLabel={t("notifications.title")}
         className="border-ink-100 bg-paper relative h-10 w-10 items-center justify-center rounded-chip border"
       >
-        <Bell size={18} color="#223D69" />
+        <Bell size={18} color={colors.navy[900]} />
         {unread > 0 ? (
           <View
             className="bg-amber h-[18px] min-w-[18px] items-center justify-center rounded-pill px-1"

@@ -1,5 +1,7 @@
 import { View, type ViewProps } from "react-native";
 
+import { shadow } from "@/theme";
+
 /**
  * The design's `.card` element: a paper-coloured rounded-22 container with a
  * soft drop shadow. `flat` swaps the shadow for a hairline border (matches
@@ -17,7 +19,7 @@ export function Card({ flat, className, style, children, ...rest }: CardProps) {
       className={`bg-paper rounded-card ${tone} ${className ?? ""}`}
       // RN can't render the design's compound shadow at runtime; the elevation
       // prop is the Android counterpart of the iOS shadow set by `shadow-card`.
-      style={[flat ? undefined : { elevation: 1 }, style]}
+      style={[flat ? undefined : { elevation: shadow.card.elevation }, style]}
       {...rest}
     >
       {children}

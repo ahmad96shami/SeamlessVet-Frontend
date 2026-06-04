@@ -1,6 +1,7 @@
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 
 import { Card } from "./Card";
+import { IconTile } from "./IconTile";
 
 /**
  * The design's `.stat` cell from the home dashboard — a small card with a tinted
@@ -19,19 +20,12 @@ interface StatProps {
   tone?: Tone;
 }
 
-const TONE: Record<Tone, string> = {
-  teal: "bg-teal-50",
-  amber: "bg-amber-soft",
-  green: "bg-emerald-soft",
-  red: "bg-rose-soft",
-};
-
 export function Stat({ value, label, icon, tone = "teal" }: StatProps) {
   return (
     <Card className="min-h-[116px] flex-1 items-start p-3.5">
-      <View className={`mb-2 h-9 w-9 items-center justify-center rounded-chip ${TONE[tone]}`}>
+      <IconTile size="sm" tone={tone} className="mb-2">
         {icon}
-      </View>
+      </IconTile>
       <Text className="text-navy-900 text-[22px] font-tajawal-extrabold">{value}</Text>
       <Text className="text-ink-500 mt-0.5 text-[12px] font-tajawal">{label}</Text>
     </Card>

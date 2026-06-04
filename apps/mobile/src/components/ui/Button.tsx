@@ -1,5 +1,7 @@
 import { ActivityIndicator, Pressable, Text, View, type PressableProps } from "react-native";
 
+import { colors } from "@/theme";
+
 /**
  * The four button shapes from the design's `.btn` system:
  * - `primary` — navy CTA, white text (the dominant action on a screen).
@@ -24,10 +26,10 @@ interface ButtonProps extends Omit<PressableProps, "children"> {
 }
 
 const TONE: Record<Variant, { bg: string; text: string; spinner: string }> = {
-  primary: { bg: "bg-navy-900 active:bg-navy-800", text: "text-paper", spinner: "#FFFFFF" },
-  teal: { bg: "bg-teal-500 active:bg-teal-600", text: "text-paper", spinner: "#FFFFFF" },
-  soft: { bg: "bg-ink-100 active:bg-ink-200", text: "text-navy-900", spinner: "#223D69" },
-  ghost: { bg: "bg-transparent active:bg-ink-100", text: "text-navy-900", spinner: "#223D69" },
+  primary: { bg: "bg-navy-900 active:bg-navy-800", text: "text-paper", spinner: colors.white },
+  teal: { bg: "bg-teal-500 active:bg-teal-600", text: "text-paper", spinner: colors.white },
+  soft: { bg: "bg-ink-100 active:bg-ink-200", text: "text-navy-900", spinner: colors.navy[900] },
+  ghost: { bg: "bg-transparent active:bg-ink-100", text: "text-navy-900", spinner: colors.navy[900] },
 };
 
 export function Button({
@@ -42,7 +44,7 @@ export function Button({
 }: ButtonProps) {
   const tone = TONE[variant];
   const isDisabled = disabled || loading;
-  const padding = size === "sm" ? "px-3.5 py-2 rounded-chip" : "px-4 py-3.5 rounded-input";
+  const padding = size === "sm" ? "px-3.5 py-[9px] rounded-[10px]" : "px-[18px] py-3.5 rounded-input";
   const fontSize = size === "sm" ? "text-[13px]" : "text-[15px]";
 
   return (

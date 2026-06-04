@@ -1,5 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 
+import { colors } from "@/theme";
+
 import { Forward, More } from "../icons";
 
 /**
@@ -30,12 +32,13 @@ export function TopBar({ title, onBack, right, solid = true }: TopBarProps) {
           onPress={onBack}
           accessibilityRole="button"
           accessibilityLabel="رجوع"
-          className="h-9 w-9 items-center justify-center"
+          hitSlop={8}
+          className="h-[38px] w-[38px] items-center justify-center"
         >
-          <Forward size={22} color="#223D69" />
+          <Forward size={22} color={colors.navy[900]} />
         </Pressable>
       ) : (
-        <View className="w-9" />
+        <View className="w-[38px]" />
       )}
       <Text
         className="text-navy-900 flex-1 text-center text-[18px] font-tajawal-extrabold"
@@ -46,8 +49,8 @@ export function TopBar({ title, onBack, right, solid = true }: TopBarProps) {
       {right !== undefined ? (
         right
       ) : (
-        <Pressable className="h-9 w-9 items-center justify-center" accessibilityRole="button">
-          <More size={22} color="#223D69" />
+        <Pressable className="h-[38px] w-[38px] items-center justify-center" accessibilityRole="button">
+          <More size={22} color={colors.navy[900]} />
         </Pressable>
       )}
     </View>

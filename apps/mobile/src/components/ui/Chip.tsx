@@ -23,7 +23,7 @@ export function Chip({ label, active = "off", leadingIcon, ...rest }: ChipProps)
   const tone = TONE[active];
   return (
     <Pressable
-      className={`${tone.bg} ${tone.border} self-start flex-row items-center gap-1.5 rounded-pill border px-3.5 py-2`}
+      className={`${tone.bg} ${tone.border} self-start flex-row items-center gap-1.5 rounded-pill border px-3.5 py-[9px]`}
       {...rest}
     >
       {leadingIcon ? <View>{leadingIcon}</View> : null}

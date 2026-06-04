@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { Shield } from "@/components/icons";
 import { useAuthStore } from "@/stores/authStore";
+import { colors } from "@/theme";
 
 /**
  * App-wide read-only banner (PRD §8.8). **Self-gating**: it renders only when the session is
@@ -17,8 +18,8 @@ export function SessionBanner() {
   const status = useAuthStore((s) => s.status);
   if (!expired || status !== "authenticated") return null;
   return (
-    <View className="bg-amber-soft border-b border-[#F1D989] flex-row items-center gap-2 px-4 py-2">
-      <Shield size={14} color="#8A6A00" />
+    <View className="bg-amber-soft border-amber-border flex-row items-center gap-2 border-b px-4 py-2">
+      <Shield size={14} color={colors.amber.ink} />
       <Text className="text-amber-ink flex-1 text-[12px] font-tajawal-bold">
         {t("auth.session.expiredBanner")}
       </Text>

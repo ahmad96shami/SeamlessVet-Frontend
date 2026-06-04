@@ -1,6 +1,8 @@
 import { forwardRef, useState } from "react";
 import { Text, TextInput, View, type TextInputProps } from "react-native";
 
+import { colors } from "@/theme";
+
 /**
  * The design's `.input` — paper-backed, hairline border (`ink-100`), 14-px
  * rounded corners, teal focus ring (mimicked here with a 1-px teal border +
@@ -41,7 +43,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
         {leading}
         <TextInput
           ref={ref}
-          placeholderTextColor="#94A1B5"
+          placeholderTextColor={colors.ink[400]}
           className="text-ink-900 flex-1 py-3.5 text-[15px] font-tajawal"
           style={style}
           onFocus={(e) => {
