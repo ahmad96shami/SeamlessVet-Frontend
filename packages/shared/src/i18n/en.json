@@ -37,6 +37,14 @@
     "finance": "Finance",
     "system": "System"
   },
+  "me": {
+    "title": "My account",
+    "general": "General",
+    "prefix": "Numbering prefix",
+    "syncRow": "Sync",
+    "syncSub": "Automatic when online",
+    "signOutConfirm": "Signing out clears local data on this device. Continue?"
+  },
   "shell": {
     "signOut": "Sign out",
     "language": "Language",
