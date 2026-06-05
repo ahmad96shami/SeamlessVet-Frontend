@@ -33,8 +33,9 @@
     "myIncome": "دخلي"
   },
   "navSection": {
+    "dashboard": "الرئيسية",
     "operations": "العمليات",
-    "catalog": "الكتالوج",
+    "sales": "البيع والمخزون",
     "finance": "المالية",
     "system": "النظام"
   },

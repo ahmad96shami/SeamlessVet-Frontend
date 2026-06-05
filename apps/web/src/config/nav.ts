@@ -14,14 +14,15 @@ export interface NavItem {
 
 /** Sidebar section order (the design groups nav items under labelled sections). */
 export const NAV_SECTION_ORDER = [
+  "navSection.dashboard",
   "navSection.operations",
-  "navSection.catalog",
+  "navSection.sales",
   "navSection.finance",
   "navSection.system",
 ] as const;
 
 export const NAV_ITEMS: NavItem[] = [
-  { to: "/", labelKey: "nav.dashboard", icon: Icon.home, section: "navSection.operations" },
+  { to: "/", labelKey: "nav.dashboard", icon: Icon.home, section: "navSection.dashboard" },
   {
     to: "/operations/customers",
     labelKey: "nav.customers",
@@ -54,28 +55,28 @@ export const NAV_ITEMS: NavItem[] = [
     to: "/pos",
     labelKey: "nav.pos",
     icon: Icon.receipt,
-    section: "navSection.operations",
+    section: "navSection.sales",
     roles: ["admin", "cashier"],
   },
   {
     to: "/inventory",
     labelKey: "nav.inventory",
     icon: Icon.truck,
-    section: "navSection.operations",
+    section: "navSection.sales",
     roles: ["admin", "inventory_staff"],
   },
   {
     to: "/admin/products",
     labelKey: "nav.products",
     icon: Icon.box,
-    section: "navSection.catalog",
+    section: "navSection.sales",
     roles: ["admin"],
   },
   {
     to: "/admin/services",
     labelKey: "nav.services",
     icon: Icon.stethoscope,
-    section: "navSection.catalog",
+    section: "navSection.sales",
     roles: ["admin"],
   },
   {
@@ -124,7 +125,7 @@ export const NAV_ITEMS: NavItem[] = [
     to: "/reports",
     labelKey: "nav.reports",
     icon: Icon.chart,
-    section: "navSection.system",
+    section: "navSection.finance",
     roles: ["admin", "accountant"],
   },
   {

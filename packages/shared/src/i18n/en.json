@@ -33,8 +33,9 @@
     "myIncome": "My income"
   },
   "navSection": {
+    "dashboard": "Dashboard",
     "operations": "Operations",
-    "catalog": "Catalog",
+    "sales": "Sales & inventory",
     "finance": "Finance",
     "system": "System"
   },
