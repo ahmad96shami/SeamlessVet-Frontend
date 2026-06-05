@@ -154,11 +154,15 @@ export const Pill = (p: IconProps) => (
   </Frame>
 );
 
+// lucide's `syringe` geometry (ISC) — matches the web app's vaccination icon.
 export const Syringe = (p: IconProps) => (
   <Frame {...p}>
-    <Path d="M19 5l-2-2" />
-    <Path d="M18 6l-9 9-3 3-1-1 3-3 9-9 1 1z" />
-    <Path d="M11 13l-1-1M14 10l-1-1M16 8l-1-1" />
+    <Path d="m18 2 4 4" />
+    <Path d="m17 7 3-3" />
+    <Path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+    <Path d="m9 11 4 4" />
+    <Path d="m5 19-3 3" />
+    <Path d="m14 4 6 6" />
   </Frame>
 );
 
