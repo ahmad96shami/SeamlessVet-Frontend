@@ -1179,14 +1179,22 @@
       "empty": "Cart is empty — add a product or service from the list",
       "qty": "Qty",
       "remove": "Remove",
+      "edit": "Edit line",
       "lineDiscount": "Line discount",
       "subtotal": "Subtotal",
       "discount": "Discount",
+      "addDiscount": "Add discount",
       "invoiceDiscount": "Invoice discount",
       "tax": "VAT",
       "taxExempt": "— exempt",
       "total": "Total due",
       "clear": "Clear cart"
+    },
+    "layout": {
+      "list": "List view",
+      "grid2": "2-column grid",
+      "grid3": "3-column grid",
+      "grid4": "4-column grid"
     },
     "link": {
       "walkIn": "Quick walk-in sale",
