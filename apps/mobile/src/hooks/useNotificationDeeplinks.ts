@@ -26,6 +26,11 @@ function routeFromData(router: AppRouter, data: unknown): void {
  * early-arriving response must be BUFFERED, not dropped, and routed once authenticated.
  * `getLastNotificationResponseAsync` stays as the fallback for the opposite race (auth restored
  * before the listener replay).
+ *
+ * KNOWN DEV-CLIENT LIMITATION (cannot be fixed here): expo-dev-launcher's cold-launch redirect
+ * strips the notification extras, so in a development build a killed-app tap opens the app on home
+ * — neither the listener nor getLast ever sees the response (verified on the S20+, Mo10 smoke).
+ * Warm taps work everywhere; the cold path must be re-verified on a release/preview build.
  */
 export function useNotificationDeeplinks(): void {
   const router = useRouter();
