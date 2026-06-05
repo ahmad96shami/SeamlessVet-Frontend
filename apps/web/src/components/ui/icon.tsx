@@ -215,11 +215,15 @@ export const Icon = {
       <path d="M9.5 7.5l7 7" />
     </Svg>
   ),
+  // lucide's `syringe` geometry (ISC) — clearer barrel/plunger than the old bespoke one.
   syringe: (p: IconProps) => (
     <Svg {...p}>
-      <path d="M19 5l-2-2" />
-      <path d="M18 6l-9 9-3 3-1-1 3-3 9-9 1 1z" />
-      <path d="M11 13l-1-1M14 10l-1-1M16 8l-1-1" />
+      <path d="m18 2 4 4" />
+      <path d="m17 7 3-3" />
+      <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+      <path d="m9 11 4 4" />
+      <path d="m5 19-3 3" />
+      <path d="m14 4 6 6" />
     </Svg>
   ),
   paper: (p: IconProps) => (
