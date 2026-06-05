@@ -44,7 +44,6 @@ export function AppShell() {
           </div>
           <div className="sn-brand-text">
             <span className="sn-brand-name">SeamlessVet</span>
-            <span className="sn-brand-sub">{t("shell.center")}</span>
           </div>
         </div>
 
