@@ -137,7 +137,9 @@ export function VisitsPage() {
         header: t("visits.col.started"),
         cell: ({ row }) =>
           row.original.startedAt ? (
-            <span dir="ltr">{formatDateTime(row.original.startedAt, lang)}</span>
+            // No dir="ltr": in the RTL cell the date sits rightmost and reads
+            // date → time → marker ("م 6:48 2026/06/05"), like the rest of the app.
+            <span>{formatDateTime(row.original.startedAt, lang)}</span>
           ) : (
             <span className="text-muted-foreground">—</span>
           ),
