@@ -16,21 +16,33 @@ function routeFromData(router: AppRouter, data: unknown): void {
 }
 
 /**
- * Mo7.4 — route a tapped notification to its record. Handles a **warm** tap (the response listener,
- * while the app is running) and a **cold start** (the app was launched by the tap —
- * getLastNotificationResponseAsync, consumed once per session). Mounted in AppServices; only routes
- * while authenticated so we never push a protected route at/before sign-in.
+ * Mo7.4 (+ Mo10) — route a tapped notification to its record. Handles a **warm** tap (the response
+ * listener, while the app is running) and a **cold start** (the app was launched by the tap).
+ * Mounted in AppServices; only routes while authenticated so we never push a protected route
+ * at/before sign-in.
+ *
+ * Cold-start subtlety (Mo10 live-smoke finding): Android REPLAYS the launch tap to the response
+ * listener as soon as it subscribes — before the async auth restore flips the store — so an
+ * early-arriving response must be BUFFERED, not dropped, and routed once authenticated.
+ * `getLastNotificationResponseAsync` stays as the fallback for the opposite race (auth restored
+ * before the listener replay).
  */
 export function useNotificationDeeplinks(): void {
   const router = useRouter();
   const status = useAuthStore((s) => s.status);
   const coldStartHandled = useRef(false);
+  const pendingData = useRef<unknown>(null);
 
-  // Warm taps.
+  // Taps while the JS runtime is up — warm taps route immediately; a pre-auth (cold-start replay)
+  // tap is parked for the auth effect below.
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((response) => {
-      if (useAuthStore.getState().status !== "authenticated") return;
-      routeFromData(router, response.notification.request.content.data);
+      const data = response.notification.request.content.data;
+      if (useAuthStore.getState().status !== "authenticated") {
+        pendingData.current = data;
+        return;
+      }
+      routeFromData(router, data);
     });
     return () => sub.remove();
   }, [router]);
@@ -39,6 +51,13 @@ export function useNotificationDeeplinks(): void {
   useEffect(() => {
     if (status !== "authenticated" || coldStartHandled.current) return;
     coldStartHandled.current = true;
+
+    if (pendingData.current != null) {
+      routeFromData(router, pendingData.current);
+      pendingData.current = null;
+      return;
+    }
+
     void Notifications.getLastNotificationResponseAsync().then((response) => {
       if (response) routeFromData(router, response.notification.request.content.data);
     });
