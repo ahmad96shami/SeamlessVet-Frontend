@@ -45,7 +45,9 @@ export const CreateUserRequestSchema = z.object({
   phonePrimary: z
     .string()
     .regex(/^\+?[0-9- ]{7,32}$/, "invalid_phone"),
-  email: z.string().email().max(255).optional(),
+  // `.or(z.literal(""))` keeps the RHF resolver happy on the untouched empty input —
+  // the web form drops blanks at submit (omitEmptyStrings), so "" never reaches the API.
+  email: z.string().email().max(255).optional().or(z.literal("")),
   password: z.string().min(8).max(128),
   roleKey: z.string().min(1),
   licenseNumber: z.string().max(64).optional(),
