@@ -2,9 +2,11 @@ import type { AxiosInstance } from "axios";
 import { z } from "zod";
 
 import {
+  CreateUserRequestSchema,
   PermissionOverrideRequestSchema,
   UserDetailResponseSchema,
   UserResponseSchema,
+  type CreateUserRequest,
   type PermissionOverrideRequest,
   type UserDetailResponse,
   type UserListParams,
@@ -26,6 +28,16 @@ export async function listUsers(
 export async function getUser(client: AxiosInstance, id: string): Promise<UserDetailResponse> {
   const res = await client.get(`/admin/users/${id}`);
   return UserDetailResponseSchema.parse(res.data);
+}
+
+/** POST /admin/users — admin-created staff account; active immediately (no approval round-trip). */
+export async function createUser(
+  client: AxiosInstance,
+  body: CreateUserRequest,
+): Promise<UserResponse> {
+  const payload = CreateUserRequestSchema.parse(body);
+  const res = await client.post("/admin/users", payload);
+  return UserResponseSchema.parse(res.data);
 }
 
 /** POST /admin/users/{id}/deactivate — suspends an active account. */

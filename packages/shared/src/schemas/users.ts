@@ -36,6 +36,23 @@ export const PermissionOverrideRequestSchema = z.object({
 });
 export type PermissionOverrideRequest = z.infer<typeof PermissionOverrideRequestSchema>;
 
+/**
+ * POST /admin/users body — an admin-created staff account (cashier, in-clinic doctor, …) that
+ * skips the self-registration approval queue and is active immediately.
+ */
+export const CreateUserRequestSchema = z.object({
+  fullName: z.string().min(1).max(128),
+  phonePrimary: z
+    .string()
+    .regex(/^\+?[0-9- ]{7,32}$/, "invalid_phone"),
+  email: z.string().email().max(255).optional(),
+  password: z.string().min(8).max(128),
+  roleKey: z.string().min(1),
+  licenseNumber: z.string().max(64).optional(),
+  licenseDetails: z.string().optional(),
+});
+export type CreateUserRequest = z.infer<typeof CreateUserRequestSchema>;
+
 /** Query params for the roster list — offset-paged (admin-table convention). */
 export interface UserListParams {
   search?: string;
