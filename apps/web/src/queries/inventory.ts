@@ -5,7 +5,6 @@ import {
   listMovements,
   listStock,
   loadField,
-  receiveStock,
   unloadField,
   type AdjustStockInput,
   type ApiError,
@@ -14,7 +13,6 @@ import {
   type InventoryMovementResponse,
   type LoadFieldInput,
   type MovementListParams,
-  type ReceiveStockInput,
   type StockLevelResponse,
   type StockListParams,
   type UnloadFieldInput,
@@ -51,15 +49,6 @@ export function useFieldInventories() {
     queryKey: [KEY, "field-inventories"],
     queryFn: () => listFieldInventories(apiClient),
     staleTime: 60_000,
-  });
-}
-
-/** POST /inventory/receive — receive stock into the warehouse. Refetches all inventory reads. */
-export function useReceiveStock() {
-  const qc = useQueryClient();
-  return useMutation<IdentifierResponse, ApiError, ReceiveStockInput>({
-    mutationFn: (input) => receiveStock(apiClient, input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }
 

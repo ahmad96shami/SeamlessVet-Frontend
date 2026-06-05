@@ -1,7 +1,6 @@
 import { Money } from "@/components/ui/money";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
-  formatCurrency,
   formatDate,
   formatQuantity,
   STOCK_LOCATION_VALUES,
@@ -25,7 +24,6 @@ import { useFieldInventories, useStock } from "@/queries/inventory";
 import { AdjustStockDialog } from "@/routes/inventory/AdjustStockDialog";
 import { InventoryTabs } from "@/routes/inventory/InventoryTabs";
 import { LoadFieldDialog } from "@/routes/inventory/LoadFieldDialog";
-import { ReceiveStockDialog } from "@/routes/inventory/ReceiveStockDialog";
 
 /** True once today is past the expiration day (date-only comparison). */
 function isExpired(date: string): boolean {
@@ -43,7 +41,6 @@ export function StockPage() {
   // Default to the central warehouse — the design's primary stock view.
   const [locationType, setLocationType] = useState("warehouse");
   const [lowStockOnly, setLowStockOnly] = useState(false);
-  const [receiveOpen, setReceiveOpen] = useState(false);
   const [loadOpen, setLoadOpen] = useState(false);
   const [adjustTarget, setAdjustTarget] = useState<StockLevelResponse | null>(null);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
@@ -179,17 +176,13 @@ export function StockPage() {
     <AdminPage
       title={t("inventory.title")}
       description={t("inventory.description")}
+      // Receiving stock happens through purchase invoices (M19) — the manual receive
+      // action was retired; load/unload remains the only header action here.
       actions={
-        <>
-          <Button variant="secondary" onClick={() => setLoadOpen(true)}>
-            <Icon.truck className="size-4" />
-            {t("inventory.load.action")}
-          </Button>
-          <Button onClick={() => setReceiveOpen(true)}>
-            <Icon.plus className="size-4" />
-            {t("inventory.receive.action")}
-          </Button>
-        </>
+        <Button variant="secondary" onClick={() => setLoadOpen(true)}>
+          <Icon.truck className="size-4" />
+          {t("inventory.load.action")}
+        </Button>
       }
     >
       <div className="space-y-4">
@@ -234,7 +227,6 @@ export function StockPage() {
         />
       </div>
 
-      <ReceiveStockDialog open={receiveOpen} onClose={() => setReceiveOpen(false)} />
       <LoadFieldDialog open={loadOpen} onClose={() => setLoadOpen(false)} />
       <AdjustStockDialog
         stockItem={adjustTarget}
