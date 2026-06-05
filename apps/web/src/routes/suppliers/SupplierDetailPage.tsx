@@ -67,10 +67,12 @@ export function SupplierDetailPage() {
         </Button>
       </header>
 
-      {/* Balance — positive = the clinic owes the supplier (an outstanding payable). */}
+      {/* Balance — positive = the clinic owes the supplier (an outstanding payable).
+          No dir="ltr" wrapper: it would drag the amount to the card's LEFT edge (the customer
+          card only gets away with it because flex shrink-wraps its block); Money self-isolates. */}
       <div className="rounded-2xl border p-4">
         <div className="text-sm text-muted-foreground">{t("suppliers.balanceOwed")}</div>
-        <div className={cn("text-2xl font-bold", balanceClass(s.balance))} dir="ltr">
+        <div className={cn("text-2xl font-bold", balanceClass(s.balance))}>
           <Money value={s.balance} />
         </div>
       </div>
