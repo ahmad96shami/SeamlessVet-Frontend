@@ -1,9 +1,14 @@
 import { useEffect } from "react";
+import * as Notifications from "expo-notifications";
 import { AppState } from "react-native";
 
 import { useNotificationDeeplinks } from "@/hooks/useNotificationDeeplinks";
 import { useNotificationsRealtime } from "@/hooks/useNotificationsRealtime";
-import { configureNotificationHandler, registerForPushNotificationsAsync } from "@/services/localNotifications";
+import {
+  configureNotificationHandler,
+  ensurePushTokenRegistered,
+  registerForPushNotificationsAsync,
+} from "@/services/localNotifications";
 import { syncVaccinationReminders } from "@/services/vaccinationReminders";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -25,14 +30,25 @@ export function AppServices(): null {
     configureNotificationHandler();
   }, []);
 
-  // On sign-in: request permission + set up the channel + a best-effort push token, then schedule
-  // local vaccination reminders from the (already-persisted) local DB once permission is granted.
+  // On sign-in: request permission + set up the channel + mint the Expo push token, then schedule
+  // local vaccination reminders and register the token with the backend (Mo10 — remote push).
   useEffect(() => {
     if (status !== "authenticated") return;
     void registerForPushNotificationsAsync().then((granted) => {
       if (granted) void syncVaccinationReminders();
+      void ensurePushTokenRegistered(); // no-op until a token was ever minted
     });
   }, [status]);
+
+  // Token rotation (rare): the listener delivers the NATIVE token, so re-mint the Expo token and
+  // re-register — only while signed in; an unauthenticated rotation is covered by the next sign-in.
+  useEffect(() => {
+    const sub = Notifications.addPushTokenListener(() => {
+      if (useAuthStore.getState().status !== "authenticated") return;
+      void registerForPushNotificationsAsync().then(() => ensurePushTokenRegistered());
+    });
+    return () => sub.remove();
+  }, []);
 
   // Reschedule reminders on foreground — newly-synced vaccinations may have arrived while away.
   useEffect(() => {

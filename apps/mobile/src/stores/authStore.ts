@@ -4,6 +4,7 @@ import type { LoginResponse } from "@vet/shared";
 import { logout as logoutApi } from "@/api/auth";
 import { decodeJwt } from "@/lib/jwt";
 import { setOnAuthError, setOnRefreshSuccess } from "@/services/apiClient";
+import { unregisterPushTokenBestEffort } from "@/services/localNotifications";
 import { prefs } from "@/services/mmkv";
 import { tokenStorage } from "@/services/tokenStorage";
 import { useSyncStore } from "@/stores/syncStore";
@@ -124,6 +125,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   },
 
   logout: async () => {
+    // Mo10: drop this device's push token while the bearer is still valid — best-effort, swallowed
+    // inside, never blocks the local-first logout below.
+    await unregisterPushTokenBestEffort();
     const refreshToken = (await tokenStorage.getTokens())?.refreshToken;
     if (refreshToken) {
       try {
