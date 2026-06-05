@@ -77,16 +77,21 @@ export function SupplierPaymentsSection({ supplierId }: { supplierId: string }) 
                 const ref = chequeRef(p, lang);
                 return (
                   <TableRow key={p.id}>
-                    <TableCell dir="ltr">{formatDate(p.paidAt, lang)}</TableCell>
+                    {/* dir="ltr" cells flip text-start to the LEFT — force text-end (= right
+                        inside an LTR cell) so they line up with the RTL headers; the amount
+                        cell stays RTL so its text-end matches the header's left edge. */}
+                    <TableCell className="text-end" dir="ltr">
+                      {formatDate(p.paidAt, lang)}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="secondary">
                         {t(`paymentMethod.${p.method}`, { defaultValue: p.method })}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground" dir="ltr">
+                    <TableCell className="text-end text-sm text-muted-foreground" dir="ltr">
                       {ref ?? "—"}
                     </TableCell>
-                    <TableCell className="text-end font-medium text-success" dir="ltr">
+                    <TableCell className="text-end font-medium text-success">
                       <Money value={p.amount} />
                     </TableCell>
                   </TableRow>

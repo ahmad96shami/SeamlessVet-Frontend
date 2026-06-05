@@ -29,7 +29,9 @@ export function Money({
   const { body, symbol } = formatCurrencyParts(value, i18n.language, currency);
   const symbolNode = symbol ? <span className="money-symbol">{symbol}</span> : null;
   return (
-    <span className={cn("money tabular-nums", className)}>
+    // dir="ltr" isolates the amount from the surrounding paragraph: the ar Intl body embeds
+    // an RLM that would otherwise flip the symbol to the digits' right inside RTL cells.
+    <span dir="ltr" className={cn("money tabular-nums", className)}>
       {symbolPlacement === "leading" ? symbolNode : null}
       <span className="money-body">{body}</span>
       {symbolPlacement === "trailing" ? symbolNode : null}
