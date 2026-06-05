@@ -96,6 +96,7 @@ function VisitChargesPreview({ visitId }: { visitId: string }) {
       </button>
       {open ? (
         <div className="px-2.5 pb-2.5 ps-8">
+          {/* No charges → the empty message alone; the auto-add hint would only confuse. */}
           {count === 0 && !isLoading ? (
             <p className="text-xs text-muted-foreground">{t("pos.link.noVisitCharges")}</p>
           ) : (
@@ -120,9 +121,11 @@ function VisitChargesPreview({ visitId }: { visitId: string }) {
               ))}
             </ul>
           )}
-          <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-            {t("pos.link.visitChargesHint")}
-          </p>
+          {count > 0 ? (
+            <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+              {t("pos.link.visitChargesHint")}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </div>

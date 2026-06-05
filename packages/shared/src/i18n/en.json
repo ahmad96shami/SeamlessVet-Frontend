@@ -1208,7 +1208,7 @@
       "linkVisit": "Link a visit",
       "noVisit": "No visit",
       "visitCharges": "Visit charges",
-      "visitChargesHint": "Unbilled dispensed-to-owner meds and procedures are added automatically at issuance",
+      "visitChargesHint": "Visit charges are added to the invoice automatically at issuance, on top of the total shown — don't add them manually",
       "noVisitCharges": "No unbilled charges for this visit",
       "dispensed": "Dispensed",
       "procedure": "Procedure"
