@@ -188,7 +188,9 @@ export function BatchFormDialog({
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <Field label={t("finance.batches.customer")} error={errors.customerId?.message}>
           {batch ? (
-            <Input value={customerName} dir="auto" readOnly />
+            // No dir="auto" — a Latin-first name would flip the input LTR and left-align it;
+            // inheriting the page RTL keeps the value on the right like every other field.
+            <Input value={customerName} readOnly />
           ) : (
             <div className="flex items-center gap-2">
               <Input
