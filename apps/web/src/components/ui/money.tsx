@@ -13,12 +13,16 @@ export function Money({
   value,
   currency = DEFAULT_CURRENCY,
   className,
-  symbolPlacement = "trailing",
+  symbolPlacement = "leading",
 }: {
   value: number;
   currency?: string;
   className?: string;
-  /** Where to render the currency symbol relative to the amount. Default trailing. */
+  /**
+   * Where to render the currency symbol relative to the amount. Default leading — in the RTL
+   * layout the symbol then sits visually to the LEFT of the digits (the app-wide convention,
+   * matching the customers/suppliers/purchases list columns).
+   */
   symbolPlacement?: "leading" | "trailing";
 }) {
   const { i18n } = useTranslation();

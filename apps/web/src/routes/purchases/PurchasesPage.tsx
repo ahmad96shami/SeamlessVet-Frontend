@@ -81,7 +81,7 @@ export function PurchasesPage() {
         header: t("purchases.colTotal"),
         cell: ({ row }) => (
           <span className="font-medium" dir="ltr">
-            <Money value={row.original.total} symbolPlacement="leading" />
+            <Money value={row.original.total} />
           </span>
         ),
       },

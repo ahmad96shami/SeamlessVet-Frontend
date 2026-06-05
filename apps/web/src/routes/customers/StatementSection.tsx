@@ -243,14 +243,14 @@ export function StatementSection({
                       <TableCell className="max-w-[16rem] truncate">{e.description ?? "—"}</TableCell>
                       <TableCell className="text-end" dir="ltr">
                         {e.amount > 0 ? (
-                          formatCurrency(e.amount, lang)
+                          <Money value={e.amount} />
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-end text-success" dir="ltr">
                         {e.amount < 0 ? (
-                          formatCurrency(-e.amount, lang)
+                          <Money value={-e.amount} />
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}

@@ -1,7 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   CUSTOMER_TYPE_VALUES,
-  formatCurrency,
   LEDGER_STATUS_VALUES,
   type CustomerResponse,
 } from "@vet/shared";
@@ -121,7 +120,7 @@ export function CustomersPage() {
             b > 0 ? "font-medium text-destructive" : b < 0 ? "font-medium text-success" : "text-muted-foreground";
           return (
             <span className={cls} dir="ltr">
-              <Money value={b} symbolPlacement="leading" />
+              <Money value={b} />
             </span>
           );
         },

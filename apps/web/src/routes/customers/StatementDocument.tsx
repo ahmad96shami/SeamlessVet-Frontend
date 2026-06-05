@@ -1,6 +1,8 @@
-import { formatCurrency, formatDate, type LedgerEntryResponse } from "@vet/shared";
+import { formatDate, type LedgerEntryResponse } from "@vet/shared";
 import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
+
+import { Money } from "@/components/ui/money";
 
 export interface StatementDocumentProps {
   customerName: string;
@@ -75,7 +77,7 @@ export const StatementDocument = forwardRef<HTMLDivElement, StatementDocumentPro
                 {t("customers.statement.opening")}
               </td>
               <td className="p-2 text-end font-medium" dir="ltr">
-                {formatCurrency(openingBalance, lang)}
+                <Money value={openingBalance} />
               </td>
             </tr>
             {entries.map((e) => (
@@ -89,13 +91,13 @@ export const StatementDocument = forwardRef<HTMLDivElement, StatementDocumentPro
                 <td className="p-2">{t(`ledgerEntryType.${e.entryType}`, { defaultValue: e.entryType })}</td>
                 <td className="p-2">{e.description ?? "—"}</td>
                 <td className="p-2 text-end" dir="ltr">
-                  {e.amount > 0 ? formatCurrency(e.amount, lang) : "—"}
+                  {e.amount > 0 ? <Money value={e.amount} /> : "—"}
                 </td>
                 <td className="p-2 text-end" dir="ltr">
-                  {e.amount < 0 ? formatCurrency(-e.amount, lang) : "—"}
+                  {e.amount < 0 ? <Money value={-e.amount} /> : "—"}
                 </td>
                 <td className="p-2 text-end font-medium" dir="ltr">
-                  {formatCurrency(e.balanceAfter, lang)}
+                  <Money value={e.balanceAfter} />
                 </td>
               </tr>
             ))}
@@ -105,15 +107,15 @@ export const StatementDocument = forwardRef<HTMLDivElement, StatementDocumentPro
         <div className="mt-4 flex justify-end gap-8 border-t pt-3 text-sm">
           <span>
             {t("customers.statement.totalDebit")}:{" "}
-            <b dir="ltr">{formatCurrency(totalDebit, lang)}</b>
+            <b dir="ltr"><Money value={totalDebit} /></b>
           </span>
           <span>
             {t("customers.statement.totalCredit")}:{" "}
-            <b dir="ltr">{formatCurrency(totalCredit, lang)}</b>
+            <b dir="ltr"><Money value={totalCredit} /></b>
           </span>
           <span className="font-bold">
             {t("customers.statement.closing")}:{" "}
-            <b dir="ltr">{formatCurrency(closingBalance, lang)}</b>
+            <b dir="ltr"><Money value={closingBalance} /></b>
           </span>
         </div>
       </div>

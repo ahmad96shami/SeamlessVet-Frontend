@@ -1,6 +1,8 @@
-import { formatCurrency, formatDate, type SupplierLedgerEntryResponse } from "@vet/shared";
+import { formatDate, type SupplierLedgerEntryResponse } from "@vet/shared";
 import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
+
+import { Money } from "@/components/ui/money";
 
 export interface SupplierStatementDocumentProps {
   supplierName: string;
@@ -75,7 +77,7 @@ export const SupplierStatementDocument = forwardRef<HTMLDivElement, SupplierStat
                 {t("suppliers.statement.opening")}
               </td>
               <td className="p-2 text-end font-medium" dir="ltr">
-                {formatCurrency(openingBalance, lang)}
+                <Money value={openingBalance} />
               </td>
             </tr>
             {entries.map((e) => (
@@ -91,13 +93,13 @@ export const SupplierStatementDocument = forwardRef<HTMLDivElement, SupplierStat
                 </td>
                 <td className="p-2">{e.description ?? "—"}</td>
                 <td className="p-2 text-end" dir="ltr">
-                  {e.amount > 0 ? formatCurrency(e.amount, lang) : "—"}
+                  {e.amount > 0 ? <Money value={e.amount} /> : "—"}
                 </td>
                 <td className="p-2 text-end" dir="ltr">
-                  {e.amount < 0 ? formatCurrency(-e.amount, lang) : "—"}
+                  {e.amount < 0 ? <Money value={-e.amount} /> : "—"}
                 </td>
                 <td className="p-2 text-end font-medium" dir="ltr">
-                  {formatCurrency(e.balanceAfter, lang)}
+                  <Money value={e.balanceAfter} />
                 </td>
               </tr>
             ))}
@@ -106,13 +108,13 @@ export const SupplierStatementDocument = forwardRef<HTMLDivElement, SupplierStat
 
         <div className="mt-4 flex justify-end gap-8 border-t pt-3 text-sm">
           <span>
-            {t("suppliers.statement.totalDebit")}: <b dir="ltr">{formatCurrency(totalDebit, lang)}</b>
+            {t("suppliers.statement.totalDebit")}: <b dir="ltr"><Money value={totalDebit} /></b>
           </span>
           <span>
-            {t("suppliers.statement.totalCredit")}: <b dir="ltr">{formatCurrency(totalCredit, lang)}</b>
+            {t("suppliers.statement.totalCredit")}: <b dir="ltr"><Money value={totalCredit} /></b>
           </span>
           <span className="font-bold">
-            {t("suppliers.statement.closing")}: <b dir="ltr">{formatCurrency(closingBalance, lang)}</b>
+            {t("suppliers.statement.closing")}: <b dir="ltr"><Money value={closingBalance} /></b>
           </span>
         </div>
       </div>

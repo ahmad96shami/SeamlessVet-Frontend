@@ -98,7 +98,7 @@ export function SuppliersPage() {
         header: t("suppliers.colBalance"),
         cell: ({ row }) => (
           <span className={balanceClass(row.original.balance)} dir="ltr">
-            <Money value={row.original.balance} symbolPlacement="leading" />
+            <Money value={row.original.balance} />
           </span>
         ),
       },
