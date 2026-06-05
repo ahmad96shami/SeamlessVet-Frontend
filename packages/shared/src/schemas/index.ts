@@ -32,3 +32,4 @@ export * from "./entitlements";
 export * from "./partnership";
 export * from "./reports";
 export * from "./notifications";
+export * from "./devices";
