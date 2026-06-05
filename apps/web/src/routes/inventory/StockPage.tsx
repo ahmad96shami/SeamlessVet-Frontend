@@ -85,7 +85,8 @@ export function StockPage() {
             <div>
               <div className="font-medium">{row.original.nameAr}</div>
               {sub ? (
-                <div className="text-xs text-muted-foreground" dir="ltr">
+                // text-end = right inside this LTR sub-line, lining it up with the Arabic name.
+                <div className="text-end text-xs text-muted-foreground" dir="ltr">
                   {sub}
                 </div>
               ) : null}

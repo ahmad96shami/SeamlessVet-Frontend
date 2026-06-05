@@ -59,7 +59,8 @@ export function ProductsPage() {
           <div>
             <div className="font-medium">{row.original.nameAr}</div>
             {row.original.nameLatin ? (
-              <div className="text-xs text-muted-foreground" dir="ltr">
+              // text-end = right inside this LTR sub-line, lining it up with the Arabic name.
+              <div className="text-end text-xs text-muted-foreground" dir="ltr">
                 {row.original.nameLatin}
               </div>
             ) : null}
