@@ -15,6 +15,7 @@ import { Select } from "@/components/ui/select";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useDeactivateUser, useReactivateUser, useUsers } from "@/queries/users";
+import { UserFormDialog } from "@/routes/admin/UserFormDialog";
 import { UserPermissionsDialog } from "@/routes/admin/UserPermissionsDialog";
 
 function statusVariant(status: string): BadgeProps["variant"] {
@@ -30,6 +31,7 @@ export function UsersPage() {
   const [role, setRole] = useState("");
   const [status, setStatus] = useState("");
   const [permUserId, setPermUserId] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
 
   // Any filter change jumps back to the first page.
@@ -164,6 +166,10 @@ export function UsersPage() {
               </option>
             ))}
           </Select>
+          <Button className="ms-auto" onClick={() => setAddOpen(true)}>
+            <Icon.plus className="size-4" />
+            {t("admin.users.add")}
+          </Button>
         </div>
 
         <DataTable
@@ -181,6 +187,7 @@ export function UsersPage() {
         />
       </div>
 
+      <UserFormDialog open={addOpen} onClose={() => setAddOpen(false)} />
       <UserPermissionsDialog userId={permUserId} onClose={() => setPermUserId(null)} />
     </AdminPage>
   );

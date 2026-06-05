@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addPermissionOverride,
+  createUser,
   deactivateUser,
   getUser,
   listUsers,
   reactivateUser,
   type ApiError,
+  type CreateUserRequest,
   type PermissionOverrideRequest,
   type UserDetailResponse,
   type UserListParams,
@@ -30,6 +32,14 @@ export function useUserDetail(id: string | null) {
     queryKey: [USER, id],
     queryFn: () => getUser(apiClient, id as string),
     enabled: id !== null,
+  });
+}
+
+export function useCreateUser() {
+  const qc = useQueryClient();
+  return useMutation<UserResponse, ApiError, CreateUserRequest>({
+    mutationFn: (body) => createUser(apiClient, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [USERS] }),
   });
 }
 
