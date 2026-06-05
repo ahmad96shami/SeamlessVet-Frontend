@@ -4,7 +4,11 @@ import type { LoginResponse } from "@vet/shared";
 import { logout as logoutApi } from "@/api/auth";
 import { decodeJwt } from "@/lib/jwt";
 import { setOnAuthError, setOnRefreshSuccess } from "@/services/apiClient";
-import { unregisterPushTokenBestEffort } from "@/services/localNotifications";
+import {
+  resumePushTokenRegistration,
+  suspendPushTokenRegistration,
+  unregisterPushTokenBestEffort,
+} from "@/services/localNotifications";
 import { prefs } from "@/services/mmkv";
 import { tokenStorage } from "@/services/tokenStorage";
 import { useSyncStore } from "@/stores/syncStore";
@@ -84,6 +88,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   sessionExpired: false,
 
   setSessionFromLogin: async (res) => {
+    resumePushTokenRegistration(); // Mo10 — lift the logout suspension for the new session.
     await tokenStorage.setTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
     // Cache the prefix in MMKV so a cold start (before /auth/refresh runs) still
     // has it for client-side visit-number minting.
@@ -126,7 +131,10 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   logout: async () => {
     // Mo10: drop this device's push token while the bearer is still valid — best-effort, swallowed
-    // inside, never blocks the local-first logout below.
+    // inside, never blocks the local-first logout below. Registration is suspended FIRST so a
+    // token-listener mint chain resolving mid-logout can't re-register the row we just deleted
+    // (live-smoke race); the next sign-in/restore resumes it.
+    suspendPushTokenRegistration();
     await unregisterPushTokenBestEffort();
     const refreshToken = (await tokenStorage.getTokens())?.refreshToken;
     if (refreshToken) {

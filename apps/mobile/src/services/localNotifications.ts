@@ -136,12 +136,28 @@ export async function registerForPushNotificationsAsync(): Promise<boolean> {
 }
 
 /**
+ * Mo10 live-smoke finding — expo-notifications fires `addPushTokenListener` in bursts and the
+ * mint promises those events start can resolve MID-LOGOUT (status flips only at the end), so a
+ * late `ensurePushTokenRegistered` re-created the row two seconds after logout's unregister had
+ * deleted it — leaving a signed-out shared device still receiving the previous user's pushes.
+ * `authStore.logout` suspends registration up front; the next sign-in/restore resumes it.
+ */
+let registrationSuspended = false;
+export function suspendPushTokenRegistration(): void {
+  registrationSuspended = true;
+}
+export function resumePushTokenRegistration(): void {
+  registrationSuspended = false;
+}
+
+/**
  * Mo10 — register the cached Expo token with the backend (`POST /devices/push-token`, upsert by
  * token) so remote pushes reach this device. Call while authenticated: after the sign-in mint and
  * on token rotation. No retry plumbing — a failure is benign (the next sign-in / rotation /
  * foreground re-registers) and the server reassigns a shared device to whoever signed in last.
  */
 export async function ensurePushTokenRegistered(): Promise<void> {
+  if (registrationSuspended) return;
   const token = getCachedPushToken();
   if (!token) return;
   try {
