@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { NotificationResponse } from "@vet/shared";
 
-import { presentLocalNotification } from "@/services/localNotifications";
+import { markNotificationSeen, presentLocalNotification } from "@/services/localNotifications";
 import { onNotification, startNotificationsHub, stopNotificationsHub } from "@/services/notificationsHub";
 import { NOTIFICATIONS_KEY } from "@/queries/notifications";
 import { useAuthStore } from "@/stores/authStore";
@@ -33,6 +33,9 @@ export function useNotificationsRealtime(): void {
   useEffect(() => {
     handlerRef.current = (n) => {
       void qc.invalidateQueries({ queryKey: [NOTIFICATIONS_KEY] });
+      // Mo10 dedup: skip presenting if the Expo remote push for this id already showed a banner
+      // (the feed invalidation above still runs — the badge must update either way).
+      if (!markNotificationSeen(n.id)) return;
       const heading =
         n.title ?? t(`notifications.type.${n.type}`, { defaultValue: t("notifications.title") });
       void presentLocalNotification({

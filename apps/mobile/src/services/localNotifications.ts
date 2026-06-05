@@ -31,17 +31,51 @@ const PUSH_TOKEN_KEY = "notifications.expoPushToken";
 export const ANDROID_CHANNEL_ID = "default";
 
 /**
+ * Mo10 dedup — a foregrounded device receives every notification TWICE: SignalR presents it as a
+ * local banner (Mo7) and the Expo remote push also arrives. Both channels carry the same
+ * `data.notificationId`, so a small insertion-ordered seen-set dedups symmetrically (whichever
+ * channel lands first presents; the other is suppressed). Local reminders carry no
+ * `notificationId` and never enter this path.
+ */
+const SEEN_NOTIFICATION_LIMIT = 50;
+const seenNotificationIds = new Set<string>();
+
+/** Record an id; returns false when it was already seen (the caller skips presenting). */
+export function markNotificationSeen(id: string): boolean {
+  if (seenNotificationIds.has(id)) return false;
+  seenNotificationIds.add(id);
+  if (seenNotificationIds.size > SEEN_NOTIFICATION_LIMIT) {
+    // Sets iterate in insertion order — drop the oldest.
+    const oldest = seenNotificationIds.values().next().value;
+    if (oldest !== undefined) seenNotificationIds.delete(oldest);
+  }
+  return true;
+}
+
+/**
  * Foreground presentation: show the banner + the notification-tray entry, no sound/badge — quiet,
  * matching the unobtrusive sync pill. Must be set before any notification can arrive.
+ *
+ * Suppresses a REMOTE push whose id the SignalR path already presented (and vice-versa records
+ * first-arrival so SignalR skips). The `trigger.type === "push"` guard is load-bearing: the
+ * SignalR-presented local notification flows through this same handler with its id already in the
+ * seen-set — without the guard it would suppress itself.
  */
 export function configureNotificationHandler(): void {
   Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
+    handleNotification: async (notification) => {
+      const trigger = notification.request.trigger;
+      // Narrow via `in`: the trigger union includes input shapes without a `type` discriminator.
+      const isRemote = trigger != null && "type" in trigger && trigger.type === "push";
+      const id = notification.request.content.data?.notificationId;
+      const suppress = isRemote && typeof id === "string" && !markNotificationSeen(id);
+      return {
+        shouldShowBanner: !suppress,
+        shouldShowList: !suppress,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+      };
+    },
   });
 }
 
