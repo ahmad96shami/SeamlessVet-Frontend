@@ -23,24 +23,16 @@ function toLatinDigits(s: string): string {
     .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
 }
 
-/**
- * Anchor the Arabic am/pm marker so bidi doesn't reorder it past the date.
- *
- * Without help, "7:18ص 2026/05/28" in an LTR span renders visually as
- * "7:18 2026/05/28 ص" — the strong-RTL ص jumps past the following LTR digit run.
- * Inserting a U+200E LEFT-TO-RIGHT MARK right after ص/م forces a bidi-level break,
- * keeping the marker glued to the time where it logically belongs.
- */
-function anchorAmPm(s: string): string {
-  return s.replace(/([صم])(?!‎)/g, "$1‎");
-}
-
 export const DATE_FORMAT = "yyyy/MM/dd";
 // 12-hour clock — visual conventions differ by locale:
-//   ar → "ص7:18 2026/05/28" (am/pm + time glued, then date) — matches Palestinian print style.
+//   ar → logical "7:18 ص 2026/05/28"; in an RTL paragraph that displays time rightmost with
+//        ص/م to its LEFT (i.e. *after* the time when reading), then the date — user-requested.
+//        The marker sits MID-STRING between two digit runs, so bidi keeps it glued to the
+//        time in both RTL and LTR contexts — no LRM anchoring needed (a leading-marker
+//        pattern is what used to require it).
 //   en → "2026/05/28 7:18 AM" (date, time, AM/PM with breathing space).
 // Date-fns `a` → "ص"/"م" (ar) or "AM"/"PM" (en).
-export const DATE_TIME_FORMAT_AR = "a h:mm yyyy/MM/dd";
+export const DATE_TIME_FORMAT_AR = "h:mm a yyyy/MM/dd";
 export const DATE_TIME_FORMAT_EN = "yyyy/MM/dd h:mm a";
 /** Back-compat: callers that explicitly pass a pattern still work; locale-default uses the pair above. */
 export const DATE_TIME_FORMAT = DATE_TIME_FORMAT_AR;
@@ -60,5 +52,5 @@ export function formatDateTime(
   pattern?: string,
 ): string {
   const resolved = pattern ?? (locale.startsWith("ar") ? DATE_TIME_FORMAT_AR : DATE_TIME_FORMAT_EN);
-  return anchorAmPm(toLatinDigits(formatDateFns(toDate(value), resolved, { locale: localeFor(locale) })));
+  return toLatinDigits(formatDateFns(toDate(value), resolved, { locale: localeFor(locale) }));
 }
