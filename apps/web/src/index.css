@@ -464,11 +464,19 @@
   .money-symbol { font-size: 0.78em; font-weight: 600; color: var(--ink-500); }
   .sidenav .sn-user-chev { opacity: 0; transition: opacity 0.18s; }
   .sidenav:hover .sn-user-chev { opacity: 1; }
-  .sidenav .sn-utility { display: none; gap: 6px; }
-  .sidenav:hover .sn-utility { display: flex; flex-direction: row; }
-  .sidenav .sn-utility .icon-pill { width: 36px; height: 36px; border-radius: 8px; background: var(--ink-50); flex: 0 0 auto; }
+  /* Always visible (a hover-only reveal grew the footer under the cursor and stole clicks
+     from the last nav item): a compact stacked column in the collapsed rail, a row when
+     expanded. The footer only ever SHRINKS on hover, so nothing appears under the cursor. */
+  .sidenav .sn-utility { display: flex; flex-direction: column; gap: 4px; }
+  .sidenav:hover .sn-utility { flex-direction: row; gap: 6px; }
+  .sidenav .sn-utility .icon-pill { width: 32px; height: 32px; border-radius: 8px; background: var(--ink-50); flex: 0 0 auto; }
+  .sidenav:hover .sn-utility .icon-pill { width: 36px; height: 36px; }
   .sidenav .sn-utility .sn-utility-spacer { flex: 1; display: none; }
   .sidenav:hover .sn-utility .sn-utility-spacer { display: block; }
+  /* The user row is informational (name/role text) — hidden in the collapsed rail where it
+     would only show an anonymous avatar; it returns with the expanded footer. */
+  .sidenav .sn-user { display: none; }
+  .sidenav:hover .sn-user { display: flex; }
 
   /* ── Sub-nav (page tabs) ────────────────────────────────── */
   .subnav { display: flex; align-items: center; gap: 6px; padding: 0 28px; height: 46px; background: var(--paper); border-bottom: 1px solid var(--ink-100); flex: 0 0 auto; overflow-x: auto; }
