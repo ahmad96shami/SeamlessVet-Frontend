@@ -24,15 +24,12 @@ function toLatinDigits(s: string): string {
 }
 
 export const DATE_FORMAT = "yyyy/MM/dd";
-// 12-hour clock — visual conventions differ by locale:
-//   ar → logical "7:18 ص 2026/05/28"; in an RTL paragraph that displays time rightmost with
-//        ص/م to its LEFT (i.e. *after* the time when reading), then the date — user-requested.
-//        The marker sits MID-STRING between two digit runs, so bidi keeps it glued to the
-//        time in both RTL and LTR contexts — no LRM anchoring needed (a leading-marker
-//        pattern is what used to require it).
-//   en → "2026/05/28 7:18 AM" (date, time, AM/PM with breathing space).
+// 12-hour clock — one convention for both locales: date first, then time, then the am/pm
+// marker ("2026/05/28 7:18 ص" / "… 7:18 AM"). The marker trails the digits, so bidi keeps
+// it glued to the time in both RTL and LTR contexts — no LRM anchoring needed (the old
+// leading-marker ar pattern is what used to require it).
 // Date-fns `a` → "ص"/"م" (ar) or "AM"/"PM" (en).
-export const DATE_TIME_FORMAT_AR = "h:mm a yyyy/MM/dd";
+export const DATE_TIME_FORMAT_AR = "yyyy/MM/dd h:mm a";
 export const DATE_TIME_FORMAT_EN = "yyyy/MM/dd h:mm a";
 /** Back-compat: callers that explicitly pass a pattern still work; locale-default uses the pair above. */
 export const DATE_TIME_FORMAT = DATE_TIME_FORMAT_AR;
