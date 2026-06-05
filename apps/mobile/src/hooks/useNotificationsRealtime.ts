@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { AppState } from "react-native";
 import type { NotificationResponse } from "@vet/shared";
 
 import { markNotificationSeen, presentLocalNotification } from "@/services/localNotifications";
@@ -33,7 +34,13 @@ export function useNotificationsRealtime(): void {
   useEffect(() => {
     handlerRef.current = (n) => {
       void qc.invalidateQueries({ queryKey: [NOTIFICATIONS_KEY] });
-      // Mo10 dedup: skip presenting if the Expo remote push for this id already showed a banner
+      // Mo10: present only while FOREGROUNDED. A backgrounded app's delivery belongs to the FCM
+      // remote push — the OS displays it directly (the JS presentation handler never runs back
+      // there, so the seen-set can't dedup) and the SignalR socket survives backgrounding just
+      // long enough to double up in the tray. Skipping here must NOT mark the id seen: if the
+      // remote push lands after the app returns to foreground, it still owes the banner.
+      if (AppState.currentState !== "active") return;
+      // Dedup: skip presenting if the Expo remote push for this id already showed a banner
       // (the feed invalidation above still runs — the badge must update either way).
       if (!markNotificationSeen(n.id)) return;
       const heading =
