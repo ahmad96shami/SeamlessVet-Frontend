@@ -36,7 +36,11 @@ export function VaccinationCertificate({
       >
         <Icon.print className="size-4" />
       </Button>
-      <div style={{ position: "absolute", left: "-9999px", top: 0 }} aria-hidden>
+      {/* position:fixed, NOT absolute — this row action lives inside the table's scroll
+          container, and absolute off-screen boxes count as scrollable overflow in RTL
+          (the table grew scrollbars that revealed the certificate). Fixed boxes are
+          viewport-relative and never create scroll. */}
+      <div style={{ position: "fixed", left: "-9999px", top: 0, visibility: "hidden" }} aria-hidden>
         <VaccinationCertificateDocument
           ref={printRef}
           vaccination={vaccination}
