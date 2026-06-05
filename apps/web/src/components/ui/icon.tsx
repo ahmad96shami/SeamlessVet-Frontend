@@ -96,6 +96,11 @@ export const Icon = {
       <path d="M12 5v14M5 12h14" />
     </Svg>
   ),
+  minus: (p: IconProps) => (
+    <Svg {...p}>
+      <path d="M5 12h14" />
+    </Svg>
+  ),
   check: (p: IconProps) => (
     <Svg {...p}>
       <path d="M5 12.5l4.5 4.5L19 7" />

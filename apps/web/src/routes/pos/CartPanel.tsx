@@ -1,4 +1,3 @@
-import { formatCurrency } from "@vet/shared";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
@@ -38,16 +37,16 @@ function QtyStepper({
   };
 
   const btn =
-    "grid w-9 place-items-center text-muted-foreground transition-colors hover:bg-ink-50 hover:text-navy-900 active:bg-ink-100";
+    "grid w-8 place-items-center text-muted-foreground transition-colors hover:bg-ink-50 hover:text-navy-900 active:bg-ink-100";
 
   return (
     // Stop clicks from bubbling to the expander header (which toggles on click).
     <div
       onClick={(e) => e.stopPropagation()}
-      className="inline-flex h-9 select-none items-stretch overflow-hidden rounded-[var(--radius-input)] border border-[var(--border-strong)] bg-[var(--paper)]"
+      className="inline-flex h-8 flex-none select-none items-stretch overflow-hidden rounded-[var(--radius-input)] border bg-[var(--paper)]"
     >
       <button type="button" aria-label="-" onClick={() => onChange(value - 1)} className={btn}>
-        <span className="block h-0.5 w-3 rounded-full bg-current" aria-hidden />
+        <Icon.minus className="size-3.5" aria-hidden />
       </button>
       <input
         type="number"
@@ -58,7 +57,7 @@ function QtyStepper({
         value={shown}
         onChange={(e) => commit(e.target.value)}
         onBlur={() => setDraft(null)}
-        className="w-11 border-x border-[var(--border-strong)] bg-transparent text-center text-sm font-bold tabular-nums text-navy-900 outline-none focus:bg-ink-50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-9 border-x bg-transparent text-center text-sm font-bold tabular-nums text-navy-900 outline-none focus:bg-ink-50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <button type="button" aria-label="+" onClick={() => onChange(value + 1)} className={btn}>
         <Icon.add className="size-3.5" aria-hidden />
@@ -69,19 +68,20 @@ function QtyStepper({
 
 /**
  * One cart line. The whole header is the expander toggle (click anywhere that isn't the qty stepper
- * or trash); it reveals an inline editor for unit price and line discount. Header is two tidy rows:
- * top = name · line total; bottom = unit · qty stepper. Chevron leads, trash trails.
+ * or trash); it reveals an inline editor for unit price and line discount. Two aligned rows:
+ * top = chevron · name · trash; bottom (indented under the name) = qty stepper · "× unit price"
+ * · line total — so the money math reads on one line and every total sits on the start edge,
+ * the same rail as the subtotal/total block below.
  */
 function CartLineRow({ line }: { line: CartLine }) {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+  const { t } = useTranslation();
   const { setQty, setUnitPrice, setLineDiscount, removeLine } = usePosCartStore.getState();
   const overSell = line.available != null && line.quantity > line.available;
   const [open, setOpen] = useState(false);
   const toggle = () => setOpen((v) => !v);
 
   return (
-    <div className="border-b px-3 py-2.5">
+    <div className="border-b px-3 py-2">
       <div
         role="button"
         tabIndex={0}
@@ -94,48 +94,54 @@ function CartLineRow({ line }: { line: CartLine }) {
             toggle();
           }
         }}
-        className="flex cursor-pointer items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+        className="block cursor-pointer space-y-1.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
       >
-        <Icon.fwd
-          className={cn(
-            "size-4 flex-none text-muted-foreground transition-transform",
-            open ? "rotate-90" : "rtl:-scale-x-100",
-          )}
-          aria-hidden
-        />
-
-        <div className="min-w-0 flex-1 space-y-1.5">
-          <div className="flex items-center justify-between gap-2">
-            <span className="truncate text-sm font-semibold text-navy-900">{line.name}</span>
-            <span className="flex-none text-sm font-bold tabular-nums text-navy-900">
-              {formatCurrency(lineTotal(line), lang)}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="min-w-0 flex-1 truncate text-[11px] text-muted-foreground">
-              {line.unit ?? ""}
-            </span>
-            <QtyStepper value={line.quantity} onChange={(n) => setQty(line.key, n)} />
-          </div>
+        <div className="flex items-center gap-2">
+          <Icon.fwd
+            className={cn(
+              "size-3.5 flex-none text-muted-foreground transition-transform",
+              open ? "rotate-90" : "rtl:-scale-x-100",
+            )}
+            aria-hidden
+          />
+          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-navy-900">
+            {line.name}
+          </span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              removeLine(line.key);
+            }}
+            aria-label={t("pos.cart.remove")}
+            className="-my-1 flex-none rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-soft/40 hover:text-destructive"
+          >
+            <Icon.trash className="size-4" />
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            removeLine(line.key);
-          }}
-          aria-label={t("pos.cart.remove")}
-          className="flex-none self-center rounded-md p-1 text-destructive hover:bg-red-soft/40"
-        >
-          <Icon.trash className="size-4" />
-        </button>
+        {/* ps aligns the stepper under the name (chevron 14px + gap 8px). */}
+        <div className="flex items-center gap-2 ps-[22px]">
+          <QtyStepper value={line.quantity} onChange={(n) => setQty(line.key, n)} />
+          <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+            × <Money value={line.unitPrice} />
+            {line.unit ? ` · ${line.unit}` : null}
+          </span>
+          {line.discountAmount > 0 ? (
+            <span className="flex-none text-[11px] text-destructive">
+              {t("pos.cart.lineDiscount")} <Money value={line.discountAmount} />
+            </span>
+          ) : null}
+          <span className="flex-none text-sm font-bold tabular-nums text-navy-900">
+            <Money value={lineTotal(line)} />
+          </span>
+        </div>
       </div>
 
       {open ? (
-        <div className="mt-2 grid grid-cols-2 gap-2 rounded-lg bg-ink-50/60 p-2">
+        <div className="ms-[22px] mt-2 grid grid-cols-2 gap-2 rounded-lg bg-ink-50/60 p-2">
           <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-semibold text-muted-foreground">
+            <span className="text-[11px] font-semibold text-muted-foreground">
               {t("pos.receipt.price")}
             </span>
             <Input
@@ -149,7 +155,7 @@ function CartLineRow({ line }: { line: CartLine }) {
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-semibold text-muted-foreground">
+            <span className="text-[11px] font-semibold text-muted-foreground">
               {t("pos.cart.lineDiscount")}
             </span>
             <Input
@@ -167,7 +173,7 @@ function CartLineRow({ line }: { line: CartLine }) {
       ) : null}
 
       {overSell ? (
-        <p className="mt-1 text-xs text-destructive">
+        <p className="mt-1 ps-[22px] text-xs text-destructive">
           {t("pos.catalog.available")}: {line.available}
         </p>
       ) : null}
@@ -232,8 +238,7 @@ function InvoiceDiscount() {
 
 /** The POS right/start pane: working invoice — compact line items + the live (server-previewed) totals. */
 export function CartPanel() {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+  const { t } = useTranslation();
   const lines = usePosCartStore((s) => s.lines);
   const invoiceDiscount = usePosCartStore((s) => s.invoiceDiscount);
   const clear = usePosCartStore((s) => s.clear);
@@ -281,7 +286,7 @@ export function CartPanel() {
           {tax.enabled ? (
             <div className="flex items-center justify-between">
               <dt className="text-muted-foreground">{t("pos.cart.tax")}</dt>
-              <dd className="tabular-nums">{formatCurrency(totals.taxAmount, lang)}</dd>
+              <dd className="tabular-nums"><Money value={totals.taxAmount} /></dd>
             </div>
           ) : null}
           <div className="flex items-center justify-between border-t pt-2 text-base font-bold text-navy-900">
