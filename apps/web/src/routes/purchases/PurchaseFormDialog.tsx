@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ApiError, type PurchaseInvoiceInput } from "@vet/shared";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useProducts } from "@/queries/products";
 import { useCreatePurchaseInvoice } from "@/queries/purchaseInvoices";
 import { useSuppliers } from "@/queries/suppliers";
+import { ProductFormDialog } from "@/routes/admin/ProductFormDialog";
 
 const LineSchema = z.object({
   productId: z.string().min(1),
@@ -63,15 +65,50 @@ export function PurchaseFormDialog({
     for (const p of products.data ?? []) m.set(p.id, { nameAr: p.nameAr, purchasePrice: p.purchasePrice });
     return m;
   }, [products.data]);
+  const productOptions = useMemo(
+    () =>
+      (products.data ?? []).map((p) => ({
+        value: p.id,
+        label: p.nameAr,
+        sublabel: p.barcode ?? undefined,
+        keywords: p.nameLatin ?? undefined,
+      })),
+    [products.data],
+  );
 
   const form = useForm<FormValues>({ resolver: zodResolver(FormSchema), defaultValues: DEFAULTS });
   const { register, control, handleSubmit, reset, watch, setValue, formState } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "lines" });
   const errors = formState.errors;
 
+  // Inline "add product" — reuses the catalog form; the new id is then selected on the
+  // line that asked for it (one shared dialog instance across all lines).
+  const [addProductOpen, setAddProductOpen] = useState(false);
+  const [productDefaultName, setProductDefaultName] = useState("");
+  const [addForLine, setAddForLine] = useState<number | null>(null);
+  const [createdProductId, setCreatedProductId] = useState<string | null>(null);
+
   useEffect(() => {
-    if (open) reset({ ...DEFAULTS, supplierId: presetSupplierId ?? "", lines: [{ ...EMPTY_LINE }] });
+    if (!open) return;
+    reset({ ...DEFAULTS, supplierId: presetSupplierId ?? "", lines: [{ ...EMPTY_LINE }] });
+    setAddProductOpen(false);
+    setAddForLine(null);
+    setCreatedProductId(null);
   }, [open, presetSupplierId, reset]);
+
+  // Once the freshly-created product lands in the (invalidated) catalog list, select it
+  // on the originating line and seed the unit cost like a manual pick would.
+  useEffect(() => {
+    if (createdProductId === null || addForLine === null) return;
+    const p = productById.get(createdProductId);
+    if (!p) return;
+    setValue(`lines.${addForLine}.productId`, createdProductId, { shouldValidate: true });
+    if (!watch(`lines.${addForLine}.unitCost`)) {
+      setValue(`lines.${addForLine}.unitCost`, p.purchasePrice, { shouldValidate: true });
+    }
+    setCreatedProductId(null);
+    setAddForLine(null);
+  }, [createdProductId, addForLine, productById, setValue, watch]);
 
   // Client preview only — the server computes the authoritative subtotal/total (and any sales tax).
   const lines = watch("lines");
@@ -146,25 +183,24 @@ export function PurchaseFormDialog({
                       name={`lines.${idx}.productId` as const}
                       control={control}
                       render={({ field }) => (
-                        <Select
+                        <Combobox
                           value={field.value ?? ""}
-                          onChange={(e) => {
-                            field.onChange(e.target.value);
+                          onChange={(v) => {
+                            field.onChange(v);
                             // Convenience: seed the unit cost from the product's stored purchase price.
-                            const p = productById.get(e.target.value);
+                            const p = productById.get(v);
                             if (p && !watch(`lines.${idx}.unitCost`)) {
                               setValue(`lines.${idx}.unitCost`, p.purchasePrice, { shouldValidate: true });
                             }
                           }}
-                        >
-                          <option value="">{t("purchases.lines.selectProduct")}</option>
-                          {(products.data ?? []).map((p) => (
-                            <option key={p.id} value={p.id}>
-                              {p.nameAr}
-                              {p.barcode ? ` · ${p.barcode}` : ""}
-                            </option>
-                          ))}
-                        </Select>
+                          placeholder={t("purchases.lines.selectProduct")}
+                          options={productOptions}
+                          onCreateNew={(term) => {
+                            setProductDefaultName(term);
+                            setAddForLine(idx);
+                            setAddProductOpen(true);
+                          }}
+                        />
                       )}
                     />
                   </Field>
@@ -271,6 +307,14 @@ export function PurchaseFormDialog({
           </Button>
         </div>
       </form>
+
+      <ProductFormDialog
+        open={addProductOpen}
+        product={null}
+        defaultName={productDefaultName}
+        onClose={() => setAddProductOpen(false)}
+        onCreated={(id) => setCreatedProductId(id)}
+      />
     </Dialog>
   );
 }
