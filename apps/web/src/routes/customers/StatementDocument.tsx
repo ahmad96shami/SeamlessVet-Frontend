@@ -76,27 +76,29 @@ export const StatementDocument = forwardRef<HTMLDivElement, StatementDocumentPro
               <td className="p-2" colSpan={6}>
                 {t("customers.statement.opening")}
               </td>
-              <td className="p-2 text-end font-medium" dir="ltr">
+              <td className="p-2 text-end font-medium">
                 <Money value={openingBalance} />
               </td>
             </tr>
             {entries.map((e) => (
               <tr key={e.id} className="border-b">
-                <td className="p-2" dir="ltr">
+                {/* dir="ltr" cells need text-end (= right inside LTR) to line up with the RTL
+                    headers; amount cells stay RTL so text-end = the header's left edge. */}
+                <td className="p-2 text-end" dir="ltr">
                   {formatDate(e.createdAt, lang)}
                 </td>
-                <td className="p-2 font-mono text-xs" dir="ltr">
+                <td className="p-2 text-end font-mono text-xs" dir="ltr">
                   {refOf(e)}
                 </td>
                 <td className="p-2">{t(`ledgerEntryType.${e.entryType}`, { defaultValue: e.entryType })}</td>
                 <td className="p-2">{e.description ?? "—"}</td>
-                <td className="p-2 text-end" dir="ltr">
+                <td className="p-2 text-end">
                   {e.amount > 0 ? <Money value={e.amount} /> : "—"}
                 </td>
-                <td className="p-2 text-end" dir="ltr">
+                <td className="p-2 text-end">
                   {e.amount < 0 ? <Money value={-e.amount} /> : "—"}
                 </td>
-                <td className="p-2 text-end font-medium" dir="ltr">
+                <td className="p-2 text-end font-medium">
                   <Money value={e.balanceAfter} />
                 </td>
               </tr>

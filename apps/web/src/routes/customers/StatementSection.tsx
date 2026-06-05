@@ -223,7 +223,7 @@ export function StatementSection({
               <>
                 <TableRow className="text-muted-foreground hover:bg-transparent">
                   <TableCell colSpan={6}>{t("customers.statement.opening")}</TableCell>
-                  <TableCell className="text-end font-medium" dir="ltr">
+                  <TableCell className="text-end font-medium">
                     <Money value={stmt?.openingBalance ?? 0} />
                   </TableCell>
                 </TableRow>
@@ -231,8 +231,12 @@ export function StatementSection({
                   const refId = e.invoiceId ?? e.receiptVoucherId;
                   return (
                     <TableRow key={e.id}>
-                      <TableCell dir="ltr">{formatDate(e.createdAt, lang)}</TableCell>
-                      <TableCell className="font-mono text-xs" dir="ltr">
+                      {/* dir="ltr" cells need text-end (= right inside LTR) to line up with the
+                          RTL headers; amount cells stay RTL so text-end = the header's left edge. */}
+                      <TableCell className="text-end" dir="ltr">
+                        {formatDate(e.createdAt, lang)}
+                      </TableCell>
+                      <TableCell className="text-end font-mono text-xs" dir="ltr">
                         {refId ? `#${refId.slice(0, 8)}` : "—"}
                       </TableCell>
                       <TableCell>
@@ -241,21 +245,21 @@ export function StatementSection({
                         </Badge>
                       </TableCell>
                       <TableCell className="max-w-[16rem] truncate">{e.description ?? "—"}</TableCell>
-                      <TableCell className="text-end" dir="ltr">
+                      <TableCell className="text-end">
                         {e.amount > 0 ? (
                           <Money value={e.amount} />
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-end text-success" dir="ltr">
+                      <TableCell className="text-end text-success">
                         {e.amount < 0 ? (
                           <Money value={-e.amount} />
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
-                      <TableCell className={cn("text-end font-medium", balanceClass(e.balanceAfter))} dir="ltr">
+                      <TableCell className={cn("text-end font-medium", balanceClass(e.balanceAfter))}>
                         <Money value={e.balanceAfter} />
                       </TableCell>
                     </TableRow>
