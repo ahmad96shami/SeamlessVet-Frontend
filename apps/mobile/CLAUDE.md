@@ -46,6 +46,13 @@ Arabic-first; RTL is **forced** at startup (`src/lib/rtl.ts`).
     use the `dialog` service (`@/stores/dialogStore`, plain TS, works outside components):
     `dialog.alert(title, msg?)`, `await dialog.confirm({ title, msg, confirmLabel, destructive? })`,
     `dialog.choose(title, options)`. `DialogHost` is mounted once in the root layout.
+  - Notifications (Mo7 + Mo10): foreground live channel is SignalR (presented as local
+    notifications); backgrounded/killed delivery is Expo REMOTE push — the token is minted +
+    registered in `services/localNotifications.ts` (sign-in / rotation / logout wiring lives in
+    `AppServices` + `authStore.logout`). Both channels carry the same
+    `{ notificationId, type, payload }` data; `markNotificationSeen` dedups them when foregrounded —
+    the handler suppresses only `trigger.type === "push"` (a SignalR-presented local notification
+    must not suppress itself). Keep any new push data mirroring the SignalR shape EXACTLY.
 - **NativeWind rules**: className-first; **never interpolate class names** (purge!) — tone maps are
   `Record`s of full literal strings (see `Button`/`Pill`). **Shadows via the token STYLE objects
   (`style={shadow.card}`), NEVER the `shadow-card`/`shadow-pop` classes**: Tailwind shadow classes

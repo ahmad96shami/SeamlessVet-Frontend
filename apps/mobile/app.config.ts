@@ -23,6 +23,9 @@ const config: ExpoConfig = {
   },
   android: {
     package: "com.seamlessvet.mobile",
+    // Mo10 — FCM wiring for Expo remote push. The file is NOT a secret (Google: safe to commit);
+    // the FCM V1 *service-account key* is, and lives only in EAS credentials.
+    googleServicesFile: "./google-services.json",
   },
   plugins: [
     "expo-router",
@@ -50,8 +53,9 @@ const config: ExpoConfig = {
     ],
     [
       // Mo7 notifications: vaccination/visit reminders + live SignalR pushes presented as local
-      // notifications. `color` tints the Android small icon; the channel + permission are set up at
-      // runtime (localNotifications.ts). No remote-push entitlements — delivery is SignalR + local.
+      // notifications; Mo10 adds REMOTE push (Expo Push Service via FCM — googleServicesFile above,
+      // FCM V1 key in EAS credentials, token registered on /devices/push-token). `color` tints the
+      // Android small icon; the channel + permission are set up at runtime (localNotifications.ts).
       "expo-notifications",
       {
         color: "#0B6573",
@@ -66,6 +70,11 @@ const config: ExpoConfig = {
     apiUrl: API_URL,
     powersyncUrl: POWERSYNC_URL,
     sentryDsn: SENTRY_DSN,
+    eas: {
+      // @ahmad96shami/vet-mobile — unlocks getExpoPushTokenAsync (Mo10 remote push).
+      // Public identifier, not a secret; eas-cli can't write it into a dynamic config itself.
+      projectId: "91687ccd-f454-4414-9804-ac8edf385e5c",
+    },
   },
 };
 

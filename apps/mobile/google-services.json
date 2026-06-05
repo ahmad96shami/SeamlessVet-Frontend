@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "286551433490",
+    "project_id": "seamlessvet",
+    "storage_bucket": "seamlessvet.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:286551433490:android:d19b96c7c0340220eed3cb",
+        "android_client_info": {
+          "package_name": "com.seamlessvet.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOTfFq3U9ks9PizjZb03PPqewmmodGkLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
