@@ -163,9 +163,11 @@ export default function InventoryScreen() {
             accessibilityRole="button"
           >
             <ArrowDown size={14} color={colors.white} />
-            <Text className="text-paper text-[13px] font-tajawal-bold">
+            <Text className="text-paper text-[13px] font-tajawal-bold" numberOfLines={1}>
               {t("mobile.inventory.recordReturn", { defaultValue: "تسجيل إرجاع" })}
             </Text>
+            {/* Spacer mirrors the icon so the label sits dead-centre, not icon-shifted. */}
+            <View className="w-3.5" />
           </Pressable>
           <Pressable
             // Same expo-router typed-routes caveat as above.
@@ -174,9 +176,11 @@ export default function InventoryScreen() {
             accessibilityRole="button"
           >
             <Truck size={14} color={colors.teal[700]} />
-            <Text className="text-navy-900 text-[13px] font-tajawal-bold">
+            <Text className="text-navy-900 text-[13px] font-tajawal-bold" numberOfLines={1}>
               {t("inventory.movements.title", { defaultValue: "سجل الحركات" })}
             </Text>
+            {/* Spacer mirrors the icon so the label sits dead-centre, not icon-shifted. */}
+            <View className="w-3.5" />
           </Pressable>
         </View>
       </Card>
