@@ -27,10 +27,12 @@ const buttonVariants = cva(
         link: "text-teal-600 underline-offset-4 hover:underline",
       },
       size: {
-        // pt-1 / pb-px nudges the Tajawal glyph row down so it reads visually centred
-        default: "h-10 px-4 pt-1 pb-px",
-        sm: "h-9 rounded-md px-3 text-[13px] pt-1 pb-px",
-        lg: "h-11 px-6 pt-1 pb-px",
+        // pt-1 / pb-px nudges the Tajawal glyph row down so it reads visually centred — but the
+        // asymmetric padding drags SVG icons 1.5px below centre with it, so icons get a counter
+        // -translate back up. The icon-only size has no padding nudge, so no counter there.
+        default: "h-10 px-4 pt-1 pb-px [&_svg]:-translate-y-[1.5px]",
+        sm: "h-9 rounded-md px-3 text-[13px] pt-1 pb-px [&_svg]:-translate-y-[1.5px]",
+        lg: "h-11 px-6 pt-1 pb-px [&_svg]:-translate-y-[1.5px]",
         icon: "size-10",
       },
     },
