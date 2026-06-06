@@ -33,7 +33,7 @@ export function SyncIndicator({ onPress }: { onPress?: () => void }) {
         <View className="bg-teal-50 flex-row items-center gap-1.5 rounded-pill px-2.5 py-1">
           <Check size={12} color={colors.teal[700]} />
           <Text className="text-teal-700 text-[12px] font-tajawal-bold">
-            {t("sync.online", { count: 0 })}
+            {t("sync.online")}
           </Text>
         </View>
       );
@@ -44,7 +44,8 @@ export function SyncIndicator({ onPress }: { onPress?: () => void }) {
         <View className="bg-teal-50 flex-row items-center gap-1.5 rounded-pill px-2.5 py-1">
           <Spinner size={12} color={colors.teal[700]} />
           <Text className="text-teal-700 text-[12px] font-tajawal-bold">
-            {t("sync.syncing", { count: pending })}
+            {/* Count-less on purpose — the breakdown lives in the review sheet this pill opens. */}
+            {t("sync.syncingShort")}
           </Text>
         </View>
       );
@@ -66,7 +67,7 @@ export function SyncIndicator({ onPress }: { onPress?: () => void }) {
       <View className="bg-ink-100 flex-row items-center gap-1.5 rounded-pill px-2.5 py-1">
         <WifiOff size={12} color={colors.ink[700]} />
         <Text className="text-ink-700 text-[12px] font-tajawal-bold">
-          {t("sync.offline", { count: pending })}
+          {t("sync.offlineShort")}
         </Text>
       </View>
     );
