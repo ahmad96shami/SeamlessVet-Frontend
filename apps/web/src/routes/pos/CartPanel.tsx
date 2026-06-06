@@ -126,7 +126,9 @@ function CartLineRow({ line }: { line: CartLine }) {
         <div className="flex items-center gap-2 ps-[22px]">
           <QtyStepper value={line.quantity} onChange={(n) => setQty(line.key, n)} />
           <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-            × <Money value={line.unitPrice} />
+            {/* The × glyph centres ~3px above the baseline while the digit body (with Money's
+                1px up-nudge) centres at 5px — lift it 2px to sit optically centred on the price. */}
+            <span className="inline-block -translate-y-[2px]">×</span> <Money value={line.unitPrice} />
             {line.unit ? ` · ${line.unit}` : null}
           </span>
           {line.discountAmount > 0 ? (
