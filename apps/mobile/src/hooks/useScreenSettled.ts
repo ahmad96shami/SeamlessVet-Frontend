@@ -1,27 +1,21 @@
 import { useEffect, useState } from "react";
-import { useNavigation } from "expo-router";
 
 /**
- * False while the screen's enter transition is still running, true once the
- * navigator reports it finished (`transitionEnd` — native-stack fires it from
- * the native appear event, bottom-tabs around its slide timing). The fallback
- * timer covers mounts that animate nothing, where the event never fires.
+ * False for the screen's very first frame, true from the next frame on.
  *
- * Gate expensive list commits behind it so a fresh mount stays cheap: the
- * skeleton rides through the push/slide and the real rows commit right after,
- * instead of contending with the animation (see the visits tab).
+ * Gate expensive list commits behind it so a fresh mount paints something
+ * immediately (the skeleton), then commits the real rows one frame later —
+ * the tap → screen-on-screen delay stays minimal even for heavy lists.
+ *
+ * (Navigation animations are currently OFF; when they come back, this can wait
+ * for the navigator's `transitionEnd` instead — but never on a long fallback:
+ * a stalled event would park every gated screen on its skeleton.)
  */
 export function useScreenSettled(): boolean {
-  const navigation = useNavigation();
   const [settled, setSettled] = useState(false);
   useEffect(() => {
-    const settle = () => setSettled(true);
-    const unsubscribe = navigation.addListener("transitionEnd" as never, settle as never);
-    const fallback = setTimeout(settle, 400);
-    return () => {
-      unsubscribe();
-      clearTimeout(fallback);
-    };
-  }, [navigation]);
+    const id = requestAnimationFrame(() => setSettled(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
   return settled;
 }

@@ -1,4 +1,4 @@
-import { Easing, I18nManager, useWindowDimensions, View } from "react-native";
+import { View } from "react-native";
 import { Tabs, type BottomTabBarProps } from "expo-router/js-tabs";
 
 import { BottomBar, type TabKey } from "@/components/layout";
@@ -54,36 +54,11 @@ function MoDTabBar({ state, navigation, insets }: BottomTabBarProps) {
 }
 
 export default function TabsLayout() {
-  const { width } = useWindowDimensions();
-  // Direction-aware tab slide (a pager feel; stack pushes keep the root fade).
-  // `progress` is signed by relative tab index: -1 = lower index than the focused
-  // tab, +1 = higher. RTL is forced, so lower-index tabs sit visually to the
-  // RIGHT — going home → visits the incoming scene enters from the left edge and
-  // the whole content slides rightward (flip `offset` if the device says otherwise).
-  const offset = I18nManager.isRTL ? width : -width;
+  // No tab animation — perf experiment: isolate switch cost from the slide.
   return (
     <Tabs
       tabBar={(props) => <MoDTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-        freezeOnBlur: true,
-        transitionSpec: {
-          animation: "timing",
-          config: { duration: 220, easing: Easing.out(Easing.cubic) },
-        },
-        sceneStyleInterpolator: ({ current }) => ({
-          sceneStyle: {
-            transform: [
-              {
-                translateX: current.progress.interpolate({
-                  inputRange: [-1, 0, 1],
-                  outputRange: [offset, 0, -offset],
-                }),
-              },
-            ],
-          },
-        }),
-      }}
+      screenOptions={{ headerShown: false, freezeOnBlur: true }}
     >
       <Tabs.Screen name="index" />
       <Tabs.Screen name="visits" />
