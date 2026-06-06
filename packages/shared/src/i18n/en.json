@@ -1479,7 +1479,9 @@
   "sync": {
     "online": "Online and synced",
     "syncing": "Syncing ({{count}} pending)",
+    "syncingShort": "Syncing",
     "offline": "Offline ({{count}} pending)",
+    "offlineShort": "Offline",
     "conflict": "Needs conflict resolution",
     "panelTitle": "Sync status",
     "panelEmpty": "Nothing waiting to sync.",

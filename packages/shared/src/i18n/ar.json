@@ -1495,7 +1495,9 @@
   "sync": {
     "online": "متصل ومتزامن",
     "syncing": "جارٍ المزامنة ({{count}} معلّقة)",
+    "syncingShort": "جارٍ المزامنة",
     "offline": "غير متصل ({{count}} معلّقة)",
+    "offlineShort": "غير متصل",
     "conflict": "يتطلب حل تعارض",
     "panelTitle": "حالة المزامنة",
     "panelEmpty": "لا توجد عمليات بانتظار المزامنة.",
