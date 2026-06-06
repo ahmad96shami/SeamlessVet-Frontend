@@ -114,20 +114,20 @@ export default function Index() {
       {/* Stat row */}
       <View className="flex-row gap-2.5">
         <Stat
-          icon={<Box size={18} color={colors.teal[600]} />}
+          icon={<Box size={22} color={colors.teal[600]} />}
           value={stockRows.length}
           loading={stockLoading}
           label={t("dashboard.stats.stockItems")}
         />
         <Stat
-          icon={<Warn size={18} color={colors.amber.DEFAULT} />}
+          icon={<Warn size={22} color={colors.amber.DEFAULT} />}
           tone="amber"
           value={lowCount}
           loading={stockLoading || settingsLoading}
           label={t("dashboard.stats.belowThreshold")}
         />
         <Stat
-          icon={<Receipt size={18} color={colors.emerald.ink} />}
+          icon={<Receipt size={22} color={colors.emerald.ink} />}
           tone="green"
           value={voucherRows[0]?.n ?? 0}
           loading={vouchersLoading}
@@ -142,50 +142,50 @@ export default function Index() {
           {
             key: "new-visit",
             label: t("dashboard.actions.newVisit"),
-            icon: <Add size={20} color={colors.white} />,
+            icon: <Add size={24} color={colors.white} />,
             primary: true,
             onPress: () => router.push("/visits/new"),
           },
           {
             key: "load-inventory",
             label: t("dashboard.actions.loadInventory"),
-            icon: <Truck size={20} color={colors.teal[600]} />,
+            icon: <Truck size={24} color={colors.teal[600]} />,
             onPress: () => router.navigate("/inventory"),
           },
           {
             key: "receipt-voucher",
             label: t("dashboard.actions.receiptVoucher"),
-            icon: <Receipt size={20} color={colors.teal[600]} />,
+            icon: <Receipt size={24} color={colors.teal[600]} />,
             onPress: () => router.push("/customers"),
           },
           {
             key: "statement",
             label: t("dashboard.actions.statement"),
-            icon: <Paper size={20} color={colors.teal[600]} />,
+            icon: <Paper size={24} color={colors.teal[600]} />,
             onPress: () => router.push("/customers"),
           },
           {
             key: "customers",
             label: t("nav.customers"),
-            icon: <User size={20} color={colors.teal[600]} />,
+            icon: <User size={24} color={colors.teal[600]} />,
             onPress: () => router.push("/customers"),
           },
           {
             key: "contracts",
             label: t("nav.contracts"),
-            icon: <Briefcase size={20} color={colors.teal[600]} />,
+            icon: <Briefcase size={24} color={colors.teal[600]} />,
             onPress: () => router.push("/contracts"),
           },
           {
             key: "vaccinations",
             label: t("nav.vaccinations"),
-            icon: <Syringe size={20} color={colors.teal[600]} />,
+            icon: <Syringe size={24} color={colors.teal[600]} />,
             onPress: () => router.push("/vaccinations"),
           },
           {
             key: "stock-alerts",
             label: t("dashboard.actions.stockAlerts"),
-            icon: <Warn size={20} color={colors.teal[600]} />,
+            icon: <Warn size={24} color={colors.teal[600]} />,
             onPress: () => router.push("/inventory/alerts"),
           },
         ]}
