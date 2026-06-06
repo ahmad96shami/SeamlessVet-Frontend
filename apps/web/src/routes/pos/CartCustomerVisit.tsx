@@ -193,13 +193,10 @@ export function CartCustomerVisit() {
             clearLabel={t("pos.link.clear")}
           />
         ) : (
-          <>
-            <Button type="button" variant="secondary" size="sm" onClick={() => setPickCustomer(true)}>
-              <Icon.user className="size-4" />
-              {t("pos.link.selectCustomer")}
-            </Button>
-            <span className="text-xs text-muted-foreground">{t("pos.link.walkInBadge")}</span>
-          </>
+          <Button type="button" variant="secondary" size="sm" onClick={() => setPickCustomer(true)}>
+            <Icon.user className="size-4" />
+            {t("pos.link.selectCustomer")}
+          </Button>
         )}
         {customerId ? (
           visitId ? (
