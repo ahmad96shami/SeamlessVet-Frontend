@@ -6,6 +6,7 @@ import {
   getFarm,
   getFarmStatement,
   listFarms,
+  reopenFarmAccount,
   updateFarm,
   type ApiError,
   type CloseAccountResponse,
@@ -97,6 +98,19 @@ export function useCloseFarmAccount() {
       qc.invalidateQueries({ queryKey: [KEY] });
       qc.invalidateQueries({ queryKey: [CUSTOMERS] });
       qc.invalidateQueries({ queryKey: [ENTITLEMENTS] });
+      qc.invalidateQueries({ queryKey: [STATEMENT] });
+    },
+  });
+}
+
+/** Re-opening a farm ledger lifts its settlement lock so the farm can be billed again. */
+export function useReopenFarmAccount() {
+  const qc = useQueryClient();
+  return useMutation<CloseAccountResponse, ApiError, string>({
+    mutationFn: (farmId) => reopenFarmAccount(apiClient, farmId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [KEY] });
+      qc.invalidateQueries({ queryKey: [CUSTOMERS] });
       qc.invalidateQueries({ queryKey: [STATEMENT] });
     },
   });

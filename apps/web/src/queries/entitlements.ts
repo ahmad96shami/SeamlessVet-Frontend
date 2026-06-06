@@ -5,6 +5,7 @@ import {
   getEntitlement,
   listEntitlements,
   payEntitlement,
+  reopenAccount,
   type ApiError,
   type CloseAccountResponse,
   type DoctorEntitlementResponse,
@@ -60,6 +61,17 @@ export function useCloseAccount() {
     mutationFn: (customerId) => closeAccount(apiClient, customerId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: [KEY] });
+      qc.invalidateQueries({ queryKey: [CUSTOMERS] });
+    },
+  });
+}
+
+/** Re-opening lifts the settlement lock so the customer can be billed again → refresh customers. */
+export function useReopenAccount() {
+  const qc = useQueryClient();
+  return useMutation<CloseAccountResponse, ApiError, string>({
+    mutationFn: (customerId) => reopenAccount(apiClient, customerId),
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: [CUSTOMERS] });
     },
   });

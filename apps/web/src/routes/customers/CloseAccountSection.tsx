@@ -13,8 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { useDoctorOptions } from "@/hooks/useDoctorOptions";
-import { useCloseAccount } from "@/queries/entitlements";
-import { useCloseFarmAccount } from "@/queries/farms";
+import { useCloseAccount, useReopenAccount } from "@/queries/entitlements";
+import { useCloseFarmAccount, useReopenFarmAccount } from "@/queries/farms";
 import { entitlementStatusVariant } from "@/routes/finance/statusVariants";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -45,14 +45,30 @@ function CloseAccountBase({
   const closeCustomer = useCloseAccount();
   const closeFarm = useCloseFarmAccount();
   const close = kind === "farm" ? closeFarm : closeCustomer;
+  const reopenCustomer = useReopenAccount();
+  const reopenFarm = useReopenFarmAccount();
+  const reopen = kind === "farm" ? reopenFarm : reopenCustomer;
   const doctors = useDoctorOptions();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [reopenConfirmOpen, setReopenConfirmOpen] = useState(false);
   const [result, setResult] = useState<CloseAccountResponse | null>(null);
 
   if (!role || !SETTLEMENT_ROLES.includes(role)) return null;
 
   const ns = kind === "farm" ? "finance.closeFarmAccount" : "finance.closeAccount";
   const canClose = balance === 0;
+
+  const doReopen = () =>
+    reopen.mutate(ownerId, {
+      onSuccess: () => {
+        setReopenConfirmOpen(false);
+        toast.success(t(`${ns}.reopened`));
+      },
+      onError: (e) => {
+        setReopenConfirmOpen(false);
+        toast.error(e.message);
+      },
+    });
   const doctorName = (id: string | null | undefined) =>
     (id ? doctors.byId.get(id) : undefined) ?? "—";
 
@@ -78,9 +94,19 @@ function CloseAccountBase({
   return (
     <>
       {isClosed ? (
-        <div className="flex items-center gap-2 rounded-2xl border p-4 text-sm">
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border p-4 text-sm">
           <Icon.shield className="size-4 text-success" />
           <span className="font-medium">{t(`${ns}.closed`)}</span>
+          {/* Re-open so a returning customer's new visit can be billed (charges never auto-reopen). */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="ms-auto"
+            onClick={() => setReopenConfirmOpen(true)}
+            disabled={reopen.isPending}
+          >
+            {t(`${ns}.reopen`)}
+          </Button>
         </div>
       ) : (
         <div className="space-y-3 rounded-2xl border p-4">
@@ -110,6 +136,20 @@ function CloseAccountBase({
             </Button>
             <Button onClick={doClose} disabled={close.isPending}>
               {t(`${ns}.confirm`)}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog open={reopenConfirmOpen} onClose={() => setReopenConfirmOpen(false)} title={t(`${ns}.reopen`)}>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t(`${ns}.reopenBody`)}</p>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setReopenConfirmOpen(false)} disabled={reopen.isPending}>
+              {t("admin.common.cancel")}
+            </Button>
+            <Button onClick={doReopen} disabled={reopen.isPending}>
+              {t(`${ns}.reopenConfirm`)}
             </Button>
           </div>
         </div>
@@ -161,7 +201,9 @@ export function CloseAccountSection({ customer }: { customer: CustomerResponse }
       kind="customer"
       ownerId={customer.id}
       balance={customer.ownBalance}
-      isClosed={customer.ledgerStatus === "closed"}
+      // The OWN ledger's status (not the aggregate, which reads open if any farm ledger is open) —
+      // otherwise an own-closed customer with an open farm would never show the reopen action.
+      isClosed={(customer.ownLedgerStatus ?? customer.ledgerStatus) === "closed"}
     />
   );
 }
