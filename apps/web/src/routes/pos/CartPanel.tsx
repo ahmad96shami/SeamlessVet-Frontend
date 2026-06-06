@@ -233,7 +233,6 @@ export function CartPanel() {
   const invoiceDiscount = usePosCartStore((s) => s.invoiceDiscount);
   const payments = usePosCartStore((s) => s.payments);
   const setPayments = usePosCartStore((s) => s.setPayments);
-  const clear = usePosCartStore((s) => s.clear);
   const [addingDiscount, setAddingDiscount] = useState(false);
 
   const settings = useSystemSettings();
@@ -260,21 +259,7 @@ export function CartPanel() {
         {lines.length === 0 ? (
           <p className="px-6 py-16 text-center text-sm text-muted-foreground">{t("pos.cart.empty")}</p>
         ) : (
-          <>
-            {lines.map((line) => <CartLineRow key={line.key} line={line} />)}
-            <div className="flex justify-end px-3 py-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={clear}
-                className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
-              >
-                <Icon.trash className="size-3.5" />
-                {t("pos.cart.clear")}
-              </Button>
-            </div>
-          </>
+          lines.map((line) => <CartLineRow key={line.key} line={line} />)
         )}
       </div>
 

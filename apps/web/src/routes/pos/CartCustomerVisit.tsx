@@ -172,9 +172,11 @@ export function CartCustomerVisit() {
   const { t } = useTranslation();
   const customerId = usePosCartStore((s) => s.customerId);
   const visitId = usePosCartStore((s) => s.visitId);
+  const hasLines = usePosCartStore((s) => s.lines.length > 0);
   const setCustomer = usePosCartStore((s) => s.setCustomer);
   const linkVisit = usePosCartStore((s) => s.linkVisit);
   const clearVisit = usePosCartStore((s) => s.clearVisit);
+  const clear = usePosCartStore((s) => s.clear);
 
   const [pickCustomer, setPickCustomer] = useState(false);
   const [pickVisit, setPickVisit] = useState(false);
@@ -213,6 +215,19 @@ export function CartCustomerVisit() {
               {t("pos.link.linkVisit")}
             </Button>
           )
+        ) : null}
+        {/* Empty-the-cart, on the row's far (visually left) end — clears lines AND links. */}
+        {hasLines ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={clear}
+            className="ms-auto h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
+          >
+            <Icon.trash className="size-3.5" />
+            {t("pos.cart.clear")}
+          </Button>
         ) : null}
       </div>
 

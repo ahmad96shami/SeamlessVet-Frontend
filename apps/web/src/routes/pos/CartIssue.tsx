@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Money } from "@/components/ui/money";
+import { cn } from "@/lib/utils";
 import { useIssuePosInvoice } from "@/queries/invoices";
 import { usePosCartStore } from "@/stores/posCartStore";
 
@@ -92,10 +93,19 @@ export function CartIssue({ total }: { total: number }) {
           <p className="text-xs text-destructive">{t("pos.payment.walkInMustPay")}</p>
         ) : null}
         {/* Always visible — grayed out (disabled) on an empty cart. The amount due replaces the
-            old grand-total row; the symbol's fixed ink tint is overridden to read on navy. */}
-        <Button type="button" size="lg" className="w-full" disabled={!canIssue} onClick={onIssue}>
-          <Icon.receipt className="size-4" />
-          {issue.isPending ? t("pos.issue.submitting") : t("pos.issue.submit")}
+            old grand-total row: label on the start edge, amount pushed to the end (space-between);
+            the symbol's fixed ink tint is overridden to read on navy. */}
+        <Button
+          type="button"
+          size="lg"
+          className={cn("w-full", hasSomethingToBill && "justify-between")}
+          disabled={!canIssue}
+          onClick={onIssue}
+        >
+          <span className="inline-flex items-center gap-2">
+            <Icon.receipt className="size-4" />
+            {issue.isPending ? t("pos.issue.submitting") : t("pos.issue.submit")}
+          </span>
           {hasSomethingToBill ? (
             <Money value={total} className="[&_.money-symbol]:text-current" />
           ) : null}
