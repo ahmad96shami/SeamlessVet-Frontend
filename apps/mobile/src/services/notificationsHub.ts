@@ -3,6 +3,7 @@ import {
   HubConnectionBuilder,
   HubConnectionState,
   LogLevel,
+  type ILogger,
 } from "@microsoft/signalr";
 import { NotificationResponseSchema, type NotificationResponse } from "@vet/shared";
 
@@ -28,6 +29,18 @@ type Handler = (n: NotificationResponse) => void;
 const handlers = new Set<Handler>();
 let connection: HubConnection | null = null;
 
+// An unreachable server is a NORMAL state for this offline-first app, but
+// SignalR's built-in ConsoleLogger writes connection failures via
+// console.error BEFORE our start() catch runs — and dev LogBox escalates
+// every console.error to a red full-screen box on each cold start without
+// connectivity. Route the library's log lines through console.log instead;
+// they stay visible in Metro without tripping LogBox.
+const quietLogger: ILogger = {
+  log(level: LogLevel, message: string) {
+    if (level >= LogLevel.Warning) console.log(`[signalr] ${message}`);
+  },
+};
+
 function build(): HubConnection {
   const conn = new HubConnectionBuilder()
     .withUrl(`${API_BASE_URL}/hubs/notifications`, {
@@ -35,7 +48,7 @@ function build(): HubConnection {
       withCredentials: false,
     })
     .withAutomaticReconnect()
-    .configureLogging(LogLevel.Warning)
+    .configureLogging(quietLogger)
     .build();
 
   // Server → client method (the backend's strongly-typed INotificationClient.ReceiveNotification).
