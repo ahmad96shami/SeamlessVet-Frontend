@@ -88,7 +88,9 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false, animation: "none", freezeOnBlur: true }} />
           <AppServices />
           <DialogHost />
-          <StatusBar style="auto" />
+          {/* dark, not auto: the status-bar strip is always light (paper/teal — design
+              locked light), so system dark mode must not flip the icons to white. */}
+          <StatusBar style="dark" />
         </QueryClientProvider>
       </PowerSyncContext.Provider>
     </SafeAreaProvider>

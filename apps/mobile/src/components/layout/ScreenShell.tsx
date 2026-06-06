@@ -34,6 +34,14 @@ const BG: Record<Background, string> = {
   teal: "bg-teal-500",
 };
 
+// The strip under the status bar matches the HEADER chrome (paper / teal),
+// not the body canvas — so the status bar reads as part of the header.
+const STATUS_STRIP: Record<Background, string> = {
+  default: "bg-paper",
+  paper: "bg-paper",
+  teal: "bg-teal-500",
+};
+
 export function ScreenShell({
   header,
   footer,
@@ -47,11 +55,8 @@ export function ScreenShell({
 }: ScreenShellProps) {
   const insets = useSafeAreaInsets();
   return (
-    <View
-      className={`flex-1 ${BG[background]} ${className ?? ""}`}
-      style={[{ paddingTop: insets.top }, style]}
-      {...rest}
-    >
+    <View className={`flex-1 ${BG[background]} ${className ?? ""}`} style={style} {...rest}>
+      <View className={STATUS_STRIP[background]} style={{ height: insets.top }} />
       {header}
       <SessionBanner />
       {staticBody ? (
