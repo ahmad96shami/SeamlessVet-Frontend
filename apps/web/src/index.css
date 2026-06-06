@@ -417,12 +417,12 @@
   .app-shell { position: relative; display: flex; height: 100vh; overflow: hidden; }
   .app-shell > .page { margin-inline-start: 68px; }
   .sidenav { position: absolute; top: 0; bottom: 0; inset-inline-start: 0; width: 68px; background: var(--paper); border-inline-end: 1px solid var(--ink-100); display: flex; flex-direction: column; z-index: 5; overflow: hidden; transition: width 0.22s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.22s; }
-  .sidenav:hover { width: 250px; box-shadow: 0 8px 28px rgba(15, 42, 68, 0.1); }
+  .sidenav:is(:hover, .mobile-open) { width: 250px; box-shadow: 0 8px 28px rgba(15, 42, 68, 0.1); }
   .sidenav .sn-brand { display: flex; align-items: center; gap: 10px; padding: 14px 16px 12px; border-bottom: 1px solid var(--ink-100); min-height: 64px; }
   .sidenav .sn-brand-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--navy-900); display: grid; place-items: center; color: #fff; position: relative; flex: 0 0 auto; }
   .sidenav .sn-brand-mark::after { content: ""; position: absolute; inset: 5px; border-radius: 7px; border: 1.5px solid var(--teal-400); opacity: 0.45; }
   .sidenav .sn-brand-text { display: flex; flex-direction: column; line-height: 1.15; opacity: 0; transition: opacity 0.18s; white-space: nowrap; }
-  .sidenav:hover .sn-brand-text { opacity: 1; }
+  .sidenav:is(:hover, .mobile-open) .sn-brand-text { opacity: 1; }
   .sidenav .sn-brand-name { font-weight: 800; font-size: 15px; color: var(--fg-strong); letter-spacing: -0.01em; }
   .sidenav .sn-brand-sub { font-size: 11px; color: var(--ink-500); margin-top: 2px; }
   .sidenav .sn-items { display: flex; flex-direction: column; gap: 1px; padding: 10px; flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
@@ -432,20 +432,20 @@
   .sidenav .sn-item:hover { background: var(--ink-50); color: var(--fg-strong); }
   .sidenav .sn-item .sn-ico { width: 28px; height: 28px; border-radius: 8px; background: var(--ink-50); display: grid; place-items: center; color: var(--ink-700); flex: 0 0 auto; }
   .sidenav .sn-item-label { opacity: 0; transition: opacity 0.18s; }
-  .sidenav:hover .sn-item-label { opacity: 1; }
+  .sidenav:is(:hover, .mobile-open) .sn-item-label { opacity: 1; }
   .sidenav .sn-item.active { background: var(--teal-50); color: var(--teal-700); }
   .sidenav .sn-item.active .sn-ico { background: var(--teal-500); color: white; }
   .sidenav .sn-item.active::after { content: ""; position: absolute; inset-inline-start: -10px; top: 8px; bottom: 8px; width: 3px; border-radius: 4px; background: var(--teal-500); transition: opacity 0.18s; }
-  .sidenav:hover .sn-item.active::after { opacity: 0; }
+  .sidenav:is(:hover, .mobile-open) .sn-item.active::after { opacity: 0; }
   .sidenav .sn-item .sn-badge { margin-inline-start: auto; background: var(--red); color: white; font-size: 10px; font-weight: 800; border-radius: 999px; padding: 1px 6px; line-height: 1.4; opacity: 0; transition: opacity 0.18s; }
-  .sidenav:hover .sn-item .sn-badge { opacity: 1; }
+  .sidenav:is(:hover, .mobile-open) .sn-item .sn-badge { opacity: 1; }
   .sidenav .sn-item.has-badge .sn-ico::after { content: ""; position: absolute; margin-top: -12px; margin-inline-start: 18px; width: 8px; height: 8px; border-radius: 999px; background: var(--red); border: 2px solid var(--paper); transition: opacity 0.18s; }
-  .sidenav:hover .sn-item.has-badge .sn-ico::after { opacity: 0; }
+  .sidenav:is(:hover, .mobile-open) .sn-item.has-badge .sn-ico::after { opacity: 0; }
   .sidenav .sn-footer { border-top: 1px solid var(--ink-100); padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
   .sidenav .sn-user { display: flex; align-items: center; gap: 10px; padding: 4px; border-radius: 10px; white-space: nowrap; }
   .sidenav .sn-user-av { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; color: white; font-weight: 800; font-size: 13px; flex: 0 0 auto; }
   .sidenav .sn-user-text { line-height: 1.2; flex: 1; min-width: 0; opacity: 0; transition: opacity 0.18s; }
-  .sidenav:hover .sn-user-text { opacity: 1; }
+  .sidenav:is(:hover, .mobile-open) .sn-user-text { opacity: 1; }
   .sidenav .sn-user-name { font-size: 13px; font-weight: 800; color: var(--fg-strong); }
   .sidenav .sn-user-role { font-size: 11px; color: var(--ink-500); margin-top: 1px; display: flex; align-items: center; gap: 6px; }
   .sidenav .sn-env-chip { background: var(--amber-soft); color: #8b6500; font-weight: 700; padding: 1px 6px; border-radius: 999px; font-size: 10px; letter-spacing: 0.04em; }
@@ -463,20 +463,46 @@
   .money-body { transform: translateY(-1px); }
   .money-symbol { font-size: 0.78em; font-weight: 600; color: var(--ink-500); }
   .sidenav .sn-user-chev { opacity: 0; transition: opacity 0.18s; }
-  .sidenav:hover .sn-user-chev { opacity: 1; }
+  .sidenav:is(:hover, .mobile-open) .sn-user-chev { opacity: 1; }
   /* Always visible (a hover-only reveal grew the footer under the cursor and stole clicks
      from the last nav item): a compact stacked column in the collapsed rail, a row when
      expanded. The footer only ever SHRINKS on hover, so nothing appears under the cursor. */
   .sidenav .sn-utility { display: flex; flex-direction: column; gap: 4px; }
-  .sidenav:hover .sn-utility { flex-direction: row; gap: 6px; }
+  .sidenav:is(:hover, .mobile-open) .sn-utility { flex-direction: row; gap: 6px; }
   .sidenav .sn-utility .icon-pill { width: 32px; height: 32px; border-radius: 8px; background: var(--ink-50); flex: 0 0 auto; }
-  .sidenav:hover .sn-utility .icon-pill { width: 36px; height: 36px; }
+  .sidenav:is(:hover, .mobile-open) .sn-utility .icon-pill { width: 36px; height: 36px; }
   .sidenav .sn-utility .sn-utility-spacer { flex: 1; display: none; }
-  .sidenav:hover .sn-utility .sn-utility-spacer { display: block; }
+  .sidenav:is(:hover, .mobile-open) .sn-utility .sn-utility-spacer { display: block; }
   /* The user row is informational (name/role text) — hidden in the collapsed rail where it
      would only show an anonymous avatar; it returns with the expanded footer. */
   .sidenav .sn-user { display: none; }
-  .sidenav:hover .sn-user { display: flex; }
+  .sidenav:is(:hover, .mobile-open) .sn-user { display: flex; }
+
+  /* ── Mobile shell (<768px): topbar + off-canvas drawer ── */
+  /* The hover-expand rail needs a pointer; on small screens it parks past the inline-start edge
+     and a compact topbar (hamburger + brand) joins the column flow. Opening slides the rail in at
+     its EXPANDED width over a backdrop — the `.mobile-open` arm of the `:is()` selectors above
+     reuses every hover-expanded style. */
+  .mobile-topbar { display: none; }
+  .sidenav-backdrop { display: none; }
+  @media (max-width: 767px) {
+    .app-shell { flex-direction: column; }
+    .app-shell > .page { margin-inline-start: 0; }
+    .mobile-topbar { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; padding: 8px 14px; background: var(--paper); border-bottom: 1px solid var(--ink-100); }
+    .mobile-topbar .sn-brand-mark { width: 32px; height: 32px; border-radius: 9px; }
+    .mobile-topbar .icon-pill { width: 36px; height: 36px; }
+    .sidenav-backdrop { display: block; position: absolute; inset: 0; z-index: 4; background: rgb(15 42 68 / 0.45); }
+    .sidenav { width: 250px; inset-inline-start: -270px; transition: inset-inline-start 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s; }
+    .sidenav.mobile-open { inset-inline-start: 0; box-shadow: 0 8px 28px rgb(15 42 68 / 0.25); }
+    /* Touch has no hover — pin the expanded visuals on (labels, footer row, hidden edge ticks). */
+    .sidenav .sn-brand-text, .sidenav .sn-item-label, .sidenav .sn-user-text, .sidenav .sn-user-chev, .sidenav .sn-item .sn-badge { opacity: 1; }
+    .sidenav .sn-item.active::after { opacity: 0; }
+    .sidenav .sn-item.has-badge .sn-ico::after { opacity: 0; }
+    .sidenav .sn-user { display: flex; }
+    .sidenav .sn-utility { flex-direction: row; gap: 6px; }
+    .sidenav .sn-utility .icon-pill { width: 36px; height: 36px; }
+    .sidenav .sn-utility .sn-utility-spacer { display: block; }
+  }
 
   /* ── Sub-nav (page tabs) ────────────────────────────────── */
   .subnav { display: flex; align-items: center; gap: 6px; padding: 0 28px; height: 46px; background: var(--paper); border-bottom: 1px solid var(--ink-100); flex: 0 0 auto; overflow-x: auto; }
@@ -488,7 +514,12 @@
 
   /* ── Page body + head ───────────────────────────────────── */
   .page { flex: 1 1 auto; overflow: auto; padding: 24px 28px; }
-  .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  /* Title + actions wrap instead of crushing each other on narrow screens. */
+  .page-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+  @media (max-width: 767px) {
+    .page { padding: 16px; }
+    .subnav { padding: 0 16px; }
+  }
   .page-title { font-weight: 800; font-size: 22px; color: var(--fg-strong); letter-spacing: -0.01em; margin: 0; }
   .page-sub { font-size: 13px; color: var(--ink-500); margin-top: 2px; }
 }

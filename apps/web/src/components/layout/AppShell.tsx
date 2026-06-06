@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router-dom";
 
@@ -15,6 +15,10 @@ import { useAuthStore } from "@/stores/authStore";
  * The Center Web App shell: the design's collapsible right-edge rail (68px → 250px on hover),
  * grouped nav sections, a brand mark, and a footer with the current user + utility pills
  * (language toggle, sign-out, sync indicator). Page content renders in the scrolling `.page`.
+ *
+ * Below 768px the rail has no hover to expand it, so it becomes an off-canvas drawer: a compact
+ * topbar (hamburger + brand) replaces it in the flow, and the hamburger slides the rail in —
+ * fully expanded — over a backdrop. Nav clicks and the backdrop close it.
  */
 /**
  * If a future env-selector writes the picked env id to this key, the rail shows a small chip
@@ -34,10 +38,29 @@ export function AppShell() {
   const envId = user?.environmentId ?? "";
   const selectedEnv = typeof window !== "undefined" ? window.localStorage.getItem(SELECTED_ENV_STORAGE_KEY) : null;
   const showEnvChip = !!selectedEnv && !!envId && selectedEnv === envId;
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <div className="app-shell h-screen">
-      <aside className="sidenav">
+      <header className="mobile-topbar">
+        <button
+          type="button"
+          className="icon-pill"
+          aria-label={t("shell.menu")}
+          aria-expanded={mobileNavOpen}
+          onClick={() => setMobileNavOpen(true)}
+        >
+          <Icon.menu size={18} />
+        </button>
+        <div className="sn-brand-mark">
+          <Icon.stethoscope size={18} />
+        </div>
+        <span className="sn-brand-name">SeamlessVet</span>
+      </header>
+
+      {mobileNavOpen ? <div className="sidenav-backdrop" onClick={() => setMobileNavOpen(false)} /> : null}
+
+      <aside className={cn("sidenav", mobileNavOpen && "mobile-open")}>
         <div className="sn-brand">
           <div className="sn-brand-mark">
             <Icon.stethoscope size={20} />
@@ -61,6 +84,7 @@ export function AppShell() {
                     end={item.to === "/"}
                     title={t(item.labelKey)}
                     className={({ isActive }) => cn("sn-item", isActive && "active")}
+                    onClick={() => setMobileNavOpen(false)}
                   >
                     <span className="sn-ico">
                       <item.icon className="size-[18px]" />

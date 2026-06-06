@@ -85,6 +85,11 @@ export const Icon = {
       <path d="M6 6l12 12M18 6L6 18" />
     </Svg>
   ),
+  menu: (p: IconProps) => (
+    <Svg {...p} sw={2}>
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </Svg>
+  ),
   // actions
   add: (p: IconProps) => (
     <Svg {...p}>
