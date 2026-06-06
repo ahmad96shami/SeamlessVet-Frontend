@@ -34,9 +34,6 @@ function NotificationItem({
           {notification.body ? (
             <p className="text-xs text-muted-foreground">{notification.body}</p>
           ) : null}
-          <p className="text-xs text-muted-foreground" dir="ltr">
-            {formatDateTime(notification.createdAt, lang)}
-          </p>
         </div>
         {unread ? (
           <Button
@@ -49,6 +46,12 @@ function NotificationItem({
           </Button>
         ) : null}
       </div>
+      {/* Outside the content/button flex row so it spans the full card; text-end puts it at the
+          card's visual left in RTL, and without a dir override the bidi rendering
+          ("م 6:48 2026/06/05") matches timestamps everywhere else in the app. */}
+      <p className="mt-1 text-end text-xs text-muted-foreground">
+        {formatDateTime(notification.createdAt, lang)}
+      </p>
     </li>
   );
 }
