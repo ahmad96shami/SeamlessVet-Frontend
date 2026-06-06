@@ -163,7 +163,7 @@ export default function InventoryScreen() {
             accessibilityRole="button"
           >
             <ArrowDown size={14} color={colors.white} />
-            <Text className="text-paper text-[13px] font-tajawal-bold" numberOfLines={1}>
+            <Text className="text-paper shrink text-center text-[13px] font-tajawal-bold">
               {t("mobile.inventory.recordReturn", { defaultValue: "تسجيل إرجاع" })}
             </Text>
             {/* Spacer mirrors the icon so the label sits dead-centre, not icon-shifted. */}
@@ -176,7 +176,7 @@ export default function InventoryScreen() {
             accessibilityRole="button"
           >
             <Truck size={14} color={colors.teal[700]} />
-            <Text className="text-navy-900 text-[13px] font-tajawal-bold" numberOfLines={1}>
+            <Text className="text-navy-900 shrink text-center text-[13px] font-tajawal-bold">
               {t("inventory.movements.title", { defaultValue: "سجل الحركات" })}
             </Text>
             {/* Spacer mirrors the icon so the label sits dead-centre, not icon-shifted. */}
