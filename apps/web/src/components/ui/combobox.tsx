@@ -248,10 +248,13 @@ export function Combobox({
                       onMouseEnter={() => setActiveIndex(i)}
                       onClick={() => chooseIndex(i)}
                     >
-                      <span className="min-w-0 truncate">
-                        {opt.label}
+                      {/* Flex gap, not an inline margin: ms-* on the sublabel resolves against its
+                          own dir="auto" direction, so an LTR sublabel (phone, Latin unit) in the RTL
+                          list put the gap on its outer side — name and sublabel ran together. */}
+                      <span className="flex min-w-0 items-baseline gap-1.5">
+                        <span className="min-w-0 truncate">{opt.label}</span>
                         {opt.sublabel ? (
-                          <span dir="auto" className="ms-1.5 text-xs text-muted-foreground">
+                          <span dir="auto" className="flex-none text-xs text-muted-foreground">
                             {opt.sublabel}
                           </span>
                         ) : null}
