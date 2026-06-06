@@ -15,9 +15,12 @@ export type CustomerFarmLedger = z.infer<typeof CustomerFarmLedgerSchema>;
 
 /**
  * A customer row (GET /customers[/{id}]). **M16:** `balance` + `ledgerStatus` are the **aggregate**
- * across the customer's own ledger and all its farm ledgers (own + Σ farms; `closed` only when every
- * owning ledger is closed). `ownBalance` is the own (non-farm) ledger alone; `farmLedgers` is the
- * per-farm breakdown — populated by the single-customer detail read, null on the list.
+ * across the customer's own ledger and all its farm ledgers (own + Σ farms). `ledgerStatus` is a
+ * **settled rollup**: `has_debt` when the aggregate is positive, else `closed` when the customer's
+ * own ledger is closed (a zero-balance farm ledger left open doesn't keep them open), else `open` —
+ * so closing the customer's account shows `closed` even while a farm ledger is still open. `ownBalance`
+ * is the own (non-farm) ledger alone; `ownLedgerStatus` is its status; `farmLedgers` is the per-farm
+ * breakdown — populated by the single-customer detail read, null on the list.
  * **Positive `balance` = the customer owes the clinic.** All are read-only — the ledgers are
  * server-authoritative.
  */
