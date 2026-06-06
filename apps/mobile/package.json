@@ -22,6 +22,7 @@
     "@powersync/react": "^1.10.0",
     "@powersync/react-native": "^1.35.3",
     "@sentry/react-native": "^8.12.0",
+    "@shopify/flash-list": "^2.3.1",
     "@tanstack/react-query": "^5.100.14",
     "@vet/shared": "workspace:*",
     "axios": "^1.16.1",
