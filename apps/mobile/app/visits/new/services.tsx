@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
@@ -18,6 +19,10 @@ import { useQuery } from "@/sync/hooks";
 import { getDefaultExamFee } from "@/sync/queries";
 import type { ServiceRow } from "@/sync/types";
 import { colors } from "@/theme";
+
+// Hoisted: one stable icon element shared by every row instead of a fresh
+// allocation per row per render.
+const SERVICE_ICON = <Stethoscope size={20} color={colors.teal[600]} />;
 
 /**
  * Wizard step 3 — services, exam fee, notes & an optional next-dose reminder
@@ -88,89 +93,101 @@ export default function WizardServicesScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <View className="gap-3 pb-6">
-            {/* Exam fee — the design's "كشفية ميدانية" row. */}
-            <SelectableRow
-              selected={examFeeEnabled}
-              onPress={() => setExamFeeEnabled(!examFeeEnabled)}
-              title={t("visits.wizard.fieldExamFee")}
-              price={effectiveExamFee}
-              icon={<Stethoscope size={20} color={colors.teal[600]} />}
-            />
-            {examFeeEnabled ? (
-              <Input
-                label={t("invoiceType.exam_fee")}
-                keyboardType="decimal-pad"
-                value={examFee != null ? String(examFee) : ""}
-                placeholder={defaultFee != null ? String(defaultFee) : "0"}
-                onChangeText={(v) => {
-                  const n = Number(v.trim());
-                  setExamFee(v.trim() === "" || !Number.isFinite(n) ? null : n);
-                }}
+        {/* FlashList, not ScrollView+map: the catalog can be hundreds of services,
+            and an unvirtualized column re-rendered EVERY row on each tap (the
+            exam-fee toggle froze until the whole list committed). Header/footer
+            slots carry the non-list fields so the screen stays one scrollable. */}
+        <FlashList
+          data={catalog}
+          keyExtractor={(s) => s.id}
+          extraData={services}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 24 }}
+          ItemSeparatorComponent={() => <View className="h-3" />}
+          ListHeaderComponent={
+            <View className="gap-3 pb-3">
+              {/* Exam fee — the design's "كشفية ميدانية" row. */}
+              <SelectableRow
+                selected={examFeeEnabled}
+                onPress={() => setExamFeeEnabled(!examFeeEnabled)}
+                title={t("visits.wizard.fieldExamFee")}
+                price={effectiveExamFee}
+                icon={SERVICE_ICON}
               />
-            ) : null}
-
-            {/* Service catalog */}
-            {catalog.length === 0 ? (
-              <Text className="text-ink-500 mt-4 text-center text-[14px] font-tajawal">
-                {t("visits.wizard.noServices")}
-              </Text>
-            ) : (
-              catalog.map((s) => (
-                <SelectableRow
-                  key={s.id}
-                  selected={!!services[s.id]}
-                  onPress={() => toggleService(s.id)}
-                  title={s.name_ar}
-                  price={s.default_price ?? 0}
-                  icon={<Stethoscope size={20} color={colors.teal[600]} />}
+              {examFeeEnabled ? (
+                <Input
+                  label={t("invoiceType.exam_fee")}
+                  keyboardType="decimal-pad"
+                  value={examFee != null ? String(examFee) : ""}
+                  placeholder={defaultFee != null ? String(defaultFee) : "0"}
+                  onChangeText={(v) => {
+                    const n = Number(v.trim());
+                    setExamFee(v.trim() === "" || !Number.isFinite(n) ? null : n);
+                  }}
                 />
-              ))
-            )}
-
-            {/* Notes */}
-            <View className="mt-2">
-              <Input
-                label={t("visits.wizard.notesLabel")}
-                value={notes}
-                onChangeText={setNotes}
-                multiline
-              />
+              ) : null}
             </View>
-
-            {/* Optional next-dose reminder */}
-            <View className="mt-2">
-              <FieldLabel>{t("visits.wizard.nextDoseTitle")}</FieldLabel>
-              <View className="gap-3">
+          }
+          ListEmptyComponent={
+            <Text className="text-ink-500 mt-4 text-center text-[14px] font-tajawal">
+              {t("visits.wizard.noServices")}
+            </Text>
+          }
+          renderItem={({ item: s }) => (
+            <SelectableRow
+              selected={!!services[s.id]}
+              onPress={() => toggleService(s.id)}
+              title={s.name_ar}
+              price={s.default_price ?? 0}
+              icon={SERVICE_ICON}
+            />
+          )}
+          ListFooterComponent={
+            <View className="pt-3">
+              {/* Notes */}
+              <View className="mt-2">
                 <Input
-                  label={t("vaccinations.form.vaccineType")}
-                  value={nextDose?.vaccineType ?? ""}
-                  onChangeText={(v) =>
-                    setNextDose(
-                      v.trim() === "" && !(nextDose?.dueDate ?? "")
-                        ? null
-                        : { vaccineType: v, dueDate: nextDose?.dueDate ?? "" },
-                    )
-                  }
-                />
-                <Input
-                  label={t("vaccinations.form.nextDueDate")}
-                  placeholder="YYYY-MM-DD"
-                  autoCapitalize="none"
-                  value={nextDose?.dueDate ?? ""}
-                  onChangeText={(v) =>
-                    setNextDose(
-                      v.trim() === "" && !(nextDose?.vaccineType ?? "")
-                        ? null
-                        : { vaccineType: nextDose?.vaccineType ?? "", dueDate: v },
-                    )
-                  }
+                  label={t("visits.wizard.notesLabel")}
+                  value={notes}
+                  onChangeText={setNotes}
+                  multiline
                 />
               </View>
+
+              {/* Optional next-dose reminder */}
+              <View className="mt-2">
+                <FieldLabel>{t("visits.wizard.nextDoseTitle")}</FieldLabel>
+                <View className="gap-3">
+                  <Input
+                    label={t("vaccinations.form.vaccineType")}
+                    value={nextDose?.vaccineType ?? ""}
+                    onChangeText={(v) =>
+                      setNextDose(
+                        v.trim() === "" && !(nextDose?.dueDate ?? "")
+                          ? null
+                          : { vaccineType: v, dueDate: nextDose?.dueDate ?? "" },
+                      )
+                    }
+                  />
+                  <Input
+                    label={t("vaccinations.form.nextDueDate")}
+                    placeholder="YYYY-MM-DD"
+                    autoCapitalize="none"
+                    value={nextDose?.dueDate ?? ""}
+                    onChangeText={(v) =>
+                      setNextDose(
+                        v.trim() === "" && !(nextDose?.vaccineType ?? "")
+                          ? null
+                          : { vaccineType: nextDose?.vaccineType ?? "", dueDate: v },
+                      )
+                    }
+                  />
+                </View>
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          }
+        />
       </KeyboardAvoidingView>
     </ScreenShell>
   );
