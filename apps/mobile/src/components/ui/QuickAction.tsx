@@ -31,7 +31,7 @@ export function QuickAction({ label, icon, onPress, primary }: QuickActionProps)
       style={shadow.card}
     >
       <View
-        className={`h-9 w-9 items-center justify-center rounded-chip ${
+        className={`h-11 w-11 items-center justify-center rounded-[14px] ${
           primary ? "bg-white/15" : "bg-teal-50"
         }`}
       >

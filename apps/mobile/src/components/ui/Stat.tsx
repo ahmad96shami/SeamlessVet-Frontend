@@ -26,7 +26,7 @@ interface StatProps {
 export function Stat({ value, label, icon, tone = "teal", loading }: StatProps) {
   return (
     <Card className="min-h-[116px] flex-1 items-start p-3.5">
-      <IconTile size="sm" tone={tone} className="mb-2">
+      <IconTile size="md" tone={tone} className="mb-2">
         {icon}
       </IconTile>
       {loading ? (
