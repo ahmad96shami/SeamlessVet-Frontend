@@ -7,7 +7,24 @@ export interface ApiErrorBody {
   fieldErrors?: Record<string, string[] | string>;
 }
 
-/** Normalised, typed error every API call rejects with. */
+/**
+ * Localises an error message by its stable backend `code`; returns the fallback (the server's
+ * English text) when no translation exists for the code.
+ */
+type ApiErrorTranslator = (code: string, fallbackMessage: string) => string;
+
+let translateApiError: ApiErrorTranslator = (_code, fallback) => fallback;
+
+/**
+ * Hook the host app's i18n in (web does this at i18n init: `t("apiErrors." + code, ...)`) so every
+ * {@link ApiError} carries a localised `message` — toasts then read Arabic without each call site
+ * mapping codes itself. Unregistered (e.g. tests), messages pass through untranslated.
+ */
+export function setApiErrorTranslator(translator: ApiErrorTranslator): void {
+  translateApiError = translator;
+}
+
+/** Normalised, typed error every API call rejects with; `message` is localised at construction. */
 export class ApiError extends Error {
   readonly code: string;
   readonly status?: number;
@@ -19,7 +36,7 @@ export class ApiError extends Error {
     status?: number;
     fieldErrors?: Record<string, string[]>;
   }) {
-    super(params.message);
+    super(translateApiError(params.code, params.message));
     this.name = "ApiError";
     this.code = params.code;
     this.status = params.status;
