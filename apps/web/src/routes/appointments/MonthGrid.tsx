@@ -28,7 +28,10 @@ export function MonthGrid({ days, month, appointments, labelFor, onSelectDay }: 
   const byDay = days.map((day) => sorted.filter((a) => isSameDay(day, new Date(a.scheduledAt))));
 
   return (
-    <div>
+    // 7 columns can't compress below ~80px/cell and stay readable — on narrow screens the grid
+    // keeps a floor width and pans horizontally instead.
+    <div className="overflow-x-auto">
+      <div className="min-w-[560px]">
       <div className="grid grid-cols-7 border-b">
         {days.slice(0, 7).map((d) => (
           <div
@@ -95,6 +98,7 @@ export function MonthGrid({ days, month, appointments, labelFor, onSelectDay }: 
             </button>
           );
         })}
+      </div>
       </div>
     </div>
   );

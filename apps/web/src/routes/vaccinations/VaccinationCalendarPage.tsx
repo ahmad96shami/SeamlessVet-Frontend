@@ -208,7 +208,10 @@ function MonthView({
   const { i18n } = useTranslation();
   const lang = i18n.language;
   return (
-    <div>
+    // 7 columns can't compress below ~80px/cell and stay readable — on narrow screens the grid
+    // keeps a floor width and pans horizontally instead.
+    <div className="overflow-x-auto">
+      <div className="min-w-[560px]">
       <div className="grid grid-cols-7 border-b">
         {days.slice(0, 7).map((d) => (
           <div
@@ -273,6 +276,7 @@ function MonthView({
           );
         })}
       </div>
+      </div>
     </div>
   );
 }
@@ -294,8 +298,10 @@ function Agenda({
   const { i18n } = useTranslation();
   const lang = i18n.language;
   return (
+    // Week view (7 day columns) pans horizontally on narrow screens, like the month grid.
+    <div className="overflow-x-auto">
     <div
-      className="grid"
+      className={cn("grid", days.length > 1 && "min-w-[560px]")}
       style={{ gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }}
     >
       {days.map((day, i) => {
@@ -350,6 +356,7 @@ function Agenda({
           {emptyLabel}
         </p>
       ) : null}
+    </div>
     </div>
   );
 }

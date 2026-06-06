@@ -32,11 +32,13 @@ export function PosPage() {
   }, [params, linkVisit, setCustomer, setParams]);
 
   return (
-    <div className="flex h-full gap-4">
-      <Card className="flex w-[440px] flex-none flex-col overflow-hidden">
+    // Below lg the panes stack (catalog on top, cart under it — `col-reverse` keeps the cart
+    // first in DOM so the lg row still puts it at the inline-start), each taking half the height.
+    <div className="flex h-full flex-col-reverse gap-4 lg:flex-row">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden lg:w-[440px] lg:flex-none">
         <CartPanel />
       </Card>
-      <Card className="flex flex-1 flex-col overflow-hidden">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <CatalogPanel />
       </Card>
     </div>
