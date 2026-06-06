@@ -1,7 +1,7 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { baseI18nConfig, FALLBACK_LANGUAGE, type AppLanguage } from "@vet/shared";
+import { baseI18nConfig, FALLBACK_LANGUAGE, setApiErrorTranslator, type AppLanguage } from "@vet/shared";
 
 void i18next
   .use(LanguageDetector)
@@ -17,6 +17,11 @@ void i18next
     },
     react: { useSuspense: false }, // resources are bundled (sync init); no Suspense boundary needed
   });
+
+// Every ApiError's `message` localises by its stable backend code at construction, so toasts
+// (the central queryClient notify + the many `toast.error(e.message)` sites) read in the UI
+// language. Unmapped codes fall back to the server's English text.
+setApiErrorTranslator((code, fallback) => i18next.t(`apiErrors.${code}`, { defaultValue: fallback }));
 
 /** Mirror the active language onto <html dir/lang> (Arabic → RTL). */
 export function applyDocumentDirection(language: string): void {
