@@ -57,7 +57,8 @@
     "language": "Language",
     "account": "Account",
     "center": "Center · Jenin",
-    "envIndicator": "partner env"
+    "envIndicator": "partner env",
+    "menu": "Menu"
   },
   "dashboard": {
     "title": "Dashboard",
