@@ -108,7 +108,9 @@ export function CatalogPanel() {
                 )}
               >
                 {mode === "list" ? <Icon.list className="size-4" /> : <Icon.grid className="size-4" />}
-                {mode !== "list" ? <span className="tabular-nums">{mode.slice(-1)}</span> : null}
+                {/* Tajawal's lining digits float ~2px above the flex centre (no descender ink,
+                    big reserved diacritic descent) — push the digit down to the icon's centre. */}
+                {mode !== "list" ? <span className="translate-y-[2px] tabular-nums">{mode.slice(-1)}</span> : null}
               </button>
             );
           })}
