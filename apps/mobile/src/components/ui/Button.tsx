@@ -46,7 +46,7 @@ export function Button({
 }: ButtonProps) {
   const tone = TONE[variant];
   const isDisabled = disabled || loading;
-  const padding = size === "sm" ? "px-3.5 py-[9px] rounded-[10px]" : "px-[18px] py-3.5 rounded-input";
+  const padding = size === "sm" ? "px-4 py-2.5 rounded-[10px]" : "px-6 py-4 rounded-input";
   const fontSize = size === "sm" ? "text-[13px]" : "text-[15px]";
 
   return (
