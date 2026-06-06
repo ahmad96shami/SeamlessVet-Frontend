@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
@@ -14,7 +15,9 @@ import {
   Photo,
   photoKindForCustomerType,
   Pill,
+  SkeletonList,
 } from "@/components/ui";
+import { useScreenSettled } from "@/hooks/useScreenSettled";
 import { formatAmount } from "@/lib/numerals";
 import { useVisitWizardStore } from "@/stores/visitWizardStore";
 import { useQuery } from "@/sync/hooks";
@@ -50,6 +53,9 @@ export default function WizardClientScreen() {
 
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
+
+  // Cheap first frame: skeleton through the push transition, rows right after.
+  const settled = useScreenSettled();
 
   // Deep-link from customer detail: pre-select once on mount.
   useEffect(() => {
@@ -216,17 +222,22 @@ export default function WizardClientScreen() {
             </View>
           </View>
 
-          <FlatList
-            className="mt-3 flex-1"
-            data={filtered}
+          <FlashList
+            // Style object, not className — FlashList isn't css-interop registered.
+            style={{ marginTop: 12, flex: 1 }}
+            data={settled ? filtered : []}
             keyExtractor={(c) => c.id}
             ItemSeparatorComponent={() => <View className="h-3" />}
             ListEmptyComponent={
-              <View className="mt-12 items-center">
-                <Text className="text-ink-500 text-[14px] font-tajawal">
-                  {t("customers.empty")}
-                </Text>
-              </View>
+              !settled ? (
+                <SkeletonList />
+              ) : (
+                <View className="mt-12 items-center">
+                  <Text className="text-ink-500 text-[14px] font-tajawal">
+                    {t("customers.empty")}
+                  </Text>
+                </View>
+              )
             }
             renderItem={({ item }) => {
               const owes = (item.total_balance ?? 0) > 0;

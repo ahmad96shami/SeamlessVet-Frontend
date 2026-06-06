@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
@@ -7,6 +8,7 @@ import { formatDate } from "@vet/shared";
 import { ArrowDown, ArrowUp, Pill as PillIcon, Truck, Warn } from "@/components/icons";
 import { Card, Chip, Pill, SkeletonList } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
+import { useScreenSettled } from "@/hooks/useScreenSettled";
 import { useQuery } from "@/sync/hooks";
 import { colors } from "@/theme";
 
@@ -47,6 +49,9 @@ export default function MovementsScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const [filter, setFilter] = useState<FilterKey>("all");
+
+  // Cheap first frame: skeleton through the push transition, rows right after.
+  const settled = useScreenSettled();
 
   const { data: rows = [], isLoading } = useQuery<MovementRow>(
     `SELECT m.id, m.product_id, m.movement_type,
@@ -111,15 +116,16 @@ export default function MovementsScreen() {
         />
       </ScrollView>
 
-      <FlatList
-        // Full-bleed: see the FlatList note in visits/index — shadows clip otherwise.
-        className="-mx-5 flex-1"
+      <FlashList
+        // Full-bleed (shadows clip otherwise). Style object, not className —
+        // FlashList isn't css-interop registered.
+        style={{ marginHorizontal: -20, flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 8 }}
-        data={filtered}
+        data={settled ? filtered : []}
         keyExtractor={(r) => r.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          isLoading ? (
+          isLoading || !settled ? (
             <SkeletonList />
           ) : (
             <View className="mt-12 items-center">

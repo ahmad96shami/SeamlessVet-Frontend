@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Pressable, SectionList, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
@@ -7,6 +8,7 @@ import { formatDate } from "@vet/shared";
 import { Add, Forward, Search, Syringe } from "@/components/icons";
 import { IconTile, Input, ListRow, Pill, SkeletonList } from "@/components/ui";
 import { ScreenShell, TopBar } from "@/components/layout";
+import { useScreenSettled } from "@/hooks/useScreenSettled";
 import { useQuery } from "@/sync/hooks";
 import type { VaccinationRow } from "@/sync/types";
 import { colors } from "@/theme";
@@ -16,11 +18,10 @@ interface RowWithNames extends VaccinationRow {
   pet_name: string | null;
 }
 
-interface DueSection {
-  title: string;
-  overdue: boolean;
-  data: RowWithNames[];
-}
+/** SectionList flattened for FlashList — `getItemType` keeps recycling pools separate. */
+type AgendaItem =
+  | { kind: "header"; key: string; date: string; overdue: boolean }
+  | { kind: "row"; key: string; row: RowWithNames };
 
 /**
  * Upcoming-vaccination agenda (Mo9.2) — **offline, from on-device SQLite**, per the plan
@@ -51,7 +52,7 @@ export default function VaccinationsAgendaScreen() {
       LIMIT 500`,
   );
 
-  const sections = useMemo<DueSection[]>(() => {
+  const { items, rowCount } = useMemo(() => {
     const q = search.trim().toLowerCase();
     const rows = (data ?? []).filter((v) => {
       if (!q) return true;
@@ -69,12 +70,16 @@ export default function VaccinationsAgendaScreen() {
       if (bucket) bucket.push(row);
       else byDate.set(key, [row]);
     }
-    return [...byDate.entries()].map(([date, items]) => ({
-      title: date,
-      overdue: date < today,
-      data: items,
-    }));
+    const flat: AgendaItem[] = [];
+    for (const [date, bucket] of byDate) {
+      flat.push({ kind: "header", key: `h-${date}`, date, overdue: date < today });
+      for (const row of bucket) flat.push({ kind: "row", key: row.id, row });
+    }
+    return { items: flat, rowCount: rows.length };
   }, [data, search, today]);
+
+  // Cheap first frame: skeleton through the push transition, rows right after.
+  const settled = useScreenSettled();
 
   return (
     <ScreenShell
@@ -99,22 +104,22 @@ export default function VaccinationsAgendaScreen() {
             <Text className="text-paper text-[12px] font-tajawal-bold">{t("vaccinations.new")}</Text>
           </Pressable>
           <Text className="text-ink-700 text-[13px] font-tajawal-bold">
-            {(data ?? []).length > 0 ? `${sections.reduce((n, s) => n + s.data.length, 0)} / ${(data ?? []).length}` : ""}
+            {(data ?? []).length > 0 ? `${rowCount} / ${(data ?? []).length}` : ""}
           </Text>
         </View>
       </View>
 
-      <SectionList
-        // Full-bleed: see the FlatList note in visits/index — shadows clip otherwise.
-        className="-mx-5 mt-3 flex-1"
+      <FlashList
+        // Full-bleed (shadows clip otherwise). Style object, not className —
+        // FlashList isn't css-interop registered.
+        style={{ marginHorizontal: -20, marginTop: 12, flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 8 }}
-        sections={sections}
-        keyExtractor={(v) => v.id}
-        stickySectionHeadersEnabled={false}
+        data={settled ? items : []}
+        keyExtractor={(it) => it.key}
+        getItemType={(it) => it.kind}
         ItemSeparatorComponent={() => <View className="h-2" />}
-        SectionSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          isLoading ? (
+          isLoading || !settled ? (
             <SkeletonList />
           ) : (
             <View className="mt-12 items-center">
@@ -124,38 +129,39 @@ export default function VaccinationsAgendaScreen() {
             </View>
           )
         }
-        renderSectionHeader={({ section }) => (
-          <View className="flex-row items-center gap-2 pb-1 pt-2">
-            <Text
-              className={`text-[13px] font-tajawal-extrabold ${section.overdue ? "text-rose-ink" : "text-ink-700"}`}
-            >
-              {formatDate(section.title, i18n.resolvedLanguage)}
-            </Text>
-            {section.overdue ? <Pill compact tone="red" label={t("vaccinations.calendar.due")} /> : null}
-          </View>
-        )}
-        renderItem={({ item }) => (
-          <ListRow
-            onPress={() =>
-              router.push({ pathname: "/vaccinations/[vaxId]/edit", params: { vaxId: item.id } })
-            }
-          >
-            <IconTile>
-              <Syringe size={20} color={colors.teal[600]} />
-            </IconTile>
-            <View className="min-w-0 flex-1 gap-1">
-              <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
-                {item.vaccine_type}
+        renderItem={({ item }) =>
+          item.kind === "header" ? (
+            <View className="flex-row items-center gap-2 pb-1 pt-2">
+              <Text
+                className={`text-[13px] font-tajawal-extrabold ${item.overdue ? "text-rose-ink" : "text-ink-700"}`}
+              >
+                {formatDate(item.date, i18n.resolvedLanguage)}
               </Text>
-              <Text className="text-ink-500 text-[12px] font-tajawal" numberOfLines={1}>
-                {item.customer_name ?? t("vaccinations.recipientUnknown")}
-                {" · "}
-                {item.pet_name ?? t("vaccinations.recipientFarm")}
-              </Text>
+              {item.overdue ? <Pill compact tone="red" label={t("vaccinations.calendar.due")} /> : null}
             </View>
-            <Forward size={20} color={colors.ink[400]} />
-          </ListRow>
-        )}
+          ) : (
+            <ListRow
+              onPress={() =>
+                router.push({ pathname: "/vaccinations/[vaxId]/edit", params: { vaxId: item.row.id } })
+              }
+            >
+              <IconTile>
+                <Syringe size={20} color={colors.teal[600]} />
+              </IconTile>
+              <View className="min-w-0 flex-1 gap-1">
+                <Text className="text-navy-900 text-[15px] font-tajawal-extrabold" numberOfLines={1}>
+                  {item.row.vaccine_type}
+                </Text>
+                <Text className="text-ink-500 text-[12px] font-tajawal" numberOfLines={1}>
+                  {item.row.customer_name ?? t("vaccinations.recipientUnknown")}
+                  {" · "}
+                  {item.row.pet_name ?? t("vaccinations.recipientFarm")}
+                </Text>
+              </View>
+              <Forward size={20} color={colors.ink[400]} />
+            </ListRow>
+          )
+        }
       />
     </ScreenShell>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
@@ -15,8 +16,10 @@ import {
   ListRow,
   Money,
   Pill,
+  SkeletonList,
   Stepper,
 } from "@/components/ui";
+import { useScreenSettled } from "@/hooks/useScreenSettled";
 import { useVisitWizardStore } from "@/stores/visitWizardStore";
 import {
   classifyStock,
@@ -45,6 +48,9 @@ export default function WizardMedsScreen() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [contractId, setContractId] = useState<string | null>(null);
+
+  // Cheap first frame: skeleton through the push transition, rows right after.
+  const settled = useScreenSettled();
 
   // Active contract detection — drives the banner + the price-override preview.
   useEffect(() => {
@@ -161,17 +167,22 @@ export default function WizardMedsScreen() {
         ) : null}
       </View>
 
-      <FlatList
-        className="mt-3 flex-1"
-        data={filtered}
+      <FlashList
+        // Style object, not className — FlashList isn't css-interop registered.
+        style={{ marginTop: 12, flex: 1 }}
+        data={settled ? filtered : []}
         keyExtractor={(r) => r.id}
         ItemSeparatorComponent={() => <View className="h-3" />}
         ListEmptyComponent={
-          <View className="mt-12 items-center">
-            <Text className="text-ink-500 text-[14px] font-tajawal">
-              {t("visits.wizard.noStock")}
-            </Text>
-          </View>
+          !settled ? (
+            <SkeletonList />
+          ) : (
+            <View className="mt-12 items-center">
+              <Text className="text-ink-500 text-[14px] font-tajawal">
+                {t("visits.wizard.noStock")}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => {
           const qty = cart[item.product_id] ?? 0;

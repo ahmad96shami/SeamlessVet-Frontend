@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import {
-  FlatList,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -8,11 +7,13 @@ import {
   Text,
   View,
 } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 import { Forward, Search } from "@/components/icons";
-import { Card, Input } from "@/components/ui";
+import { Card, Input, SkeletonList } from "@/components/ui";
+import { useScreenSettled } from "@/hooks/useScreenSettled";
 import { VaccinationForm } from "@/components/forms/VaccinationForm";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
@@ -115,6 +116,9 @@ function CustomerPicker({ onPick }: { onPick: (id: string) => void }) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
+  // Cheap first frame: skeleton through the push transition, rows right after.
+  const settled = useScreenSettled();
+
   const { data } = useQuery<CustomerRow>(`SELECT * FROM customers ORDER BY full_name LIMIT 400`);
 
   const filtered = useMemo(() => {
@@ -146,15 +150,20 @@ function CustomerPicker({ onPick }: { onPick: (id: string) => void }) {
         leading={<Search size={18} color={colors.ink[400]} />}
         autoCapitalize="none"
       />
-      <FlatList
-        className="mt-3 flex-1"
-        data={filtered.slice(0, 80)}
+      <FlashList
+        // Style object, not className — FlashList isn't css-interop registered.
+        style={{ marginTop: 12, flex: 1 }}
+        data={settled ? filtered.slice(0, 80) : []}
         keyExtractor={(c) => c.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          <View className="mt-12 items-center">
-            <Text className="text-ink-500 text-[14px] font-tajawal">{t("customers.empty")}</Text>
-          </View>
+          !settled ? (
+            <SkeletonList />
+          ) : (
+            <View className="mt-12 items-center">
+              <Text className="text-ink-500 text-[14px] font-tajawal">{t("customers.empty")}</Text>
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <Pressable onPress={() => onPick(item.id)}>
