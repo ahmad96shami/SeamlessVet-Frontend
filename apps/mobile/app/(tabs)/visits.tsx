@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { FlatList, InteractionManager, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
@@ -41,13 +41,27 @@ export default function VisitsListScreen() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
 
+  // LIMIT bounds the bridge hydration as the synced window fills up — the list
+  // (and the in-memory search) covers the 300 most recent visits, which is the
+  // "scan my recent work" job this screen does. Anything older is reachable from
+  // the customer's own visit history.
   const { data, isLoading } = useQuery<RowWithCustomer>(
     `SELECT v.*, c.full_name AS customer_name, c.type AS customer_type, pe.name AS pet_name
        FROM visits v
        LEFT JOIN customers c ON c.id = v.customer_id
        LEFT JOIN pets pe ON pe.id = v.pet_id
-       ORDER BY COALESCE(v.started_at, v.created_at) DESC`,
+       ORDER BY COALESCE(v.started_at, v.created_at) DESC
+       LIMIT 300`,
   );
+
+  // The lazy first mount runs inside the tab-press turn, and the row tree (clay
+  // avatars, pills) is the expensive part — keep the skeleton up through the tab
+  // slide and commit the real rows only once the transition has settled.
+  const [settled, setSettled] = useState(false);
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => setSettled(true));
+    return () => task.cancel();
+  }, []);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -113,11 +127,11 @@ export default function VisitsListScreen() {
         // body padding lives INSIDE the scroll content or card shadows get cut.
         className="-mx-5 mt-3 flex-1"
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 8 }}
-        data={filtered}
+        data={settled ? filtered : []}
         keyExtractor={(v) => v.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          isLoading ? (
+          isLoading || !settled ? (
             <SkeletonList />
           ) : (
             <View className="mt-12 items-center">
