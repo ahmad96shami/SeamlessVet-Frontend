@@ -12,7 +12,7 @@ import { usePosCartStore, type CartLine } from "@/stores/posCartStore";
 import { CartCustomerVisit } from "./CartCustomerVisit";
 import { CartIssue } from "./CartIssue";
 import { CartPayments } from "./CartPayments";
-import { computeTotals, lineTotal } from "./cartTotals";
+import { computeTotals, lineTotal, paymentSummary } from "./cartTotals";
 
 /**
  * Quantity stepper: − / editable number / +, in one bordered control whose radius matches the text
@@ -186,56 +186,41 @@ function CartLineRow({ line }: { line: CartLine }) {
 }
 
 /**
- * Invoice-level discount — mirrors the payments block: a header with an "add" button that reveals
- * the input row (with a trash to clear it again). The input stays revealed while a discount is set.
+ * Invoice-level discount row — the parent only mounts it while a discount is being entered or is
+ * set (no "الخصم 0.00" filler row); the trash clears the value and tells the parent to hide it.
  */
-function InvoiceDiscount() {
+function InvoiceDiscount({ onHide }: { onHide: () => void }) {
   const { t } = useTranslation();
   const invoiceDiscount = usePosCartStore((s) => s.invoiceDiscount);
   const setInvoiceDiscount = usePosCartStore((s) => s.setInvoiceDiscount);
-  const [adding, setAdding] = useState(false);
-  const shown = adding || invoiceDiscount > 0;
 
   return (
     <div className="flex items-center justify-between gap-2">
       <span className="text-muted-foreground">{t("pos.cart.discount")}</span>
-      {shown ? (
-        <div className="flex items-center gap-1.5">
-          <Input
-            type="number"
-            min={0}
-            step="0.01"
-            dir="ltr"
-            placeholder="0"
-            autoFocus
-            value={invoiceDiscount || ""}
-            onChange={(e) => setInvoiceDiscount(Number(e.target.value) || 0)}
-            className="h-8 w-24 text-end"
-          />
-          <button
-            type="button"
-            onClick={() => {
-              setInvoiceDiscount(0);
-              setAdding(false);
-            }}
-            aria-label={t("pos.cart.remove")}
-            className="shrink-0 rounded-md p-1 text-destructive hover:bg-red-soft/40"
-          >
-            <Icon.trash className="size-4" />
-          </button>
-        </div>
-      ) : (
-        <Button
+      <div className="flex items-center gap-1.5">
+        <Input
+          type="number"
+          min={0}
+          step="0.01"
+          dir="ltr"
+          placeholder="0"
+          autoFocus
+          value={invoiceDiscount || ""}
+          onChange={(e) => setInvoiceDiscount(Number(e.target.value) || 0)}
+          className="h-8 w-24 text-end"
+        />
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
-          className="-my-1 h-7 gap-1 px-2 text-primary"
-          onClick={() => setAdding(true)}
+          onClick={() => {
+            setInvoiceDiscount(0);
+            onHide();
+          }}
+          aria-label={t("pos.cart.remove")}
+          className="shrink-0 rounded-md p-1 text-destructive hover:bg-red-soft/40"
         >
-          <Icon.add className="size-3.5" />
-          {t("pos.cart.addDiscount")}
-        </Button>
-      )}
+          <Icon.trash className="size-4" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -244,8 +229,12 @@ function InvoiceDiscount() {
 export function CartPanel() {
   const { t } = useTranslation();
   const lines = usePosCartStore((s) => s.lines);
+  const visitId = usePosCartStore((s) => s.visitId);
   const invoiceDiscount = usePosCartStore((s) => s.invoiceDiscount);
+  const payments = usePosCartStore((s) => s.payments);
+  const setPayments = usePosCartStore((s) => s.setPayments);
   const clear = usePosCartStore((s) => s.clear);
+  const [addingDiscount, setAddingDiscount] = useState(false);
 
   const settings = useSystemSettings();
   const tax = {
@@ -253,6 +242,15 @@ export function CartPanel() {
     rate: settings.data?.taxRate ?? 0,
   };
   const totals = computeTotals(lines, invoiceDiscount, tax);
+
+  const hasSomethingToBill = lines.length > 0 || visitId !== null;
+  // The discount row only exists while one is being entered or set — no placeholder row.
+  const discountShown = lines.length > 0 && (addingDiscount || invoiceDiscount > 0);
+
+  const addPaymentLeg = () => {
+    const { remaining } = paymentSummary(payments, totals.total);
+    setPayments([...payments, { key: crypto.randomUUID(), method: "cash", amount: remaining }]);
+  };
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -281,12 +279,41 @@ export function CartPanel() {
       </div>
 
       <div className="flex-none border-t bg-ink-50/50 p-4">
+        {/* Add payment / add discount — one action row above the totals (replaces the old
+            payments header and the always-on discount row). */}
+        {hasSomethingToBill ? (
+          <div className="mb-3 flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={addPaymentLeg}
+            >
+              <Icon.add className="size-4" />
+              {t("pos.payment.add")}
+            </Button>
+            {lines.length > 0 && !discountShown ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => setAddingDiscount(true)}
+              >
+                <Icon.add className="size-4" />
+                {t("pos.cart.addDiscount")}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+
         <dl className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
             <dt className="text-muted-foreground">{t("pos.cart.subtotal")}</dt>
             <dd className="font-medium tabular-nums"><Money value={totals.subtotal} /></dd>
           </div>
-          {lines.length > 0 ? <InvoiceDiscount /> : null}
+          {discountShown ? <InvoiceDiscount onHide={() => setAddingDiscount(false)} /> : null}
           {tax.enabled ? (
             <div className="flex items-center justify-between">
               <dt className="text-muted-foreground">{t("pos.cart.tax")}</dt>

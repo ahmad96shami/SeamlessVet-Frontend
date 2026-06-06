@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
@@ -21,9 +20,10 @@ import { paymentSummary } from "./cartTotals";
 const IMMEDIATE_METHODS = IMMEDIATE_PAYMENT_METHODS;
 
 /**
- * Mixed-payment entry (W6.4): one or more legs (method + amount). Shows paid / remaining; a positive
- * remainder lands on the customer's ledger as credit (and is blocked for a walk-in, who has no
- * ledger). Sum-vs-total is also enforced server-side; the issue button (W6.5) gates on this state.
+ * Mixed-payment entry (W6.4): the legs (method + amount) added from the action row above the totals
+ * (CartPanel). Shows paid / remaining only once they're non-trivial; a positive remainder lands on
+ * the customer's ledger as credit. A walk-in (no ledger) must pay in full — surfaced on the issue
+ * attempt (CartIssue), not here. Sum-vs-total is also enforced server-side.
  */
 export function CartPayments({ total }: { total: number }) {
   const { t } = useTranslation();
@@ -33,12 +33,12 @@ export function CartPayments({ total }: { total: number }) {
   const hasLines = usePosCartStore((s) => s.lines.length > 0);
   const hasVisit = usePosCartStore((s) => s.visitId != null);
 
-  if (!hasLines && !hasVisit) return null;
-
   const { paid, remaining, overpaid } = paymentSummary(payments, total);
 
-  const addLeg = () =>
-    setPayments([...payments, { key: crypto.randomUUID(), method: "cash", amount: remaining }]);
+  // Nothing to say (e.g. a walk-in with no legs yet) → no empty bordered block.
+  const hasStatus = overpaid || remaining === 0 || hasCustomer;
+  if ((!hasLines && !hasVisit) || (payments.length === 0 && !hasStatus && !hasVisit)) return null;
+
   const updateLeg = (key: string, patch: Partial<Omit<PaymentLeg, "key">>) =>
     setPayments(payments.map((p) => (p.key === key ? { ...p, ...patch } : p)));
   const changeMethod = (key: string, method: PaymentMethod) =>
@@ -53,14 +53,6 @@ export function CartPayments({ total }: { total: number }) {
 
   return (
     <div className="space-y-2 border-t pt-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-navy-900">{t("pos.payment.title")}</span>
-        <Button type="button" variant="ghost" size="sm" onClick={addLeg}>
-          <Icon.add className="size-4" />
-          {t("pos.payment.add")}
-        </Button>
-      </div>
-
       {payments.map((p) => (
         <div key={p.key} className="space-y-2">
           <div className="flex items-center gap-2">
@@ -119,10 +111,12 @@ export function CartPayments({ total }: { total: number }) {
         </div>
       ))}
 
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">{t("pos.payment.paid")}</span>
-        <span className="tabular-nums"><Money value={paid} /></span>
-      </div>
+      {paid > 0 ? (
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">{t("pos.payment.paid")}</span>
+          <span className="tabular-nums"><Money value={paid} /></span>
+        </div>
+      ) : null}
 
       {overpaid ? (
         <p className="text-xs text-destructive">{t("pos.payment.exceedsTotal")}</p>
@@ -135,9 +129,7 @@ export function CartPayments({ total }: { total: number }) {
             <Money value={remaining} />
           </span>
         </div>
-      ) : (
-        <p className="text-xs text-destructive">{t("pos.payment.walkInMustPay")}</p>
-      )}
+      ) : null}
 
       {hasVisit ? (
         <p className="text-[11px] leading-snug text-muted-foreground">

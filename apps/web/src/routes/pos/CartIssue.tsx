@@ -15,9 +15,11 @@ import { IssuedSaleDialog } from "./IssuedSaleDialog";
  * Issues the cart as a POS invoice (W6.5). Builds the request from the store, sends it (the wrapper
  * mints the id + idempotency key), and on success opens the receipt dialog and clears the cart.
  *
- * `canIssue` mirrors the server's guards client-side: something to bill, payments not over the total,
- * and a walk-in (no ledger) paid in full. When a visit is linked the client total understates (the
- * server adds the visit's charges), so payment validation is deferred to the server.
+ * `canIssue` mirrors the server's guards client-side: something to bill and payments not over the
+ * total. The walk-in (no ledger) paid-in-full rule is checked on press instead — the button stays
+ * enabled and the warning only appears once the cashier actually tries to collect. When a visit is
+ * linked the client total understates (the server adds the visit's charges), so payment validation
+ * is deferred to the server.
  */
 export function CartIssue({ total }: { total: number }) {
   const { t } = useTranslation();
@@ -28,13 +30,19 @@ export function CartIssue({ total }: { total: number }) {
 
   const issue = useIssuePosInvoice();
   const [issuedId, setIssuedId] = useState<string | null>(null);
+  const [walkInWarning, setWalkInWarning] = useState(false);
 
   const { overpaid, remaining } = paymentSummary(payments, total);
   const hasSomethingToBill = lines.length > 0 || visitId !== null;
-  const clientPaymentOk = !overpaid && !(customerId === null && remaining > 0);
-  const canIssue = hasSomethingToBill && !issue.isPending && (visitId !== null || clientPaymentOk);
+  // A linked visit implies a customer, so this can only hold for a plain walk-in cart.
+  const walkInUnpaid = customerId === null && remaining > 0;
+  const canIssue = hasSomethingToBill && !issue.isPending && (visitId !== null || !overpaid);
 
   const onIssue = () => {
+    if (walkInUnpaid) {
+      setWalkInWarning(true);
+      return;
+    }
     const s = usePosCartStore.getState();
     const input: PosInvoiceInput = {
       customerId: s.customerId ?? undefined,
@@ -63,6 +71,7 @@ export function CartIssue({ total }: { total: number }) {
     issue.mutate(input, {
       onSuccess: (res) => {
         s.clear();
+        setWalkInWarning(false);
         if (res.queued) {
           // Offline: the sale is queued and will post (stock + ledger) on reconnect. No receipt yet —
           // it prints from the invoices history once it syncs.
@@ -78,10 +87,15 @@ export function CartIssue({ total }: { total: number }) {
   return (
     <>
       {hasSomethingToBill ? (
-        <Button type="button" size="lg" className="mt-3 w-full" disabled={!canIssue} onClick={onIssue}>
-          <Icon.receipt className="size-4" />
-          {issue.isPending ? t("pos.issue.submitting") : t("pos.issue.submit")}
-        </Button>
+        <div className="mt-3 space-y-2">
+          {walkInWarning && walkInUnpaid ? (
+            <p className="text-xs text-destructive">{t("pos.payment.walkInMustPay")}</p>
+          ) : null}
+          <Button type="button" size="lg" className="w-full" disabled={!canIssue} onClick={onIssue}>
+            <Icon.receipt className="size-4" />
+            {issue.isPending ? t("pos.issue.submitting") : t("pos.issue.submit")}
+          </Button>
+        </div>
       ) : null}
       {issuedId ? (
         <IssuedSaleDialog invoiceId={issuedId} onClose={() => setIssuedId(null)} />
