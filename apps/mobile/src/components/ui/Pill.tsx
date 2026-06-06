@@ -29,7 +29,7 @@ const TONE: Record<Tone, { bg: string; text: string }> = {
 
 export function Pill({ label, tone = "neutral", leadingIcon, compact, className, ...rest }: PillProps) {
   const palette = TONE[tone];
-  const padding = compact ? "px-2 py-0.5" : "px-2.5 py-[5px]";
+  const padding = compact ? "px-2 py-0.5" : "px-3.5 py-1.5";
   return (
     <View
       className={`${palette.bg} ${padding} self-start flex-row items-center gap-1.5 rounded-pill ${className ?? ""}`}

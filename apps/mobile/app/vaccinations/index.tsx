@@ -98,7 +98,7 @@ export default function VaccinationsAgendaScreen() {
         <View className="mt-1 flex-row items-center justify-between">
           <Pressable
             onPress={() => router.push("/vaccinations/new")}
-            className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-3 py-1.5"
+            className="bg-navy-900 active:bg-navy-800 flex-row items-center gap-1.5 rounded-pill px-4 py-2"
           >
             <Add size={14} color={colors.white} />
             <Text className="text-paper text-[12px] font-tajawal-bold">{t("vaccinations.new")}</Text>
