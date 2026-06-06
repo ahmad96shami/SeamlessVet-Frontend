@@ -49,3 +49,19 @@ const tokenProvider: TokenProvider = {
 
 /** The app-wide Axios client: Authorization + idempotency + 401→refresh→retry (from @vet/shared). */
 export const apiClient = createApiClient({ baseURL: API_BASE_URL, tokenProvider });
+
+/**
+ * Cheap authed round-trip to self-heal a lapsed access token while the server is reachable:
+ * the 401 → single-flight refresh → retry pipeline rotates the pair and `onRefreshSuccess`
+ * clears the read-only banner. Offline it fails at the network layer (no 401), so nothing
+ * changes and the banner stays. `POST /auth/powersync-token` is the cheapest authed endpoint:
+ * idempotency-exempt (auth/*) and side-effect-free (mints a short-lived stream JWT).
+ *
+ * Without this, a foregrounded app whose reads are all local SQLite never fires a REST call,
+ * so nothing drives the refresh and the "session expired" banner sticks until cold start.
+ */
+export function pokeSession(): void {
+  void apiClient.post("/auth/powersync-token").catch(() => {
+    /* offline / unreachable — a later poke or the PowerSync reconnect heals it */
+  });
+}

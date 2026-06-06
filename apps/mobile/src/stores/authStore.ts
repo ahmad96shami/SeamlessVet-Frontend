@@ -3,7 +3,7 @@ import type { LoginResponse } from "@vet/shared";
 
 import { logout as logoutApi } from "@/api/auth";
 import { decodeJwt } from "@/lib/jwt";
-import { setOnAuthError, setOnRefreshSuccess } from "@/services/apiClient";
+import { pokeSession, setOnAuthError, setOnRefreshSuccess } from "@/services/apiClient";
 import {
   resumePushTokenRegistration,
   suspendPushTokenRegistration,
@@ -168,11 +168,13 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   refreshSessionState: async () => {
     const tokens = await tokenStorage.getTokens();
-    set(
-      get().status === "authenticated"
-        ? { sessionExpired: isAccessTokenExpired(tokens?.accessToken) }
-        : { sessionExpired: false },
-    );
+    const expired =
+      get().status === "authenticated" && isAccessTokenExpired(tokens?.accessToken);
+    set({ sessionExpired: expired });
+    // Self-heal: with all reads local, nothing else fires a REST call after a
+    // foreground — poke one authed request so 401→refresh rotates the pair and
+    // clears the banner (no-op while offline; see pokeSession).
+    if (expired) pokeSession();
   },
 }));
 
