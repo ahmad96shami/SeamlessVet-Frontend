@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { Money } from "@/components/ui/money";
 import { useIssuePosInvoice } from "@/queries/invoices";
 import { usePosCartStore } from "@/stores/posCartStore";
 
@@ -86,17 +87,20 @@ export function CartIssue({ total }: { total: number }) {
 
   return (
     <>
-      {hasSomethingToBill ? (
-        <div className="mt-3 space-y-2">
-          {walkInWarning && walkInUnpaid ? (
-            <p className="text-xs text-destructive">{t("pos.payment.walkInMustPay")}</p>
+      <div className="mt-3 space-y-2">
+        {walkInWarning && walkInUnpaid ? (
+          <p className="text-xs text-destructive">{t("pos.payment.walkInMustPay")}</p>
+        ) : null}
+        {/* Always visible — grayed out (disabled) on an empty cart. The amount due replaces the
+            old grand-total row; the symbol's fixed ink tint is overridden to read on navy. */}
+        <Button type="button" size="lg" className="w-full" disabled={!canIssue} onClick={onIssue}>
+          <Icon.receipt className="size-4" />
+          {issue.isPending ? t("pos.issue.submitting") : t("pos.issue.submit")}
+          {hasSomethingToBill ? (
+            <Money value={total} className="[&_.money-symbol]:text-current" />
           ) : null}
-          <Button type="button" size="lg" className="w-full" disabled={!canIssue} onClick={onIssue}>
-            <Icon.receipt className="size-4" />
-            {issue.isPending ? t("pos.issue.submitting") : t("pos.issue.submit")}
-          </Button>
-        </div>
-      ) : null}
+        </Button>
+      </div>
       {issuedId ? (
         <IssuedSaleDialog invoiceId={issuedId} onClose={() => setIssuedId(null)} />
       ) : null}

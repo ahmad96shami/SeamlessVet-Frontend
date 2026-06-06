@@ -320,10 +320,7 @@ export function CartPanel() {
               <dd className="tabular-nums"><Money value={totals.taxAmount} /></dd>
             </div>
           ) : null}
-          <div className="flex items-center justify-between border-t pt-2 text-base font-bold text-navy-900">
-            <dt>{t("pos.cart.total")}</dt>
-            <dd className="tabular-nums"><Money value={totals.total} /></dd>
-          </div>
+          {/* No grand-total row — the amount due lives on the collect button (CartIssue). */}
         </dl>
 
         <CartPayments total={totals.total} />
