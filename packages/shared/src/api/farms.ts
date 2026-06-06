@@ -94,3 +94,15 @@ export async function closeFarmAccount(
   const res = await client.post(`/farms/${id}/close-account`);
   return CloseAccountResponseSchema.parse(res.data);
 }
+
+/**
+ * POST /farms/{id}/reopen-account (M16) — lift the settlement lock on a closed farm ledger so its new
+ * visits can be billed. Idempotent; payout authority (`entitlements.approve`).
+ */
+export async function reopenFarmAccount(
+  client: AxiosInstance,
+  id: string,
+): Promise<CloseAccountResponse> {
+  const res = await client.post(`/farms/${id}/reopen-account`);
+  return CloseAccountResponseSchema.parse(res.data);
+}

@@ -1730,6 +1730,10 @@
       "balanceMustBeZero": "Can't close while a balance is outstanding ({{balance}}). Collect the remainder first.",
       "confirm": "Close the account now",
       "closed": "Account closed",
+      "reopen": "Reopen account",
+      "reopenBody": "The account will reopen so the customer can be billed again. Already-computed entitlements are unaffected.",
+      "reopenConfirm": "Reopen now",
+      "reopened": "Account reopened",
       "resulting": "Resulting entitlements",
       "noEntitlements": "No entitlements were produced."
     },
@@ -1740,6 +1744,10 @@
       "balanceMustBeZero": "Can't close while the farm has an outstanding balance ({{balance}}). Collect the remainder first.",
       "confirm": "Close the farm account now",
       "closed": "Farm account closed",
+      "reopen": "Reopen farm account",
+      "reopenBody": "The farm account will reopen so it can be billed again. Already-computed entitlements are unaffected.",
+      "reopenConfirm": "Reopen now",
+      "reopened": "Farm account reopened",
       "resulting": "Resulting entitlements",
       "noEntitlements": "No entitlements were produced."
     },

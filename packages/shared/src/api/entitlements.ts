@@ -75,3 +75,16 @@ export async function closeAccount(
   const res = await client.post(`/customers/${customerId}/close-account`);
   return CloseAccountResponseSchema.parse(res.data);
 }
+
+/**
+ * POST /customers/{id}/reopen-account — lift the settlement lock on a closed own ledger so a
+ * returning customer's new visit can be billed (`entitlements.approve`). Idempotent; returns the
+ * re-opened ledger (entitlements list empty — re-opening computes none).
+ */
+export async function reopenAccount(
+  client: AxiosInstance,
+  customerId: string,
+): Promise<CloseAccountResponse> {
+  const res = await client.post(`/customers/${customerId}/reopen-account`);
+  return CloseAccountResponseSchema.parse(res.data);
+}
