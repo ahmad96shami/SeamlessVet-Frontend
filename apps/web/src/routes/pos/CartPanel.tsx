@@ -57,7 +57,9 @@ function QtyStepper({
         value={shown}
         onChange={(e) => commit(e.target.value)}
         onBlur={() => setDraft(null)}
-        className="w-9 border-x bg-transparent text-center text-sm font-bold tabular-nums text-navy-900 outline-none focus:bg-ink-50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        // pt-1.5 (6px/0) shifts the line box down 3px: Tajawal's lining digits carry no
+        // descender while the font reserves diacritic descent, so the ink otherwise floats high.
+        className="w-9 border-x bg-transparent pt-1.5 text-center text-sm font-bold tabular-nums text-navy-900 outline-none focus:bg-ink-50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <button type="button" aria-label="+" onClick={() => onChange(value + 1)} className={btn}>
         <Icon.add className="size-3.5" aria-hidden />
