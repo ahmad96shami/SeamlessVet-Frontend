@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { FlatList, InteractionManager, Pressable, ScrollView, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
@@ -8,6 +9,7 @@ import { Add, Forward } from "@/components/icons";
 import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill, SkeletonList } from "@/components/ui";
 import { Search } from "@/components/icons";
 import { ScreenShell, TopBar } from "@/components/layout";
+import { useScreenSettled } from "@/hooks/useScreenSettled";
 import { useQuery } from "@/sync/hooks";
 import type { VisitRow } from "@/sync/types";
 import { colors } from "@/theme";
@@ -57,11 +59,7 @@ export default function VisitsListScreen() {
   // The lazy first mount runs inside the tab-press turn, and the row tree (clay
   // avatars, pills) is the expensive part — keep the skeleton up through the tab
   // slide and commit the real rows only once the transition has settled.
-  const [settled, setSettled] = useState(false);
-  useEffect(() => {
-    const task = InteractionManager.runAfterInteractions(() => setSettled(true));
-    return () => task.cancel();
-  }, []);
+  const settled = useScreenSettled();
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -122,10 +120,11 @@ export default function VisitsListScreen() {
         </View>
       </View>
 
-      <FlatList
+      <FlashList
         // Full-bleed: ScrollViews clip children on Android, so the horizontal
         // body padding lives INSIDE the scroll content or card shadows get cut.
-        className="-mx-5 mt-3 flex-1"
+        // Style object, not className — FlashList isn't css-interop registered.
+        style={{ marginHorizontal: -20, marginTop: 12, flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 8 }}
         data={settled ? filtered : []}
         keyExtractor={(v) => v.id}

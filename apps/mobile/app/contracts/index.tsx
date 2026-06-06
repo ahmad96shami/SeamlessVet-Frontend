@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@vet/shared";
@@ -7,6 +8,7 @@ import { formatDate } from "@vet/shared";
 import { Add, Forward, Paper, Search } from "@/components/icons";
 import { Chip, IconTile, Input, ListRow, Money, Pill, SkeletonList } from "@/components/ui";
 import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
+import { useScreenSettled } from "@/hooks/useScreenSettled";
 import { useAuthStore } from "@/stores/authStore";
 import { useQuery } from "@/sync/hooks";
 import type { ContractRow } from "@/sync/types";
@@ -53,6 +55,9 @@ export default function ContractsListScreen() {
        ORDER BY COALESCE(c.updated_at, c.created_at, c.period_start) DESC`,
     [userId ?? ""],
   );
+
+  // Cheap first frame: skeleton through the push transition, rows right after.
+  const settled = useScreenSettled();
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -114,16 +119,17 @@ export default function ContractsListScreen() {
         </View>
       </View>
 
-      <FlatList
+      <FlashList
         // Full-bleed: ScrollViews clip children on Android, so the horizontal
         // body padding lives INSIDE the scroll content or card shadows get cut.
-        className="-mx-5 mt-3 flex-1"
+        // Style object, not className — FlashList isn't css-interop registered.
+        style={{ marginHorizontal: -20, marginTop: 12, flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 8 }}
-        data={filtered}
+        data={settled ? filtered : []}
         keyExtractor={(c) => c.id}
         ItemSeparatorComponent={() => <View className="h-2" />}
         ListEmptyComponent={
-          isLoading ? (
+          isLoading || !settled ? (
             <SkeletonList />
           ) : (
             <View className="mt-12 items-center">
