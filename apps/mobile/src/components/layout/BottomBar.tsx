@@ -18,7 +18,7 @@ import { Box, Calendar, Home, User } from "../icons";
  * ("new visit") lives inside the home screen, not the chrome — fewer concepts
  * to learn and one less thumb-target collision with the home indicator.
  */
-type TabKey = "home" | "visits" | "inv" | "me";
+export type TabKey = "home" | "visits" | "inv" | "me";
 
 interface BottomBarProps {
   active?: TabKey;

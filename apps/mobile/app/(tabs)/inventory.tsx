@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate, formatQuantity } from "@vet/shared";
 
 import { ArrowDown, Pill as PillIcon, Search, Truck, Warn } from "@/components/icons";
-import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
+import { ScreenShell, TopBar } from "@/components/layout";
 import { Card, IconTile, Input, ListRow, Pill, SegmentedTabs, SkeletonList } from "@/components/ui";
 import {
   classifyStock,
@@ -94,7 +94,6 @@ export default function InventoryScreen() {
     <ScreenShell
       staticBody
       header={<TopBar title={t("nav.inventory")} right={null} />}
-      footer={<NavBottomBar active="inv" />}
     >
       <Card className="p-4">
         <View className="flex-row items-start justify-between">

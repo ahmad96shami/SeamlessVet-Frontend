@@ -3,7 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { Forward, User } from "@/components/icons";
-import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
+import { ScreenShell, TopBar } from "@/components/layout";
 import { NotificationPanel } from "@/components/NotificationPanel";
 import { SyncReviewSheet } from "@/components/SyncReviewSheet";
 import { Card, Divider, IconTile, Pill, SectionTitle } from "@/components/ui";
@@ -47,7 +47,6 @@ export default function MeScreen() {
   return (
     <ScreenShell
       header={<TopBar title={t("me.title")} right={null} />}
-      footer={<NavBottomBar active="me" />}
     >
       {/* Profile */}
       <Card className="flex-row items-center gap-3.5 p-4">

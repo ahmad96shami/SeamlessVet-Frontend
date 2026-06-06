@@ -14,7 +14,7 @@ import {
   User,
   Warn,
 } from "@/components/icons";
-import { NavBottomBar, ScreenShell } from "@/components/layout";
+import { ScreenShell } from "@/components/layout";
 import { NotificationBell } from "@/components/NotificationBell";
 import { SyncIndicator } from "@/components/SyncIndicator";
 import { SyncReviewSheet } from "@/components/SyncReviewSheet";
@@ -110,7 +110,6 @@ export default function Index() {
   return (
     <ScreenShell
       header={<HomeHeader greeting={t(`dashboard.greeting.${greetingKey}`)} name={user?.fullName ?? ""} onOpenSync={() => setReviewOpen(true)} />}
-      footer={<NavBottomBar active="home" />}
     >
       {/* Stat row */}
       <View className="flex-row gap-2.5">
@@ -151,7 +150,7 @@ export default function Index() {
             key: "load-inventory",
             label: t("dashboard.actions.loadInventory"),
             icon: <Truck size={20} color={colors.teal[600]} />,
-            onPress: () => router.push("/inventory"),
+            onPress: () => router.navigate("/inventory"),
           },
           {
             key: "receipt-voucher",
@@ -196,7 +195,7 @@ export default function Index() {
       <SectionTitle
         title={t("dashboard.todaySchedule.title")}
         actionLabel={t("dashboard.viewAll")}
-        onAction={() => router.push("/visits")}
+        onAction={() => router.navigate("/visits")}
       />
       {scheduleLoading ? (
         <SkeletonList rows={2} />

@@ -1,4 +1,4 @@
-export { BottomBar } from "./BottomBar";
+export { BottomBar, type TabKey } from "./BottomBar";
 export { Footer } from "./Footer";
 export { NavBottomBar } from "./NavBottomBar";
 export { ScreenShell } from "./ScreenShell";

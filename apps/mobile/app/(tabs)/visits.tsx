@@ -7,7 +7,7 @@ import { formatDate } from "@vet/shared";
 import { Add, Forward } from "@/components/icons";
 import { Chip, Input, ListRow, Photo, photoKindForCustomerType, Pill, SkeletonList } from "@/components/ui";
 import { Search } from "@/components/icons";
-import { NavBottomBar, ScreenShell, TopBar } from "@/components/layout";
+import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { VisitRow } from "@/sync/types";
 import { colors } from "@/theme";
@@ -67,7 +67,6 @@ export default function VisitsListScreen() {
     <ScreenShell
       staticBody
       header={<TopBar title={t("nav.visits")} right={null} />}
-      footer={<NavBottomBar active="visits" />}
     >
       <View className="gap-3">
         <Input

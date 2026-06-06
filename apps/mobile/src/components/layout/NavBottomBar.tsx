@@ -3,10 +3,10 @@ import { useRouter } from "expo-router";
 import { BottomBar } from "./BottomBar";
 
 /**
- * Route-aware wrapper around {@link BottomBar}. Each Mo2+ screen drops one of these
- * in its footer slot so the four bottom-bar tabs all navigate to the same canonical
- * routes without each screen re-implementing the mapping. `active` keeps the chosen
- * tab visually selected.
+ * Route-aware wrapper around {@link BottomBar} for STACK screens that sit above the
+ * `(tabs)` navigator but still show the bar (contracts, customers). The four real tab
+ * screens get their bar from the navigator's custom `tabBar` — never render this there.
+ * `active` keeps the visually-nearest tab selected.
  */
 type TabKey = "home" | "visits" | "inv" | "me";
 
@@ -29,10 +29,10 @@ export function NavBottomBar({ active }: NavBottomBarProps) {
       onSelect={(key) => {
         if (key === active) return;
         const route = ROUTE[key];
-        // The Mo3/Mo7 routes don't exist yet — `replace` is a safe no-op since RN's
-        // router silently ignores unknown paths in production; in dev the warning
-        // signals which tab still needs its destination.
-        router.push(route as never);
+        // `navigate`, not `push`: the tab destinations live in the `(tabs)` navigator
+        // below this stack screen — navigate pops back to it and switches the tab
+        // instead of stacking a duplicate copy of the whole screen.
+        router.navigate(route as never);
       }}
     />
   );
