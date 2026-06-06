@@ -1,5 +1,5 @@
 import { IMMEDIATE_PAYMENT_METHODS, type PaymentMethod } from "@vet/shared";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
@@ -39,6 +39,10 @@ export function ReceiptVoucherDialog({
   const { t } = useTranslation();
 
   const [customerId, setCustomerId] = useState<string | null>(presetCustomerId ?? null);
+  // Which ledger the credit posts to: null = the customer's own (non-farm) ledger, else a farm id.
+  // M16 split a customer into own + per-farm ledgers, so a payment must name its target ledger —
+  // otherwise it lands on the own ledger, which may be closed while a farm ledger is still open.
+  const [targetFarmId, setTargetFarmId] = useState<string | null>(null);
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<PaymentMethod>("cash");
   const [notes, setNotes] = useState("");
@@ -51,6 +55,7 @@ export function ReceiptVoucherDialog({
   useEffect(() => {
     if (!open) return;
     setCustomerId(presetCustomerId ?? null);
+    setTargetFarmId(null);
     setAmount("");
     setMethod("cash");
     setNotes("");
@@ -64,6 +69,53 @@ export function ReceiptVoucherDialog({
   const issue = useIssueReceiptVoucher();
   const issuedVoucher = useReceiptVoucher(issuedId);
 
+  // The customer's postable ledgers: own account + each farm. A closed ledger can't take a credit,
+  // so it's shown but disabled. The picker only appears once a customer has farm ledgers.
+  const targets = useMemo(() => {
+    const c = picked.data;
+    if (!c) return [] as { farmId: string | null; label: string; balance: number; closed: boolean }[];
+    return [
+      {
+        farmId: null,
+        label: t("pos.voucher.ownAccount"),
+        balance: c.ownBalance,
+        closed: c.ownLedgerStatus === "closed",
+      },
+      ...(c.farmLedgers ?? []).map((fl) => ({
+        farmId: fl.farmId,
+        label: fl.farmName,
+        balance: fl.balance,
+        closed: fl.status === "closed",
+      })),
+    ];
+  }, [picked.data, t]);
+
+  const hasFarms = (picked.data?.farmLedgers?.length ?? 0) > 0;
+  const openTargets = targets.filter((tg) => !tg.closed);
+  const allClosed = targets.length > 0 && openTargets.length === 0;
+  const selectedTarget = targets.find((tg) => tg.farmId === targetFarmId) ?? null;
+
+  // Default the target whenever a different customer loads: the open ledger carrying the most debt
+  // (so the common "pay down the biggest balance" case is preselected), else the first open one.
+  useEffect(() => {
+    const c = picked.data;
+    if (!c) {
+      setTargetFarmId(null);
+      return;
+    }
+    const opts = [
+      { farmId: null as string | null, balance: c.ownBalance, closed: c.ownLedgerStatus === "closed" },
+      ...(c.farmLedgers ?? []).map((fl) => ({
+        farmId: fl.farmId as string | null,
+        balance: fl.balance,
+        closed: fl.status === "closed",
+      })),
+    ];
+    const open = opts.filter((o) => !o.closed).sort((a, b) => b.balance - a.balance);
+    setTargetFarmId(open[0]?.farmId ?? null);
+    // Keyed on identity, not the query object, so a background refetch never overrides a manual pick.
+  }, [picked.data?.id]);
+
   const printRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -72,10 +124,15 @@ export function ReceiptVoucherDialog({
   });
 
   const amountNum = Number(amount) || 0;
-  const canSubmit = customerId !== null && amountNum > 0 && !issue.isPending;
+  const canSubmit =
+    customerId !== null &&
+    amountNum > 0 &&
+    !issue.isPending &&
+    selectedTarget !== null &&
+    !selectedTarget.closed;
 
   const onSubmit = () => {
-    if (customerId === null || amountNum <= 0) return;
+    if (customerId === null || amountNum <= 0 || selectedTarget === null || selectedTarget.closed) return;
     const cheque =
       method === "cheque"
         ? {
@@ -85,7 +142,14 @@ export function ReceiptVoucherDialog({
           }
         : {};
     issue.mutate(
-      { customerId, amount: amountNum, method, notes: notes.trim() || undefined, ...cheque },
+      {
+        customerId,
+        ...(targetFarmId ? { farmId: targetFarmId } : {}),
+        amount: amountNum,
+        method,
+        notes: notes.trim() || undefined,
+        ...cheque,
+      },
       {
         onSuccess: (res) => {
           setIssuedId(res.id);
@@ -127,9 +191,31 @@ export function ReceiptVoucherDialog({
               disabled={!!presetCustomerId}
             />
           </Field>
-          {picked.data && picked.data.balance > 0 ? (
+
+          {/* Per-farm ledger picker (M16): only when the customer actually has farm ledgers, so a
+              plain customer's flow is unchanged. Closed ledgers stay listed but disabled. */}
+          {hasFarms ? (
+            <label className="block space-y-1">
+              <span className="text-sm font-medium">{t("pos.voucher.targetAccount")}</span>
+              <Select
+                value={targetFarmId ?? ""}
+                onChange={(e) => setTargetFarmId(e.target.value || null)}
+              >
+                {targets.map((tg) => (
+                  <option key={tg.farmId ?? "own"} value={tg.farmId ?? ""} disabled={tg.closed}>
+                    {tg.label}
+                    {tg.closed ? ` ${t("pos.voucher.accountClosedSuffix")}` : ""}
+                  </option>
+                ))}
+              </Select>
+            </label>
+          ) : null}
+
+          {allClosed ? (
+            <p className="text-xs text-destructive">{t("pos.voucher.allClosed")}</p>
+          ) : selectedTarget && selectedTarget.balance > 0 ? (
             <div className="text-xs text-muted-foreground tabular-nums">
-              <Money value={picked.data.balance} />
+              <Money value={selectedTarget.balance} />
             </div>
           ) : null}
 
