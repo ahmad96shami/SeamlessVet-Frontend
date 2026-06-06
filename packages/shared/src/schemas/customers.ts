@@ -35,6 +35,10 @@ export const CustomerResponseSchema = z.object({
   balance: z.number(),
   ledgerStatus: z.string(),
   ownBalance: z.number(),
+  // The own (non-farm) ledger's status alone, vs. `ledgerStatus` (the aggregate). Lets a posting
+  // client (e.g. the receipt voucher) tell an open own ledger from a closed one when the aggregate
+  // reads open only because a farm ledger is open. Detail/list reads set it; legacy reads omit it.
+  ownLedgerStatus: z.string().nullish(),
   farmLedgers: z.array(CustomerFarmLedgerSchema).nullish(),
   createdAt: z.string(),
   updatedAt: z.string(),
