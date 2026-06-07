@@ -12,6 +12,7 @@ import { Icon } from "@/components/ui/icon";
 import { useDeleteProcedure, useProcedures } from "@/queries/procedures";
 import { useServices } from "@/queries/services";
 import { ProcedureFormDialog } from "@/routes/visits/ProcedureFormDialog";
+import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
 
 /** Procedures performed during the visit (PRD §5.2-C). */
 export function ProceduresTab({ visitId, readOnly }: { visitId: string; readOnly: boolean }) {
@@ -26,6 +27,7 @@ export function ProceduresTab({ visitId, readOnly }: { visitId: string; readOnly
     return m;
   }, [services.data]);
   const del = useDeleteProcedure();
+  const billed = useBilledChargeIds(visitId);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<ProcedureResponse | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ProcedureResponse | null>(null);
@@ -76,20 +78,31 @@ export function ProceduresTab({ visitId, readOnly }: { visitId: string; readOnly
             >
               <Icon.edit className="size-4" />
             </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label={t("admin.common.delete")}
-              onClick={() => setDeleteTarget(row.original)}
-            >
-              <Icon.trash className="size-4 text-destructive" />
-            </Button>
+            {billed.procedures.has(row.original.id) ? (
+              // Billed on an invoice — the row backs an issued invoice line (server-enforced too;
+              // the edit stays for the clinical result, but re-pricing is rejected server-side).
+              <span
+                title={t("visits.billedLocked")}
+                className="grid size-10 place-items-center text-muted-foreground"
+              >
+                <Icon.lock className="size-4" aria-label={t("visits.billedLocked")} />
+              </span>
+            ) : (
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label={t("admin.common.delete")}
+                onClick={() => setDeleteTarget(row.original)}
+              >
+                <Icon.trash className="size-4 text-destructive" />
+              </Button>
+            )}
           </div>
         ),
       });
     }
     return cols;
-  }, [t, lang, serviceById, readOnly]);
+  }, [t, lang, serviceById, readOnly, billed]);
 
   const confirmDelete = () => {
     if (!deleteTarget) return;

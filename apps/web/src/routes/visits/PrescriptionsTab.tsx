@@ -12,6 +12,7 @@ import { Icon } from "@/components/ui/icon";
 import { useProducts } from "@/queries/products";
 import { useDeletePrescription, usePrescriptions } from "@/queries/prescriptions";
 import { PrescriptionFormDialog } from "@/routes/visits/PrescriptionFormDialog";
+import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
 
 /** Prescriptions on the visit (PRD §5.2-D) — the dispense-type split is shown as a pill. */
 export function PrescriptionsTab({ visitId, readOnly }: { visitId: string; readOnly: boolean }) {
@@ -26,6 +27,7 @@ export function PrescriptionsTab({ visitId, readOnly }: { visitId: string; readO
     return m;
   }, [products.data]);
   const del = useDeletePrescription();
+  const billed = useBilledChargeIds(visitId);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<PrescriptionResponse | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PrescriptionResponse | null>(null);
@@ -96,20 +98,30 @@ export function PrescriptionsTab({ visitId, readOnly }: { visitId: string; readO
             >
               <Icon.edit className="size-4" />
             </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label={t("admin.common.delete")}
-              onClick={() => setDeleteTarget(row.original)}
-            >
-              <Icon.trash className="size-4 text-destructive" />
-            </Button>
+            {billed.prescriptions.has(row.original.id) ? (
+              // Billed on an invoice — the row backs an issued invoice line (server-enforced too).
+              <span
+                title={t("visits.billedLocked")}
+                className="grid size-10 place-items-center text-muted-foreground"
+              >
+                <Icon.lock className="size-4" aria-label={t("visits.billedLocked")} />
+              </span>
+            ) : (
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label={t("admin.common.delete")}
+                onClick={() => setDeleteTarget(row.original)}
+              >
+                <Icon.trash className="size-4 text-destructive" />
+              </Button>
+            )}
           </div>
         ),
       });
     }
     return cols;
-  }, [t, lang, productById, readOnly]);
+  }, [t, lang, productById, readOnly, billed]);
 
   const confirmDelete = () => {
     if (!deleteTarget) return;

@@ -980,7 +980,8 @@
       "procedures": "procedures",
       "prescriptions": "prescriptions",
       "vaccinations": "vaccinations"
-    }
+    },
+    "billedLocked": "Billed — backed by an invoice line; it cannot be removed"
   },
   "vaccinations": {
     "title": "Vaccinations",
@@ -2175,9 +2176,13 @@
     "pet_id_collision": "A pet with the same id already exists.",
     "pet_transfer_same_owner": "The target customer is the current owner — nothing to transfer.",
     "phone_in_use": "An account with this phone number already exists.",
+    "prescription_already_billed": "This prescription is already billed.",
     "prescription_already_exists": "This prescription already exists.",
+    "prescription_billed": "This prescription is billed — it can no longer be removed from the visit.",
     "prescription_id_collision": "A prescription with the same id already exists.",
+    "procedure_already_billed": "This procedure is already billed.",
     "procedure_already_exists": "This procedure already exists.",
+    "procedure_billed": "This procedure is billed — it can no longer be removed or re-priced.",
     "procedure_id_collision": "A procedure with the same id already exists.",
     "product_barcode_taken": "A product with this barcode already exists.",
     "product_id_collision": "A product with the same id already exists.",

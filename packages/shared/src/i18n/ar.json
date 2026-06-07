@@ -996,7 +996,8 @@
       "procedures": "إجراءات",
       "prescriptions": "وصفات",
       "vaccinations": "تطعيمات"
-    }
+    },
+    "billedLocked": "مُفوتر — يُدار من الفاتورة ولا يمكن حذفه"
   },
   "vaccinations": {
     "title": "التطعيمات",
@@ -2199,9 +2200,13 @@
     "pet_id_collision": "يوجد حيوان بنفس المعرّف.",
     "pet_transfer_same_owner": "العميل الهدف هو المالك الحالي — لا نقل مطلوب.",
     "phone_in_use": "يوجد حساب بهذا الرقم مسبقًا.",
+    "prescription_already_billed": "هذه الوصفة مُفوترة مسبقًا.",
     "prescription_already_exists": "الوصفة موجودة مسبقًا.",
+    "prescription_billed": "هذه الوصفة مُفوترة — لا يمكن حذفها من الزيارة.",
     "prescription_id_collision": "توجد وصفة بنفس المعرّف.",
+    "procedure_already_billed": "هذا الإجراء مُفوتر مسبقًا.",
     "procedure_already_exists": "الإجراء موجود مسبقًا.",
+    "procedure_billed": "هذا الإجراء مُفوتر — لا يمكن حذفه أو تعديل سعره.",
     "procedure_id_collision": "يوجد إجراء بنفس المعرّف.",
     "product_barcode_taken": "يوجد منتج بهذا الباركود مسبقًا.",
     "product_id_collision": "يوجد منتج بنفس المعرّف.",
