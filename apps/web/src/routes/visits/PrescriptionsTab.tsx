@@ -68,9 +68,15 @@ export function PrescriptionsTab({ visitId, readOnly }: { visitId: string; readO
         accessorKey: "dispenseType",
         header: t("visits.prescriptions.col.dispense"),
         cell: ({ row }) => (
-          <Badge variant={row.original.dispenseType === "dispensed_to_owner" ? "navy" : "default"}>
-            {t(`dispenseType.${row.original.dispenseType}`, { defaultValue: row.original.dispenseType })}
-          </Badge>
+          <span className="flex items-center gap-1.5">
+            <Badge variant={row.original.dispenseType === "dispensed_to_owner" ? "navy" : "default"}>
+              {t(`dispenseType.${row.original.dispenseType}`, { defaultValue: row.original.dispenseType })}
+            </Badge>
+            {/* M23 — an in-clinic med flagged billable is charged on the visit's invoice. */}
+            {row.original.dispenseType === "administered_in_clinic" && row.original.billable ? (
+              <Badge variant="success">{t("visits.prescriptions.billableBadge")}</Badge>
+            ) : null}
+          </span>
         ),
       },
       {

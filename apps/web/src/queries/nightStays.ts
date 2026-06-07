@@ -41,15 +41,16 @@ export function useUpdateNightStay() {
   });
 }
 
-/** POST /night-stays/{id}/close — counts nights hotel-style and posts the `night_stay` ledger entry. */
+/**
+ * POST /night-stays/{id}/close — records the checkout and counts nights hotel-style. M23: no charge
+ * posts here (the stay bills at POS or via the visit-completion backstop); an explicit `checkOutAt`
+ * on a closed-unbilled stay re-closes it (recompute).
+ */
 export function useCloseNightStay() {
   const qc = useQueryClient();
   return useMutation<NightStayResponse, ApiError, { id: string; body?: NightStayCloseRequest }>({
     mutationFn: ({ id, body }) => closeNightStay(apiClient, id, body ?? {}),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: [KEY] });
-      qc.invalidateQueries({ queryKey: ["customers"] }); // the charge moved the ledger balance
-    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }
 

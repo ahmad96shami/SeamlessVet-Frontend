@@ -22,6 +22,7 @@ import { toDateTimeLocal } from "@/lib/calendar";
 import { useCreatePrescription, useUpdatePrescription } from "@/queries/prescriptions";
 import { useProducts } from "@/queries/products";
 import { ProductFormDialog } from "@/routes/admin/ProductFormDialog";
+import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
 
 type DispenseType = "administered_in_clinic" | "dispensed_to_owner";
 type IntervalUnit = "minutes" | "hours" | "days";
@@ -77,6 +78,10 @@ export function PrescriptionFormDialog({
   const [notes, setNotes] = useState("");
   const [dispenseType, setDispenseType] = useState<DispenseType>("dispensed_to_owner");
   const [quantity, setQuantity] = useState("");
+  // M23 — charge an administered_in_clinic med to the customer; toggleable until billed.
+  const [billable, setBillable] = useState(false);
+  const billed = useBilledChargeIds(visitId);
+  const billableLocked = isEdit && billed.prescriptions.has(prescription.id);
 
   // M18 recurring-dose reminder schedule.
   const [reminderEnabled, setReminderEnabled] = useState(false);
@@ -96,6 +101,7 @@ export function PrescriptionFormDialog({
     setNotes(prescription?.notes ?? "");
     setDispenseType((prescription?.dispenseType as DispenseType) ?? "dispensed_to_owner");
     setQuantity(prescription?.quantity != null ? String(prescription.quantity) : "");
+    setBillable(prescription?.billable ?? false);
     setReminderEnabled(prescription?.reminderEnabled ?? false);
     const iv = splitInterval(prescription?.intervalMinutes);
     setIntervalValue(iv.value);
@@ -143,6 +149,9 @@ export function PrescriptionFormDialog({
     if (!valid) return;
     const onError = (e: ApiError) => toast.error(e.message);
     const text = (s: string) => (s.trim() === "" ? undefined : s.trim());
+    // M23 — the billable toggle only travels for in-clinic meds, and never once billed (frozen).
+    const billableBody =
+      dispenseType === "administered_in_clinic" && !billableLocked ? { billable } : {};
     if (isEdit) {
       update.mutate(
         {
@@ -152,6 +161,7 @@ export function PrescriptionFormDialog({
             frequency: text(frequency),
             duration: text(duration),
             notes: text(notes),
+            ...billableBody,
             ...reminderBody(),
           },
         },
@@ -168,6 +178,7 @@ export function PrescriptionFormDialog({
           notes: text(notes),
           dispenseType,
           quantity: Number(quantity),
+          ...billableBody,
           ...reminderBody(),
         },
         { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); }, onError },
@@ -239,6 +250,20 @@ export function PrescriptionFormDialog({
         <Field label={t("visits.prescriptions.notes")}>
           <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
         </Field>
+
+        {/* M23 — charge an in-clinic administered med to the customer (assembles into the visit's
+            invoice; stock already deducted at recording). Frozen once the line is billed. */}
+        {dispenseType === "administered_in_clinic" ? (
+          <div className="space-y-1 rounded-md border p-3">
+            <div className="flex items-center justify-between gap-4">
+              <Label>{t("visits.prescriptions.billable")}</Label>
+              <Switch checked={billable} onCheckedChange={setBillable} disabled={billableLocked} />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {billableLocked ? t("visits.billedLocked") : t("visits.prescriptions.billableHint")}
+            </p>
+          </div>
+        ) : null}
 
         {/* M18 — recurring-dose reminders */}
         <div className="space-y-3 rounded-md border p-3">

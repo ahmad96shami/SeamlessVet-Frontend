@@ -24,9 +24,10 @@ const RATE_FIELD = {
 } as const;
 
 /**
- * Record / edit a night-stay (M17). Created **open** — nothing is billed until it's closed. The
- * nightly rate defaults from the settings rate for the chosen care type (overridable); on create an
- * omitted check-in defaults to now server-side. Billing fields freeze once the stay is closed.
+ * Record / edit a night-stay (M17). Created **open**. The nightly rate defaults from the settings
+ * rate for the chosen care type (overridable); on create an omitted check-in defaults to now
+ * server-side. M23: billing fields stay editable until the stay is BILLED (a closed-unbilled edit
+ * recomputes nights/total server-side); the tab hides this dialog for billed rows.
  */
 export function NightStayFormDialog({
   open,

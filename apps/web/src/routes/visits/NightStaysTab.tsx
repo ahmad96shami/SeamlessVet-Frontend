@@ -7,12 +7,15 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { Money } from "@/components/ui/money";
+import { toDateTimeLocal } from "@/lib/calendar";
 import { useCloseNightStay, useDeleteNightStay, useNightStays } from "@/queries/nightStays";
 import { useSystemSettings } from "@/queries/systemSettings";
 import { NightStayFormDialog } from "@/routes/visits/NightStayFormDialog";
+import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
 
 /**
  * Hotel-style night count for an open stay (mirrors the backend `NightStayChargeCalculator`): a guest
@@ -34,7 +37,11 @@ function estimateNights(checkInIso: string, checkoutHour: number, now: Date): nu
 
 const isClosed = (s: NightStayResponse) => s.checkOutAt != null;
 
-/** Night-stays / boarding on an in-clinic visit (مبيت, M17). Clinic-only — the parent gates the tab. */
+/**
+ * Night-stays / boarding on an in-clinic visit (مبيت, M17, M23 billing rework). Clinic-only — the
+ * parent gates the tab. A stay is editable / deletable / re-closable until BILLED (invoice line or
+ * the completion backstop); billed rows show مُفوتر + a lock, mirroring billed procedures.
+ */
 export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly: boolean }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -44,11 +51,15 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
   const checkoutHour = settings.data?.nightStayCheckoutHour ?? 12;
   const close = useCloseNightStay();
   const del = useDeleteNightStay();
+  const billed = useBilledChargeIds(visitId);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<NightStayResponse | null>(null);
   const [closeTarget, setCloseTarget] = useState<NightStayResponse | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<NightStayResponse | null>(null);
+  // M23 — re-close: correct a closed-unbilled stay's checkout (nights/total recompute server-side).
+  const [recloseTarget, setRecloseTarget] = useState<NightStayResponse | null>(null);
+  const [recloseAt, setRecloseAt] = useState("");
 
   const now = new Date();
   const hasOpen = rows.some((r) => !isClosed(r));
@@ -102,7 +113,9 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
         id: "status",
         header: t("visits.nightStays.col.status"),
         cell: ({ row }) =>
-          isClosed(row.original) ? (
+          billed.nightStays.has(row.original.id) ? (
+            <Badge variant="success">{t("visits.nightStays.billed")}</Badge>
+          ) : isClosed(row.original) ? (
             <Badge variant="secondary">{t("visits.nightStays.statusClosed")}</Badge>
           ) : (
             <Badge variant="warning">{t("visits.nightStays.statusOpen")}</Badge>
@@ -115,13 +128,31 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
         header: "",
         cell: ({ row }) => {
           const s = row.original;
-          if (isClosed(s)) return <span className="text-muted-foreground">—</span>;
+          if (billed.nightStays.has(s.id)) {
+            // Billed (invoice line or completion backstop) — frozen, server-enforced too.
+            return (
+              <span
+                title={t("visits.billedLocked")}
+                className="grid size-10 place-items-center text-muted-foreground"
+              >
+                <Icon.lock className="size-4" aria-label={t("visits.billedLocked")} />
+              </span>
+            );
+          }
           return (
             <div className="flex justify-end gap-1">
-              <Button size="sm" variant="teal" onClick={() => setCloseTarget(s)}>
-                <Icon.check className="size-4" />
-                {t("visits.nightStays.close")}
-              </Button>
+              {isClosed(s) ? (
+                // M23 — a closed-unbilled stay can correct its checkout (recompute) until billed.
+                <Button size="sm" variant="outline" onClick={() => { setRecloseTarget(s); setRecloseAt(toDateTimeLocal(new Date(s.checkOutAt!))); }}>
+                  <Icon.clock className="size-4" />
+                  {t("visits.nightStays.reclose")}
+                </Button>
+              ) : (
+                <Button size="sm" variant="teal" onClick={() => setCloseTarget(s)}>
+                  <Icon.check className="size-4" />
+                  {t("visits.nightStays.close")}
+                </Button>
+              )}
               <Button
                 size="icon"
                 variant="ghost"
@@ -147,7 +178,7 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
       });
     }
     return cols;
-  }, [t, lang, readOnly, checkoutHour, now]);
+  }, [t, lang, readOnly, checkoutHour, now, billed]);
 
   const confirmClose = () => {
     if (!closeTarget) return;
@@ -157,6 +188,20 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
         onSuccess: () => {
           toast.success(t("visits.nightStays.closed"));
           setCloseTarget(null);
+        },
+        onError: (e) => toast.error(e.message),
+      },
+    );
+  };
+
+  const confirmReclose = () => {
+    if (!recloseTarget || !recloseAt) return;
+    close.mutate(
+      { id: recloseTarget.id, body: { checkOutAt: new Date(recloseAt).toISOString() } },
+      {
+        onSuccess: () => {
+          toast.success(t("admin.common.updated"));
+          setRecloseTarget(null);
         },
         onError: (e) => toast.error(e.message),
       },
@@ -221,12 +266,35 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
                 total: formatCurrency(closeEstimate.total, lang),
               })}
             </p>
+            {/* M23 — closing no longer charges; the stay bills at POS / on visit completion. */}
+            <p className="text-sm text-muted-foreground">{t("visits.nightStays.closeBody2")}</p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setCloseTarget(null)} disabled={close.isPending}>
                 {t("admin.common.cancel")}
               </Button>
               <Button variant="teal" onClick={confirmClose} disabled={close.isPending}>
                 {close.isPending ? t("admin.common.saving") : t("visits.nightStays.close")}
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </Dialog>
+
+      <Dialog
+        open={recloseTarget !== null}
+        onClose={() => setRecloseTarget(null)}
+        title={t("visits.nightStays.recloseTitle")}
+      >
+        {recloseTarget ? (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">{t("visits.nightStays.recloseBody")}</p>
+            <DatePicker withTime value={recloseAt} onChange={(e) => setRecloseAt(e.target.value)} />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setRecloseTarget(null)} disabled={close.isPending}>
+                {t("admin.common.cancel")}
+              </Button>
+              <Button variant="teal" onClick={confirmReclose} disabled={close.isPending || !recloseAt}>
+                {close.isPending ? t("admin.common.saving") : t("visits.nightStays.reclose")}
               </Button>
             </div>
           </div>
