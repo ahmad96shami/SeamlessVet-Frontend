@@ -15,6 +15,7 @@ import { CustomersPage } from "@/routes/customers/CustomersPage";
 import { FarmDetailPage } from "@/routes/customers/FarmDetailPage";
 import { DashboardPage } from "@/routes/dashboard/DashboardPage";
 import { BatchesPage } from "@/routes/finance/BatchesPage";
+import { BatchSettlementPage } from "@/routes/finance/BatchSettlementPage";
 import { ContractsPage } from "@/routes/finance/ContractsPage";
 import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
@@ -205,6 +206,15 @@ export function AppRoutes() {
           <Route path="entitlements" element={<EntitlementsPage />} />
           <Route path="partners" element={<PartnersPage />} />
         </Route>
+        {/* M24 — the settle screen is a focused full-page workflow, standalone like suppliers. */}
+        <Route
+          path="finance/batches/:id/settle"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <BatchSettlementPage />
+            </RequireRole>
+          }
+        />
         {/* Suppliers & purchases — finance-section screens, standalone (not under the contracts tabs). */}
         <Route
           path="finance/suppliers"
