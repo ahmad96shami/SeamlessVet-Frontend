@@ -2144,6 +2144,7 @@ export interface components {
             dispenseType?: string;
             /** Format: decimal */
             quantity?: number | null;
+            billable?: boolean;
             reminderEnabled?: boolean;
             /** Format: int32 */
             intervalMinutes?: number | null;
@@ -2161,6 +2162,7 @@ export interface components {
             frequency?: string | null;
             duration?: string | null;
             notes?: string | null;
+            billable?: boolean | null;
             reminderEnabled?: boolean | null;
             /** Format: int32 */
             intervalMinutes?: number | null;
@@ -2355,6 +2357,10 @@ export interface components {
             procedureId?: string | null;
             /** Format: guid */
             vaccinationId?: string | null;
+            /** Format: guid */
+            nightStayId?: string | null;
+            /** Format: guid */
+            checkupFeeVisitId?: string | null;
         };
         PaymentRequest: {
             /** Format: guid */

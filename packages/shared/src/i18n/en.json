@@ -750,11 +750,13 @@
     },
     "checkupFee": {
       "label": "Checkup fee",
-      "hint": "Applied when an in-clinic visit is completed. Defaults from settings; edit it or set 0 to waive.",
+      "hint": "Confirmed at start-of-exam and billed on the invoice (or posted at visit completion). Edit it, or set 0 to waive.",
       "fromSettings": "Settings default: {{amount}}",
       "save": "Save fee",
       "saved": "Checkup fee saved",
-      "fieldNa": "Checkup fee applies to in-clinic visits only."
+      "fieldNa": "Checkup fee applies to in-clinic visits only.",
+      "pending": "Applied at start of examination",
+      "billed": "Billed"
     },
     "scheduleFollowUp": {
       "action": "Schedule follow-up",
@@ -800,7 +802,12 @@
         "rate": "Rate/night",
         "total": "Total",
         "status": "Status"
-      }
+      },
+      "billed": "Billed",
+      "reclose": "Adjust check-out",
+      "recloseTitle": "Adjust check-out",
+      "recloseBody": "Nights and total are recomputed from the new check-out. The stay isn't billed yet, so no amount is charged now.",
+      "closeBody2": "Records the check-out and counts the nights. Nothing is charged now — the stay bills at POS or when the visit completes."
     },
     "assessment": {
       "title": "Initial assessment",
@@ -879,7 +886,10 @@
         "duration": "Duration",
         "dispense": "Dispense",
         "qty": "Qty"
-      }
+      },
+      "billable": "Charge the customer",
+      "billableHint": "Adds the medication as a line on the visit's invoice at the selling price (stock was deducted at recording).",
+      "billableBadge": "Charged"
     },
     "followups": {
       "title": "Daily follow-up",
@@ -988,7 +998,15 @@
     "billedLocked": "Billed — backed by an invoice line; it cannot be removed",
     "billedRx": "Billed",
     "billedProcedure": "Billed",
-    "billedVaccination": "Billed"
+    "billedVaccination": "Billed",
+    "startExam": {
+      "title": "Start examination",
+      "body": "The checkup fee will be applied to this visit and appear on the invoice.",
+      "feeLabel": "Checkup fee",
+      "waivedHint": "Free follow-up — the fee is waived for this visit.",
+      "confirm": "Start examination",
+      "lockedHint": "Press “Start examination” to confirm the checkup fee and unlock the clinical record."
+    }
   },
   "vaccinations": {
     "title": "Vaccinations",
@@ -1342,6 +1360,10 @@
       "confirm": "Confirm void",
       "success": "Invoice voided",
       "alreadyVoid": "This invoice is already void"
+    },
+    "visitLine": {
+      "checkupFee": "Checkup fee",
+      "nightStay": "Night stay"
     }
   },
   "admin": {

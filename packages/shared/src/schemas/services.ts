@@ -8,6 +8,15 @@ import { optionalText } from "./common";
  */
 export const VACCINE_CATEGORY = "vaccination";
 
+/**
+ * M23 — the server-managed **system services** backing checkup-fee («رسوم الكشف») and night-stay
+ * («مبيت») invoice lines (find-or-created per environment at issuance). Catalog UIs hide them from
+ * the sellable services lists; their lines never need a client-supplied serviceId.
+ */
+export const CHECKUP_CATEGORY = "checkup";
+export const NIGHT_STAY_CATEGORY = "night_stay";
+export const SYSTEM_SERVICE_CATEGORIES: readonly string[] = [CHECKUP_CATEGORY, NIGHT_STAY_CATEGORY];
+
 /** A services-catalog row (GET /admin/services[/{id}]). */
 export const ServiceResponseSchema = z.object({
   id: z.string(),

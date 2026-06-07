@@ -20,6 +20,10 @@ export const PrescriptionResponseSchema = z.object({
   notes: z.string().nullish(),
   dispenseType: z.string(),
   quantity: z.number().nullish(),
+  // M23 — an administered_in_clinic med with `billable` is charged to the customer: it assembles
+  // into the visit's invoice like a dispensed one (stock already deducted at recording). Editable
+  // until billed; meaningless for dispensed_to_owner (always bills).
+  billable: z.boolean(),
   // M18 — recurring-dose reminder schedule (PRD §18.9). When `reminderEnabled`, the server fires a
   // `medication_due` notification ahead of each dose at `startAt + k·intervalMinutes` (k = 0..dosesCount-1,
   // bounded by `endAt`), `leadMinutes` (or the settings default) before each.
@@ -70,14 +74,16 @@ export const PrescriptionCreateRequestSchema = z
     notes: optionalText,
     dispenseType: z.enum(["administered_in_clinic", "dispensed_to_owner"]),
     quantity: z.number().positive(),
+    billable: z.boolean().optional(),
     ...reminderFields,
   })
   .superRefine(reminderRule);
 export type PrescriptionCreateRequest = z.infer<typeof PrescriptionCreateRequestSchema>;
 
 /**
- * Partial update (PATCH /prescriptions/{id}) — advisory text + the M18 reminder schedule. Product /
- * quantity / dispense type stay immutable post-create.
+ * Partial update (PATCH /prescriptions/{id}) — advisory text + the M18 reminder schedule + the M23
+ * billable toggle (until billed; administered_in_clinic only). Product / quantity / dispense type
+ * stay immutable post-create.
  */
 export const PrescriptionPatchRequestSchema = z
   .object({
@@ -85,6 +91,7 @@ export const PrescriptionPatchRequestSchema = z
     frequency: z.string().trim().max(128).optional(),
     duration: z.string().trim().max(128).optional(),
     notes: optionalText,
+    billable: z.boolean().optional(),
     ...reminderFields,
   })
   .superRefine(reminderRule);

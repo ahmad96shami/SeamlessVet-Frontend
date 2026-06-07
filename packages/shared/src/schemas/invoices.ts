@@ -8,8 +8,9 @@ import { optionalText } from "./common";
  * One line of an issued invoice (GET /invoices). References a product OR a service (typed pair).
  * `costPrice` is the server's sale-time snapshot of the product purchase price (0 for services);
  * `lineTotal = quantity × unitPrice − discountAmount` (server-rounded). `prescriptionId` /
- * `procedureId` / `vaccinationId` (M22) back-link a line the issuance assembler auto-added from a
- * visit's unbilled charges. The list endpoint returns an untyped 200, so this schema is the contract.
+ * `procedureId` / `vaccinationId` (M22) / `nightStayId` / `checkupFeeVisitId` (M23) back-link a
+ * line the issuance assembler auto-added from a visit's unbilled charges. The list endpoint returns
+ * an untyped 200, so this schema is the contract.
  */
 export const InvoiceItemResponseSchema = z.object({
   id: z.string(),
@@ -25,6 +26,8 @@ export const InvoiceItemResponseSchema = z.object({
   prescriptionId: z.string().nullish(),
   procedureId: z.string().nullish(),
   vaccinationId: z.string().nullish(),
+  nightStayId: z.string().nullish(),
+  checkupFeeVisitId: z.string().nullish(),
 });
 export type InvoiceItemResponse = z.infer<typeof InvoiceItemResponseSchema>;
 
@@ -91,10 +94,12 @@ export interface InvoiceListParams {
 /**
  * One requested line: exactly one of productId/serviceId; omit unitPrice to bill at catalog price.
  * A line may back-link one of the linked visit's charges via `prescriptionId` (with the matching
- * productId), `procedureId`, or `vaccinationId` (M22 — each with the matching serviceId) — the POS
- * sends visit charges this way so the till's price/discount edits are honoured, while quantity
- * stays server-authoritative (the prescription's / 1 for a procedure or vaccination; the sent
- * quantity is ignored) and auto-assembly skips them.
+ * productId), `procedureId` / `vaccinationId` (M22 — each with the matching serviceId), or the M23
+ * care charges `nightStayId` / `checkupFeeVisitId` (productId AND serviceId both omitted — the
+ * server resolves the per-environment system service itself) — the POS sends visit charges this
+ * way so the till's price/discount edits are honoured, while quantity stays server-authoritative
+ * (the prescription's / the stay's nights / 1 otherwise; the sent quantity is ignored) and
+ * auto-assembly skips them.
  */
 export const InvoiceLineRequestSchema = z.object({
   productId: z.string().optional(),
@@ -106,6 +111,8 @@ export const InvoiceLineRequestSchema = z.object({
   prescriptionId: z.string().optional(),
   procedureId: z.string().optional(),
   vaccinationId: z.string().optional(),
+  nightStayId: z.string().optional(),
+  checkupFeeVisitId: z.string().optional(),
 });
 export type InvoiceLineRequest = z.infer<typeof InvoiceLineRequestSchema>;
 
