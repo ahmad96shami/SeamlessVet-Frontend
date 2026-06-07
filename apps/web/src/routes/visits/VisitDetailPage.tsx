@@ -37,16 +37,14 @@ type TabId =
   | "nightStays"
   | "files";
 
-// `nightStays` is clinic-only (the backend rejects boarding on a field visit) — inserted for
-// in-clinic visits in `tabIds` below.
+// `nightStays` is clinic-only (the backend rejects boarding on a field visit) and `followups`
+// belongs right after it (related workflows) — both are appended in `tabIds` below.
 const BASE_TAB_IDS = [
   "assessment",
   "diagnosis",
   "procedures",
   "prescriptions",
-  "followups",
   "vaccinations",
-  "files",
 ] as const satisfies readonly TabId[];
 
 export function VisitDetailPage() {
@@ -99,10 +97,10 @@ export function VisitDetailPage() {
   const isTerminal = v.status === "completed" || v.status === "cancelled";
   const isOpen = v.status === "open";
   const isClinic = v.visitType === "in_clinic";
-  // Night-stays are clinic-only; slot the tab in just before "files" for in-clinic visits.
+  // Night-stays are clinic-only, with daily follow-ups right after them (related workflows).
   const tabIds: readonly TabId[] = isClinic
-    ? ([...BASE_TAB_IDS.slice(0, -1), "nightStays", "files"] as const)
-    : BASE_TAB_IDS;
+    ? ([...BASE_TAB_IDS, "nightStays", "followups", "files"] as const)
+    : ([...BASE_TAB_IDS, "followups", "files"] as const);
   // Hand off to the cashier surface (admin/cashier only); a cancelled visit has nothing to bill.
   const canBill = (role === "admin" || role === "cashier") && v.status !== "cancelled";
   const title = pet?.name ?? customer.data?.fullName ?? "—";

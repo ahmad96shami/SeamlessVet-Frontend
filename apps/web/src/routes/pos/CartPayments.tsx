@@ -52,7 +52,8 @@ export function CartPayments({ total }: { total: number }) {
   const removeLeg = (key: string) => setPayments(payments.filter((p) => p.key !== key));
 
   return (
-    <div className="space-y-2 border-t pt-3">
+    // mt-3 keeps the divider clear of the totals block above (the discount input otherwise touches it).
+    <div className="mt-3 space-y-2 border-t pt-3">
       {payments.map((p) => (
         <div key={p.key} className="space-y-2">
           <div className="flex items-center gap-2">
