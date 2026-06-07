@@ -33,10 +33,16 @@ export function VaccineFormDialog({
   open,
   vaccine,
   onClose,
+  defaultName,
+  onCreated,
 }: {
   open: boolean;
   vaccine: ServiceResponse | null;
   onClose: () => void;
+  /** Prefill the Arabic name when opening a fresh form (e.g. the text typed into a picker search). */
+  defaultName?: string;
+  /** Fired with the new vaccine's id after a create (not an edit) — lets callers select it inline. */
+  onCreated?: (id: string) => void;
 }) {
   const { t } = useTranslation();
   const create = useCreateService();
@@ -58,9 +64,9 @@ export function VaccineFormDialog({
             category: VACCINE_CATEGORY,
             defaultPrice: vaccine.defaultPrice,
           }
-        : DEFAULTS,
+        : { ...DEFAULTS, nameAr: defaultName ?? "" },
     );
-  }, [open, vaccine, reset]);
+  }, [open, vaccine, defaultName, reset]);
 
   const onSubmit = handleSubmit((values) => {
     const body = { ...omitEmptyStrings(values), category: VACCINE_CATEGORY };
@@ -81,8 +87,9 @@ export function VaccineFormDialog({
       create.mutate(
         { ...body, id: newGuidV7() },
         {
-          onSuccess: () => {
+          onSuccess: (res) => {
             toast.success(t("admin.common.created"));
+            onCreated?.(res.id);
             onClose();
           },
           onError,

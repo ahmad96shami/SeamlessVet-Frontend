@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
+import { Money } from "@/components/ui/money";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useDeleteVaccination, useVaccinations } from "@/queries/vaccinations";
 import { CustomerPickerDialog } from "@/routes/pos/CustomerPickerDialog";
@@ -61,6 +62,17 @@ export function VaccinationsListPage() {
             </div>
           );
         },
+      },
+      {
+        accessorKey: "price",
+        header: t("vaccinations.col.price"),
+        cell: ({ row }) =>
+          // Catalog-linked vaccinations carry the billable snapshot; legacy rows have none.
+          row.original.price != null ? (
+            <Money value={row.original.price} />
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
       },
       {
         accessorKey: "dateGiven",

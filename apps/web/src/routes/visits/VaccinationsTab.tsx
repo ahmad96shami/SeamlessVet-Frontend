@@ -8,6 +8,7 @@ import { DataTable } from "@/components/data-table/DataTable";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
+import { Money } from "@/components/ui/money";
 import { useCustomer } from "@/queries/customers";
 import { useFieldInventories } from "@/queries/inventory";
 import { usePet } from "@/queries/pets";
@@ -43,6 +44,17 @@ export function VaccinationsTab({ visit, readOnly }: { visit: VisitResponse; rea
         accessorKey: "vaccineType",
         header: t("visits.vaccinations.col.type"),
         cell: ({ row }) => <span className="font-medium">{row.original.vaccineType}</span>,
+      },
+      {
+        accessorKey: "price",
+        header: t("visits.vaccinations.col.price"),
+        cell: ({ row }) =>
+          // Catalog-linked vaccinations carry the billable snapshot; legacy rows have none.
+          row.original.price != null ? (
+            <Money value={row.original.price} />
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
       },
       {
         accessorKey: "dateGiven",

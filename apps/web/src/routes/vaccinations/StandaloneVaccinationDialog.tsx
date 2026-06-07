@@ -1,17 +1,20 @@
-import { type ApiError, type CustomerResponse, type VaccinationResponse } from "@vet/shared";
-import { useEffect, useState } from "react";
+import { VACCINE_CATEGORY, type ApiError, type CustomerResponse, type VaccinationResponse } from "@vet/shared";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { usePets } from "@/queries/pets";
+import { useServices } from "@/queries/services";
 import { CustomerCombobox } from "@/routes/customers/CustomerCombobox";
 import { useCreateVaccination, useUpdateVaccination } from "@/queries/vaccinations";
+import { VaccineFormDialog } from "@/routes/vaccinations/VaccineFormDialog";
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -20,6 +23,9 @@ const todayISO = () => new Date().toISOString().slice(0, 10);
  * recipient: customer live-search → a specific pet, or "the whole group" (a farm-group vaccination,
  * customer-level, no pet). Edit mode keeps the recipient fixed (the backend PATCH can't move it) and
  * only updates the vaccine/dates. `nextDueDate` drives the M18 reminder job + the upcoming calendar.
+ * M22: the vaccine is picked from the catalog (services, category `vaccination`) and the price
+ * snapshots at recording time; with no visit there is nothing to auto-assemble — sell it from the
+ * POS vaccines tab. Editing a legacy free-text record keeps its name unless a vaccine is picked.
  */
 export function StandaloneVaccinationDialog({
   open,
@@ -35,6 +41,7 @@ export function StandaloneVaccinationDialog({
   const { t } = useTranslation();
   const create = useCreateVaccination();
   const update = useUpdateVaccination();
+  const vaccines = useServices({ category: VACCINE_CATEGORY, take: 200 });
   const editing = vaccination !== null;
 
   // Recipient (create mode only)
@@ -42,9 +49,15 @@ export function StandaloneVaccinationDialog({
   const [petId, setPetId] = useState(""); // "" = the whole group (farm-group)
 
   // Fields
-  const [vaccineType, setVaccineType] = useState("");
+  const [serviceId, setServiceId] = useState("");
+  const [price, setPrice] = useState("");
   const [dateGiven, setDateGiven] = useState(todayISO());
   const [nextDueDate, setNextDueDate] = useState("");
+
+  // Inline "add vaccine" — reuses the catalog form; the new id is then auto-selected here.
+  const [addVaccineOpen, setAddVaccineOpen] = useState(false);
+  const [vaccineDefaultName, setVaccineDefaultName] = useState("");
+  const [createdVaccineId, setCreatedVaccineId] = useState<string | null>(null);
 
   const petsQuery = usePets(customer ? { customerId: customer.id, take: 100 } : { take: 0 });
   const pets = customer ? (petsQuery.data ?? []) : [];
@@ -53,23 +66,66 @@ export function StandaloneVaccinationDialog({
     if (!open) return;
     setCustomer(null);
     setPetId("");
-    setVaccineType(vaccination?.vaccineType ?? "");
+    setServiceId(vaccination?.serviceId ?? "");
+    setPrice(vaccination?.price != null ? String(vaccination.price) : "");
     setDateGiven(vaccination?.dateGiven ?? todayISO());
     setNextDueDate(vaccination?.nextDueDate ?? "");
+    setAddVaccineOpen(false);
+    setCreatedVaccineId(null);
   }, [open, vaccination]);
 
+  const onPickVaccine = (id: string) => {
+    setServiceId(id);
+    const svc = (vaccines.data ?? []).find((s) => s.id === id);
+    if (svc) setPrice(String(svc.defaultPrice));
+  };
+
+  // Once the freshly-created vaccine lands in the (invalidated) catalog list, select it —
+  // through onPickVaccine so its default price snapshots like any other pick.
+  useEffect(() => {
+    if (createdVaccineId && (vaccines.data ?? []).some((s) => s.id === createdVaccineId)) {
+      onPickVaccine(createdVaccineId);
+      setCreatedVaccineId(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createdVaccineId, vaccines.data]);
+
+  const vaccineOptions = useMemo(
+    () =>
+      (vaccines.data ?? []).map((s) => ({
+        value: s.id,
+        label: s.nameAr,
+        keywords: s.nameLatin ?? undefined,
+      })),
+    [vaccines.data],
+  );
+  const pickedName = (vaccines.data ?? []).find((s) => s.id === serviceId)?.nameAr;
+
   const pending = create.isPending || update.isPending;
-  const fieldsValid = vaccineType.trim() !== "" && dateGiven.trim() !== "";
+  const priceValid = price === "" || (!Number.isNaN(Number(price)) && Number(price) >= 0);
+  // Catalog-only: a new record needs a picked vaccine; an edit may keep a legacy free-text name.
+  const fieldsValid = dateGiven.trim() !== "" && priceValid && (editing || serviceId !== "");
   const valid = editing ? fieldsValid : fieldsValid && customer !== null;
 
   const onSubmit = () => {
     if (!valid) return;
     const onError = (e: ApiError) => toast.error(e.message);
     const due = nextDueDate.trim() === "" ? undefined : nextDueDate;
+    const priceNum = price.trim() === "" ? undefined : Number(price);
 
     if (vaccination) {
       update.mutate(
-        { id: vaccination.id, body: { vaccineType: vaccineType.trim(), dateGiven, nextDueDate: due } },
+        {
+          id: vaccination.id,
+          body: {
+            // Only re-link / re-snapshot when a catalog vaccine is picked (legacy rows keep their name).
+            serviceId: serviceId || undefined,
+            vaccineType: pickedName ?? undefined,
+            price: priceNum,
+            dateGiven,
+            nextDueDate: due,
+          },
+        },
         { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); }, onError },
       );
     } else if (customer) {
@@ -78,7 +134,9 @@ export function StandaloneVaccinationDialog({
           // recipient: a specific pet, else the customer (farm group). No visit — standalone.
           petId: petId || undefined,
           customerId: petId ? undefined : customer.id,
-          vaccineType: vaccineType.trim(),
+          serviceId,
+          vaccineType: pickedName ?? "",
+          price: priceNum, // omitted → the server snapshots the catalog price
           dateGiven,
           nextDueDate: due,
         },
@@ -132,10 +190,33 @@ export function StandaloneVaccinationDialog({
         )}
 
         {/* Fields */}
-        <Field label={t("vaccinations.form.vaccineType")}>
-          <Input value={vaccineType} onChange={(e) => setVaccineType(e.target.value)} />
+        <Field label={t("vaccinations.form.vaccine")}>
+          <Combobox
+            value={serviceId}
+            onChange={onPickVaccine}
+            options={vaccineOptions}
+            placeholder={
+              editing && !serviceId && vaccination
+                ? vaccination.vaccineType
+                : t("vaccinations.form.selectVaccine")
+            }
+            onCreateNew={(term) => {
+              setVaccineDefaultName(term);
+              setAddVaccineOpen(true);
+            }}
+          />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={t("vaccinations.form.price")}>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              dir="ltr"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </Field>
           <Field label={t("vaccinations.form.dateGiven")}>
             <DatePicker value={dateGiven} onChange={(e) => setDateGiven(e.target.value)} />
           </Field>
@@ -153,6 +234,14 @@ export function StandaloneVaccinationDialog({
           </Button>
         </div>
       </div>
+
+      <VaccineFormDialog
+        open={addVaccineOpen}
+        vaccine={null}
+        defaultName={vaccineDefaultName}
+        onClose={() => setAddVaccineOpen(false)}
+        onCreated={(id) => setCreatedVaccineId(id)}
+      />
     </Dialog>
   );
 }
