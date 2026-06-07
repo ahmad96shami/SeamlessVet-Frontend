@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { useCustomer } from "@/queries/customers";
 import { useInvoices } from "@/queries/invoices";
+import { useNightStays } from "@/queries/nightStays";
 import { usePrescriptions } from "@/queries/prescriptions";
 import { useProcedures } from "@/queries/procedures";
 import { useProducts } from "@/queries/products";
@@ -17,15 +18,20 @@ import { CustomerPickerDialog } from "./CustomerPickerDialog";
 import { VisitPickerDialog, visitRef } from "./VisitPickerDialog";
 
 /**
- * The visit's UNBILLED dispensed-to-owner prescriptions + procedures + catalog-linked vaccinations
- * (M22) — exactly what the server bills at issuance. Anything already on a non-void invoice for the
- * visit is filtered out (the server de-dups via the prescription/procedure/vaccination back-links);
- * names/prices resolve via catalog maps.
+ * The visit's UNBILLED billable charges — exactly what the server bills at issuance: billable
+ * prescriptions (dispensed-to-owner + M23 billable in-clinic), procedures, catalog-linked
+ * vaccinations (M22), and — while the visit is in_progress (M23) — its checkup fee and closed
+ * night stays. Anything already back-linked on ANY invoice is filtered out (void included — the
+ * server treats voided back-links as billed too); a completed visit's care charges never mirror
+ * (completion backstopped whatever the till didn't bill). Names/prices resolve via catalog maps.
  */
 function useVisitCharges(visitId: string) {
+  const { t } = useTranslation();
+  const visit = useVisit(visitId);
   const rx = usePrescriptions(visitId);
   const procs = useProcedures(visitId);
   const vax = useVaccinations({ visitId, take: 200 });
+  const stays = useNightStays(visitId);
   const invoices = useInvoices({ visitId, take: 50 });
   const products = useProducts({ take: 200 });
   const services = useServices({ take: 200 });
@@ -37,17 +43,25 @@ function useVisitCharges(visitId: string) {
     const billedRx = new Set<string>();
     const billedProc = new Set<string>();
     const billedVax = new Set<string>();
+    const billedStays = new Set<string>();
+    let billedFee = false;
     for (const inv of invoices.data ?? []) {
-      if (inv.status === "void") continue;
       for (const it of inv.items) {
         if (it.prescriptionId) billedRx.add(it.prescriptionId);
         if (it.procedureId) billedProc.add(it.procedureId);
         if (it.vaccinationId) billedVax.add(it.vaccinationId);
+        if (it.nightStayId) billedStays.add(it.nightStayId);
+        if (it.checkupFeeVisitId) billedFee = true;
       }
     }
 
     const prescriptions = (rx.data ?? [])
-      .filter((p) => p.dispenseType === "dispensed_to_owner" && !billedRx.has(p.id))
+      .filter(
+        (p) =>
+          (p.dispenseType === "dispensed_to_owner" ||
+            (p.dispenseType === "administered_in_clinic" && p.billable)) &&
+          !billedRx.has(p.id),
+      )
       .map((p) => {
         const product = productById.get(p.productId);
         return {
@@ -79,13 +93,39 @@ function useVisitCharges(visitId: string) {
         price: v.price ?? serviceById.get(v.serviceId!)?.defaultPrice ?? 0,
       }));
 
+    // M23 care charges — only while in_progress: an open visit's fee isn't confirmed yet
+    // (بدء الكشف), and a completed visit's charges were already settled (invoice or backstop —
+    // the backstop's ledger keys aren't visible here, so completed visits must not re-offer them).
+    const v = visit.data;
+    const careChargesActive = v?.visitType === "in_clinic" && v.status === "in_progress";
+
+    const checkupFee =
+      careChargesActive && !billedFee && (v.checkupFeeApplied ?? 0) > 0
+        ? { visitId: v.id, name: t("pos.visitLine.checkupFee"), price: v.checkupFeeApplied! }
+        : null;
+
+    const nightStays = careChargesActive
+      ? (stays.data ?? [])
+          .filter((s) => s.checkOutAt != null && s.nightsCount > 0 && s.total > 0 && !billedStays.has(s.id))
+          .map((s) => ({
+            id: s.id,
+            name: t(`careType.${s.careType}`, { defaultValue: t("pos.visitLine.nightStay") }),
+            nights: s.nightsCount,
+            rate: s.nightlyRate,
+          }))
+      : [];
+
     return {
       prescriptions,
       procedures,
       vaccinations,
-      isLoading: rx.isLoading || procs.isLoading || vax.isLoading || invoices.isLoading,
+      checkupFee,
+      nightStays,
+      isLoading:
+        visit.isLoading || rx.isLoading || procs.isLoading || vax.isLoading ||
+        stays.isLoading || invoices.isLoading,
     };
-  }, [rx.data, rx.isLoading, procs.data, procs.isLoading, vax.data, vax.isLoading, invoices.data, invoices.isLoading, products.data, services.data]);
+  }, [visit.data, visit.isLoading, rx.data, rx.isLoading, procs.data, procs.isLoading, vax.data, vax.isLoading, stays.data, stays.isLoading, invoices.data, invoices.isLoading, products.data, services.data, t]);
 }
 
 /**
@@ -95,7 +135,8 @@ function useVisitCharges(visitId: string) {
  * issuance regardless. Renders nothing; the store merge keeps the cashier's edits across refetches.
  */
 function VisitLinesSync({ visitId }: { visitId: string }) {
-  const { prescriptions, procedures, vaccinations, isLoading } = useVisitCharges(visitId);
+  const { prescriptions, procedures, vaccinations, checkupFee, nightStays, isLoading } =
+    useVisitCharges(visitId);
   const syncVisitLines = usePosCartStore((s) => s.syncVisitLines);
 
   useEffect(() => {
@@ -132,8 +173,32 @@ function VisitLinesSync({ visitId }: { visitId: string }) {
         discountAmount: 0,
         vaccinationId: v.id,
       })),
+      // M23 care charges — synthetic refIds: these lines send NO productId/serviceId at issue
+      // (CartIssue omits them; the server resolves the system service from the back-link).
+      ...(checkupFee
+        ? [{
+            key: `checkup-${checkupFee.visitId}`,
+            kind: "service" as const,
+            refId: `checkup-${checkupFee.visitId}`,
+            name: checkupFee.name,
+            unitPrice: checkupFee.price,
+            quantity: 1,
+            discountAmount: 0,
+            checkupFeeVisitId: checkupFee.visitId,
+          }]
+        : []),
+      ...nightStays.map((s) => ({
+        key: s.id,
+        kind: "service" as const,
+        refId: s.id,
+        name: s.name,
+        unitPrice: s.rate,
+        quantity: s.nights, // server-wins (the stay's hotel-rule night count)
+        discountAmount: 0,
+        nightStayId: s.id,
+      })),
     ]);
-  }, [isLoading, prescriptions, procedures, vaccinations, syncVisitLines]);
+  }, [isLoading, prescriptions, procedures, vaccinations, checkupFee, nightStays, syncVisitLines]);
 
   return null;
 }

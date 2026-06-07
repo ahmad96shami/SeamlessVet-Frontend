@@ -33,6 +33,11 @@ export interface CartLine {
   procedureId?: string;
   /** M22 — a catalog-linked visit vaccination billed as a service line. */
   vaccinationId?: string;
+  /** M23 — a closed night stay billed as a system-service line (qty = nights, price = rate). */
+  nightStayId?: string;
+  /** M23 — the visit's checkup fee billed as a system-service line (these two lines send NO
+   *  productId/serviceId at issue — the server resolves the system service itself). */
+  checkupFeeVisitId?: string;
 }
 
 export interface PaymentLeg {

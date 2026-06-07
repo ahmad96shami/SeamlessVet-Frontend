@@ -1,4 +1,4 @@
-import { formatQuantity, VACCINE_CATEGORY } from "@vet/shared";
+import { formatQuantity, SYSTEM_SERVICE_CATEGORIES, VACCINE_CATEGORY } from "@vet/shared";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
@@ -48,11 +48,14 @@ export function CatalogPanel() {
 
   // Products come from warehouse stock (on-hand + low-stock flag + selling price); the search
   // matches name + barcode server-side. Services have no inventory. Vaccines (M22) are the
-  // services with category `vaccination` — one fetch, split client-side, own filter tab.
+  // services with category `vaccination` — one fetch, split client-side, own filter tab. The M23
+  // system services (checkup fee / night stay) are billing plumbing, never sold from the catalog.
   const stock = useStock({ locationType: "warehouse", search: debounced || undefined, take: 50 });
   const services = useServices({ search: debounced || undefined, take: 50 });
 
-  const allSvcs = services.data ?? [];
+  const allSvcs = (services.data ?? []).filter(
+    (s) => s.category == null || !SYSTEM_SERVICE_CATEGORIES.includes(s.category),
+  );
   const products = filter === "services" || filter === "vaccines" ? [] : (stock.data ?? []);
   const svcs =
     filter === "products" || filter === "vaccines"

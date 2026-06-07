@@ -50,18 +50,25 @@ export function CartIssue({ total }: { total: number }) {
       customerId: s.customerId ?? undefined,
       visitId: s.visitId ?? undefined,
       discountAmount: s.invoiceDiscount,
-      items: s.lines.map((l) => ({
-        productId: l.kind === "product" ? l.refId : undefined,
-        serviceId: l.kind === "service" ? l.refId : undefined,
-        quantity: l.quantity,
-        unitPrice: l.unitPrice,
-        discountAmount: l.discountAmount,
-        // Visit-charge back-links: the server honours the till's price/discount, keeps quantity
-        // from the clinical record, and skips these during auto-assembly (no double billing).
-        prescriptionId: l.prescriptionId,
-        procedureId: l.procedureId,
-        vaccinationId: l.vaccinationId,
-      })),
+      items: s.lines.map((l) => {
+        // M23 care-charge lines (checkup fee / night stay) carry a synthetic refId and send NO
+        // catalog ids — the server resolves the per-environment system service from the back-link.
+        const careCharge = l.nightStayId != null || l.checkupFeeVisitId != null;
+        return {
+          productId: !careCharge && l.kind === "product" ? l.refId : undefined,
+          serviceId: !careCharge && l.kind === "service" ? l.refId : undefined,
+          quantity: l.quantity,
+          unitPrice: l.unitPrice,
+          discountAmount: l.discountAmount,
+          // Visit-charge back-links: the server honours the till's price/discount, keeps quantity
+          // from the clinical record, and skips these during auto-assembly (no double billing).
+          prescriptionId: l.prescriptionId,
+          procedureId: l.procedureId,
+          vaccinationId: l.vaccinationId,
+          nightStayId: l.nightStayId,
+          checkupFeeVisitId: l.checkupFeeVisitId,
+        };
+      }),
       payments: s.payments.map((p) => ({
         method: p.method,
         amount: p.amount,
