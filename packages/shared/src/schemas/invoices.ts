@@ -87,7 +87,13 @@ export interface InvoiceListParams {
 // catalog item is one or the other) and re-checked server-side. The api wrappers mint the invoice
 // `id` (GUID v7) + the `idempotencyKey`, so the `*Input` types carry only what a form collects.
 
-/** One requested line: exactly one of productId/serviceId; omit unitPrice to bill at catalog price. */
+/**
+ * One requested line: exactly one of productId/serviceId; omit unitPrice to bill at catalog price.
+ * A line may back-link one of the linked visit's charges via `prescriptionId` (with the matching
+ * productId) or `procedureId` (with the matching serviceId) — the POS sends visit charges this way
+ * so the till's price/discount edits are honoured, while quantity stays server-authoritative (the
+ * prescription's / 1 for a procedure; the sent quantity is ignored) and auto-assembly skips them.
+ */
 export const InvoiceLineRequestSchema = z.object({
   productId: z.string().optional(),
   serviceId: z.string().optional(),
@@ -95,6 +101,8 @@ export const InvoiceLineRequestSchema = z.object({
   quantity: z.number().positive(),
   unitPrice: z.number().min(0).optional(),
   discountAmount: z.number().min(0).default(0),
+  prescriptionId: z.string().optional(),
+  procedureId: z.string().optional(),
 });
 export type InvoiceLineRequest = z.infer<typeof InvoiceLineRequestSchema>;
 

@@ -1108,6 +1108,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/farms/{id}/reopen-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Farms_ReopenAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/doctor-entitlements": {
         parameters: {
             query?: never;
@@ -1294,6 +1310,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["Customers_CloseAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customers/{id}/reopen-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Customers_ReopenAccount"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2309,6 +2341,10 @@ export interface components {
             unitPrice?: number | null;
             /** Format: decimal */
             discountAmount?: number;
+            /** Format: guid */
+            prescriptionId?: string | null;
+            /** Format: guid */
+            procedureId?: string | null;
         };
         PaymentRequest: {
             /** Format: guid */
@@ -4906,6 +4942,25 @@ export interface operations {
             };
         };
     };
+    Farms_ReopenAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     Entitlements_List: {
         parameters: {
             query?: {
@@ -5263,6 +5318,25 @@ export interface operations {
         };
     };
     Customers_CloseAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Customers_ReopenAccount: {
         parameters: {
             query?: never;
             header?: never;
