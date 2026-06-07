@@ -192,18 +192,13 @@ export function BatchFormDialog({
             // inheriting the page RTL keeps the value on the right like every other field.
             <Input value={customerName} readOnly />
           ) : (
-            <div className="flex items-center gap-2">
-              <Input
-                value={customerName}
-                readOnly
-                placeholder={t("finance.selectCustomer")}
-                onClick={() => setPickerOpen(true)}
-                className="cursor-pointer"
-              />
-              <Button type="button" variant="outline" onClick={() => setPickerOpen(true)}>
-                {t("finance.selectCustomer")}
-              </Button>
-            </div>
+            <Input
+              value={customerName}
+              readOnly
+              placeholder={t("finance.selectCustomer")}
+              onClick={() => setPickerOpen(true)}
+              className="cursor-pointer"
+            />
           )}
         </Field>
 
