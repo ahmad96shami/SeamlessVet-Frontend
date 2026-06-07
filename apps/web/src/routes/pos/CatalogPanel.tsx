@@ -1,4 +1,4 @@
-import { formatQuantity } from "@vet/shared";
+import { formatQuantity, VACCINE_CATEGORY } from "@vet/shared";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
@@ -15,8 +15,8 @@ import { usePosCartStore } from "@/stores/posCartStore";
 
 import { ReceiptVoucherDialog } from "./ReceiptVoucherDialog";
 
-type Filter = "all" | "products" | "services";
-const FILTERS: Filter[] = ["all", "products", "services"];
+type Filter = "all" | "products" | "services" | "vaccines";
+const FILTERS: Filter[] = ["all", "products", "services", "vaccines"];
 
 type LayoutMode = "list" | "grid2" | "grid3" | "grid4";
 const LAYOUT_KEY = "pos.catalogLayout";
@@ -47,14 +47,23 @@ export function CatalogPanel() {
   }, [layout]);
 
   // Products come from warehouse stock (on-hand + low-stock flag + selling price); the search
-  // matches name + barcode server-side. Services have no inventory.
+  // matches name + barcode server-side. Services have no inventory. Vaccines (M22) are the
+  // services with category `vaccination` — one fetch, split client-side, own filter tab.
   const stock = useStock({ locationType: "warehouse", search: debounced || undefined, take: 50 });
   const services = useServices({ search: debounced || undefined, take: 50 });
 
-  const products = filter === "services" ? [] : (stock.data ?? []);
-  const svcs = filter === "products" ? [] : (services.data ?? []);
+  const allSvcs = services.data ?? [];
+  const products = filter === "services" || filter === "vaccines" ? [] : (stock.data ?? []);
+  const svcs =
+    filter === "products" || filter === "vaccines"
+      ? []
+      : allSvcs.filter((s) => s.category !== VACCINE_CATEGORY);
+  const vaccines =
+    filter === "products" || filter === "services"
+      ? []
+      : allSvcs.filter((s) => s.category === VACCINE_CATEGORY);
   const loading = stock.isLoading || services.isLoading;
-  const empty = !loading && products.length === 0 && svcs.length === 0;
+  const empty = !loading && products.length === 0 && svcs.length === 0 && vaccines.length === 0;
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -187,6 +196,31 @@ export function CatalogPanel() {
                   <span className="mt-1 text-sm font-bold text-navy-900"><Money value={s.defaultPrice} /></span>
                 </div>
                 <Badge variant="secondary" className="flex-none">{t("pos.catalog.service")}</Badge>
+              </button>
+            ))}
+            {vaccines.map((s) => (
+              <button
+                key={`v-${s.id}`}
+                type="button"
+                onClick={() =>
+                  addItem({
+                    kind: "service",
+                    refId: s.id,
+                    name: s.nameAr,
+                    unit: t("pos.catalog.vaccine"),
+                    unitPrice: s.defaultPrice,
+                  })
+                }
+                className="flex items-center gap-3 rounded-xl border bg-card p-3 text-start transition-colors hover:border-teal-400"
+              >
+                <span className="grid size-12 flex-none place-items-center rounded-lg bg-teal-50 text-teal-600">
+                  <Icon.syringe className="size-5" />
+                </span>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-sm font-semibold leading-tight text-navy-900">{s.nameAr}</span>
+                  <span className="mt-1 text-sm font-bold text-navy-900"><Money value={s.defaultPrice} /></span>
+                </div>
+                <Badge variant="secondary" className="flex-none">{t("pos.catalog.vaccine")}</Badge>
               </button>
             ))}
           </div>
