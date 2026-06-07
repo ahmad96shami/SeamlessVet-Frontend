@@ -107,7 +107,7 @@ export function CartIssue({ total }: { total: number }) {
             {issue.isPending ? t("pos.issue.submitting") : t("pos.issue.submit")}
           </span>
           {hasSomethingToBill ? (
-            <Money value={total} className="[&_.money-symbol]:text-current" />
+            <Money value={total} className="text-base [&_.money-symbol]:text-current" />
           ) : null}
         </Button>
       </div>
