@@ -15,72 +15,26 @@ import { CartPayments } from "./CartPayments";
 import { computeTotals, lineTotal, paymentSummary } from "./cartTotals";
 
 /**
- * Quantity stepper: − / editable number / +, in one bordered control whose radius matches the text
- * inputs (`--radius-input`). The number is directly editable; a transient draft string lets the
- * field go empty mid-edit without the store dropping the line (it only commits a value ≥ 1).
- */
-function QtyStepper({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (n: number) => void;
-}) {
-  const { t } = useTranslation();
-  const [draft, setDraft] = useState<string | null>(null);
-  const shown = draft ?? String(value);
-
-  const commit = (raw: string) => {
-    setDraft(raw);
-    const n = Math.floor(Number(raw));
-    if (raw !== "" && Number.isFinite(n) && n >= 1) onChange(n);
-  };
-
-  const btn =
-    "grid w-8 place-items-center text-muted-foreground transition-colors hover:bg-ink-50 hover:text-navy-900 active:bg-ink-100";
-
-  return (
-    // Stop clicks from bubbling to the expander header (which toggles on click).
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="inline-flex h-8 flex-none select-none items-stretch overflow-hidden rounded-[var(--radius-input)] border bg-[var(--paper)]"
-    >
-      <button type="button" aria-label="-" onClick={() => onChange(value - 1)} className={btn}>
-        <Icon.minus className="size-3.5" aria-hidden />
-      </button>
-      <input
-        type="number"
-        inputMode="numeric"
-        min={0}
-        dir="ltr"
-        aria-label={t("pos.cart.qty")}
-        value={shown}
-        onChange={(e) => commit(e.target.value)}
-        onBlur={() => setDraft(null)}
-        // pt-1.5 (6px/0) shifts the line box down 3px: Tajawal's lining digits carry no
-        // descender while the font reserves diacritic descent, so the ink otherwise floats high.
-        className="w-9 border-x bg-transparent pt-1.5 text-center text-sm font-bold tabular-nums text-navy-900 outline-none focus:bg-ink-50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-      />
-      <button type="button" aria-label="+" onClick={() => onChange(value + 1)} className={btn}>
-        <Icon.add className="size-3.5" aria-hidden />
-      </button>
-    </div>
-  );
-}
-
-/**
- * One cart line. The whole header is the expander toggle (click anywhere that isn't the qty stepper
- * or trash); it reveals an inline editor for unit price and line discount. Two aligned rows:
- * top = chevron · name · trash; bottom (indented under the name) = qty stepper · "× unit price"
- * · line total — so the money math reads on one line and every total sits on the start edge,
- * the same rail as the subtotal/total block below.
+ * One cart line — a single header row that is also the expander toggle (click anywhere that isn't
+ * the trash): chevron · "qty ×" · name on the start edge; the line total (with its unit × qty math
+ * stacked in small print above) and the trash on the end edge. Expanding reveals a flat 3-column
+ * editor — quantity / unit price / line discount.
  */
 function CartLineRow({ line }: { line: CartLine }) {
   const { t } = useTranslation();
   const { setQty, setUnitPrice, setLineDiscount, removeLine } = usePosCartStore.getState();
   const overSell = line.available != null && line.quantity > line.available;
   const [open, setOpen] = useState(false);
+  // Transient draft so the qty field can go empty mid-edit without the store dropping the line
+  // (it only commits a value ≥ 1).
+  const [qtyDraft, setQtyDraft] = useState<string | null>(null);
   const toggle = () => setOpen((v) => !v);
+
+  const commitQty = (raw: string) => {
+    setQtyDraft(raw);
+    const n = Math.floor(Number(raw));
+    if (raw !== "" && Number.isFinite(n) && n >= 1) setQty(line.key, n);
+  };
 
   return (
     <div className="border-b px-3 py-2">
@@ -96,54 +50,63 @@ function CartLineRow({ line }: { line: CartLine }) {
             toggle();
           }
         }}
-        className="block cursor-pointer space-y-1.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+        className="flex cursor-pointer items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
       >
-        <div className="flex items-center gap-2">
-          <Icon.fwd
-            className={cn(
-              "size-3.5 flex-none text-muted-foreground transition-transform",
-              open ? "rotate-90" : "rtl:-scale-x-100",
-            )}
-            aria-hidden
-          />
-          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-navy-900">
-            {line.name}
+        <Icon.fwd
+          className={cn(
+            "size-3.5 flex-none text-muted-foreground transition-transform",
+            open ? "rotate-90" : "rtl:-scale-x-100",
+          )}
+          aria-hidden
+        />
+        <span className="flex-none text-sm font-bold tabular-nums text-navy-900">
+          {line.quantity} ×
+        </span>
+        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-navy-900">
+          {line.name}
+        </span>
+        <span className="flex flex-none flex-col items-end">
+          <span dir="ltr" className="text-[11px] leading-tight tabular-nums text-muted-foreground">
+            {line.unitPrice.toFixed(2)}×{line.quantity}
+            {line.discountAmount > 0 ? (
+              <span className="text-destructive"> −{line.discountAmount.toFixed(2)}</span>
+            ) : null}
           </span>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              removeLine(line.key);
-            }}
-            aria-label={t("pos.cart.remove")}
-            className="-my-1 flex-none rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-soft/40 hover:text-destructive"
-          >
-            <Icon.trash className="size-4" />
-          </button>
-        </div>
-
-        {/* ps aligns the stepper under the name (chevron 14px + gap 8px). */}
-        <div className="flex items-center gap-2 ps-[22px]">
-          <QtyStepper value={line.quantity} onChange={(n) => setQty(line.key, n)} />
-          <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-            {/* The × glyph centres ~3px above the baseline while the digit body (with Money's
-                1px up-nudge) centres at 5px — lift it 2px to sit optically centred on the price. */}
-            <span className="inline-block -translate-y-[2px]">×</span> <Money value={line.unitPrice} />
-            {line.unit ? ` · ${line.unit}` : null}
-          </span>
-          {line.discountAmount > 0 ? (
-            <span className="flex-none text-[11px] text-destructive">
-              {t("pos.cart.lineDiscount")} <Money value={line.discountAmount} />
-            </span>
-          ) : null}
-          <span className="flex-none text-sm font-bold tabular-nums text-navy-900">
+          <span className="text-sm font-bold leading-tight tabular-nums text-navy-900">
             <Money value={lineTotal(line)} />
           </span>
-        </div>
+        </span>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            removeLine(line.key);
+          }}
+          aria-label={t("pos.cart.remove")}
+          className="-my-1 flex-none rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-soft/40 hover:text-destructive"
+        >
+          <Icon.trash className="size-4" />
+        </button>
       </div>
 
       {open ? (
-        <div className="ms-[22px] mt-2 grid grid-cols-2 gap-2 rounded-lg bg-ink-50/60 p-2">
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] font-semibold text-muted-foreground">
+              {t("pos.cart.qty")}
+            </span>
+            <Input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              step="1"
+              dir="ltr"
+              value={qtyDraft ?? String(line.quantity)}
+              onChange={(e) => commitQty(e.target.value)}
+              onBlur={() => setQtyDraft(null)}
+              className="h-8 text-sm"
+            />
+          </label>
           <label className="flex flex-col gap-1">
             <span className="text-[11px] font-semibold text-muted-foreground">
               {t("pos.receipt.price")}
