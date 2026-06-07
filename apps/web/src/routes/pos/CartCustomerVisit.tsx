@@ -9,6 +9,7 @@ import { usePrescriptions } from "@/queries/prescriptions";
 import { useProcedures } from "@/queries/procedures";
 import { useProducts } from "@/queries/products";
 import { useServices } from "@/queries/services";
+import { useVaccinations } from "@/queries/vaccinations";
 import { useVisit } from "@/queries/visits";
 import { usePosCartStore } from "@/stores/posCartStore";
 
@@ -16,28 +17,32 @@ import { CustomerPickerDialog } from "./CustomerPickerDialog";
 import { VisitPickerDialog, visitRef } from "./VisitPickerDialog";
 
 /**
- * The visit's UNBILLED dispensed-to-owner prescriptions + procedures — exactly what the server
- * bills at issuance. Anything already on a non-void invoice for the visit is filtered out (the
- * server de-dups via the prescription/procedure back-links); names/prices resolve via catalog maps.
+ * The visit's UNBILLED dispensed-to-owner prescriptions + procedures + catalog-linked vaccinations
+ * (M22) — exactly what the server bills at issuance. Anything already on a non-void invoice for the
+ * visit is filtered out (the server de-dups via the prescription/procedure/vaccination back-links);
+ * names/prices resolve via catalog maps.
  */
 function useVisitCharges(visitId: string) {
   const rx = usePrescriptions(visitId);
   const procs = useProcedures(visitId);
+  const vax = useVaccinations({ visitId, take: 200 });
   const invoices = useInvoices({ visitId, take: 50 });
   const products = useProducts({ take: 200 });
   const services = useServices({ take: 200 });
 
   return useMemo(() => {
     const productById = new Map((products.data ?? []).map((p) => [p.id, p]));
-    const serviceName = new Map((services.data ?? []).map((s) => [s.id, s.nameAr]));
+    const serviceById = new Map((services.data ?? []).map((s) => [s.id, s]));
 
     const billedRx = new Set<string>();
     const billedProc = new Set<string>();
+    const billedVax = new Set<string>();
     for (const inv of invoices.data ?? []) {
       if (inv.status === "void") continue;
       for (const it of inv.items) {
         if (it.prescriptionId) billedRx.add(it.prescriptionId);
         if (it.procedureId) billedProc.add(it.procedureId);
+        if (it.vaccinationId) billedVax.add(it.vaccinationId);
       }
     }
 
@@ -60,16 +65,27 @@ function useVisitCharges(visitId: string) {
       .map((p) => ({
         id: p.id,
         serviceId: p.serviceId!,
-        name: (p.serviceId && serviceName.get(p.serviceId)) || "—",
+        name: (p.serviceId && serviceById.get(p.serviceId)?.nameAr) || "—",
         price: p.price,
+      }));
+
+    // Only catalog-linked vaccinations bill; legacy free-text rows are clinical records only.
+    const vaccinations = (vax.data ?? [])
+      .filter((v) => v.serviceId != null && !billedVax.has(v.id))
+      .map((v) => ({
+        id: v.id,
+        serviceId: v.serviceId!,
+        name: v.vaccineType || serviceById.get(v.serviceId!)?.nameAr || "—",
+        price: v.price ?? serviceById.get(v.serviceId!)?.defaultPrice ?? 0,
       }));
 
     return {
       prescriptions,
       procedures,
-      isLoading: rx.isLoading || procs.isLoading || invoices.isLoading,
+      vaccinations,
+      isLoading: rx.isLoading || procs.isLoading || vax.isLoading || invoices.isLoading,
     };
-  }, [rx.data, rx.isLoading, procs.data, procs.isLoading, invoices.data, invoices.isLoading, products.data, services.data]);
+  }, [rx.data, rx.isLoading, procs.data, procs.isLoading, vax.data, vax.isLoading, invoices.data, invoices.isLoading, products.data, services.data]);
 }
 
 /**
@@ -79,7 +95,7 @@ function useVisitCharges(visitId: string) {
  * issuance regardless. Renders nothing; the store merge keeps the cashier's edits across refetches.
  */
 function VisitLinesSync({ visitId }: { visitId: string }) {
-  const { prescriptions, procedures, isLoading } = useVisitCharges(visitId);
+  const { prescriptions, procedures, vaccinations, isLoading } = useVisitCharges(visitId);
   const syncVisitLines = usePosCartStore((s) => s.syncVisitLines);
 
   useEffect(() => {
@@ -106,8 +122,18 @@ function VisitLinesSync({ visitId }: { visitId: string }) {
         discountAmount: 0,
         procedureId: p.id,
       })),
+      ...vaccinations.map((v) => ({
+        key: v.id,
+        kind: "service" as const,
+        refId: v.serviceId,
+        name: v.name,
+        unitPrice: v.price,
+        quantity: 1,
+        discountAmount: 0,
+        vaccinationId: v.id,
+      })),
     ]);
-  }, [isLoading, prescriptions, procedures, syncVisitLines]);
+  }, [isLoading, prescriptions, procedures, vaccinations, syncVisitLines]);
 
   return null;
 }

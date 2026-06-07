@@ -60,6 +60,7 @@ export function CartIssue({ total }: { total: number }) {
         // from the clinical record, and skips these during auto-assembly (no double billing).
         prescriptionId: l.prescriptionId,
         procedureId: l.procedureId,
+        vaccinationId: l.vaccinationId,
       })),
       payments: s.payments.map((p) => ({
         method: p.method,

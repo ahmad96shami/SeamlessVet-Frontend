@@ -31,6 +31,8 @@ export interface CartLine {
   locked?: boolean;
   prescriptionId?: string;
   procedureId?: string;
+  /** M22 — a catalog-linked visit vaccination billed as a service line. */
+  vaccinationId?: string;
 }
 
 export interface PaymentLeg {
@@ -47,7 +49,7 @@ interface PosCartState {
   lines: CartLine[];
   /** Linked customer (null = walk-in / no ledger); the name is resolved from the id for display. */
   customerId: string | null;
-  /** Linked visit — its unbilled dispensed meds + procedures auto-assemble server-side at issuance. */
+  /** Linked visit — its unbilled dispensed meds + procedures + vaccinations auto-assemble server-side at issuance. */
   visitId: string | null;
   invoiceDiscount: number;
   payments: PaymentLeg[];
