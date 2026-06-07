@@ -37,7 +37,7 @@ function CartLineRow({ line }: { line: CartLine }) {
   };
 
   return (
-    <div className="border-b px-3 py-2">
+    <div className="border-b p-3">
       <div
         role="button"
         tabIndex={0}
@@ -59,13 +59,15 @@ function CartLineRow({ line }: { line: CartLine }) {
           )}
           aria-hidden
         />
-        <span className="flex-none text-sm font-bold tabular-nums text-navy-900">
+        {/* Text spans get the app-wide 1.5px down-nudge: Tajawal reserves descent its glyphs don't
+            use, so the ink otherwise floats high next to the geometrically-centred icons. */}
+        <span className="flex-none translate-y-[1.5px] text-sm font-bold tabular-nums text-navy-900">
           {line.quantity} ×
         </span>
-        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-navy-900">
+        <span className="min-w-0 flex-1 translate-y-[1.5px] truncate text-sm font-semibold text-navy-900">
           {line.name}
         </span>
-        <span className="flex flex-none flex-col items-end justify-center">
+        <span className="flex flex-none translate-y-[1.5px] flex-col items-end justify-center">
           {/* Old (pre-discount) price, struck through, only when a line discount applies. */}
           {line.discountAmount > 0 ? (
             <span
