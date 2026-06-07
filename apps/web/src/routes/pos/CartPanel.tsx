@@ -16,9 +16,9 @@ import { computeTotals, lineTotal, paymentSummary } from "./cartTotals";
 
 /**
  * One cart line — a single header row that is also the expander toggle (click anywhere that isn't
- * the trash): chevron · "qty ×" · name on the start edge; the line total (with its unit × qty math
- * stacked in small print above) and the trash on the end edge. Expanding reveals a flat 3-column
- * editor — quantity / unit price / line discount.
+ * the trash): chevron · "qty ×" · name on the start edge; the line total (with the pre-discount
+ * price struck through above it when a line discount applies) and the trash on the end edge.
+ * Expanding reveals a flat 3-column editor — quantity / unit price / line discount.
  */
 function CartLineRow({ line }: { line: CartLine }) {
   const { t } = useTranslation();
@@ -65,13 +65,16 @@ function CartLineRow({ line }: { line: CartLine }) {
         <span className="min-w-0 flex-1 truncate text-sm font-semibold text-navy-900">
           {line.name}
         </span>
-        <span className="flex flex-none flex-col items-end">
-          <span dir="ltr" className="text-[11px] leading-tight tabular-nums text-muted-foreground">
-            {line.unitPrice.toFixed(2)}×{line.quantity}
-            {line.discountAmount > 0 ? (
-              <span className="text-destructive"> −{line.discountAmount.toFixed(2)}</span>
-            ) : null}
-          </span>
+        <span className="flex flex-none flex-col items-end justify-center">
+          {/* Old (pre-discount) price, struck through, only when a line discount applies. */}
+          {line.discountAmount > 0 ? (
+            <span
+              dir="ltr"
+              className="text-[11px] leading-tight tabular-nums text-muted-foreground line-through"
+            >
+              {(line.quantity * line.unitPrice).toFixed(2)}
+            </span>
+          ) : null}
           <span className="text-sm font-bold leading-tight tabular-nums text-navy-900">
             <Money value={lineTotal(line)} />
           </span>
