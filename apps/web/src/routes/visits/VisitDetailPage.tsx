@@ -24,6 +24,7 @@ import { NightStaysTab } from "@/routes/visits/NightStaysTab";
 import { PrescriptionsTab } from "@/routes/visits/PrescriptionsTab";
 import { ProceduresTab } from "@/routes/visits/ProceduresTab";
 import { ScheduleFollowUpDialog } from "@/routes/visits/ScheduleFollowUpDialog";
+import { useVisitTabBadges } from "@/routes/visits/useVisitTabBadges";
 import { VaccinationsTab } from "@/routes/visits/VaccinationsTab";
 import { VisitReportButton } from "@/routes/visits/VisitReportButton";
 import { visitRef, visitStatusVariant } from "@/routes/visits/VisitsPage";
@@ -63,6 +64,8 @@ export function VisitDetailPage() {
   const update = useUpdateVisit();
   const complete = useCompleteVisit();
   const cancel = useCancelVisit();
+  // Per-tab content indicators (counts for record tabs, a dot for the form tabs).
+  const badges = useVisitTabBadges(v);
 
   const navigate = useNavigate();
   const role = useAuthStore((s) => s.user?.role);
@@ -264,37 +267,57 @@ export function VisitDetailPage() {
 
       {isClinic ? <CheckupFeeCard visit={v} readOnly={isTerminal} /> : null}
 
-      {/* Clinical-record tabs */}
+      {/* Clinical-record tabs — a count chip (record tabs) / dot (form tabs) marks the
+          sections that already hold content, so staff see at a glance where work happened. */}
       <div className="flex flex-wrap gap-1 border-b">
-        {tabIds.map((id) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setTab(id)}
-            className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors",
-              tab === id
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t(`visits.tab.${id}`)}
-          </button>
-        ))}
+        {tabIds.map((id) => {
+          const badge = badges[id];
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setTab(id)}
+              className={cn(
+                "-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+                tab === id
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t(`visits.tab.${id}`)}
+              {typeof badge === "number" ? (
+                <span
+                  className={cn(
+                    "inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums",
+                    tab === id ? "bg-teal-50 text-teal-700" : "bg-ink-100 text-muted-foreground",
+                  )}
+                  dir="ltr"
+                >
+                  {badge}
+                </span>
+              ) : badge ? (
+                <span
+                  aria-hidden
+                  className={cn("size-1.5 rounded-full", tab === id ? "bg-teal-600" : "bg-ink-300")}
+                />
+              ) : null}
+            </button>
+          );
+        })}
       </div>
 
-      {/* M23 — clinical tabs are read-only until بدء الكشف on a clinic visit; assessment
-          (reception triage) and files stay editable while open. */}
+      {/* M23 — clinical tabs (incl. daily follow-ups + files) are read-only until بدء الكشف on a
+          clinic visit; only assessment (reception triage) stays editable while open. */}
       {tab === "assessment" ? <AssessmentTab visit={v} readOnly={isTerminal} /> : null}
       {tab === "diagnosis" ? <DiagnosisTab visit={v} readOnly={isTerminal || clinicalLocked} /> : null}
       {tab === "procedures" ? <ProceduresTab visitId={v.id} readOnly={isTerminal || clinicalLocked} /> : null}
       {tab === "prescriptions" ? <PrescriptionsTab visitId={v.id} readOnly={isTerminal || clinicalLocked} /> : null}
-      {tab === "followups" ? <FollowUpsTab visit={v} readOnly={isTerminal} /> : null}
+      {tab === "followups" ? <FollowUpsTab visit={v} readOnly={isTerminal || clinicalLocked} /> : null}
       {tab === "vaccinations" ? <VaccinationsTab visit={v} readOnly={isTerminal || clinicalLocked} /> : null}
       {tab === "nightStays" && isClinic ? (
         <NightStaysTab visitId={v.id} readOnly={isTerminal || clinicalLocked} />
       ) : null}
-      {tab === "files" ? <AttachmentsTab visitId={v.id} readOnly={isTerminal} /> : null}
+      {tab === "files" ? <AttachmentsTab visitId={v.id} readOnly={isTerminal || clinicalLocked} /> : null}
 
       {followUpOpen ? (
         <ScheduleFollowUpDialog open visit={v} onClose={() => setFollowUpOpen(false)} />
