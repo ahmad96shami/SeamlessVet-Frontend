@@ -36,7 +36,7 @@ export function CartPayments({ total }: { total: number }) {
   const { paid, remaining, overpaid } = paymentSummary(payments, total);
 
   // Nothing to say (e.g. a walk-in with no legs yet) → no empty bordered block.
-  const hasStatus = overpaid || remaining === 0 || hasCustomer;
+  const hasStatus = overpaid || (remaining > 0 && hasCustomer);
   if ((!hasLines && !hasVisit) || (payments.length === 0 && !hasStatus && !hasVisit)) return null;
 
   const updateLeg = (key: string, patch: Partial<Omit<PaymentLeg, "key">>) =>
@@ -112,17 +112,21 @@ export function CartPayments({ total }: { total: number }) {
       ))}
 
       {paid > 0 ? (
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">{t("pos.payment.paid")}</span>
+        <div className="flex items-center justify-between gap-2 text-sm">
+          {/* The fully-paid badge rides the paid row instead of taking its own line. */}
+          <span className="flex items-center gap-2">
+            <span className="text-muted-foreground">{t("pos.payment.paid")}</span>
+            {!overpaid && remaining === 0 ? (
+              <Badge variant="success">{t("pos.payment.fullyPaid")}</Badge>
+            ) : null}
+          </span>
           <span className="tabular-nums"><Money value={paid} /></span>
         </div>
       ) : null}
 
       {overpaid ? (
         <p className="text-xs text-destructive">{t("pos.payment.exceedsTotal")}</p>
-      ) : remaining === 0 ? (
-        <Badge variant="success">{t("pos.payment.fullyPaid")}</Badge>
-      ) : hasCustomer ? (
+      ) : remaining > 0 && hasCustomer ? (
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">{t("pos.payment.onCredit")}</span>
           <span className="font-semibold tabular-nums text-navy-900">
