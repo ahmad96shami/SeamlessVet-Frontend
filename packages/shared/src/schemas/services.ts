@@ -2,6 +2,12 @@ import { z } from "zod";
 
 import { optionalText } from "./common";
 
+/**
+ * M22 — services with this category form the **vaccine catalog**: managed from the web اللقاحات
+ * tab, listed in their own POS tab, and linkable from `vaccinations.serviceId`.
+ */
+export const VACCINE_CATEGORY = "vaccination";
+
 /** A services-catalog row (GET /admin/services[/{id}]). */
 export const ServiceResponseSchema = z.object({
   id: z.string(),

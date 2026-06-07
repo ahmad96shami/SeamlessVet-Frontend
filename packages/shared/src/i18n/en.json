@@ -915,8 +915,12 @@
       "col": {
         "type": "Vaccine",
         "given": "Date given",
-        "due": "Next due"
-      }
+        "due": "Next due",
+        "price": "Price"
+      },
+      "vaccine": "Vaccine",
+      "selectVaccine": "Select a vaccine",
+      "price": "Price"
     },
     "files": {
       "title": "Files & attachments",
@@ -990,7 +994,8 @@
     "description": "Vaccination records and the upcoming due schedule",
     "tabs": {
       "list": "Records",
-      "calendar": "Calendar"
+      "calendar": "Calendar",
+      "vaccines": "Vaccines"
     },
     "new": "New vaccination",
     "newTitle": "New vaccination",
@@ -1000,7 +1005,8 @@
       "type": "Vaccine",
       "recipient": "Recipient",
       "given": "Date given",
-      "due": "Next due"
+      "due": "Next due",
+      "price": "Price"
     },
     "recipientFarm": "Farm group",
     "recipientUnknown": "Unknown",
@@ -1018,12 +1024,38 @@
       "vaccineType": "Vaccine type",
       "dateGiven": "Date given",
       "nextDueDate": "Next due",
-      "missingCustomer": "Select a customer first"
+      "missingCustomer": "Select a customer first",
+      "vaccine": "Vaccine",
+      "selectVaccine": "Select a vaccine",
+      "searchVaccine": "Search by vaccine name",
+      "noVaccines": "No vaccines — add them from the Vaccines tab",
+      "price": "Price"
     },
     "calendar": {
       "empty": "No vaccinations due in this period",
       "more": "+{{count}}",
       "due": "due"
+    },
+    "vaccines": {
+      "title": "Vaccines",
+      "description": "The vaccine catalog and prices — picked when recording a vaccination and billed automatically",
+      "new": "New vaccine",
+      "newTitle": "New vaccine",
+      "editTitle": "Edit vaccine",
+      "empty": "No vaccines defined",
+      "searchPlaceholder": "Search by vaccine name",
+      "deleteTitle": "Delete vaccine",
+      "deleteConfirm": "This vaccine will be removed from the catalog. Recorded vaccinations are unaffected.",
+      "col": {
+        "nameAr": "Name",
+        "nameLatin": "Latin name",
+        "price": "Price"
+      },
+      "form": {
+        "nameAr": "Arabic name",
+        "nameLatin": "Latin name (optional)",
+        "price": "Price"
+      }
     }
   },
   "billing": {
@@ -1170,14 +1202,16 @@
       "noResults": "No matching results",
       "all": "All",
       "products": "Products",
-      "services": "Services"
+      "services": "Services",
+      "vaccines": "Vaccines"
     },
     "catalog": {
       "available": "Available",
       "outOfStock": "Out of stock",
       "lowStock": "Low",
       "service": "Service",
-      "add": "Add"
+      "add": "Add",
+      "vaccine": "Vaccine"
     },
     "cart": {
       "title": "Invoice",
