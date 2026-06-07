@@ -1003,7 +1003,8 @@
     },
     "billedLocked": "مُفوتر — يُدار من الفاتورة ولا يمكن حذفه",
     "billedRx": "مُفوترة",
-    "billedProcedure": "مُفوتر"
+    "billedProcedure": "مُفوتر",
+    "billedVaccination": "مُفوتر"
   },
   "vaccinations": {
     "title": "التطعيمات",

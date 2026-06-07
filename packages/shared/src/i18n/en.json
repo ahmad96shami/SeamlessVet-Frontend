@@ -987,7 +987,8 @@
     },
     "billedLocked": "Billed — backed by an invoice line; it cannot be removed",
     "billedRx": "Billed",
-    "billedProcedure": "Billed"
+    "billedProcedure": "Billed",
+    "billedVaccination": "Billed"
   },
   "vaccinations": {
     "title": "Vaccinations",

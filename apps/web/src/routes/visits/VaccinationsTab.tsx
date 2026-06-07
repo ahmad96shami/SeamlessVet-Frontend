@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { DataTable } from "@/components/data-table/DataTable";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
@@ -13,6 +14,7 @@ import { useCustomer } from "@/queries/customers";
 import { useFieldInventories } from "@/queries/inventory";
 import { usePet } from "@/queries/pets";
 import { useDeleteVaccination, useVaccinations } from "@/queries/vaccinations";
+import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
 import { VaccinationCertificate } from "@/routes/visits/VaccinationCertificate";
 import { VaccinationFormDialog } from "@/routes/visits/VaccinationFormDialog";
 
@@ -23,6 +25,7 @@ export function VaccinationsTab({ visit, readOnly }: { visit: VisitResponse; rea
   const query = useVaccinations({ visitId: visit.id, take: 200 });
   const rows = query.data ?? [];
   const del = useDeleteVaccination();
+  const billed = useBilledChargeIds(visit.id);
 
   // Names for the printable certificate: recipient is the visit's pet, else the customer (farm).
   const owner = useCustomer(visit.customerId);
@@ -43,7 +46,14 @@ export function VaccinationsTab({ visit, readOnly }: { visit: VisitResponse; rea
       {
         accessorKey: "vaccineType",
         header: t("visits.vaccinations.col.type"),
-        cell: ({ row }) => <span className="font-medium">{row.original.vaccineType}</span>,
+        cell: ({ row }) => (
+          <span className="flex items-center gap-2">
+            <span className="font-medium">{row.original.vaccineType}</span>
+            {billed.vaccinations.has(row.original.id) ? (
+              <Badge variant="success">{t("visits.billedVaccination")}</Badge>
+            ) : null}
+          </span>
+        ),
       },
       {
         accessorKey: "price",
@@ -88,16 +98,27 @@ export function VaccinationsTab({ visit, readOnly }: { visit: VisitResponse; rea
               <Button size="icon" variant="ghost" aria-label={t("admin.common.edit")} onClick={() => { setEditing(row.original); setFormOpen(true); }}>
                 <Icon.edit className="size-4" />
               </Button>
-              <Button size="icon" variant="ghost" aria-label={t("admin.common.delete")} onClick={() => setDeleteTarget(row.original)}>
-                <Icon.trash className="size-4 text-destructive" />
-              </Button>
+              {billed.vaccinations.has(row.original.id) ? (
+                // Billed on an invoice — the row backs an issued invoice line (server-enforced too;
+                // the edit stays for the clinical dates, but re-pricing is rejected server-side).
+                <span
+                  title={t("visits.billedLocked")}
+                  className="grid size-10 place-items-center text-muted-foreground"
+                >
+                  <Icon.lock className="size-4" aria-label={t("visits.billedLocked")} />
+                </span>
+              ) : (
+                <Button size="icon" variant="ghost" aria-label={t("admin.common.delete")} onClick={() => setDeleteTarget(row.original)}>
+                  <Icon.trash className="size-4 text-destructive" />
+                </Button>
+              )}
             </>
           ) : null}
         </div>
       ),
     });
     return cols;
-  }, [t, lang, readOnly, recipientName, ownerName, doctorName]);
+  }, [t, lang, readOnly, recipientName, ownerName, doctorName, billed]);
 
   const confirmDelete = () => {
     if (!deleteTarget) return;
