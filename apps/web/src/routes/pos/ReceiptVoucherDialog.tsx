@@ -31,10 +31,13 @@ export function ReceiptVoucherDialog({
   open,
   onClose,
   presetCustomerId,
+  presetFarmId,
 }: {
   open: boolean;
   onClose: () => void;
   presetCustomerId?: string | null;
+  /** M24 — lock the credit onto one farm ledger (the farm page's collect button). */
+  presetFarmId?: string | null;
 }) {
   const { t } = useTranslation();
 
@@ -55,7 +58,7 @@ export function ReceiptVoucherDialog({
   useEffect(() => {
     if (!open) return;
     setCustomerId(presetCustomerId ?? null);
-    setTargetFarmId(null);
+    setTargetFarmId(presetFarmId ?? null);
     setAmount("");
     setMethod("cash");
     setNotes("");
@@ -63,7 +66,7 @@ export function ReceiptVoucherDialog({
     setChequeBank("");
     setChequeDueDate("");
     setIssuedId(null);
-  }, [open, presetCustomerId]);
+  }, [open, presetCustomerId, presetFarmId]);
 
   const picked = useCustomer(customerId);
   const issue = useIssueReceiptVoucher();
@@ -111,10 +114,15 @@ export function ReceiptVoucherDialog({
         closed: fl.status === "closed",
       })),
     ];
+    // A preset farm (the farm page's collect button) wins over the highest-debt default.
+    if (presetFarmId != null) {
+      setTargetFarmId(presetFarmId);
+      return;
+    }
     const open = opts.filter((o) => !o.closed).sort((a, b) => b.balance - a.balance);
     setTargetFarmId(open[0]?.farmId ?? null);
     // Keyed on identity, not the query object, so a background refetch never overrides a manual pick.
-  }, [picked.data?.id]);
+  }, [picked.data?.id, presetFarmId]);
 
   const printRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
@@ -200,6 +208,7 @@ export function ReceiptVoucherDialog({
               <Select
                 value={targetFarmId ?? ""}
                 onChange={(e) => setTargetFarmId(e.target.value || null)}
+                disabled={presetFarmId != null}
               >
                 {targets.map((tg) => (
                   <option key={tg.farmId ?? "own"} value={tg.farmId ?? ""} disabled={tg.closed}>

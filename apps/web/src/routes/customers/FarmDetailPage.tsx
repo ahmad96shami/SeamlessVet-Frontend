@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Money } from "@/components/ui/money";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ import { useFarm } from "@/queries/farms";
 import { CloseFarmAccountSection } from "@/routes/customers/CloseAccountSection";
 import { balanceClass, statusVariant } from "@/routes/customers/ledgerStatus";
 import { StatementSection } from "@/routes/customers/StatementSection";
+import { ReceiptVoucherDialog } from "@/routes/pos/ReceiptVoucherDialog";
 
 /**
  * A single farm's account page (M16). Reached from the customer detail page's farms section. The
@@ -25,6 +27,7 @@ export function FarmDetailPage() {
   const farm = farmQuery.data;
   const ownerQuery = useCustomer(farm?.customerId ?? null);
   const owner = ownerQuery.data;
+  const [voucherOpen, setVoucherOpen] = useState(false);
 
   const ledger = useMemo(
     () => (owner?.farmLedgers ?? []).find((fl) => fl.farmId === farmId),
@@ -92,14 +95,31 @@ export function FarmDetailPage() {
         </div>
       </header>
 
-      <div className="rounded-2xl border p-4">
-        <div className="text-sm text-muted-foreground">{t("customers.farmDetail.balance")}</div>
-        <div className={cn("text-2xl font-bold", balanceClass(balance))} dir="ltr">
-          <Money value={balance} />
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-4">
+        <div>
+          <div className="text-sm text-muted-foreground">{t("customers.farmDetail.balance")}</div>
+          <div className={cn("text-2xl font-bold", balanceClass(balance))} dir="ltr">
+            <Money value={balance} />
+          </div>
         </div>
+        {/* M24 — the collection loop: vouchers credit THIS farm's ledger until it hits 0, then the
+            close-account action below releases the doctor's entitlements (settlement lock, §10). */}
+        {!isClosed ? (
+          <Button onClick={() => setVoucherOpen(true)}>
+            <Icon.receipt className="size-4" />
+            {t("finance.farmActions.recordPayment")}
+          </Button>
+        ) : null}
       </div>
 
       {owner ? <CloseFarmAccountSection farmId={farm.id} balance={balance} isClosed={isClosed} /> : null}
+
+      <ReceiptVoucherDialog
+        open={voucherOpen}
+        onClose={() => setVoucherOpen(false)}
+        presetCustomerId={farm.customerId}
+        presetFarmId={farm.id}
+      />
 
       <StatementSection
         farmId={farm.id}
