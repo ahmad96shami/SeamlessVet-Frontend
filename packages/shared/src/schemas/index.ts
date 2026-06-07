@@ -28,6 +28,7 @@ export * from "./invoices";
 export * from "./receiptVouchers";
 export * from "./contracts";
 export * from "./batches";
+export * from "./batchSettlements";
 export * from "./entitlements";
 export * from "./partnership";
 export * from "./reports";

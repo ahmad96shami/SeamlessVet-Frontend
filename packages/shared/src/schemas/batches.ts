@@ -29,6 +29,8 @@ export const BatchResponseSchema = z.object({
   status: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  /** M24 — set once the batch has a settlement (تصفية); routes the web's settle action + badge. */
+  settledAt: z.string().nullish(),
 });
 export type BatchResponse = z.infer<typeof BatchResponseSchema>;
 
