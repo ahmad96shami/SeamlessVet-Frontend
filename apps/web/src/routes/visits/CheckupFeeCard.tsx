@@ -3,23 +3,29 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Money } from "@/components/ui/money";
 import { useSystemSettings } from "@/queries/systemSettings";
+import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
 import { useUpdateVisit } from "@/queries/visits";
 
 /**
- * In-clinic checkup fee (رسوم الكشف, M17). The backend auto-applies `defaultCheckupFee` to a new
- * in-clinic visit and posts it to the owner ledger on completion; this card lets reception/vet edit
- * or waive it (set 0) before then. Field visits have no checkup fee — the parent only renders this for
- * in-clinic visits. Terminal visits show it read-only.
+ * In-clinic checkup fee (رسوم الكشف, M17/M23). The backend resolves the proposed amount at visit
+ * creation; the fee becomes CHARGEABLE when بدء الكشف moves the visit to in_progress, then bills as
+ * a POS invoice line (or the completion backstop). Three states here: pending (visit still open —
+ * the amount is a proposal confirmed by the start dialog), editable (started, unbilled), and
+ * billed/locked (مُفوترة — re-pricing is rejected server-side too). Field visits have no checkup
+ * fee — the parent only renders this for in-clinic visits.
  */
 export function CheckupFeeCard({ visit, readOnly }: { visit: VisitResponse; readOnly: boolean }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const settings = useSystemSettings();
   const update = useUpdateVisit();
+  const billed = useBilledChargeIds(visit.id);
   const def = settings.data?.defaultCheckupFee;
 
   const seed = () =>
@@ -31,6 +37,7 @@ export function CheckupFeeCard({ visit, readOnly }: { visit: VisitResponse; read
 
   const current = fee.trim() === "" ? null : Number(fee);
   const dirty = current != null && !Number.isNaN(current) && current !== (visit.checkupFeeApplied ?? null);
+  const isPending = visit.status === "open";
 
   const onSave = () => {
     if (current == null || Number.isNaN(current)) return;
@@ -46,10 +53,29 @@ export function CheckupFeeCard({ visit, readOnly }: { visit: VisitResponse; read
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-xl border p-3">
       <span className="text-sm font-medium">{t("visits.checkupFee.label")}</span>
-      {readOnly ? (
+      {billed.checkupFee ? (
+        // Billed on an invoice (or the completion backstop posted it) — locked, server-enforced too.
+        <>
+          <span dir="ltr" className="font-semibold">
+            <Money value={visit.checkupFeeApplied ?? 0} />
+          </span>
+          <Badge variant="success">{t("visits.checkupFee.billed")}</Badge>
+          <span title={t("visits.billedLocked")} className="grid place-items-center text-muted-foreground">
+            <Icon.lock className="size-4" aria-label={t("visits.billedLocked")} />
+          </span>
+        </>
+      ) : readOnly ? (
         <span dir="ltr" className="font-semibold">
           <Money value={visit.checkupFeeApplied ?? 0} />
         </span>
+      ) : isPending ? (
+        // Visit still open — the amount is a proposal; بدء الكشف confirms (and can edit) it.
+        <>
+          <span dir="ltr" className="font-semibold text-muted-foreground">
+            <Money value={visit.checkupFeeApplied ?? def ?? 0} />
+          </span>
+          <Badge variant="secondary">{t("visits.checkupFee.pending")}</Badge>
+        </>
       ) : (
         <>
           <Input

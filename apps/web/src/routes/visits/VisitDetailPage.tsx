@@ -8,10 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useCustomer } from "@/queries/customers";
 import { useFieldInventories } from "@/queries/inventory";
 import { usePets } from "@/queries/pets";
+import { useSystemSettings } from "@/queries/systemSettings";
 import { useCancelVisit, useCompleteVisit, useUpdateVisit, useVisit } from "@/queries/visits";
 import { AssessmentTab } from "@/routes/visits/AssessmentTab";
 import { AttachmentsTab } from "@/routes/visits/AttachmentsTab";
@@ -68,6 +70,10 @@ export function VisitDetailPage() {
   const [tab, setTab] = useState<TabId>("assessment");
   const [confirm, setConfirm] = useState<null | "complete" | "cancel">(null);
   const [followUpOpen, setFollowUpOpen] = useState(false);
+  // M23 — بدء الكشف confirms the (editable) checkup fee before unlocking clinical work.
+  const [startOpen, setStartOpen] = useState(false);
+  const [startFee, setStartFee] = useState("");
+  const settings = useSystemSettings();
 
   const pet = useMemo(
     () => (v?.petId ? (pets.data ?? []).find((p) => p.id === v.petId) : undefined),
@@ -97,6 +103,12 @@ export function VisitDetailPage() {
   const isTerminal = v.status === "completed" || v.status === "cancelled";
   const isOpen = v.status === "open";
   const isClinic = v.visitType === "in_clinic";
+  // M23 — clinical work waits for بدء الكشف on clinic visits (the fee-confirmation moment);
+  // assessment (triage vitals) stays editable. Field visits are unaffected.
+  const clinicalLocked = isClinic && isOpen;
+  // 0 prefilled on an unused-waiver follow-up — surfaced as a hint in the start dialog.
+  const startFeeDefault = v.checkupFeeApplied ?? settings.data?.defaultCheckupFee ?? 0;
+  const startWaived = v.followUpOfVisitId != null && (v.checkupFeeApplied ?? 0) === 0;
   // Night-stays are clinic-only, with daily follow-ups right after them (related workflows).
   const tabIds: readonly TabId[] = isClinic
     ? ([...BASE_TAB_IDS, "nightStays", "followups", "files"] as const)
@@ -121,11 +133,31 @@ export function VisitDetailPage() {
 
   const busy = update.isPending || complete.isPending || cancel.isPending;
 
-  const onStart = () =>
+  // Field visits start directly; clinic visits go through the fee-confirm dialog (M23).
+  const onStart = () => {
+    if (isClinic) {
+      setStartFee(String(startFeeDefault));
+      setStartOpen(true);
+      return;
+    }
     update.mutate(
       { id: v.id, body: { status: "in_progress" } },
       { onSuccess: () => toast.success(t("visits.actions.started")) },
     );
+  };
+  const onConfirmStart = () => {
+    const fee = startFee.trim() === "" ? startFeeDefault : Number(startFee);
+    if (Number.isNaN(fee) || fee < 0) return;
+    update.mutate(
+      { id: v.id, body: { status: "in_progress", checkupFeeApplied: fee } },
+      {
+        onSuccess: () => {
+          toast.success(t("visits.actions.started"));
+          setStartOpen(false);
+        },
+      },
+    );
+  };
   const onComplete = () =>
     complete.mutate(v.id, {
       onSuccess: () => {
@@ -202,9 +234,13 @@ export function VisitDetailPage() {
                   {t("visits.actions.start")}
                 </Button>
               ) : null}
-              <Button onClick={() => setConfirm("complete")} disabled={busy}>
-                {t("visits.actions.complete")}
-              </Button>
+              {/* M23 — a clinic visit completes only after بدء الكشف (open→completed would skip
+                  the fee server-side); field visits still complete from open. */}
+              {!clinicalLocked ? (
+                <Button onClick={() => setConfirm("complete")} disabled={busy}>
+                  {t("visits.actions.complete")}
+                </Button>
+              ) : null}
               <Button variant="outline" onClick={() => setConfirm("cancel")} disabled={busy}>
                 {t("visits.actions.cancel")}
               </Button>
@@ -216,6 +252,13 @@ export function VisitDetailPage() {
       {isTerminal ? (
         <div className="rounded-xl border bg-[var(--paper-soft)] p-3 text-sm text-muted-foreground">
           {t("visits.detail.lockedHint")}
+        </div>
+      ) : null}
+
+      {clinicalLocked ? (
+        <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+          <Icon.lock className="size-4 shrink-0" aria-hidden />
+          {t("visits.startExam.lockedHint")}
         </div>
       ) : null}
 
@@ -240,20 +283,53 @@ export function VisitDetailPage() {
         ))}
       </div>
 
+      {/* M23 — clinical tabs are read-only until بدء الكشف on a clinic visit; assessment
+          (reception triage) and files stay editable while open. */}
       {tab === "assessment" ? <AssessmentTab visit={v} readOnly={isTerminal} /> : null}
-      {tab === "diagnosis" ? <DiagnosisTab visit={v} readOnly={isTerminal} /> : null}
-      {tab === "procedures" ? <ProceduresTab visitId={v.id} readOnly={isTerminal} /> : null}
-      {tab === "prescriptions" ? <PrescriptionsTab visitId={v.id} readOnly={isTerminal} /> : null}
+      {tab === "diagnosis" ? <DiagnosisTab visit={v} readOnly={isTerminal || clinicalLocked} /> : null}
+      {tab === "procedures" ? <ProceduresTab visitId={v.id} readOnly={isTerminal || clinicalLocked} /> : null}
+      {tab === "prescriptions" ? <PrescriptionsTab visitId={v.id} readOnly={isTerminal || clinicalLocked} /> : null}
       {tab === "followups" ? <FollowUpsTab visit={v} readOnly={isTerminal} /> : null}
-      {tab === "vaccinations" ? <VaccinationsTab visit={v} readOnly={isTerminal} /> : null}
+      {tab === "vaccinations" ? <VaccinationsTab visit={v} readOnly={isTerminal || clinicalLocked} /> : null}
       {tab === "nightStays" && isClinic ? (
-        <NightStaysTab visitId={v.id} readOnly={isTerminal} />
+        <NightStaysTab visitId={v.id} readOnly={isTerminal || clinicalLocked} />
       ) : null}
       {tab === "files" ? <AttachmentsTab visitId={v.id} readOnly={isTerminal} /> : null}
 
       {followUpOpen ? (
         <ScheduleFollowUpDialog open visit={v} onClose={() => setFollowUpOpen(false)} />
       ) : null}
+
+      {/* M23 — بدء الكشف: confirm (and optionally edit) the checkup fee, then unlock clinical work. */}
+      <Dialog open={startOpen} onClose={() => setStartOpen(false)} title={t("visits.startExam.title")}>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t("visits.startExam.body")}</p>
+          {startWaived ? (
+            <p className="text-sm text-teal-700">{t("visits.startExam.waivedHint")}</p>
+          ) : null}
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium">{t("visits.startExam.feeLabel")}</span>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              dir="ltr"
+              className="w-32"
+              value={startFee}
+              onChange={(e) => setStartFee(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setStartOpen(false)} disabled={busy}>
+              {t("admin.common.cancel")}
+            </Button>
+            <Button variant="teal" onClick={onConfirmStart} disabled={busy}>
+              <Icon.check className="size-4" />
+              {t("visits.startExam.confirm")}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
 
       <Dialog
         open={confirm !== null}
