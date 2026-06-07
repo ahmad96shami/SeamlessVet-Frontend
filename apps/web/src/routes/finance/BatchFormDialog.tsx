@@ -31,7 +31,8 @@ import { CustomerPickerDialog } from "@/routes/pos/CustomerPickerDialog";
  * Create/edit a supervision batch. Numeric fields are strings in the form (converted at submit, like
  * the contract form). `entitlementEnabled` is tri-state: "" = inherit the global toggle, else on/off
  * (and on PATCH it can be set on/off but not reverted to inherit — recreate for that). Setting the
- * status to `closed` computes the doctor's entitlement server-side, so the form warns about it.
+ * M24: status is no longer editable here — closing a cycle goes through the settle flow (تصفية),
+ * which re-prices, posts the adjustments, closes, and computes the entitlement in one step.
  */
 const FEE_MODELS = FEE_MODEL_VALUES as [string, ...string[]];
 
@@ -49,7 +50,6 @@ const FormSchema = z.object({
   entitlementSystem: z.string(),
   doctorSharePercent: z.string(),
   doctorShareCeiling: z.string(),
-  status: z.enum(["open", "closed"]),
 });
 type FormValues = z.infer<typeof FormSchema>;
 
@@ -67,7 +67,6 @@ const DEFAULTS: FormValues = {
   entitlementSystem: "",
   doctorSharePercent: "",
   doctorShareCeiling: "",
-  status: "open",
 };
 
 const num = (s: string): number | undefined => (s.trim() === "" ? undefined : Number(s));
@@ -98,7 +97,6 @@ export function BatchFormDialog({
   const { register, control, handleSubmit, reset, watch, setValue, setError, formState } = form;
   const errors = formState.errors;
   const customerId = watch("customerId");
-  const status = watch("status");
 
   // The contract + farm dropdowns are scoped to the chosen customer.
   const contractsQuery = useContracts({ customerId: customerId || undefined, take: 200 });
@@ -124,7 +122,6 @@ export function BatchFormDialog({
         entitlementSystem: batch.entitlementSystem ?? "",
         doctorSharePercent: batch.doctorSharePercent != null ? String(batch.doctorSharePercent) : "",
         doctorShareCeiling: batch.doctorShareCeiling != null ? String(batch.doctorShareCeiling) : "",
-        status: batch.status as FormValues["status"],
       });
       setCustomerName(resolveCustomerName(batch.customerId) ?? "");
     } else {
@@ -150,7 +147,6 @@ export function BatchFormDialog({
         | undefined,
       doctorSharePercent: num(values.doctorSharePercent),
       doctorShareCeiling: num(values.doctorShareCeiling),
-      status: values.status as BatchCreateRequest["status"],
     };
     if (batch) {
       const body: BatchPatchRequest = shared;
@@ -345,25 +341,7 @@ export function BatchFormDialog({
           >
             <Input type="number" step="0.01" min="0" dir="ltr" {...register("doctorShareCeiling")} />
           </Field>
-          <Field label={t("finance.batches.status")}>
-            <Controller
-              name="status"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onChange={(e) => field.onChange(e.target.value)}>
-                  <option value="open">{t("batchStatus.open")}</option>
-                  <option value="closed">{t("batchStatus.closed")}</option>
-                </Select>
-              )}
-            />
-          </Field>
         </div>
-
-        {status === "closed" ? (
-          <div className="alert amber">
-            <span>{t("finance.batches.closeWarning")}</span>
-          </div>
-        ) : null}
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={pending}>

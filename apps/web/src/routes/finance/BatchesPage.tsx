@@ -2,6 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { BATCH_STATUS_VALUES, formatNumber, type BatchResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { DataTable } from "@/components/data-table/DataTable";
@@ -22,6 +23,7 @@ import { batchStatusVariant } from "@/routes/finance/statusVariants";
 export function BatchesPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const navigate = useNavigate();
   const [status, setStatus] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<BatchResponse | null>(null);
@@ -96,17 +98,32 @@ export function BatchesPage() {
       {
         accessorKey: "status",
         header: t("finance.batches.colStatus"),
-        cell: ({ row }) => (
-          <Badge variant={batchStatusVariant(row.original.status)}>
-            {t(`batchStatus.${row.original.status}`, { defaultValue: row.original.status })}
-          </Badge>
-        ),
+        cell: ({ row }) =>
+          row.original.settledAt ? (
+            <Badge variant="success">{t("finance.settlement.settledBadge")}</Badge>
+          ) : (
+            <Badge variant={batchStatusVariant(row.original.status)}>
+              {t(`batchStatus.${row.original.status}`, { defaultValue: row.original.status })}
+            </Badge>
+          ),
       },
       {
         id: "actions",
         header: "",
         cell: ({ row }) => (
           <div className="flex justify-end gap-1">
+            {/* M24 — settling (تصفية) is THE close path: re-price + discount + close + compute.
+                Available until a settlement exists, even for batches closed via the old PATCH. */}
+            {!row.original.settledAt ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate(`/finance/batches/${row.original.id}/settle`)}
+              >
+                <Icon.receipt className="size-4" />
+                {t("finance.settlement.action")}
+              </Button>
+            ) : null}
             <Button
               size="icon"
               variant="ghost"
