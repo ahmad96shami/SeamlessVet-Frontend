@@ -73,6 +73,12 @@ export const Icon = {
       <path d="M12 5v14M6 13l6 6 6-6" />
     </Svg>
   ),
+  // points in the reading direction — flip with `rtl:-scale-x-100` in RTL layouts
+  arrowRight: (p: IconProps) => (
+    <Svg {...p}>
+      <path d="M4 12h16M14 6l6 6-6 6" />
+    </Svg>
+  ),
   more: (p: IconProps) => (
     <Svg {...p}>
       <circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none" />

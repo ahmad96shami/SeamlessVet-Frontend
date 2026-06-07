@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { DateRange } from "@/components/ui/date-range";
 import { ContractFarms } from "@/routes/finance/ContractFarms";
 import { ContractMedicationPrices } from "@/routes/finance/ContractMedicationPrices";
 import { contractStatusVariant } from "@/routes/finance/statusVariants";
@@ -54,12 +55,7 @@ export function ContractDetailPanel({
       <div>
         <Kv
           label={t("finance.contracts.colPeriod")}
-          value={
-            <span dir="ltr">
-              {formatDate(contract.periodStart, lang)}
-              {contract.periodEnd ? ` → ${formatDate(contract.periodEnd, lang)}` : ""}
-            </span>
-          }
+          value={<DateRange start={contract.periodStart} end={contract.periodEnd} />}
         />
         <Kv
           label={t("finance.contracts.totalPrice")}

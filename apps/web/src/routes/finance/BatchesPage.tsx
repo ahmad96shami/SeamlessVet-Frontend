@@ -1,10 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import {
-  BATCH_STATUS_VALUES,
-  formatDate,
-  formatNumber,
-  type BatchResponse,
-} from "@vet/shared";
+import { BATCH_STATUS_VALUES, formatNumber, type BatchResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -13,6 +8,7 @@ import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DateRange } from "@/components/ui/date-range";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { useCustomerLookup } from "@/hooks/useCustomerLookup";
@@ -67,10 +63,11 @@ export function BatchesPage() {
         accessorKey: "startDate",
         header: t("finance.batches.colPeriod"),
         cell: ({ row }) => (
-          <span dir="ltr" className="text-sm">
-            {formatDate(row.original.startDate, lang)}
-            {row.original.endDate ? ` → ${formatDate(row.original.endDate, lang)}` : ""}
-          </span>
+          <DateRange
+            start={row.original.startDate}
+            end={row.original.endDate}
+            className="text-sm"
+          />
         ),
       },
       {

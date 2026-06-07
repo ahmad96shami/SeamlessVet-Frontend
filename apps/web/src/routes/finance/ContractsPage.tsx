@@ -1,10 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import {
-  CONTRACT_STATUS_VALUES,
-  formatCurrency,
-  formatDate,
-  type ContractResponse,
-} from "@vet/shared";
+import { CONTRACT_STATUS_VALUES, formatCurrency, type ContractResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -12,6 +7,7 @@ import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DateRange } from "@/components/ui/date-range";
 import { Icon } from "@/components/ui/icon";
 import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { useCustomerLookup } from "@/hooks/useCustomerLookup";
@@ -70,10 +66,11 @@ export function ContractsPage() {
         accessorKey: "periodStart",
         header: t("finance.contracts.colPeriod"),
         cell: ({ row }) => (
-          <span dir="ltr" className="text-sm">
-            {formatDate(row.original.periodStart, lang)}
-            {row.original.periodEnd ? ` → ${formatDate(row.original.periodEnd, lang)}` : ""}
-          </span>
+          <DateRange
+            start={row.original.periodStart}
+            end={row.original.periodEnd}
+            className="text-sm"
+          />
         ),
       },
       {
