@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
 
@@ -16,19 +16,31 @@ import { computeTotals, lineTotal, paymentSummary } from "./cartTotals";
 
 /**
  * One cart line — a single header row that is also the expander toggle (click anywhere that isn't
- * the trash): chevron · "qty ×" · name on the start edge; the line total (with the pre-discount
- * price struck through above it when a line discount applies) and the trash on the end edge.
- * Expanding reveals a flat 3-column editor — quantity / unit price / line discount.
+ * the trash; the row's full padded area toggles): chevron · "qty ×" · name on the start edge; the
+ * line total (with the pre-discount price struck through above it when a line discount applies)
+ * and the trash on the end edge. Expanding reveals a flat 3-column editor — quantity / unit price
+ * / line discount — with the quantity input focused and pre-selected. The parent keeps a single
+ * open line (accordion), so opening one closes the others.
  */
-function CartLineRow({ line }: { line: CartLine }) {
+function CartLineRow({
+  line,
+  open,
+  onToggle,
+}: {
+  line: CartLine;
+  open: boolean;
+  onToggle: () => void;
+}) {
   const { t } = useTranslation();
   const { setQty, setUnitPrice, setLineDiscount, removeLine } = usePosCartStore.getState();
   const overSell = line.available != null && line.quantity > line.available;
-  const [open, setOpen] = useState(false);
   // Transient draft so the qty field can go empty mid-edit without the store dropping the line
-  // (it only commits a value ≥ 1).
+  // (it only commits a value ≥ 1). Dropped when the expander closes — including when another
+  // line's expander steals the accordion slot — so reopening never shows a stale half-edit.
   const [qtyDraft, setQtyDraft] = useState<string | null>(null);
-  const toggle = () => setOpen((v) => !v);
+  useEffect(() => {
+    if (!open) setQtyDraft(null);
+  }, [open]);
 
   const commitQty = (raw: string) => {
     setQtyDraft(raw);
@@ -37,20 +49,20 @@ function CartLineRow({ line }: { line: CartLine }) {
   };
 
   return (
-    <div className="border-b p-3">
+    <div className="border-b">
       <div
         role="button"
         tabIndex={0}
         aria-expanded={open}
         aria-label={t("pos.cart.edit")}
-        onClick={toggle}
+        onClick={onToggle}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            toggle();
+            onToggle();
           }
         }}
-        className="flex cursor-pointer items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+        className="flex cursor-pointer items-center gap-2 rounded-lg p-3 outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
       >
         <Icon.fwd
           className={cn(
@@ -95,7 +107,7 @@ function CartLineRow({ line }: { line: CartLine }) {
       </div>
 
       {open ? (
-        <div className="mt-2 grid grid-cols-3 gap-2">
+        <div className="-mt-1 grid grid-cols-3 gap-2 px-3 pb-3">
           <label className="flex flex-col gap-1">
             <span className="text-[11px] font-semibold text-muted-foreground">
               {t("pos.cart.qty")}
@@ -106,6 +118,8 @@ function CartLineRow({ line }: { line: CartLine }) {
               min={1}
               step="1"
               dir="ltr"
+              autoFocus
+              onFocus={(e) => e.target.select()}
               value={qtyDraft ?? String(line.quantity)}
               onChange={(e) => commitQty(e.target.value)}
               onBlur={() => setQtyDraft(null)}
@@ -145,7 +159,7 @@ function CartLineRow({ line }: { line: CartLine }) {
       ) : null}
 
       {overSell ? (
-        <p className="mt-1 ps-[22px] text-xs text-destructive">
+        <p className="-mt-1 pb-2 pe-3 ps-[34px] text-xs text-destructive">
           {t("pos.catalog.available")}: {line.available}
         </p>
       ) : null}
@@ -202,6 +216,8 @@ export function CartPanel() {
   const payments = usePosCartStore((s) => s.payments);
   const setPayments = usePosCartStore((s) => s.setPayments);
   const [addingDiscount, setAddingDiscount] = useState(false);
+  // Accordion: at most one line expander open at a time.
+  const [openLineKey, setOpenLineKey] = useState<string | null>(null);
 
   const settings = useSystemSettings();
   const tax = {
@@ -227,7 +243,14 @@ export function CartPanel() {
         {lines.length === 0 ? (
           <p className="px-6 py-16 text-center text-sm text-muted-foreground">{t("pos.cart.empty")}</p>
         ) : (
-          lines.map((line) => <CartLineRow key={line.key} line={line} />)
+          lines.map((line) => (
+            <CartLineRow
+              key={line.key}
+              line={line}
+              open={line.key === openLineKey}
+              onToggle={() => setOpenLineKey((k) => (k === line.key ? null : line.key))}
+            />
+          ))
         )}
       </div>
 
