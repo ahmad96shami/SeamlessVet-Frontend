@@ -790,7 +790,7 @@
       "estimateHint": "Estimate so far — finalised on close (checkout-hour rule {{hour}}).",
       "close": "Close stay",
       "closeTitle": "Close night stay",
-      "closeBody": "{{nights}} night(s) will be charged and {{total}} posted to the customer's account. This can't be undone.",
+      "closeBody": "{{nights}} night(s) totalling {{total}} will be recorded for a check-out now.",
       "closed": "Night stay closed and charge posted",
       "deleteConfirm": "This night stay will be deleted.",
       "newTitle": "Record a night stay",
