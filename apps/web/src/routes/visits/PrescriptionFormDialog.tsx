@@ -40,7 +40,9 @@ function splitInterval(minutes: number | null | undefined): { value: string; uni
  * Add / edit a prescription. On create the product, dispense type, and quantity are chosen — an
  * `administered_in_clinic` script deducts inventory server-side. Product / dispense type / quantity
  * are immutable post-create; the advisory text **and** the M18 recurring-dose reminder schedule are
- * editable on both create and edit.
+ * editable on both create and edit. The dispense type defaults to `dispensed_to_owner` (billable at
+ * the POS — matches the mobile form's Mo2 default); the vet switches to `administered_in_clinic`
+ * for meds consumed during treatment.
  */
 export function PrescriptionFormDialog({
   open,
@@ -73,7 +75,7 @@ export function PrescriptionFormDialog({
   const [frequency, setFrequency] = useState("");
   const [duration, setDuration] = useState("");
   const [notes, setNotes] = useState("");
-  const [dispenseType, setDispenseType] = useState<DispenseType>("administered_in_clinic");
+  const [dispenseType, setDispenseType] = useState<DispenseType>("dispensed_to_owner");
   const [quantity, setQuantity] = useState("");
 
   // M18 recurring-dose reminder schedule.
@@ -92,7 +94,7 @@ export function PrescriptionFormDialog({
     setFrequency(prescription?.frequency ?? "");
     setDuration(prescription?.duration ?? "");
     setNotes(prescription?.notes ?? "");
-    setDispenseType((prescription?.dispenseType as DispenseType) ?? "administered_in_clinic");
+    setDispenseType((prescription?.dispenseType as DispenseType) ?? "dispensed_to_owner");
     setQuantity(prescription?.quantity != null ? String(prescription.quantity) : "");
     setReminderEnabled(prescription?.reminderEnabled ?? false);
     const iv = splitInterval(prescription?.intervalMinutes);
