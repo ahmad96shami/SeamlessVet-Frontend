@@ -759,7 +759,7 @@
       "billed": "Billed"
     },
     "scheduleFollowUp": {
-      "action": "Schedule follow-up",
+      "action": "Schedule a follow-up for this visit",
       "title": "Schedule a follow-up visit",
       "hint": "Books a follow-up appointment for the same customer and pet. Attending it waives the checkup fee once for the origin visit.",
       "date": "Follow-up time",
