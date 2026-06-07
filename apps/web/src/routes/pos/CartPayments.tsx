@@ -37,7 +37,7 @@ export function CartPayments({ total }: { total: number }) {
 
   // Nothing to say (e.g. a walk-in with no legs yet) → no empty bordered block.
   const hasStatus = overpaid || (remaining > 0 && hasCustomer);
-  if ((!hasLines && !hasVisit) || (payments.length === 0 && !hasStatus && !hasVisit)) return null;
+  if ((!hasLines && !hasVisit) || (payments.length === 0 && !hasStatus)) return null;
 
   const updateLeg = (key: string, patch: Partial<Omit<PaymentLeg, "key">>) =>
     setPayments(payments.map((p) => (p.key === key ? { ...p, ...patch } : p)));
@@ -135,11 +135,6 @@ export function CartPayments({ total }: { total: number }) {
         </div>
       ) : null}
 
-      {hasVisit ? (
-        <p className="text-[11px] leading-snug text-muted-foreground">
-          {t("pos.link.visitChargesHint")}
-        </p>
-      ) : null}
     </div>
   );
 }

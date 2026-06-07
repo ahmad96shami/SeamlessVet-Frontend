@@ -4,7 +4,11 @@ import { create } from "zustand";
 export type CartLineKind = "product" | "service";
 
 export interface CartLine {
-  /** Stable key = the catalog id; one line per product/service (re-adding increments qty). */
+  /**
+   * Stable key = the catalog id; one line per product/service (re-adding increments qty).
+   * Locked visit lines key by their prescription/procedure id instead, so a manual line for the
+   * same product coexists without merging.
+   */
   key: string;
   kind: CartLineKind;
   refId: string;
@@ -19,6 +23,14 @@ export interface CartLine {
   discountAmount: number;
   /** On-hand at the warehouse (products only) — drives the over-sell hint. */
   available?: number;
+  /**
+   * A locked line mirrors one of the linked visit's unbilled charges: it can't be removed and its
+   * quantity is fixed (edited on the visit, server-authoritative at issuance) — only price and
+   * discount are the cashier's. Carries the back-link the server de-dupes assembly against.
+   */
+  locked?: boolean;
+  prescriptionId?: string;
+  procedureId?: string;
 }
 
 export interface PaymentLeg {
@@ -45,6 +57,12 @@ interface PosCartState {
   setUnitPrice: (key: string, unitPrice: number) => void;
   setLineDiscount: (key: string, discountAmount: number) => void;
   removeLine: (key: string) => void;
+  /**
+   * Reconcile the locked visit lines with the visit's current unbilled charges: lines for new
+   * charges appear, lines for charges that vanished (billed elsewhere / removed on the visit) go,
+   * and a line that survives keeps the cashier's price/discount edits. Manual lines are untouched.
+   */
+  syncVisitLines: (visitLines: Omit<CartLine, "locked">[]) => void;
   setInvoiceDiscount: (amount: number) => void;
   /** Set/clear the customer. Changing the customer drops any linked visit (it belonged to the old one). */
   setCustomer: (id: string | null) => void;
@@ -80,8 +98,9 @@ export const usePosCartStore = create<PosCartState>((set) => ({
     }),
   setQty: (key, quantity) =>
     set((s) => ({
+      // A locked line's quantity is the visit's to change — ignore edits (and never drop it).
       lines: s.lines.flatMap((l) =>
-        l.key === key ? (quantity <= 0 ? [] : [{ ...l, quantity }]) : [l],
+        l.key === key && !l.locked ? (quantity <= 0 ? [] : [{ ...l, quantity }]) : [l],
       ),
     })),
   setUnitPrice: (key, unitPrice) =>
@@ -90,11 +109,25 @@ export const usePosCartStore = create<PosCartState>((set) => ({
     set((s) => ({
       lines: s.lines.map((l) => (l.key === key ? { ...l, discountAmount } : l)),
     })),
-  removeLine: (key) => set((s) => ({ lines: s.lines.filter((l) => l.key !== key) })),
+  removeLine: (key) => set((s) => ({ lines: s.lines.filter((l) => l.key !== key || l.locked) })),
+  syncVisitLines: (visitLines) =>
+    set((s) => {
+      const prev = new Map(s.lines.filter((l) => l.locked).map((l) => [l.key, l]));
+      const merged = visitLines.map((vl) => {
+        const kept = prev.get(vl.key);
+        // The source (name/qty) follows the visit; price/discount keep the cashier's edits.
+        return kept
+          ? { ...vl, locked: true, unitPrice: kept.unitPrice, discountAmount: kept.discountAmount }
+          : { ...vl, locked: true };
+      });
+      return { lines: [...merged, ...s.lines.filter((l) => !l.locked)] };
+    }),
   setInvoiceDiscount: (invoiceDiscount) => set({ invoiceDiscount }),
-  setCustomer: (customerId) => set({ customerId, visitId: null }),
+  // Dropping/charging the customer or visit also drops the visit's locked lines.
+  setCustomer: (customerId) =>
+    set((s) => ({ customerId, visitId: null, lines: s.lines.filter((l) => !l.locked) })),
   linkVisit: (visitId, customerId) => set({ visitId, customerId }),
-  clearVisit: () => set({ visitId: null }),
+  clearVisit: () => set((s) => ({ visitId: null, lines: s.lines.filter((l) => !l.locked) })),
   setPayments: (payments) => set({ payments }),
   clear: () =>
     set({ lines: [], customerId: null, visitId: null, invoiceDiscount: 0, payments: [] }),

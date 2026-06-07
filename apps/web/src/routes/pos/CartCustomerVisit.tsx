@@ -1,12 +1,8 @@
-import { formatQuantity } from "@vet/shared";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Money } from "@/components/ui/money";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
-import { cn } from "@/lib/utils";
 import { useCustomer } from "@/queries/customers";
 import { useInvoices } from "@/queries/invoices";
 import { usePrescriptions } from "@/queries/prescriptions";
@@ -21,8 +17,8 @@ import { VisitPickerDialog, visitRef } from "./VisitPickerDialog";
 
 /**
  * The visit's UNBILLED dispensed-to-owner prescriptions + procedures — exactly what the server
- * auto-assembles at issuance. Anything already on a non-void invoice for the visit is filtered out
- * (the server de-dups via the prescription/procedure back-links); names resolve via catalog maps.
+ * bills at issuance. Anything already on a non-void invoice for the visit is filtered out (the
+ * server de-dups via the prescription/procedure back-links); names/prices resolve via catalog maps.
  */
 function useVisitCharges(visitId: string) {
   const rx = usePrescriptions(visitId);
@@ -32,7 +28,7 @@ function useVisitCharges(visitId: string) {
   const services = useServices({ take: 200 });
 
   return useMemo(() => {
-    const productName = new Map((products.data ?? []).map((p) => [p.id, p.nameAr]));
+    const productById = new Map((products.data ?? []).map((p) => [p.id, p]));
     const serviceName = new Map((services.data ?? []).map((s) => [s.id, s.nameAr]));
 
     const billedRx = new Set<string>();
@@ -47,11 +43,26 @@ function useVisitCharges(visitId: string) {
 
     const prescriptions = (rx.data ?? [])
       .filter((p) => p.dispenseType === "dispensed_to_owner" && !billedRx.has(p.id))
-      .map((p) => ({ id: p.id, name: productName.get(p.productId) ?? "—", quantity: p.quantity ?? 1 }));
+      .map((p) => {
+        const product = productById.get(p.productId);
+        return {
+          id: p.id,
+          productId: p.productId,
+          name: product?.nameAr ?? "—",
+          unit: product?.unitOfMeasure ?? undefined,
+          unitPrice: product?.sellingPrice ?? 0,
+          quantity: p.quantity ?? 1,
+        };
+      });
 
     const procedures = (procs.data ?? [])
       .filter((p) => p.serviceId != null && !billedProc.has(p.id))
-      .map((p) => ({ id: p.id, name: (p.serviceId && serviceName.get(p.serviceId)) || "—", price: p.price }));
+      .map((p) => ({
+        id: p.id,
+        serviceId: p.serviceId!,
+        name: (p.serviceId && serviceName.get(p.serviceId)) || "—",
+        price: p.price,
+      }));
 
     return {
       prescriptions,
@@ -62,74 +73,43 @@ function useVisitCharges(visitId: string) {
 }
 
 /**
- * Collapsed by default — a one-line header with the charge count keeps the cart's vertical
- * space for line items; expanding reveals the same dispensed/procedure breakdown as before.
+ * Mirrors the linked visit's unbilled charges into the cart as LOCKED lines (keyed by the
+ * prescription/procedure id): visible and price/discount-editable like any line, but not removable
+ * and with the quantity fixed — that is edited on the visit, and the server enforces it at
+ * issuance regardless. Renders nothing; the store merge keeps the cashier's edits across refetches.
  */
-function VisitChargesPreview({ visitId }: { visitId: string }) {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+function VisitLinesSync({ visitId }: { visitId: string }) {
   const { prescriptions, procedures, isLoading } = useVisitCharges(visitId);
-  const count = prescriptions.length + procedures.length;
-  const [open, setOpen] = useState(false);
+  const syncVisitLines = usePosCartStore((s) => s.syncVisitLines);
 
-  return (
-    <div className="rounded-xl border bg-ink-50/60">
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-2 rounded-xl p-2.5 text-xs outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
-      >
-        <Icon.fwd
-          className={cn(
-            "size-3.5 flex-none text-muted-foreground transition-transform",
-            open ? "rotate-90" : "rtl:-scale-x-100",
-          )}
-          aria-hidden
-        />
-        <span className="flex-1 text-start font-semibold text-navy-900">
-          {t("pos.link.visitCharges")}
-        </span>
-        <span className="flex-none tabular-nums text-muted-foreground">
-          {isLoading ? "…" : count}
-        </span>
-      </button>
-      {open ? (
-        <div className="px-2.5 pb-2.5 ps-8">
-          {/* No charges → the empty message alone; the auto-add hint would only confuse. */}
-          {count === 0 && !isLoading ? (
-            <p className="text-xs text-muted-foreground">{t("pos.link.noVisitCharges")}</p>
-          ) : (
-            <ul className="space-y-1 text-xs">
-              {prescriptions.map((p) => (
-                <li key={p.id} className="flex items-center justify-between gap-2">
-                  <span className="flex min-w-0 items-center gap-1">
-                    <Badge variant="secondary">{t("pos.link.dispensed")}</Badge>
-                    <span className="truncate">{p.name}</span>
-                  </span>
-                  <span className="text-muted-foreground tabular-nums">× {formatQuantity(p.quantity, lang)}</span>
-                </li>
-              ))}
-              {procedures.map((p) => (
-                <li key={p.id} className="flex items-center justify-between gap-2">
-                  <span className="flex min-w-0 items-center gap-1">
-                    <Badge variant="secondary">{t("pos.link.procedure")}</Badge>
-                    <span className="truncate">{p.name}</span>
-                  </span>
-                  <span className="tabular-nums text-muted-foreground"><Money value={p.price} /></span>
-                </li>
-              ))}
-            </ul>
-          )}
-          {count > 0 ? (
-            <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-              {t("pos.link.visitChargesHint")}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
-  );
+  useEffect(() => {
+    if (isLoading) return;
+    syncVisitLines([
+      ...prescriptions.map((p) => ({
+        key: p.id,
+        kind: "product" as const,
+        refId: p.productId,
+        name: p.name,
+        unit: p.unit,
+        unitPrice: p.unitPrice,
+        quantity: p.quantity,
+        discountAmount: 0,
+        prescriptionId: p.id,
+      })),
+      ...procedures.map((p) => ({
+        key: p.id,
+        kind: "service" as const,
+        refId: p.serviceId,
+        name: p.name,
+        unitPrice: p.price,
+        quantity: 1,
+        discountAmount: 0,
+        procedureId: p.id,
+      })),
+    ]);
+  }, [isLoading, prescriptions, procedures, syncVisitLines]);
+
+  return null;
 }
 
 /** A removable link chip — the compact "linked customer / linked visit" token in the cart header. */
@@ -231,7 +211,7 @@ export function CartCustomerVisit() {
         ) : null}
       </div>
 
-      {visitId ? <VisitChargesPreview visitId={visitId} /> : null}
+      {visitId ? <VisitLinesSync visitId={visitId} /> : null}
 
       <CustomerPickerDialog
         open={pickCustomer}

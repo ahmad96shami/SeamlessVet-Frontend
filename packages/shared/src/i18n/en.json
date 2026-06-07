@@ -1190,7 +1190,8 @@
       "tax": "VAT",
       "taxExempt": "— exempt",
       "total": "Total due",
-      "clear": "Clear cart"
+      "clear": "Clear cart",
+      "visitLineHint": "A visit charge — quantity is edited on the visit; it cannot be removed here"
     },
     "layout": {
       "list": "List view",

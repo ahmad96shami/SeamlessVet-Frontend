@@ -93,17 +93,27 @@ function CartLineRow({
             <Money value={lineTotal(line)} />
           </span>
         </span>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            removeLine(line.key);
-          }}
-          aria-label={t("pos.cart.remove")}
-          className="-my-1 flex-none rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-soft/40 hover:text-destructive"
-        >
-          <Icon.trash className="size-4" />
-        </button>
+        {line.locked ? (
+          // A visit charge: not removable here — it is billed from the visit's clinical record.
+          <span
+            title={t("pos.cart.visitLineHint")}
+            className="-my-1 flex-none rounded-md p-1 text-muted-foreground"
+          >
+            <Icon.lock className="size-4" aria-label={t("pos.cart.visitLineHint")} />
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              removeLine(line.key);
+            }}
+            aria-label={t("pos.cart.remove")}
+            className="-my-1 flex-none rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-soft/40 hover:text-destructive"
+          >
+            <Icon.trash className="size-4" />
+          </button>
+        )}
       </div>
 
       {open ? (
@@ -112,13 +122,17 @@ function CartLineRow({
             <span className="text-[11px] font-semibold text-muted-foreground">
               {t("pos.cart.qty")}
             </span>
+            {/* A locked (visit) line's quantity is edited on the visit, not at the till —
+                focus lands on the price instead. */}
             <Input
               type="number"
               inputMode="numeric"
               min={1}
               step="1"
               dir="ltr"
-              autoFocus
+              disabled={line.locked}
+              title={line.locked ? t("pos.cart.visitLineHint") : undefined}
+              autoFocus={!line.locked}
               onFocus={(e) => e.target.select()}
               value={qtyDraft ?? String(line.quantity)}
               onChange={(e) => commitQty(e.target.value)}
@@ -135,6 +149,8 @@ function CartLineRow({
               min={0}
               step="0.01"
               dir="ltr"
+              autoFocus={line.locked}
+              onFocus={(e) => e.target.select()}
               value={line.unitPrice}
               onChange={(e) => setUnitPrice(line.key, Number(e.target.value) || 0)}
               className="h-8 text-sm"

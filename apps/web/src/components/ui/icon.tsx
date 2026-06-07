@@ -171,6 +171,12 @@ export const Icon = {
       <path d="M13 19l-1.5 1.5a4 4 0 0 1-5.7-5.7L7 13" />
     </Svg>
   ),
+  lock: (p: IconProps) => (
+    <Svg {...p}>
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </Svg>
+  ),
   // domain / nav
   home: (p: IconProps) => (
     <Svg {...p}>
