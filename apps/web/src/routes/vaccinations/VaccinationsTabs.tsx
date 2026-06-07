@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { to: "/vaccinations", labelKey: "vaccinations.tabs.list", end: true },
   { to: "/vaccinations/calendar", labelKey: "vaccinations.tabs.calendar", end: false },
+  { to: "/vaccinations/vaccines", labelKey: "vaccinations.tabs.vaccines", end: false },
 ];
 
 export function VaccinationsTabs() {

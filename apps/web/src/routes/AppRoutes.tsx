@@ -47,6 +47,7 @@ import { StockPage } from "@/routes/inventory/StockPage";
 import { VaccinationCalendarPage } from "@/routes/vaccinations/VaccinationCalendarPage";
 import { VaccinationsLayout } from "@/routes/vaccinations/VaccinationsLayout";
 import { VaccinationsListPage } from "@/routes/vaccinations/VaccinationsListPage";
+import { VaccinesCatalogPage } from "@/routes/vaccinations/VaccinesCatalogPage";
 import { PetTimelinePage } from "@/routes/visits/PetTimelinePage";
 import { VisitDetailPage } from "@/routes/visits/VisitDetailPage";
 import { VisitsPage } from "@/routes/visits/VisitsPage";
@@ -153,6 +154,7 @@ export function AppRoutes() {
         >
           <Route index element={<VaccinationsListPage />} />
           <Route path="calendar" element={<VaccinationCalendarPage />} />
+          <Route path="vaccines" element={<VaccinesCatalogPage />} />
         </Route>
         <Route
           path="pos"
