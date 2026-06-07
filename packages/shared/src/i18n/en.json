@@ -981,7 +981,9 @@
       "prescriptions": "prescriptions",
       "vaccinations": "vaccinations"
     },
-    "billedLocked": "Billed — backed by an invoice line; it cannot be removed"
+    "billedLocked": "Billed — backed by an invoice line; it cannot be removed",
+    "billedRx": "Billed",
+    "billedProcedure": "Billed"
   },
   "vaccinations": {
     "title": "Vaccinations",

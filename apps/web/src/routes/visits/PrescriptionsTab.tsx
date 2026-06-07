@@ -43,6 +43,9 @@ export function PrescriptionsTab({ visitId, readOnly }: { visitId: string; readO
             {row.original.reminderEnabled ? (
               <Badge variant="warning">{t("visits.prescriptions.recurring.badge")}</Badge>
             ) : null}
+            {billed.prescriptions.has(row.original.id) ? (
+              <Badge variant="success">{t("visits.billedRx")}</Badge>
+            ) : null}
           </span>
         ),
       },

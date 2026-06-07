@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Money } from "@/components/ui/money";
 
 import { DataTable } from "@/components/data-table/DataTable";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
@@ -40,7 +41,14 @@ export function ProceduresTab({ visitId, readOnly }: { visitId: string; readOnly
         cell: ({ row }) => {
           const id = row.original.serviceId;
           const name = id ? serviceById.get(id) : undefined;
-          return name ?? <span className="text-muted-foreground">{t("visits.procedures.noService")}</span>;
+          return (
+            <span className="flex items-center gap-2">
+              {name ?? <span className="text-muted-foreground">{t("visits.procedures.noService")}</span>}
+              {billed.procedures.has(row.original.id) ? (
+                <Badge variant="success">{t("visits.billedProcedure")}</Badge>
+              ) : null}
+            </span>
+          );
         },
       },
       {

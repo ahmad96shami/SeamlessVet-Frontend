@@ -997,7 +997,9 @@
       "prescriptions": "وصفات",
       "vaccinations": "تطعيمات"
     },
-    "billedLocked": "مُفوتر — يُدار من الفاتورة ولا يمكن حذفه"
+    "billedLocked": "مُفوتر — يُدار من الفاتورة ولا يمكن حذفه",
+    "billedRx": "مُفوترة",
+    "billedProcedure": "مُفوتر"
   },
   "vaccinations": {
     "title": "التطعيمات",
