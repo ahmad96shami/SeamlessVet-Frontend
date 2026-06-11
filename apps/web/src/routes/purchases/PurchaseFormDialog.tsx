@@ -9,6 +9,7 @@ import { z } from "zod";
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
+import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,9 @@ const LineSchema = z.object({
   quantity: z.number().positive(),
   unitCost: z.number().min(0),
   discountAmount: z.number().min(0),
+  // M25 — per-line expiry + optional lot number ride onto the FEFO lot the receive creates.
+  expirationDate: z.string().nullish(),
+  lotNumber: z.string().trim().optional(),
 });
 const FormSchema = z.object({
   supplierId: z.string().min(1),
@@ -36,7 +40,7 @@ const FormSchema = z.object({
 });
 type FormValues = z.infer<typeof FormSchema>;
 
-const EMPTY_LINE = { productId: "", quantity: 0, unitCost: 0, discountAmount: 0 };
+const EMPTY_LINE = { productId: "", quantity: 0, unitCost: 0, discountAmount: 0, expirationDate: "", lotNumber: "" };
 const DEFAULTS: FormValues = {
   supplierId: "",
   number: "",
@@ -131,6 +135,8 @@ export function PurchaseFormDialog({
         quantity: l.quantity,
         unitCost: l.unitCost,
         discountAmount: l.discountAmount,
+        ...(l.expirationDate ? { expirationDate: l.expirationDate } : {}),
+        ...(l.lotNumber && l.lotNumber.trim() ? { lotNumber: l.lotNumber.trim() } : {}),
       })),
       ...(values.number && values.number.trim() ? { number: values.number.trim() } : {}),
       ...(values.taxAmount > 0 ? { taxAmount: values.taxAmount } : {}),
@@ -241,6 +247,29 @@ export function PurchaseFormDialog({
                   >
                     <Icon.trash className="size-4" />
                   </Button>
+                </div>
+                {/* M25 — per-line lot detail: expiry seeds the FEFO lot's expiration, lot number is free text. */}
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <Field label={t("purchases.lines.expiry")} error={lineErrs?.expirationDate?.message}>
+                    <Controller
+                      name={`lines.${idx}.expirationDate` as const}
+                      control={control}
+                      render={({ field }) => (
+                        <DatePicker
+                          value={field.value ?? ""}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          placeholder={t("purchases.lines.expiryPlaceholder")}
+                        />
+                      )}
+                    />
+                  </Field>
+                  <Field label={t("purchases.lines.lotNumber")} error={lineErrs?.lotNumber?.message}>
+                    <Input
+                      dir="ltr"
+                      placeholder={t("purchases.lines.lotNumberPlaceholder")}
+                      {...register(`lines.${idx}.lotNumber` as const)}
+                    />
+                  </Field>
                 </div>
               </div>
             );
