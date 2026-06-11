@@ -1,17 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   adjustStock,
+  listExpiring,
   listFieldInventories,
+  listLots,
   listMovements,
   listStock,
   loadField,
   unloadField,
   type AdjustStockInput,
   type ApiError,
+  type ExpiringParams,
+  type ExpiringProduct,
   type FieldInventoryResponse,
   type IdentifierResponse,
+  type InventoryLot,
   type InventoryMovementResponse,
   type LoadFieldInput,
+  type LotListParams,
   type MovementListParams,
   type StockLevelResponse,
   type StockListParams,
@@ -49,6 +55,27 @@ export function useFieldInventories() {
     queryKey: [KEY, "field-inventories"],
     queryFn: () => listFieldInventories(apiClient),
     staleTime: 60_000,
+  });
+}
+
+/**
+ * GET /inventory/lots — a product's FEFO lots (cost + expiry + remaining), earliest-expiry first.
+ * Gated on a productId (the lots dialog opens per stock row), so pass `enabled` to skip until open.
+ */
+export function useInventoryLots(params: LotListParams, enabled = true) {
+  return useQuery<InventoryLot[], ApiError>({
+    queryKey: [KEY, "lots", params],
+    queryFn: () => listLots(apiClient, params),
+    enabled: enabled && !!params.productId,
+  });
+}
+
+/** GET /inventory/expiring — on-hand lots near expiry (lot-accurate near-expiry view). */
+export function useExpiringStock(params?: ExpiringParams) {
+  return useQuery<ExpiringProduct[], ApiError>({
+    queryKey: [KEY, "expiring", params ?? {}],
+    queryFn: () => listExpiring(apiClient, params),
+    placeholderData: (prev) => prev,
   });
 }
 
