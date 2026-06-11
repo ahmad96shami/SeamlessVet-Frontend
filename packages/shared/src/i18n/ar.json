@@ -379,6 +379,12 @@
       "loadSuccess": "تم تحميل المخزون",
       "unloadSuccess": "تم إرجاع المخزون"
     },
+    "lines": {
+      "selectProduct": "اختر منتجًا",
+      "add": "إضافة سطر",
+      "remove": "حذف السطر"
+    },
+    "partialSuccess": "نجح {{ok}} من {{total}} — فشل {{count}}",
     "alerts": {
       "title": "تنبيهات المخزون",
       "description": "أصناف منخفضة المخزون أو قاربت على انتهاء الصلاحية.",

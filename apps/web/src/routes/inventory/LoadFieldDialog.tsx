@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ApiError, toApiError } from "@vet/shared";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
@@ -53,6 +54,16 @@ export function LoadFieldDialog({ open, onClose }: { open: boolean; onClose: () 
   const unload = useUnloadField();
   const fieldInvs = useFieldInventories();
   const products = useProducts({ take: 200 });
+  const productOptions = useMemo(
+    () =>
+      (products.data ?? []).map((p) => ({
+        value: p.id,
+        label: p.nameAr,
+        sublabel: p.barcode ?? undefined,
+        keywords: p.nameLatin ?? undefined,
+      })),
+    [products.data],
+  );
   const form = useForm<TransferForm>({
     resolver: zodResolver(TransferFormSchema),
     defaultValues: DEFAULTS,
@@ -169,18 +180,12 @@ export function LoadFieldDialog({ open, onClose }: { open: boolean; onClose: () 
                         name={`lines.${idx}.productId` as const}
                         control={control}
                         render={({ field }) => (
-                          <Select
+                          <Combobox
                             value={field.value ?? ""}
-                            onChange={(e) => field.onChange(e.target.value)}
-                          >
-                            <option value="">{t("inventory.lines.selectProduct")}</option>
-                            {(products.data ?? []).map((p) => (
-                              <option key={p.id} value={p.id}>
-                                {p.nameAr}
-                                {p.barcode ? ` · ${p.barcode}` : ""}
-                              </option>
-                            ))}
-                          </Select>
+                            onChange={(v) => field.onChange(v)}
+                            options={productOptions}
+                            placeholder={t("inventory.lines.selectProduct")}
+                          />
                         )}
                       />
                     </Field>

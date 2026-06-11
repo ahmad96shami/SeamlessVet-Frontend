@@ -363,6 +363,12 @@
       "loadSuccess": "Stock loaded",
       "unloadSuccess": "Stock unloaded"
     },
+    "lines": {
+      "selectProduct": "Select a product",
+      "add": "Add line",
+      "remove": "Remove line"
+    },
+    "partialSuccess": "Succeeded {{ok}} of {{total}} — {{count}} failed",
     "alerts": {
       "title": "Inventory alerts",
       "description": "Items low on stock or approaching expiry.",
