@@ -17,6 +17,8 @@ export const PurchaseInvoiceItemResponseSchema = z.object({
   unitCost: z.number(),
   discountAmount: z.number(),
   lineTotal: z.number(),
+  // M25 — expiry of the goods on this line; carried onto the FEFO inventory_lot the receive creates.
+  expirationDate: z.string().nullish(), // DateOnly → "yyyy-MM-dd"
 });
 export type PurchaseInvoiceItemResponse = z.infer<typeof PurchaseInvoiceItemResponseSchema>;
 
@@ -57,12 +59,17 @@ export interface PurchaseInvoiceListParams {
 // The wrapper mints the invoice `id` (GUID v7) + the `idempotencyKey`, so the `*Input` type carries
 // only what the form collects.
 
-/** One requested line: a product, a quantity, and the per-unit cost the clinic paid. */
+/**
+ * One requested line: a product, a quantity, and the per-unit cost the clinic paid. M25 — the
+ * optional `expirationDate` + `lotNumber` ride onto the FEFO `inventory_lot` the receive creates.
+ */
 export const PurchaseInvoiceLineRequestSchema = z.object({
   productId: z.string().min(1),
   quantity: z.number().positive(),
   unitCost: z.number().min(0),
   discountAmount: z.number().min(0).default(0),
+  expirationDate: z.string().nullish(), // DateOnly → "yyyy-MM-dd"
+  lotNumber: optionalText,
 });
 export type PurchaseInvoiceLineRequest = z.infer<typeof PurchaseInvoiceLineRequestSchema>;
 

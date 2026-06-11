@@ -41,10 +41,32 @@ export const InventoryMovementResponseSchema = z.object({
   reason: z.string().nullish(),
   visitId: z.string().nullish(),
   invoiceId: z.string().nullish(),
+  // M25 — the lot this leg created (arrival) or drew from (single-lot deduction); null on a split deduction.
+  lotId: z.string().nullish(),
   performedBy: z.string(),
   createdAt: z.string(),
 });
 export type InventoryMovementResponse = z.infer<typeof InventoryMovementResponseSchema>;
+
+/**
+ * M25 — one FEFO lot of a product at a location (synced to the field device via PowerSync; warehouse
+ * lots stay server-only). Carries the batch's `unitCost` + `expirationDate`; `remainingQty` is the
+ * materialized remainder, and per (location, product) `Σ remainingQty == stock_items.quantity`.
+ */
+export const InventoryLotSchema = z.object({
+  id: z.string(),
+  productId: z.string(),
+  locationType: z.string(),
+  locationId: z.string(),
+  purchaseInvoiceItemId: z.string().nullish(),
+  unitCost: z.number(),
+  expirationDate: z.string().nullish(), // DateOnly → "yyyy-MM-dd"
+  lotNumber: z.string().nullish(),
+  receivedQty: z.number(),
+  remainingQty: z.number(),
+  receivedAt: z.string(),
+});
+export type InventoryLot = z.infer<typeof InventoryLotSchema>;
 
 /** A field doctor's inventory (GET /inventory/field-inventories) — the load/unload picker source. */
 export const FieldInventoryResponseSchema = z.object({
@@ -80,12 +102,19 @@ export interface MovementListParams {
 // (the movement id) and an `idempotencyKey`; both are minted by the api wrappers, so the `*Input`
 // types below carry only the business fields a form collects.
 
-/** Purchase-order receipt into a warehouse (defaults to the env's single central warehouse). */
+/**
+ * Purchase-order receipt into a warehouse (defaults to the env's single central warehouse). M25 —
+ * the optional `unitCost` / `expirationDate` / `lotNumber` seed the created FEFO lot (cost falls
+ * back to the product's catalog purchase price when omitted).
+ */
 export const ReceiveStockRequestSchema = z.object({
   id: z.string().optional(),
   productId: z.string().min(1),
   quantity: z.number().positive(),
   warehouseId: z.string().optional(),
+  unitCost: z.number().min(0).optional(),
+  expirationDate: z.string().nullish(), // DateOnly → "yyyy-MM-dd"
+  lotNumber: optionalText,
   reason: optionalText,
   idempotencyKey: z.string().min(1).max(128),
 });
