@@ -222,6 +222,13 @@
       "write": { "name": "Manage suppliers", "desc": "Manage suppliers, record purchase invoices, and pay suppliers." }
     }
   },
+  "validation": {
+    "invalid": "Invalid value",
+    "nonzero": "Must not be zero",
+    "required": "Required",
+    "minChars": "Must be at least {{count}} characters",
+    "invalid_phone": "Invalid phone number"
+  },
   "requestStatus": {
     "pending": "Pending",
     "approved": "Approved",

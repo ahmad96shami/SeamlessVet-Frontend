@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Label } from "@/components/ui/label";
 
@@ -15,12 +16,18 @@ export function Field({
   hint?: string;
   children: ReactNode;
 }) {
+  const { t } = useTranslation();
+  // Zod's locale-mapped messages are full localized sentences (they contain spaces) and pass
+  // through as-is; short single-token messages from schemas (e.g. "nonzero", "invalid_phone")
+  // are localized via the `validation.*` catalog.
+  const errorText =
+    error && !/\s/.test(error) ? t(`validation.${error}`, { defaultValue: error }) : error;
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
       {children}
-      {error ? (
-        <p className="text-sm text-destructive">{error}</p>
+      {errorText ? (
+        <p className="text-sm text-destructive">{errorText}</p>
       ) : hint ? (
         <p className="text-xs text-muted-foreground">{hint}</p>
       ) : null}
