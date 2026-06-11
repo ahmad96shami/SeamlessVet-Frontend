@@ -147,7 +147,11 @@
       "lowStock": "Items at or below reorder point",
       "lowStockSubtitle_one": "1 item to reorder",
       "lowStockSubtitle_other": "{{count}} items to reorder",
-      "empty": "All stock is above its reorder point."
+      "empty": "All stock is above its reorder point.",
+      "nearExpiry": "Near expiry",
+      "nearExpirySubtitle_one": "1 lot nearing expiry",
+      "nearExpirySubtitle_other": "{{count}} lots nearing expiry",
+      "nearExpiryEmpty": "No lots are nearing expiry."
     }
   },
   "placeholder": {
@@ -307,7 +311,13 @@
       "date": "Date",
       "change": "Change",
       "reason": "Reason",
-      "doctor": "Doctor"
+      "doctor": "Doctor",
+      "lotNumber": "Lot no.",
+      "unitCost": "Cost",
+      "remaining": "Remaining",
+      "received": "Received",
+      "nearExpiryQty": "Near-expiry qty",
+      "onHand": "On hand"
     },
     "status": {
       "ok": "OK",
@@ -315,6 +325,14 @@
       "out": "Out of stock",
       "expiringSoon": "Expiring soon",
       "expired": "Expired"
+    },
+    "lots": {
+      "viewAction": "View lots",
+      "title": "Lots",
+      "dialogTitle": "Lots: {{product}}",
+      "dialogDescription": "Lots at this location, ordered by earliest expiry (FEFO).",
+      "noExpiry": "No expiry",
+      "empty": "No lots at this location"
     },
     "movementType": {
       "receive": "Receive",
@@ -615,6 +633,10 @@
       "unitCost": "Unit cost",
       "lineDiscount": "Line discount",
       "lineTotal": "Total",
+      "expiry": "Expiry date",
+      "expiryPlaceholder": "No expiry",
+      "lotNumber": "Lot no.",
+      "lotNumberPlaceholder": "Optional",
       "add": "Add line",
       "remove": "Remove",
       "empty": "Add at least one item"

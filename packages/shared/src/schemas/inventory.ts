@@ -68,6 +68,23 @@ export const InventoryLotSchema = z.object({
 });
 export type InventoryLot = z.infer<typeof InventoryLotSchema>;
 
+/**
+ * M25 — one on-hand lot near expiry (GET /inventory/expiring), the lot-accurate near-expiry alert
+ * row. `daysUntilExpiry` is negative once expired; `nearExpiryQuantity` is this lot's remaining
+ * quantity and `quantityOnHand` the product's total on hand across locations ("X of Y expiring").
+ */
+export const ExpiringProductSchema = z.object({
+  lotId: z.string(),
+  productId: z.string(),
+  productNameAr: z.string(),
+  lotNumber: z.string().nullish(),
+  expirationDate: z.string(), // DateOnly → "yyyy-MM-dd"
+  daysUntilExpiry: z.number(),
+  nearExpiryQuantity: z.number(),
+  quantityOnHand: z.number(),
+});
+export type ExpiringProduct = z.infer<typeof ExpiringProductSchema>;
+
 /** A field doctor's inventory (GET /inventory/field-inventories) — the load/unload picker source. */
 export const FieldInventoryResponseSchema = z.object({
   id: z.string(),
@@ -95,6 +112,19 @@ export interface MovementListParams {
   to?: string; // "yyyy-MM-dd"
   skip?: number;
   take?: number;
+}
+
+/** GET /inventory/lots — a product's FEFO lots; `productId` is required. */
+export interface LotListParams {
+  productId: string;
+  locationType?: string;
+  locationId?: string;
+  onHandOnly?: boolean; // default true (server) — pass false to include depleted lots
+}
+
+/** GET /inventory/expiring — near-expiry lots; `withinDays` overrides the configured warning window. */
+export interface ExpiringParams {
+  withinDays?: number;
 }
 
 // ---- Writes (POST /inventory/*) — delta intents, never an absolute quantity ----

@@ -163,7 +163,14 @@
       "lowStockSubtitle_few": "{{count}} أصناف تحتاج الطلب",
       "lowStockSubtitle_many": "{{count}} صنفًا يحتاج الطلب",
       "lowStockSubtitle_other": "{{count}} صنفًا يحتاج الطلب",
-      "empty": "كل المخزون فوق نقطة إعادة الطلب."
+      "empty": "كل المخزون فوق نقطة إعادة الطلب.",
+      "nearExpiry": "قرب انتهاء الصلاحية",
+      "nearExpirySubtitle_one": "دُفعة واحدة قاربت على الانتهاء",
+      "nearExpirySubtitle_two": "دُفعتان قاربتا على الانتهاء",
+      "nearExpirySubtitle_few": "{{count}} دُفعات قاربت على الانتهاء",
+      "nearExpirySubtitle_many": "{{count}} دُفعة قاربت على الانتهاء",
+      "nearExpirySubtitle_other": "{{count}} دُفعة قاربت على الانتهاء",
+      "nearExpiryEmpty": "لا توجد دُفعات قاربت على الانتهاء."
     }
   },
   "placeholder": {
@@ -323,7 +330,13 @@
       "date": "التاريخ",
       "change": "التغيّر",
       "reason": "السبب",
-      "doctor": "الطبيب"
+      "doctor": "الطبيب",
+      "lotNumber": "رقم الدُفعة",
+      "unitCost": "التكلفة",
+      "remaining": "المتبقّي",
+      "received": "المُستلَم",
+      "nearExpiryQty": "الكمية القاربة",
+      "onHand": "الرصيد الكلي"
     },
     "status": {
       "ok": "جيد",
@@ -331,6 +344,14 @@
       "out": "نفد",
       "expiringSoon": "قرب الانتهاء",
       "expired": "منتهٍ"
+    },
+    "lots": {
+      "viewAction": "عرض الدُفعات",
+      "title": "الدُفعات",
+      "dialogTitle": "دُفعات: {{product}}",
+      "dialogDescription": "الدُفعات على هذا الموقع مرتّبة حسب أسبقية الانتهاء (FEFO).",
+      "noExpiry": "بدون انتهاء",
+      "empty": "لا توجد دُفعات على هذا الموقع"
     },
     "movementType": {
       "receive": "استلام",
@@ -631,6 +652,10 @@
       "unitCost": "تكلفة الوحدة",
       "lineDiscount": "خصم",
       "lineTotal": "الإجمالي",
+      "expiry": "تاريخ الانتهاء",
+      "expiryPlaceholder": "بدون انتهاء",
+      "lotNumber": "رقم الدُفعة",
+      "lotNumberPlaceholder": "اختياري",
       "add": "إضافة",
       "remove": "حذف",
       "empty": "أضف صنفًا واحدًا على الأقل"

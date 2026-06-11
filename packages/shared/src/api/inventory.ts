@@ -6,16 +6,22 @@ import { idempotencyKey, newGuidV7 } from "../http/idempotency";
 import { IdentifierResponseSchema, type IdentifierResponse } from "../schemas/common";
 import {
   AdjustStockRequestSchema,
+  ExpiringProductSchema,
   FieldInventoryResponseSchema,
+  InventoryLotSchema,
   InventoryMovementResponseSchema,
   LoadFieldRequestSchema,
   ReceiveStockRequestSchema,
   StockLevelResponseSchema,
   UnloadFieldRequestSchema,
   type AdjustStockInput,
+  type ExpiringParams,
+  type ExpiringProduct,
   type FieldInventoryResponse,
+  type InventoryLot,
   type InventoryMovementResponse,
   type LoadFieldInput,
+  type LotListParams,
   type MovementListParams,
   type ReceiveStockInput,
   type StockLevelResponse,
@@ -26,6 +32,8 @@ import {
 const StockListSchema = z.array(StockLevelResponseSchema);
 const MovementListSchema = z.array(InventoryMovementResponseSchema);
 const FieldInventoryListSchema = z.array(FieldInventoryResponseSchema);
+const LotListSchema = z.array(InventoryLotSchema);
+const ExpiringListSchema = z.array(ExpiringProductSchema);
 
 // ---- Reads ----------------------------------------------------------------
 
@@ -53,6 +61,24 @@ export async function listFieldInventories(
 ): Promise<FieldInventoryResponse[]> {
   const res = await client.get("/inventory/field-inventories");
   return FieldInventoryListSchema.parse(res.data);
+}
+
+/** GET /inventory/lots — a product's FEFO lots (cost + expiry + remaining), earliest-expiry first. */
+export async function listLots(
+  client: AxiosInstance,
+  params: LotListParams,
+): Promise<InventoryLot[]> {
+  const res = await client.get("/inventory/lots", { params });
+  return LotListSchema.parse(res.data);
+}
+
+/** GET /inventory/expiring — on-hand lots near expiry (lot-accurate near-expiry alert view). */
+export async function listExpiring(
+  client: AxiosInstance,
+  params?: ExpiringParams,
+): Promise<ExpiringProduct[]> {
+  const res = await client.get("/inventory/expiring", { params });
+  return ExpiringListSchema.parse(res.data);
 }
 
 // ---- Writes (delta intents) -----------------------------------------------
