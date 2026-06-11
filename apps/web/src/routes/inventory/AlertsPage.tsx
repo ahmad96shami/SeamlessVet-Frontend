@@ -1,34 +1,28 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatDate, formatNumber, formatQuantity, type StockLevelResponse } from "@vet/shared";
+import {
+  formatDate,
+  formatNumber,
+  formatQuantity,
+  type ExpiringProduct,
+  type StockLevelResponse,
+} from "@vet/shared";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { DataTable } from "@/components/data-table/DataTable";
 import { AdminPage } from "@/components/layout/AdminPage";
 import { Badge } from "@/components/ui/badge";
-import { useFieldInventories, useStock } from "@/queries/inventory";
-import { useSystemSettings } from "@/queries/systemSettings";
+import { useExpiringStock, useFieldInventories, useStock } from "@/queries/inventory";
 import { InventoryTabs } from "@/routes/inventory/InventoryTabs";
-
-/** Whole days from today until the date (negative once past). Date-only comparison. */
-function daysUntil(date: string): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const exp = new Date(date);
-  exp.setHours(0, 0, 0, 0);
-  return Math.round((exp.getTime() - today.getTime()) / 86_400_000);
-}
 
 export function AlertsPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
-  // Low stock uses the server filter (same threshold as the M11 scan). Expiry has no server filter,
-  // so we fetch a page and keep on-hand items within the configured warning window.
+  // Low stock uses the server filter (same threshold as the M11 scan). Near-expiry is now
+  // lot-accurate over /inventory/expiring (M25): one row per on-hand lot within the warning window.
   const lowStock = useStock({ lowStockOnly: true, take: 200 });
-  const allStock = useStock({ take: 200 });
-  const settings = useSystemSettings();
-  const warningDays = settings.data?.expirationWarningDays ?? 30;
+  const expiring = useExpiringStock();
 
   const fieldInvs = useFieldInventories();
   const doctorByLocation = useMemo(() => {
@@ -45,13 +39,7 @@ export function AlertsPage() {
   );
 
   const lowRows = lowStock.data ?? [];
-  const expiringRows = useMemo(
-    () =>
-      (allStock.data ?? []).filter(
-        (r) => r.quantity > 0 && r.expirationDate != null && daysUntil(r.expirationDate) <= warningDays,
-      ),
-    [allStock.data, warningDays],
-  );
+  const expiringRows = expiring.data ?? [];
 
   const lowColumns = useMemo<ColumnDef<StockLevelResponse>[]>(
     () => [
@@ -85,25 +73,40 @@ export function AlertsPage() {
     [t, lang, locationLabel],
   );
 
-  const expiryColumns = useMemo<ColumnDef<StockLevelResponse>[]>(
+  const expiryColumns = useMemo<ColumnDef<ExpiringProduct>[]>(
     () => [
       {
-        accessorKey: "nameAr",
+        accessorKey: "productNameAr",
         header: t("inventory.col.product"),
-        cell: ({ row }) => <span className="font-medium">{row.original.nameAr}</span>,
+        cell: ({ row }) => <span className="font-medium">{row.original.productNameAr}</span>,
       },
-      { id: "location", header: t("inventory.col.location"), cell: ({ row }) => locationLabel(row.original) },
       {
-        accessorKey: "quantity",
-        header: t("inventory.col.quantity"),
-        cell: ({ row }) => formatQuantity(row.original.quantity, lang),
+        accessorKey: "lotNumber",
+        header: t("inventory.col.lotNumber"),
+        cell: ({ row }) =>
+          row.original.lotNumber ? (
+            <span dir="ltr">{row.original.lotNumber}</span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
       },
       {
         accessorKey: "expirationDate",
         header: t("inventory.col.expiry"),
         cell: ({ row }) => (
-          <span dir="ltr">
-            {row.original.expirationDate ? formatDate(row.original.expirationDate, lang) : "—"}
+          <span dir="ltr">{formatDate(row.original.expirationDate, lang)}</span>
+        ),
+      },
+      {
+        accessorKey: "nearExpiryQuantity",
+        header: t("inventory.col.nearExpiryQty"),
+        cell: ({ row }) => (
+          <span className="font-medium">
+            {formatQuantity(row.original.nearExpiryQuantity, lang)}
+            <span className="text-xs text-muted-foreground">
+              {" / "}
+              {formatQuantity(row.original.quantityOnHand, lang)}
+            </span>
           </span>
         ),
       },
@@ -111,7 +114,7 @@ export function AlertsPage() {
         id: "status",
         header: t("inventory.col.status"),
         cell: ({ row }) => {
-          const d = row.original.expirationDate ? daysUntil(row.original.expirationDate) : 0;
+          const d = row.original.daysUntilExpiry;
           return d < 0 ? (
             <Badge variant="destructive">
               {t("inventory.alerts.expiredAgo", { days: formatNumber(Math.abs(d), lang) })}
@@ -124,7 +127,7 @@ export function AlertsPage() {
         },
       },
     ],
-    [t, lang, locationLabel],
+    [t, lang],
   );
 
   return (
@@ -158,7 +161,7 @@ export function AlertsPage() {
           <DataTable
             columns={expiryColumns}
             data={expiringRows}
-            isLoading={allStock.isLoading}
+            isLoading={expiring.isLoading}
             emptyMessage={t("inventory.alerts.noExpiring")}
           />
         </section>

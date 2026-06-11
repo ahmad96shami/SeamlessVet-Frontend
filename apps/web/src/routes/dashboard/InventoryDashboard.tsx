@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { useStock } from "@/queries/inventory";
 import { GreetingHeader } from "@/routes/dashboard/widgets/GreetingHeader";
+import { NearExpiryCard } from "@/routes/dashboard/widgets/NearExpiryCard";
 
-/** Inventory-staff landing — low-stock list front and centre + receive-stock shortcut. */
+/** Inventory-staff landing — low-stock + near-expiry lists front and centre + inventory shortcut. */
 export function InventoryDashboard() {
   const { t, i18n } = useTranslation();
   const low = useStock({ lowStockOnly: true });
@@ -59,6 +60,8 @@ export function InventoryDashboard() {
           ))
         )}
       </div>
+
+      <NearExpiryCard />
     </div>
   );
 }
