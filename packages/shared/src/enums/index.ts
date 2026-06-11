@@ -80,9 +80,59 @@ export const PermissionKey = {
   EntitlementsApprove: "entitlements.approve",
   PartnershipManage: "partnership.manage",
   ReportsRead: "reports.read",
+  SuppliersWrite: "suppliers.write",
 } as const;
 export type PermissionKey = EnumValues<typeof PermissionKey>;
 export const PERMISSION_KEY_VALUES = values(PermissionKey);
+
+/**
+ * The standard permission set each role is seeded with (mirrors the backend
+ * `DataSeeder.BuildRoleDefaults`). The admin permission-override editor reads this to show, per
+ * permission, whether the user's role grants it by default — overrides layer on top. Keep in
+ * lockstep with the backend; `admin` implicitly gets every permission.
+ */
+export const ROLE_DEFAULT_PERMISSIONS: Record<RoleKey, readonly PermissionKey[]> = {
+  [RoleKey.Admin]: PERMISSION_KEY_VALUES,
+  [RoleKey.Accountant]: [
+    PermissionKey.InvoicesWrite,
+    PermissionKey.InvoicesRefund,
+    PermissionKey.InvoicesVoid,
+    PermissionKey.ReportsRead,
+    PermissionKey.SettingsWrite,
+    PermissionKey.CatalogWrite,
+    PermissionKey.CustomersWrite,
+    PermissionKey.ContractsWrite,
+    PermissionKey.ContractsActivate,
+    PermissionKey.EntitlementsApprove,
+    PermissionKey.SuppliersWrite,
+  ],
+  [RoleKey.InventoryStaff]: [PermissionKey.InventoryAdjust, PermissionKey.CatalogWrite],
+  [RoleKey.VetClinic]: [
+    PermissionKey.CustomersWrite,
+    PermissionKey.MedicalWrite,
+    PermissionKey.AppointmentsWrite,
+  ],
+  [RoleKey.VetField]: [
+    PermissionKey.CustomersWrite,
+    PermissionKey.MedicalWrite,
+    PermissionKey.AppointmentsWrite,
+    PermissionKey.InvoicesWrite,
+    PermissionKey.ContractsWrite,
+  ],
+  [RoleKey.VetBoth]: [
+    PermissionKey.CustomersWrite,
+    PermissionKey.MedicalWrite,
+    PermissionKey.AppointmentsWrite,
+    PermissionKey.InvoicesWrite,
+    PermissionKey.ContractsWrite,
+  ],
+  [RoleKey.Receptionist]: [
+    PermissionKey.CustomersWrite,
+    PermissionKey.MedicalWrite,
+    PermissionKey.AppointmentsWrite,
+  ],
+  [RoleKey.Cashier]: [PermissionKey.InvoicesWrite],
+};
 
 // --- 2. Customers & Pets -----------------------------------------------------
 

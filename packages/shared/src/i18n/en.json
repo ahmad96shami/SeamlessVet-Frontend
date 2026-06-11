@@ -174,6 +174,54 @@
     "cashier": "Cashier",
     "inventory_staff": "Inventory staff"
   },
+  "permissions": {
+    "users": {
+      "approve": { "name": "Approve users", "desc": "Approve or reject registration requests." },
+      "manage": { "name": "Manage users", "desc": "Deactivate or reactivate user accounts." },
+      "permissions": {
+        "override": { "name": "Override permissions", "desc": "Grant or deny individual permissions per user." }
+      }
+    },
+    "settings": {
+      "write": { "name": "Edit settings", "desc": "Edit environment-level system settings." }
+    },
+    "catalog": {
+      "write": { "name": "Manage catalog", "desc": "Create, edit, and remove products and services in the catalog." }
+    },
+    "customers": {
+      "write": { "name": "Manage customers", "desc": "Create, edit, and remove customers, pets, and ledger entries." }
+    },
+    "medical": {
+      "write": { "name": "Medical records", "desc": "Create and edit visits, procedures, prescriptions, follow-ups, vaccinations, and attachments." }
+    },
+    "appointments": {
+      "write": { "name": "Manage appointments", "desc": "Create, reschedule, and resolve (attend/cancel/no-show) appointments." }
+    },
+    "contracts": {
+      "write": { "name": "Manage contracts", "desc": "Create and edit draft contracts, batches, and per-medication contract prices." },
+      "activate": { "name": "Activate contracts", "desc": "Promote draft contracts to active." }
+    },
+    "invoices": {
+      "write": { "name": "Issue invoices", "desc": "Issue POS, field, and exam-fee invoices and receipt vouchers." },
+      "refund": { "name": "Refund invoices", "desc": "Refund issued invoices." },
+      "void": { "name": "Void invoices", "desc": "Void issued invoices." }
+    },
+    "inventory": {
+      "adjust": { "name": "Adjust inventory", "desc": "Apply inventory adjustments." }
+    },
+    "entitlements": {
+      "approve": { "name": "Approve entitlements", "desc": "Close customer accounts and approve/pay doctor entitlements." }
+    },
+    "partnership": {
+      "manage": { "name": "Manage partnership", "desc": "Manage partners and partnership profit shares (partnership environments only)." }
+    },
+    "reports": {
+      "read": { "name": "View reports", "desc": "View operational and financial reports." }
+    },
+    "suppliers": {
+      "write": { "name": "Manage suppliers", "desc": "Manage suppliers, record purchase invoices, and pay suppliers." }
+    }
+  },
   "requestStatus": {
     "pending": "Pending",
     "approved": "Approved",
@@ -1440,6 +1488,8 @@
       "effectGrant": "Grant",
       "effectDeny": "Deny",
       "roleDefault": "Default (by role)",
+      "roleGrants": "Granted by role",
+      "roleDenies": "Not in role",
       "overrideSaved": "Permission updated"
     },
     "settings": {
