@@ -81,9 +81,9 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
       {
         id: "checkIn",
         header: t("visits.nightStays.col.checkIn"),
-        cell: ({ row }) => (
-          <span dir="ltr">{formatDateTime(row.original.checkInAt, lang, "yyyy/MM/dd h:mm a")}</span>
-        ),
+        // No dir="ltr": in the RTL cell the date sits rightmost and reads
+        // date → time → marker, matching the visits list / the rest of the app.
+        cell: ({ row }) => <span>{formatDateTime(row.original.checkInAt, lang)}</span>,
       },
       {
         id: "nights",
