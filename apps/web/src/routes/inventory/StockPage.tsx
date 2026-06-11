@@ -24,6 +24,7 @@ import { useFieldInventories, useStock } from "@/queries/inventory";
 import { AdjustStockDialog } from "@/routes/inventory/AdjustStockDialog";
 import { InventoryTabs } from "@/routes/inventory/InventoryTabs";
 import { LoadFieldDialog } from "@/routes/inventory/LoadFieldDialog";
+import { LotsDialog } from "@/routes/inventory/LotsDialog";
 
 /** True once today is past the expiration day (date-only comparison). */
 function isExpired(date: string): boolean {
@@ -43,6 +44,7 @@ export function StockPage() {
   const [lowStockOnly, setLowStockOnly] = useState(false);
   const [loadOpen, setLoadOpen] = useState(false);
   const [adjustTarget, setAdjustTarget] = useState<StockLevelResponse | null>(null);
+  const [lotsTarget, setLotsTarget] = useState<StockLevelResponse | null>(null);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
 
   useEffect(() => reset(), [debouncedSearch, locationType, lowStockOnly, reset]);
@@ -157,7 +159,16 @@ export function StockPage() {
         id: "actions",
         header: "",
         cell: ({ row }) => (
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-1">
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label={t("inventory.lots.viewAction")}
+              title={t("inventory.lots.viewAction")}
+              onClick={() => setLotsTarget(row.original)}
+            >
+              <Icon.list className="size-4" />
+            </Button>
             <Button
               size="icon"
               variant="ghost"
@@ -233,6 +244,11 @@ export function StockPage() {
         stockItem={adjustTarget}
         locationLabel={adjustTarget ? locationLabel(adjustTarget) : ""}
         onClose={() => setAdjustTarget(null)}
+      />
+      <LotsDialog
+        stockItem={lotsTarget}
+        locationLabel={lotsTarget ? locationLabel(lotsTarget) : ""}
+        onClose={() => setLotsTarget(null)}
       />
     </AdminPage>
   );
