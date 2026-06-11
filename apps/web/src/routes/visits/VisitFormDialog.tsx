@@ -14,7 +14,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomerCombobox } from "@/routes/customers/CustomerCombobox";
-import { useFieldInventories } from "@/queries/inventory";
+import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { usePets } from "@/queries/pets";
 import { useCreateVisit } from "@/queries/visits";
 import { useAuthStore } from "@/stores/authStore";
@@ -23,9 +23,9 @@ const VET_ROLES = ["vet_clinic", "vet_field", "vet_both"];
 
 /**
  * Open a new visit: pick a customer (live search), then an optional pet, the doctor, and the visit
- * type. The doctor list is the authenticated field-inventories source; when the signed-in user is a
- * vet they're offered as "me" (and pre-selected) even if they have no field inventory. `visit_number`
- * is left server-side null (the web has no per-user prefix source). On success → the visit detail.
+ * type. The doctor list is every active vet (GET /doctors); when the signed-in user is a vet their
+ * own id is pre-selected. `visit_number` is left server-side null (the web has no per-user prefix
+ * source). On success → the visit detail.
  */
 export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
@@ -34,9 +34,7 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
   const isVet = !!me && VET_ROLES.includes(me.role);
 
   const create = useCreateVisit();
-  const fieldInvs = useFieldInventories();
-  const fieldDocs = fieldInvs.data ?? [];
-  const offerMe = isVet && !!me && !fieldDocs.some((d) => d.doctorId === me.userId);
+  const { options: doctorOptions } = useDoctorOptions();
 
   const [customer, setCustomer] = useState<CustomerResponse | null>(null);
   const [petId, setPetId] = useState("");
@@ -115,12 +113,9 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
             <Field label={t("visits.create.doctor")}>
               <Select value={doctorId} onChange={(e) => setDoctorId(e.target.value)}>
                 <option value="">{t("visits.create.selectDoctor")}</option>
-                {offerMe && me ? (
-                  <option value={me.userId}>{t("visits.create.currentUser")}</option>
-                ) : null}
-                {fieldDocs.map((d) => (
-                  <option key={d.doctorId} value={d.doctorId}>
-                    {d.doctorName}
+                {doctorOptions.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
                   </option>
                 ))}
               </Select>

@@ -15,9 +15,9 @@ import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Select } from "@/components/ui/select";
+import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useCustomers } from "@/queries/customers";
-import { useFieldInventories } from "@/queries/inventory";
 import { usePets } from "@/queries/pets";
 import { useVisits } from "@/queries/visits";
 import { VisitFormDialog } from "@/routes/visits/VisitFormDialog";
@@ -57,7 +57,7 @@ export function VisitsPage() {
 
   // Client-side reference joins (W2 precedent): resolve customer / pet / doctor ids to names from a
   // capped page of each reference list. Cached + slow-changing.
-  const fieldInvs = useFieldInventories();
+  const { options: doctorOptions, byId: doctorById } = useDoctorOptions();
   const customers = useCustomers({ take: 200 });
   const pets = usePets({ take: 200 });
 
@@ -71,11 +71,6 @@ export function VisitsPage() {
     for (const p of pets.data ?? []) m.set(p.id, p.name);
     return m;
   }, [pets.data]);
-  const doctorById = useMemo(() => {
-    const m = new Map<string, string>();
-    for (const f of fieldInvs.data ?? []) m.set(f.doctorId, f.doctorName);
-    return m;
-  }, [fieldInvs.data]);
 
   const columns = useMemo<ColumnDef<VisitResponse>[]>(
     () => [
@@ -171,9 +166,9 @@ export function VisitsPage() {
           </Select>
           <Select value={doctor} onChange={(e) => setDoctor(e.target.value)} containerClassName="w-52">
             <option value="">{`${t("visits.filterDoctor")}: ${t("visits.allDoctors")}`}</option>
-            {(fieldInvs.data ?? []).map((d) => (
-              <option key={d.doctorId} value={d.doctorId}>
-                {d.doctorName}
+            {doctorOptions.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
               </option>
             ))}
           </Select>

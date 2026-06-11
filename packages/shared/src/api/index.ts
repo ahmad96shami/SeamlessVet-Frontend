@@ -3,6 +3,7 @@
 export * from "./auth";
 export * from "./registrationRequests";
 export * from "./users";
+export * from "./doctors";
 export * from "./products";
 export * from "./services";
 export * from "./systemSettings";

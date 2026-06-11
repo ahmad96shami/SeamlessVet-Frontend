@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { Money } from "@/components/ui/money";
+import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { useCustomer } from "@/queries/customers";
-import { useFieldInventories } from "@/queries/inventory";
 import { usePet } from "@/queries/pets";
 import { useDeleteVaccination, useVaccinations } from "@/queries/vaccinations";
 import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
@@ -30,12 +30,12 @@ export function VaccinationsTab({ visit, readOnly }: { visit: VisitResponse; rea
   // Names for the printable certificate: recipient is the visit's pet, else the customer (farm).
   const owner = useCustomer(visit.customerId);
   const pet = usePet(visit.petId ?? null);
-  const fieldInvs = useFieldInventories();
+  const { byId: doctorById } = useDoctorOptions();
   const ownerName = owner.data?.fullName ?? null;
   const recipientName = pet.data?.name ?? owner.data?.fullName ?? null;
   const doctorName = useMemo(
-    () => (fieldInvs.data ?? []).find((f) => f.doctorId === visit.doctorId)?.doctorName ?? null,
-    [fieldInvs.data, visit.doctorId],
+    () => doctorById.get(visit.doctorId) ?? null,
+    [doctorById, visit.doctorId],
   );
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<VaccinationResponse | null>(null);

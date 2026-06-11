@@ -10,8 +10,8 @@ import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { useCustomer } from "@/queries/customers";
-import { useFieldInventories } from "@/queries/inventory";
 import { usePets } from "@/queries/pets";
 import { useSystemSettings } from "@/queries/systemSettings";
 import { useCancelVisit, useCompleteVisit, useUpdateVisit, useVisit } from "@/queries/visits";
@@ -59,7 +59,7 @@ export function VisitDetailPage() {
 
   const customer = useCustomer(v?.customerId ?? null);
   const pets = usePets(v ? { customerId: v.customerId, take: 100 } : { take: 0 });
-  const fieldInvs = useFieldInventories();
+  const { byId: doctorById } = useDoctorOptions();
 
   const update = useUpdateVisit();
   const complete = useCompleteVisit();
@@ -83,8 +83,8 @@ export function VisitDetailPage() {
     [v?.petId, pets.data],
   );
   const doctorName = useMemo(
-    () => (v ? (fieldInvs.data ?? []).find((f) => f.doctorId === v.doctorId)?.doctorName : undefined),
-    [v, fieldInvs.data],
+    () => (v ? doctorById.get(v.doctorId) : undefined),
+    [v, doctorById],
   );
 
   if (query.isLoading) {

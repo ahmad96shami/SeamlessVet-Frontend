@@ -9,7 +9,7 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { Icon } from "@/components/ui/icon";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useFieldInventories } from "@/queries/inventory";
+import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { usePet, usePetTimeline } from "@/queries/pets";
 import { visitStatusVariant } from "@/routes/visits/VisitsPage";
 
@@ -20,12 +20,7 @@ export function PetTimelinePage() {
   const lang = i18n.language;
 
   const pet = usePet(petId || null);
-  const fieldInvs = useFieldInventories();
-  const doctorById = useMemo(() => {
-    const m = new Map<string, string>();
-    for (const f of fieldInvs.data ?? []) m.set(f.doctorId, f.doctorName);
-    return m;
-  }, [fieldInvs.data]);
+  const { options: doctorOptions, byId: doctorById } = useDoctorOptions();
 
   const [doctor, setDoctor] = useState("");
   const [from, setFrom] = useState("");
@@ -65,9 +60,9 @@ export function PetTimelinePage() {
       <div className="flex flex-wrap items-center gap-2">
         <Select value={doctor} onChange={(e) => setDoctor(e.target.value)} containerClassName="w-52">
           <option value="">{`${t("visits.timeline.filterDoctor")}: ${t("visits.timeline.allDoctors")}`}</option>
-          {(fieldInvs.data ?? []).map((d) => (
-            <option key={d.doctorId} value={d.doctorId}>
-              {d.doctorName}
+          {doctorOptions.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
             </option>
           ))}
         </Select>
