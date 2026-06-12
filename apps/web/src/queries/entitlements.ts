@@ -1,16 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  approveEntitlement,
   closeAccount,
   getEntitlement,
   listEntitlements,
-  payEntitlement,
   reopenAccount,
   type ApiError,
   type CloseAccountResponse,
   type DoctorEntitlementResponse,
   type EntitlementListParams,
-  type PayEntitlementRequest,
 } from "@vet/shared";
 
 import { apiClient } from "@/services/apiClient";
@@ -31,26 +28,6 @@ export function useEntitlement(id: string | null) {
     queryKey: [KEY, "detail", id],
     queryFn: () => getEntitlement(apiClient, id as string),
     enabled: id !== null,
-  });
-}
-
-export function useApproveEntitlement() {
-  const qc = useQueryClient();
-  return useMutation<DoctorEntitlementResponse, ApiError, string>({
-    mutationFn: (id) => approveEntitlement(apiClient, id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
-  });
-}
-
-export function usePayEntitlement() {
-  const qc = useQueryClient();
-  return useMutation<
-    DoctorEntitlementResponse,
-    ApiError,
-    { id: string; body: PayEntitlementRequest }
-  >({
-    mutationFn: ({ id, body }) => payEntitlement(apiClient, id, body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }
 
