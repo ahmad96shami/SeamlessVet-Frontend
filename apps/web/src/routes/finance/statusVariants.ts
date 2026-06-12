@@ -14,6 +14,3 @@ export const contractStatusVariant = (status: string): Variant =>
 
 export const batchStatusVariant = (status: string): Variant =>
   status === "open" ? "warning" : "navy";
-
-export const entitlementStatusVariant = (status: string): Variant =>
-  status === "paid" ? "success" : status === "approved" ? "default" : "warning";

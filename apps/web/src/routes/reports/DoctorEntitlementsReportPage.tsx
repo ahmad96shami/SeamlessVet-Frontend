@@ -1,37 +1,34 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import {
-  ENTITLEMENT_STATUS_VALUES,
-  formatCurrency,
-  type DoctorEntitlementResponse,
-} from "@vet/shared";
-import { Money } from "@/components/ui/money";
+import { type DoctorEntitlementResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
 import { Badge } from "@/components/ui/badge";
+import { Money } from "@/components/ui/money";
 import { Select } from "@/components/ui/select";
 import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { cn } from "@/lib/utils";
 import { useDoctorEntitlementsReport } from "@/queries/reports";
-import { entitlementStatusVariant } from "@/routes/finance/statusVariants";
 import { ReportExportButtons } from "@/routes/reports/ReportExportButtons";
 import { ReportPageHeader } from "@/routes/reports/ReportPageHeader";
 
-/** Read-only entitlements report (task 4). Settlement actions live on the finance entitlements screen. */
+/**
+ * Read-only entitlements report. **M30:** an entitlement is an immutable accrual credited to the
+ * responsible doctor's partner ledger when a supervision batch is settled — there is no status
+ * lifecycle. Disbursement lives on the doctor-partner statement (/finance/doctor-partners).
+ */
 export function DoctorEntitlementsReportPage() {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+  const { t } = useTranslation();
   const [doctorId, setDoctorId] = useState("");
-  const [status, setStatus] = useState("");
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
 
-  useEffect(() => reset(), [doctorId, status, reset]);
+  useEffect(() => reset(), [doctorId, reset]);
 
   const doctors = useDoctorOptions();
-  const params = { doctorId: doctorId || undefined, status: status || undefined };
+  const params = { doctorId: doctorId || undefined };
   const query = useDoctorEntitlementsReport({ ...params, skip, take });
   const rows = query.data ?? [];
 
@@ -45,11 +42,7 @@ export function DoctorEntitlementsReportPage() {
       {
         id: "source",
         header: t("finance.entitlements.colSource"),
-        cell: ({ row }) => (
-          <Badge variant="secondary">
-            {row.original.batchId ? t("finance.entitlements.sourceBatch") : t("finance.entitlements.sourceVisit")}
-          </Badge>
-        ),
+        cell: () => <Badge variant="secondary">{t("finance.entitlements.sourceBatch")}</Badge>,
       },
       {
         accessorKey: "calculationSystem",
@@ -66,17 +59,8 @@ export function DoctorEntitlementsReportPage() {
           </span>
         ),
       },
-      {
-        accessorKey: "status",
-        header: t("finance.entitlements.colStatus"),
-        cell: ({ row }) => (
-          <Badge variant={entitlementStatusVariant(row.original.status)}>
-            {t(`entitlementStatus.${row.original.status}`, { defaultValue: row.original.status })}
-          </Badge>
-        ),
-      },
     ],
-    [t, lang, doctors.byId],
+    [t, doctors.byId],
   );
 
   return (
@@ -93,14 +77,6 @@ export function DoctorEntitlementsReportPage() {
           ))}
         </Select>
         <span className="flex-1" />
-        <button type="button" className={cn("chip", status === "" && "active")} onClick={() => setStatus("")}>
-          {t("finance.all")}
-        </button>
-        {ENTITLEMENT_STATUS_VALUES.map((s) => (
-          <button key={s} type="button" className={cn("chip", status === s && "active")} onClick={() => setStatus(s)}>
-            {t(`entitlementStatus.${s}`)}
-          </button>
-        ))}
         <ReportExportButtons path="/reports/doctor-entitlements" params={params} />
       </div>
 

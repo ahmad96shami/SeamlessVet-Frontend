@@ -362,13 +362,8 @@ export const IMMEDIATE_PAYMENT_METHODS = [
   PaymentMethod.Cheque,
 ] as const;
 
-export const EntitlementStatus = {
-  Pending: "pending",
-  Approved: "approved",
-  Paid: "paid",
-} as const;
-export type EntitlementStatus = EnumValues<typeof EntitlementStatus>;
-export const ENTITLEMENT_STATUS_VALUES = values(EntitlementStatus);
+// M30 removed the doctor-entitlement approve/pay lifecycle — an entitlement is now an immutable accrual
+// credited to the doctor's partner ledger on batch settle, so there is no EntitlementStatus enum.
 
 // --- 9. System ---------------------------------------------------------------
 

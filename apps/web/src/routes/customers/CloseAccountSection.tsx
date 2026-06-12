@@ -8,14 +8,12 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Money } from "@/components/ui/money";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { useCloseAccount, useReopenAccount } from "@/queries/entitlements";
 import { useCloseFarmAccount, useReopenFarmAccount } from "@/queries/farms";
-import { entitlementStatusVariant } from "@/routes/finance/statusVariants";
 import { useAuthStore } from "@/stores/authStore";
 
 const SETTLEMENT_ROLES = ["admin", "accountant"];
@@ -169,13 +167,8 @@ function CloseAccountBase({
                       })}
                     </span>
                   </span>
-                  <span className="flex items-center gap-2">
-                    <span className="font-medium">
-                      <Money value={e.computedAmount} />
-                    </span>
-                    <Badge variant={entitlementStatusVariant(e.status)}>
-                      {t(`entitlementStatus.${e.status}`, { defaultValue: e.status })}
-                    </Badge>
+                  <span className="font-medium">
+                    <Money value={e.computedAmount} />
                   </span>
                 </li>
               ))}
