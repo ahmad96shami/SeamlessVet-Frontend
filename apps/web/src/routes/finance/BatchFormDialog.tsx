@@ -48,8 +48,6 @@ const FormSchema = z.object({
   supervisionFeeValue: z.string(),
   entitlementEnabled: z.enum(["", "true", "false"]),
   entitlementSystem: z.string(),
-  doctorSharePercent: z.string(),
-  doctorShareCeiling: z.string(),
 });
 type FormValues = z.infer<typeof FormSchema>;
 
@@ -65,11 +63,8 @@ const DEFAULTS: FormValues = {
   supervisionFeeValue: "0",
   entitlementEnabled: "",
   entitlementSystem: "",
-  doctorSharePercent: "",
-  doctorShareCeiling: "",
 };
 
-const num = (s: string): number | undefined => (s.trim() === "" ? undefined : Number(s));
 const text = (s: string): string | undefined => (s.trim() === "" ? undefined : s.trim());
 const triState = (s: string): boolean | undefined => (s === "" ? undefined : s === "true");
 
@@ -120,8 +115,6 @@ export function BatchFormDialog({
         entitlementEnabled:
           batch.entitlementEnabled == null ? "" : batch.entitlementEnabled ? "true" : "false",
         entitlementSystem: batch.entitlementSystem ?? "",
-        doctorSharePercent: batch.doctorSharePercent != null ? String(batch.doctorSharePercent) : "",
-        doctorShareCeiling: batch.doctorShareCeiling != null ? String(batch.doctorShareCeiling) : "",
       });
       setCustomerName(resolveCustomerName(batch.customerId) ?? "");
     } else {
@@ -145,8 +138,6 @@ export function BatchFormDialog({
       entitlementSystem: text(values.entitlementSystem) as
         | BatchCreateRequest["entitlementSystem"]
         | undefined,
-      doctorSharePercent: num(values.doctorSharePercent),
-      doctorShareCeiling: num(values.doctorShareCeiling),
     };
     if (batch) {
       const body: BatchPatchRequest = shared;
@@ -328,18 +319,6 @@ export function BatchFormDialog({
                 </Select>
               )}
             />
-          </Field>
-          <Field
-            label={t("finance.batches.doctorSharePercent")}
-            error={errors.doctorSharePercent?.message}
-          >
-            <Input type="number" step="0.01" min="0" max="100" dir="ltr" {...register("doctorSharePercent")} />
-          </Field>
-          <Field
-            label={t("finance.batches.doctorShareCeiling")}
-            error={errors.doctorShareCeiling?.message}
-          >
-            <Input type="number" step="0.01" min="0" dir="ltr" {...register("doctorShareCeiling")} />
           </Field>
         </div>
 

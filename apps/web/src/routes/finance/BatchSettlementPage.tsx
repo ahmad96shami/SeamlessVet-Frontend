@@ -182,14 +182,6 @@ export function BatchSettlementPage() {
           value={`${t(`feeModel.${data.supervisionFeeModel}`, { defaultValue: data.supervisionFeeModel })} · ${formatNumber(data.supervisionFeeValue, lang)}`}
         />
         <Kv
-          label={t("finance.batches.colShare")}
-          value={
-            data.doctorSharePercent != null
-              ? `${formatNumber(data.doctorSharePercent, lang)}%${data.doctorShareCeiling != null ? ` (≤ ${formatNumber(data.doctorShareCeiling, lang)})` : ""}`
-              : "—"
-          }
-        />
-        <Kv
           label={t("finance.batches.colStatus")}
           value={t(`entitlementSystem.${data.entitlementSystem}`, {
             defaultValue: data.entitlementSystem ?? "—",

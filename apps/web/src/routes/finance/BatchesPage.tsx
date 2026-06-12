@@ -90,12 +90,6 @@ export function BatchesPage() {
         ),
       },
       {
-        accessorKey: "doctorSharePercent",
-        header: t("finance.batches.colShare"),
-        cell: ({ row }) =>
-          row.original.doctorSharePercent != null ? `${row.original.doctorSharePercent}%` : "—",
-      },
-      {
         accessorKey: "status",
         header: t("finance.batches.colStatus"),
         cell: ({ row }) =>

@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate, formatPercent } from "@vet/shared";
+import { formatDate, formatPercent } from "@vet/shared";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
@@ -64,7 +64,6 @@ export function ProfitPerBatchPage() {
               label={t("reports.profitPerBatch.doctorShare")}
               value={<Money value={d.doctorShare} />}
               tone="amber"
-              hint={d.ceilingApplied != null ? `${t("reports.profitPerBatch.ceiling")}: ${formatCurrency(d.ceilingApplied, lang)}` : undefined}
             />
             <SummaryStat label={t("reports.profitPerBatch.clinicShare")} value={<Money value={d.clinicShare} />} tone="teal" />
             <SummaryStat label={t("reports.profitPerBatch.distributed")} value={<Money value={d.distributedToPartners} />} tone="navy" />

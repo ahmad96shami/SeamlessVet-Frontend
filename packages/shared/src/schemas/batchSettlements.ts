@@ -49,8 +49,8 @@ export const BatchSettlementPreviewSchema = z.object({
   supervisionFeeValue: z.number(),
   entitlementEnabled: z.boolean().nullish(),
   entitlementSystem: z.string().nullish(),
-  doctorSharePercent: z.number().nullish(),
-  doctorShareCeiling: z.number().nullish(),
+  /** M28 — the supervision fee projected on `originalTotal` (= the doctor's entitlement when enabled). */
+  supervisionFee: z.number(),
   originalTotal: z.number(),
   ledgerId: z.string().nullish(),
   ledgerBalance: z.number(),
@@ -101,6 +101,9 @@ export const BatchSettlementSchema = z.object({
   discountAmount: z.number(),
   originalTotal: z.number(),
   settledTotal: z.number(),
+  /** M28 — the supervision fee snapshot computed on the settled (pre-discount) revenue. For a
+   *  `direct_fee` batch it's added to `settledTotal` and posted as a +fee owner-ledger adjustment. */
+  supervisionFee: z.number(),
   notes: z.string().nullish(),
   settledBy: z.string(),
   settledAt: z.string(),

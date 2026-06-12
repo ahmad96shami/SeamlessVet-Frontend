@@ -4,12 +4,12 @@ import { z } from "zod";
 
 /**
  * A computed doctor entitlement (GET /doctor-entitlements[/{id}], SCHEMA §8). **Server-authoritative**
- * — clients only read it; the amount/percentage/ceiling are derived server-side from batch config +
- * invoices. `calculationSystem` ∈ EntitlementSystem (drug_profit = System A, direct_fee = System B).
- * `computedAmount` is the doctor's share (0 when the toggle is off, or when System-A profit ≤ exam fee);
- * `ceilingApplied` is the cap value when the raw share exceeded the batch ceiling, else null. `status`
- * ∈ EntitlementStatus (pending|approved|paid). The list endpoint returns an untyped 200 → this is the
- * contract. A row is `batchId`-scoped (a Dawra) or `visitId`-scoped (a non-batch completed visit).
+ * — clients only read it; the amount is derived server-side from batch config + invoices.
+ * `calculationSystem` ∈ EntitlementSystem (drug_profit = System A, direct_fee = System B).
+ * M28: `computedAmount` is the doctor's share = the supervision fee when the toggle is on, else 0
+ * (no percentage, no ceiling — the ceiling was dropped). `status` ∈ EntitlementStatus
+ * (pending|approved|paid). The list endpoint returns an untyped 200 → this is the contract.
+ * A row is `batchId`-scoped (a Dawra) or `visitId`-scoped (a non-batch completed visit).
  */
 export const DoctorEntitlementResponseSchema = z.object({
   id: z.string(),
@@ -18,7 +18,6 @@ export const DoctorEntitlementResponseSchema = z.object({
   visitId: z.string().nullish(),
   calculationSystem: z.string(),
   computedAmount: z.number(),
-  ceilingApplied: z.number().nullish(),
   status: z.string(),
   approvedBy: z.string().nullish(),
   approvedAt: z.string().nullish(),

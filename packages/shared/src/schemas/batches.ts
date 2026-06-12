@@ -4,11 +4,13 @@ import { z } from "zod";
 
 /**
  * A supervision batch / Dawra (GET /batches[/{id}], PRD §7.2) — one supervision cycle for a farm.
- * The fee + share fields feed M9's entitlement calculation. `entitlementEnabled` is a **tri-state**:
- * `null` inherits `system_settings.entitlement_enabled_global`, `true`/`false` override per batch
- * (SCHEMA invariant #4). `supervisionFeeModel` ∈ FeeModel, `entitlementSystem` ∈ EntitlementSystem,
- * `status` ∈ BatchStatus (open|closed). Closing a batch triggers the doctor's entitlement compute.
- * Batches are server-authoritative; the list endpoint returns an untyped 200, so this is the contract.
+ * M28 reformulation: the supervision fee (`supervisionFeeModel`/`supervisionFeeValue`) **is** the
+ * doctor's entitlement — no percentage, no ceiling, no clamp (the clinic share may go negative).
+ * `entitlementEnabled` is a **tri-state**: `null` inherits `system_settings.entitlement_enabled_global`,
+ * `true`/`false` override per batch (SCHEMA invariant #4). `supervisionFeeModel` ∈ FeeModel,
+ * `entitlementSystem` ∈ EntitlementSystem (drug_profit = clinic funds the fee, direct_fee = farmer
+ * charged on top), `status` ∈ BatchStatus (open|closed). Batches are server-authoritative; the list
+ * endpoint returns an untyped 200, so this is the contract.
  */
 export const BatchResponseSchema = z.object({
   id: z.string(),
@@ -24,8 +26,6 @@ export const BatchResponseSchema = z.object({
   supervisionFeeValue: z.number(),
   entitlementEnabled: z.boolean().nullish(),
   entitlementSystem: z.string().nullish(),
-  doctorSharePercent: z.number().nullish(),
-  doctorShareCeiling: z.number().nullish(),
   status: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -37,8 +37,9 @@ export type BatchResponse = z.infer<typeof BatchResponseSchema>;
 /**
  * Create payload (POST /batches). Mirrors the backend `BatchCreateRequest` + validators:
  * `customerId`, `responsibleDoctorId`, `supervisionFeeModel`, `supervisionFeeValue`, and `startDate`
- * are required; `doctorSharePercent` ∈ [0,100]; `endDate` ≥ `startDate`. Batch financial config is an
- * Admin/Accountant + online-only operation (gated on `contracts.activate`). The wrapper mints the id.
+ * are required; `endDate` ≥ `startDate`. M28 dropped the doctor share %/ceiling — the supervision fee
+ * itself is the entitlement. Batch financial config is an Admin/Accountant + online-only operation
+ * (gated on `contracts.activate`). The wrapper mints the id.
  */
 export const BatchCreateRequestSchema = z.object({
   contractId: z.string().optional(),
@@ -53,8 +54,6 @@ export const BatchCreateRequestSchema = z.object({
   supervisionFeeValue: z.number().min(0),
   entitlementEnabled: z.boolean().optional(),
   entitlementSystem: z.enum(["drug_profit", "direct_fee"]).optional(),
-  doctorSharePercent: z.number().min(0).max(100).optional(),
-  doctorShareCeiling: z.number().min(0).optional(),
   status: z.enum(["open", "closed"]).optional(),
 });
 export type BatchCreateRequest = z.infer<typeof BatchCreateRequestSchema>;
@@ -78,8 +77,6 @@ export const BatchPatchRequestSchema = z.object({
   supervisionFeeValue: z.number().min(0).optional(),
   entitlementEnabled: z.boolean().optional(),
   entitlementSystem: z.enum(["drug_profit", "direct_fee"]).optional(),
-  doctorSharePercent: z.number().min(0).max(100).optional(),
-  doctorShareCeiling: z.number().min(0).optional(),
   status: z.enum(["open", "closed"]).optional(),
 });
 export type BatchPatchRequest = z.infer<typeof BatchPatchRequestSchema>;

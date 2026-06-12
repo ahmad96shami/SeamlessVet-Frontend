@@ -82,7 +82,14 @@ export interface ClinicProfitsParams {
 
 // ---- Profit per batch (task 3) --------------------------------------------
 
-/** Cost/revenue + doctor/clinic share are taken verbatim from the M9 engine (cent-perfect parity). */
+/**
+ * Cost/revenue + doctor/clinic share are taken verbatim from the M28 entitlement engine (cent-perfect
+ * parity). `examFee` is the supervision fee = the doctor's entitlement when enabled (no ceiling now).
+ * `clinicShare` (which may be **negative**) = `drugProfit + feeAddedToSettlement − settlementDiscount −
+ * doctorShare`. M28 fee handling: `feeAddedToSettlement` is the System-B fee the farmer pays on top;
+ * `feeRetainedByClinic` is the fee the clinic keeps when the toggle is off (System B); `settlementDiscount`
+ * is the M24 تصفية discount, already netted out of `clinicShare`.
+ */
 export const ProfitPerBatchReportSchema = z.object({
   batchId: z.string(),
   customerId: z.string(),
@@ -94,11 +101,13 @@ export const ProfitPerBatchReportSchema = z.object({
   drugProfit: z.number(),
   examFee: z.number(),
   doctorShare: z.number(),
-  ceilingApplied: z.number().nullish(),
   clinicShare: z.number(),
   asOf: z.string(),
   distributedToPartners: z.number(),
   retainedByClinic: z.number(),
+  feeAddedToSettlement: z.number(),
+  feeRetainedByClinic: z.number(),
+  settlementDiscount: z.number(),
   partnerAllocations: z.array(ProfitAllocationSchema),
 });
 export type ProfitPerBatchReport = z.infer<typeof ProfitPerBatchReportSchema>;

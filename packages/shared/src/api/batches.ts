@@ -34,7 +34,7 @@ export async function getBatch(client: AxiosInstance, id: string): Promise<Batch
   return BatchResponseSchema.parse(res.data);
 }
 
-/** POST /batches — create a supervision batch (fee model, share %, ceiling, entitlement toggle). */
+/** POST /batches — create a supervision batch (fee model + value, entitlement toggle + system). */
 export async function createBatch(
   client: AxiosInstance,
   body: BatchCreateRequest,

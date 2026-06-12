@@ -1,7 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   ENTITLEMENT_STATUS_VALUES,
-  formatCurrency,
   type ApiError,
   type DoctorEntitlementResponse,
 } from "@vet/shared";
@@ -32,7 +31,6 @@ function SummaryCard({
   hint,
   amount,
   count,
-  lang,
 }: {
   tone: "amber" | "teal" | "green";
   icon: React.ReactNode;
@@ -40,7 +38,6 @@ function SummaryCard({
   hint: string;
   amount: number;
   count: number;
-  lang: string;
 }) {
   const bg = tone === "amber" ? "var(--amber-soft)" : tone === "teal" ? "var(--teal-50)" : "var(--green-soft)";
   return (
@@ -59,8 +56,7 @@ function SummaryCard({
 }
 
 export function EntitlementsPage() {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+  const { t } = useTranslation();
   const [doctorId, setDoctorId] = useState("");
   const [status, setStatus] = useState("");
   const [payTarget, setPayTarget] = useState<DoctorEntitlementResponse | null>(null);
@@ -145,19 +141,6 @@ export function EntitlementsPage() {
         ),
       },
       {
-        accessorKey: "ceilingApplied",
-        header: t("finance.entitlements.colCeiling"),
-        cell: ({ row }) =>
-          row.original.ceilingApplied != null ? (
-            <span className="flex items-center gap-1">
-              <Money value={row.original.ceilingApplied} />
-              <Badge variant="warning">{t("finance.entitlements.ceilingApplied")}</Badge>
-            </span>
-          ) : (
-            "—"
-          ),
-      },
-      {
         accessorKey: "status",
         header: t("finance.entitlements.colStatus"),
         cell: ({ row }) => (
@@ -190,7 +173,7 @@ export function EntitlementsPage() {
         ),
       },
     ],
-    [t, lang, doctors.byId, approve.isPending],
+    [t, doctors.byId, approve.isPending],
   );
 
   return (
@@ -208,7 +191,6 @@ export function EntitlementsPage() {
           hint={t("finance.entitlements.pendingHint")}
           amount={summary.pending.amount}
           count={summary.pending.count}
-          lang={lang}
         />
         <SummaryCard
           tone="teal"
@@ -217,7 +199,6 @@ export function EntitlementsPage() {
           hint={t("finance.entitlements.approvedHint")}
           amount={summary.approved.amount}
           count={summary.approved.count}
-          lang={lang}
         />
         <SummaryCard
           tone="green"
@@ -226,7 +207,6 @@ export function EntitlementsPage() {
           hint={t("finance.entitlements.paidHint")}
           amount={summary.paid.amount}
           count={summary.paid.count}
-          lang={lang}
         />
       </div>
 
@@ -301,7 +281,7 @@ function PayEntitlementDialog({
   target: DoctorEntitlementResponse | null;
   onClose: () => void;
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const pay = usePayEntitlement();
   const [method, setMethod] = useState("cash");
 
