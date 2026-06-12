@@ -5,22 +5,15 @@ import {
   cancelContract,
   completeContract,
   createContract,
-  createContractMedicationPrice,
-  deleteContractMedicationPrice,
   detachContractFarm,
   getContract,
   listContractFarms,
-  listContractMedicationPrices,
   listContracts,
   updateContract,
-  updateContractMedicationPrice,
   type ApiError,
   type ContractCreateRequest,
   type ContractFarmResponse,
   type ContractListParams,
-  type ContractMedicationPriceCreateRequest,
-  type ContractMedicationPricePatchRequest,
-  type ContractMedicationPriceResponse,
   type ContractPatchRequest,
   type ContractResponse,
   type IdentifierResponse,
@@ -29,7 +22,6 @@ import {
 import { apiClient } from "@/services/apiClient";
 
 const KEY = "contracts";
-const PRICES = "contract-medication-prices";
 const FARMS = "contract-farms";
 
 export function useContracts(params: ContractListParams) {
@@ -45,14 +37,6 @@ export function useContract(id: string | null) {
     queryKey: [KEY, "detail", id],
     queryFn: () => getContract(apiClient, id as string),
     enabled: id !== null,
-  });
-}
-
-export function useContractMedicationPrices(contractId: string | null) {
-  return useQuery<ContractMedicationPriceResponse[], ApiError>({
-    queryKey: [PRICES, contractId],
-    queryFn: () => listContractMedicationPrices(apiClient, contractId as string),
-    enabled: contractId !== null,
   });
 }
 
@@ -82,35 +66,6 @@ export function useContractTransition(
   return useMutation<IdentifierResponse, ApiError, string>({
     mutationFn: (id) => fn(apiClient, id),
     onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
-  });
-}
-
-export function useCreateContractMedicationPrice(contractId: string) {
-  const qc = useQueryClient();
-  return useMutation<IdentifierResponse, ApiError, ContractMedicationPriceCreateRequest>({
-    mutationFn: (body) => createContractMedicationPrice(apiClient, contractId, body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [PRICES, contractId] }),
-  });
-}
-
-export function useUpdateContractMedicationPrice(contractId: string) {
-  const qc = useQueryClient();
-  return useMutation<
-    IdentifierResponse,
-    ApiError,
-    { priceId: string; body: ContractMedicationPricePatchRequest }
-  >({
-    mutationFn: ({ priceId, body }) =>
-      updateContractMedicationPrice(apiClient, contractId, priceId, body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [PRICES, contractId] }),
-  });
-}
-
-export function useDeleteContractMedicationPrice(contractId: string) {
-  const qc = useQueryClient();
-  return useMutation<void, ApiError, string>({
-    mutationFn: (priceId) => deleteContractMedicationPrice(apiClient, contractId, priceId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [PRICES, contractId] }),
   });
 }
 

@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { DateRange } from "@/components/ui/date-range";
 import { ContractFarms } from "@/routes/finance/ContractFarms";
-import { ContractMedicationPrices } from "@/routes/finance/ContractMedicationPrices";
 import { contractStatusVariant } from "@/routes/finance/statusVariants";
 
 function Kv({ label, value }: { label: string; value: ReactNode }) {
@@ -20,7 +19,7 @@ function Kv({ label, value }: { label: string; value: ReactNode }) {
 }
 
 /**
- * Right-rail detail for the selected contract: status, terms, and the medication-price overrides.
+ * Right-rail detail for the selected contract: status, terms, and the covered farms.
  * `footer` carries the per-status actions (edit in W8.2; the lifecycle buttons land in W8.3).
  */
 export function ContractDetailPanel({
@@ -77,10 +76,6 @@ export function ContractDetailPanel({
 
       <div className="border-t pt-3">
         <ContractFarms contractId={contract.id} customerId={contract.customerId} isDraft={isDraft} />
-      </div>
-
-      <div className="border-t pt-3">
-        <ContractMedicationPrices contractId={contract.id} isDraft={isDraft} />
       </div>
 
       {footer ? <div className="border-t pt-3">{footer}</div> : null}
