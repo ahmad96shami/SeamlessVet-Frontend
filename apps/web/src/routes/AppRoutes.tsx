@@ -21,6 +21,8 @@ import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
 import { DoctorPartnerDetailPage } from "@/routes/doctor-partners/DoctorPartnerDetailPage";
 import { DoctorPartnersPage } from "@/routes/doctor-partners/DoctorPartnersPage";
+import { EmployeeDetailPage } from "@/routes/employees/EmployeeDetailPage";
+import { EmployeesPage } from "@/routes/employees/EmployeesPage";
 import { PartnersPage } from "@/routes/finance/PartnersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
 import { PurchasesPage } from "@/routes/purchases/PurchasesPage";
@@ -267,6 +269,24 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "accountant"]}>
               <PurchasesPage />
+            </RequireRole>
+          }
+        />
+        {/* Employees (الموظفون) — M31 HR/payroll AP, standalone (not under the contracts tabs);
+            the third Supplier-ledger-triad mirror after suppliers + doctor-partners. */}
+        <Route
+          path="finance/employees"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <EmployeesPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="finance/employees/:id"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <EmployeeDetailPage />
             </RequireRole>
           }
         />
