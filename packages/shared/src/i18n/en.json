@@ -1141,7 +1141,7 @@
     },
     "vaccines": {
       "title": "Vaccines",
-      "description": "The vaccine catalog and prices — picked when recording a vaccination and billed automatically",
+      "description": "The vaccine catalog — stock products with cost, selling price and expiry; purchased like any product and billed when administered",
       "new": "New vaccine",
       "newTitle": "New vaccine",
       "editTitle": "Edit vaccine",
@@ -1152,7 +1152,9 @@
       "col": {
         "nameAr": "Name",
         "nameLatin": "Latin name",
-        "price": "Price"
+        "cost": "Cost",
+        "price": "Selling price",
+        "expiry": "Expiry"
       },
       "form": {
         "nameAr": "Arabic name",

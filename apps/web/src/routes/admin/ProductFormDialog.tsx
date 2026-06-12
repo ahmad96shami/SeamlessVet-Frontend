@@ -41,6 +41,9 @@ export function ProductFormDialog({
   onClose,
   defaultName,
   onCreated,
+  lockedCategory,
+  newTitle,
+  editTitle,
 }: {
   open: boolean;
   product: ProductResponse | null;
@@ -49,6 +52,11 @@ export function ProductFormDialog({
   defaultName?: string;
   /** Fired with the new product's id after a create (not an edit) — lets callers select it inline. */
   onCreated?: (id: string) => void;
+  /** Pin the category (e.g. the اللقاحات tab pins `vaccine`): hides the picker + forces it on save. */
+  lockedCategory?: ProductRequest["category"];
+  /** Title overrides — let a category-pinned host (e.g. vaccines) word the dialog in its own terms. */
+  newTitle?: string;
+  editTitle?: string;
 }) {
   const { t } = useTranslation();
   const create = useCreateProduct();
@@ -60,7 +68,7 @@ export function ProductFormDialog({
   const { register, control, handleSubmit, reset, setError, formState } = form;
   const errors = formState.errors;
 
-  // Hydrate on open: the edited product, or blank defaults for create.
+  // Hydrate on open: the edited product, or blank defaults for create (category pinned when locked).
   useEffect(() => {
     if (!open) return;
     reset(
@@ -78,12 +86,14 @@ export function ProductFormDialog({
             expirationDate: product.expirationDate ?? "",
             reorderPoint: product.reorderPoint,
           }
-        : { ...DEFAULTS, nameAr: defaultName ?? "" },
+        : { ...DEFAULTS, category: lockedCategory ?? DEFAULTS.category, nameAr: defaultName ?? "" },
     );
-  }, [open, product, defaultName, reset]);
+  }, [open, product, defaultName, lockedCategory, reset]);
 
   const onSubmit = handleSubmit((values) => {
-    const body = omitEmptyStrings(values); // empty optional text → omitted (stored as null)
+    const body = omitEmptyStrings(
+      lockedCategory ? { ...values, category: lockedCategory } : values,
+    ); // empty optional text → omitted (stored as null)
     const onError = (e: ApiError) =>
       applyFieldErrors(e, (name, err) => setError(name as never, err));
     if (product) {
@@ -118,7 +128,11 @@ export function ProductFormDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      title={product ? t("admin.products.editTitle") : t("admin.products.newTitle")}
+      title={
+        product
+          ? (editTitle ?? t("admin.products.editTitle"))
+          : (newTitle ?? t("admin.products.newTitle"))
+      }
       className="max-w-2xl"
     >
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
@@ -129,18 +143,22 @@ export function ProductFormDialog({
           <Field label={t("admin.products.nameLatin")} error={errors.nameLatin?.message}>
             <Input dir="ltr" {...register("nameLatin")} />
           </Field>
-          <Field label={t("admin.products.category")} error={errors.category?.message}>
-            <Controller
-              name="category"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
-                  <option value="medication">{t("productCategory.medication")}</option>
-                  <option value="product">{t("productCategory.product")}</option>
-                </Select>
-              )}
-            />
-          </Field>
+          {/* Pinned-category hosts (e.g. اللقاحات) hide the picker — the category is forced on save. */}
+          {lockedCategory ? null : (
+            <Field label={t("admin.products.category")} error={errors.category?.message}>
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
+                    <option value="medication">{t("productCategory.medication")}</option>
+                    <option value="product">{t("productCategory.product")}</option>
+                    <option value="vaccine">{t("productCategory.vaccine")}</option>
+                  </Select>
+                )}
+              />
+            </Field>
+          )}
           <Field label={t("admin.products.barcode")} error={errors.barcode?.message}>
             <Input dir="ltr" {...register("barcode")} />
           </Field>

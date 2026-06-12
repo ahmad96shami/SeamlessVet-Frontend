@@ -1,6 +1,6 @@
 import { Money } from "@/components/ui/money";
 import type { ColumnDef } from "@tanstack/react-table";
-import { VACCINE_CATEGORY, type ServiceResponse } from "@vet/shared";
+import { formatDate, VACCINE_CATEGORY, type ProductResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -13,38 +13,40 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
-import { useDeleteService, useServices } from "@/queries/services";
+import { useDeleteProduct, useProducts } from "@/queries/products";
 import { useAuthStore } from "@/stores/authStore";
 import { VaccineFormDialog } from "@/routes/vaccinations/VaccineFormDialog";
 
 /**
- * The vaccine catalog tab (اللقاحات, M22): services with category `vaccination` — picked when
- * recording a vaccination, sold from the POS vaccines tab. CRUD mirrors the admin services page;
- * mutations need `catalog.write` server-side, so the actions are admin-only UX (RequireRole-style).
+ * The vaccine catalog tab (اللقاحات, M26): products with category `vaccine` — purchased like any
+ * product, FEFO-deducted when administered, and billed as a product line. CRUD mirrors the admin
+ * products page (cost / selling price / expiry / reorder); mutations need `catalog.write`
+ * server-side, so the actions are admin-only UX (RequireRole-style).
  */
 export function VaccinesCatalogPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
   const isAdmin = useAuthStore((s) => s.user?.role === "admin");
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<ServiceResponse | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ServiceResponse | null>(null);
+  const [editing, setEditing] = useState<ProductResponse | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProductResponse | null>(null);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
 
   useEffect(() => reset(), [debouncedSearch, reset]);
 
-  const query = useServices({
+  const query = useProducts({
     category: VACCINE_CATEGORY,
     search: debouncedSearch || undefined,
     skip,
     take,
   });
   const rows = query.data ?? [];
-  const del = useDeleteService();
+  const del = useDeleteProduct();
 
-  const columns = useMemo<ColumnDef<ServiceResponse>[]>(
+  const columns = useMemo<ColumnDef<ProductResponse>[]>(
     () => [
       {
         accessorKey: "nameAr",
@@ -61,9 +63,24 @@ export function VaccinesCatalogPage() {
         ),
       },
       {
-        accessorKey: "defaultPrice",
+        accessorKey: "purchasePrice",
+        header: t("vaccinations.vaccines.col.cost"),
+        cell: ({ row }) => <Money value={row.original.purchasePrice} />,
+      },
+      {
+        accessorKey: "sellingPrice",
         header: t("vaccinations.vaccines.col.price"),
-        cell: ({ row }) => <Money value={row.original.defaultPrice} />,
+        cell: ({ row }) => <Money value={row.original.sellingPrice} />,
+      },
+      {
+        accessorKey: "expirationDate",
+        header: t("vaccinations.vaccines.col.expiry"),
+        cell: ({ row }) =>
+          row.original.expirationDate ? (
+            <span dir="ltr">{formatDate(row.original.expirationDate, lang)}</span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
       },
       ...(isAdmin
         ? [
@@ -93,11 +110,11 @@ export function VaccinesCatalogPage() {
                   </Button>
                 </div>
               ),
-            } satisfies ColumnDef<ServiceResponse>,
+            } satisfies ColumnDef<ProductResponse>,
           ]
         : []),
     ],
-    [t, isAdmin],
+    [t, lang, isAdmin],
   );
 
   const confirmDelete = () => {
