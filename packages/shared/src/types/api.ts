@@ -388,6 +388,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/consumables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Reports_Consumables"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reports/field-doctor-visits": {
         parameters: {
             query?: never;
@@ -820,6 +836,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/inventory/lots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Inventory_Lots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inventory/expiring": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Inventory_Expiring"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/inventory/receive": {
         parameters: {
             query?: never;
@@ -878,6 +926,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["Inventory_UnloadField"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inventory/consume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["Inventory_Consume"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1156,32 +1220,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/doctor-entitlements/{id}/approve": {
+    "/employees/{employeeId}/payments": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["EmployeePayments_List"];
         put?: never;
-        post: operations["Entitlements_Approve"];
+        post: operations["EmployeePayments_Create"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/doctor-entitlements/{id}/pay": {
+    "/employees": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["Employees_List"];
         put?: never;
-        post: operations["Entitlements_Pay"];
+        post: operations["Employees_Create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employees/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Employees_Get"];
+        put?: never;
+        post?: never;
+        delete: operations["Employees_Delete"];
+        options?: never;
+        head?: never;
+        patch: operations["Employees_Update"];
+        trace?: never;
+    };
+    "/employees/{id}/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Employees_Statement"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1196,6 +1292,70 @@ export interface paths {
             cookie?: never;
         };
         get: operations["Doctors_List"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/doctor-partners/{doctorPartnerId}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DoctorPartnerPayments_List"];
+        put?: never;
+        post: operations["DoctorPartnerPayments_Create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/doctor-partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DoctorPartners_List"];
+        put?: never;
+        post: operations["DoctorPartners_Create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/doctor-partners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DoctorPartners_Get"];
+        put?: never;
+        post?: never;
+        delete: operations["DoctorPartners_Delete"];
+        options?: never;
+        head?: never;
+        patch: operations["DoctorPartners_Update"];
+        trace?: never;
+    };
+    "/doctor-partners/{id}/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DoctorPartners_Statement"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1458,38 +1618,6 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/contracts/{contractId}/medication-prices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["ContractMedicationPrices_List"];
-        put?: never;
-        post: operations["ContractMedicationPrices_Create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/contracts/{contractId}/medication-prices/{priceId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["ContractMedicationPrices_Delete"];
-        options?: never;
-        head?: never;
-        patch: operations["ContractMedicationPrices_Update"];
         trace?: never;
     };
     "/contracts": {
@@ -2093,7 +2221,7 @@ export interface components {
             /** Format: guid */
             visitId?: string | null;
             /** Format: guid */
-            serviceId?: string | null;
+            productId?: string | null;
             vaccineType?: string;
             /** Format: decimal */
             price?: number | null;
@@ -2105,7 +2233,7 @@ export interface components {
         };
         VaccinationPatchRequest: {
             /** Format: guid */
-            serviceId?: string | null;
+            productId?: string | null;
             vaccineType?: string | null;
             /** Format: decimal */
             price?: number | null;
@@ -2394,7 +2522,20 @@ export interface components {
             idempotencyKey?: string;
             reason?: string | null;
         };
-        OfF__AnonymousType6OfString: {
+        ConsumeStockRequest: {
+            /** Format: guid */
+            id?: string | null;
+            /** Format: guid */
+            productId?: string;
+            /** Format: decimal */
+            quantity?: number;
+            reason?: string;
+            idempotencyKey?: string;
+            locationType?: string | null;
+            /** Format: guid */
+            locationId?: string | null;
+        };
+        OfF__AnonymousType8OfString: {
             status?: string | null;
         };
         PosInvoiceRequest: {
@@ -2505,8 +2646,68 @@ export interface components {
             headCount?: number | null;
             notes?: string | null;
         };
-        PayEntitlementRequest: {
+        EmployeePaymentRequest: {
+            /** Format: guid */
+            id?: string | null;
+            kind?: string;
+            /** Format: decimal */
+            amount?: number;
+            /** Format: decimal */
+            loanRepaymentAmount?: number | null;
             method?: string;
+            notes?: string | null;
+            chequeNumber?: string | null;
+            chequeBank?: string | null;
+            /** Format: date */
+            chequeDueDate?: string | null;
+            idempotencyKey?: string;
+        };
+        EmployeeRequest: {
+            /** Format: guid */
+            id?: string | null;
+            /** Format: guid */
+            userId?: string | null;
+            fullName?: string;
+            jobTitle?: string | null;
+            /** Format: decimal */
+            monthlySalary?: number;
+            active?: boolean;
+            /** Format: date */
+            hiredAt?: string | null;
+            notes?: string | null;
+        };
+        EmployeePatchRequest: {
+            fullName?: string | null;
+            jobTitle?: string | null;
+            /** Format: decimal */
+            monthlySalary?: number | null;
+            active?: boolean | null;
+            /** Format: date */
+            hiredAt?: string | null;
+            notes?: string | null;
+        };
+        DoctorPartnerPaymentRequest: {
+            /** Format: guid */
+            id?: string | null;
+            /** Format: decimal */
+            amount?: number;
+            method?: string;
+            notes?: string | null;
+            chequeNumber?: string | null;
+            chequeBank?: string | null;
+            /** Format: date */
+            chequeDueDate?: string | null;
+            idempotencyKey?: string;
+        };
+        DoctorPartnerRequest: {
+            /** Format: guid */
+            id?: string | null;
+            /** Format: guid */
+            userId?: string;
+            notes?: string | null;
+        };
+        DoctorPartnerPatchRequest: {
+            notes?: string | null;
         };
         RegisterPushTokenRequest: {
             token?: string;
@@ -2593,10 +2794,6 @@ export interface components {
             supervisionFeeValue?: number;
             entitlementEnabled?: boolean | null;
             entitlementSystem?: string | null;
-            /** Format: decimal */
-            doctorSharePercent?: number | null;
-            /** Format: decimal */
-            doctorShareCeiling?: number | null;
             status?: string | null;
         };
         BatchPatchRequest: {
@@ -2617,10 +2814,6 @@ export interface components {
             supervisionFeeValue?: number | null;
             entitlementEnabled?: boolean | null;
             entitlementSystem?: string | null;
-            /** Format: decimal */
-            doctorSharePercent?: number | null;
-            /** Format: decimal */
-            doctorShareCeiling?: number | null;
             status?: string | null;
         };
         BatchSettlementRequest: {
@@ -2643,18 +2836,6 @@ export interface components {
             id?: string | null;
             /** Format: guid */
             farmId?: string;
-        };
-        ContractMedicationPriceCreateRequest: {
-            /** Format: guid */
-            id?: string | null;
-            /** Format: guid */
-            productId?: string;
-            /** Format: decimal */
-            contractPrice?: number;
-        };
-        ContractMedicationPricePatchRequest: {
-            /** Format: decimal */
-            contractPrice?: number | null;
         };
         ContractCreateRequest: {
             /** Format: guid */
@@ -2710,10 +2891,10 @@ export interface components {
         LogoutRequest: {
             refreshToken?: string;
         };
-        OfF__AnonymousType4OfIEnumerableOfOfF__AnonymousType5OfStringAndStringAndStringAndStringAndStringAndString: {
-            keys?: components["schemas"]["OfF__AnonymousType5OfStringAndStringAndStringAndStringAndStringAndString"][] | null;
+        OfF__AnonymousType6OfIEnumerableOfOfF__AnonymousType7OfStringAndStringAndStringAndStringAndStringAndString: {
+            keys?: components["schemas"]["OfF__AnonymousType7OfStringAndStringAndStringAndStringAndStringAndString"][] | null;
         };
-        OfF__AnonymousType5OfStringAndStringAndStringAndStringAndStringAndString: {
+        OfF__AnonymousType7OfStringAndStringAndStringAndStringAndStringAndString: {
             kty?: string | null;
             use?: string | null;
             alg?: string | null;
@@ -2788,6 +2969,7 @@ export interface components {
             expirationDate?: string | null;
             /** Format: decimal */
             reorderPoint?: number;
+            isConsumable?: boolean;
         };
         ProductPatchRequest: {
             nameAr?: string | null;
@@ -2805,6 +2987,7 @@ export interface components {
             expirationDate?: string | null;
             /** Format: decimal */
             reorderPoint?: number | null;
+            isConsumable?: boolean | null;
         };
         ApproveRequest: {
             notes?: string | null;
@@ -3545,7 +3728,6 @@ export interface operations {
         parameters: {
             query?: {
                 doctorId?: string | null;
-                status?: string | null;
                 skip?: number | null;
                 take?: number | null;
                 format?: string | null;
@@ -3608,6 +3790,32 @@ export interface operations {
         };
     };
     Reports_InventoryMovement: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+                productId?: string | null;
+                locationType?: string | null;
+                locationId?: string | null;
+                skip?: number | null;
+                take?: number | null;
+                format?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Reports_Consumables: {
         parameters: {
             query?: {
                 from?: string | null;
@@ -4591,6 +4799,47 @@ export interface operations {
             };
         };
     };
+    Inventory_Lots: {
+        parameters: {
+            query: {
+                productId: string;
+                locationType?: string | null;
+                locationId?: string | null;
+                onHandOnly?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Inventory_Expiring: {
+        parameters: {
+            query?: {
+                withinDays?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     Inventory_Receive: {
         parameters: {
             query?: never;
@@ -4675,6 +4924,27 @@ export interface operations {
             };
         };
     };
+    Inventory_Consume: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsumeStockRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     Health_Live: {
         parameters: {
             query?: never;
@@ -4689,7 +4959,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfF__AnonymousType6OfString"];
+                    "application/json": components["schemas"]["OfF__AnonymousType8OfString"];
                 };
             };
         };
@@ -5068,7 +5338,6 @@ export interface operations {
         parameters: {
             query?: {
                 doctorId?: string | null;
-                status?: string | null;
                 skip?: number | null;
                 take?: number | null;
             };
@@ -5105,7 +5374,96 @@ export interface operations {
             };
         };
     };
-    Entitlements_Approve: {
+    EmployeePayments_List: {
+        parameters: {
+            query?: {
+                skip?: number | null;
+                take?: number | null;
+            };
+            header?: never;
+            path: {
+                employeeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EmployeePayments_Create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                employeeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeePaymentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Employees_List: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                ledgerStatus?: string | null;
+                active?: boolean | null;
+                skip?: number | null;
+                take?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Employees_Create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Employees_Get: {
         parameters: {
             query?: never;
             header?: never;
@@ -5124,7 +5482,26 @@ export interface operations {
             };
         };
     };
-    Entitlements_Pay: {
+    Employees_Delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Employees_Update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5135,9 +5512,31 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PayEntitlementRequest"];
+                "application/json": components["schemas"]["EmployeePatchRequest"];
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Employees_Statement: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -5152,6 +5551,177 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DoctorPartnerPayments_List: {
+        parameters: {
+            query?: {
+                skip?: number | null;
+                take?: number | null;
+            };
+            header?: never;
+            path: {
+                doctorPartnerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DoctorPartnerPayments_Create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doctorPartnerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DoctorPartnerPaymentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DoctorPartners_List: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                ledgerStatus?: string | null;
+                skip?: number | null;
+                take?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DoctorPartners_Create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DoctorPartnerRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DoctorPartners_Get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DoctorPartners_Delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DoctorPartners_Update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DoctorPartnerPatchRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DoctorPartners_Statement: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -5704,92 +6274,6 @@ export interface operations {
             };
         };
     };
-    ContractMedicationPrices_List: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                contractId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ContractMedicationPrices_Create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                contractId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ContractMedicationPriceCreateRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ContractMedicationPrices_Delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                contractId: string;
-                priceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ContractMedicationPrices_Update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                contractId: string;
-                priceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ContractMedicationPricePatchRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     Contracts_List: {
         parameters: {
             query?: {
@@ -6048,7 +6532,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfF__AnonymousType4OfIEnumerableOfOfF__AnonymousType5OfStringAndStringAndStringAndStringAndStringAndString"];
+                    "application/json": components["schemas"]["OfF__AnonymousType6OfIEnumerableOfOfF__AnonymousType7OfStringAndStringAndStringAndStringAndStringAndString"];
                 };
             };
         };

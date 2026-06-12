@@ -245,7 +245,8 @@
   },
   "productCategory": {
     "medication": "Medication",
-    "product": "Product"
+    "product": "Product",
+    "vaccine": "Vaccine"
   },
   "customerType": {
     "regular_farm": "General farm",

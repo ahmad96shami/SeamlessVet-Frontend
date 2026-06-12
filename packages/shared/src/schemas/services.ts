@@ -2,11 +2,9 @@ import { z } from "zod";
 
 import { optionalText } from "./common";
 
-/**
- * M22 — services with this category form the **vaccine catalog**: managed from the web اللقاحات
- * tab, listed in their own POS tab, and linkable from `vaccinations.serviceId`.
- */
-export const VACCINE_CATEGORY = "vaccination";
+// M26 retired the M22 `VACCINE_CATEGORY = "vaccination"` service category — vaccines are now
+// products (category `vaccine`, see `schemas/products.ts`). The old vaccine *services* were
+// soft-deleted by the backend migration.
 
 /**
  * M23 — the server-managed **system services** backing checkup-fee («رسوم الكشف») and night-stay

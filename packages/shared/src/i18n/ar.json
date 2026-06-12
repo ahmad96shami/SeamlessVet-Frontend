@@ -264,7 +264,8 @@
   },
   "productCategory": {
     "medication": "دواء",
-    "product": "منتج"
+    "product": "منتج",
+    "vaccine": "لقاح"
   },
   "customerType": {
     "regular_farm": "مزرعة عامة",

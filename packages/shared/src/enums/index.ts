@@ -192,6 +192,9 @@ export const LEDGER_ENTRY_TYPE_VALUES = values(LedgerEntryType);
 export const ProductCategory = {
   Medication: "medication",
   Product: "product",
+  // M26 — vaccines are stock products (category `vaccine`): purchasable, FEFO-deducted on
+  // administration, billed as a product line. Reverses the M22 vaccines-as-services model.
+  Vaccine: "vaccine",
 } as const;
 export type ProductCategory = EnumValues<typeof ProductCategory>;
 export const PRODUCT_CATEGORY_VALUES = values(ProductCategory);
