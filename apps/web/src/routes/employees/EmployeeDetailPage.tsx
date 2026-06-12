@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { balanceClass, statusVariant } from "@/routes/customers/ledgerStatus";
 import { useEmployee } from "@/queries/employees";
 import { EmployeeFormDialog } from "@/routes/employees/EmployeeFormDialog";
+import { EmployeePaymentsSection } from "@/routes/employees/EmployeePaymentsSection";
 import { EmployeeStatementSection } from "@/routes/employees/EmployeeStatementSection";
 
 export function EmployeeDetailPage() {
@@ -84,6 +85,8 @@ export function EmployeeDetailPage() {
           <Money value={e.balance} />
         </div>
       </div>
+
+      <EmployeePaymentsSection employeeId={e.id} />
 
       <EmployeeStatementSection employeeId={e.id} employeeName={e.fullName} />
 
