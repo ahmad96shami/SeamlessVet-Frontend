@@ -13,6 +13,8 @@ export * from "./pets";
 export * from "./farms";
 export * from "./suppliers";
 export * from "./supplierPayments";
+export * from "./doctorPartners";
+export * from "./doctorPartnerPayments";
 export * from "./purchaseInvoices";
 export * from "./visits";
 export * from "./procedures";

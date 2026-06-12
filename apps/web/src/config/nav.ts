@@ -94,6 +94,13 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["admin", "accountant"],
   },
   {
+    to: "/finance/doctor-partners",
+    labelKey: "nav.doctorPartners",
+    icon: Icon.stethoscope,
+    section: "navSection.finance",
+    roles: ["admin", "accountant"],
+  },
+  {
     to: "/finance/purchases",
     labelKey: "nav.purchases",
     icon: Icon.inbox,

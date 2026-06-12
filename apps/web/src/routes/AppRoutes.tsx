@@ -19,6 +19,8 @@ import { BatchSettlementPage } from "@/routes/finance/BatchSettlementPage";
 import { ContractsPage } from "@/routes/finance/ContractsPage";
 import { EntitlementsPage } from "@/routes/finance/EntitlementsPage";
 import { FinanceLayout } from "@/routes/finance/FinanceLayout";
+import { DoctorPartnerDetailPage } from "@/routes/doctor-partners/DoctorPartnerDetailPage";
+import { DoctorPartnersPage } from "@/routes/doctor-partners/DoctorPartnersPage";
 import { PartnersPage } from "@/routes/finance/PartnersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
 import { PurchasesPage } from "@/routes/purchases/PurchasesPage";
@@ -239,6 +241,24 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "accountant"]}>
               <SupplierDetailPage />
+            </RequireRole>
+          }
+        />
+        {/* Doctor-partners (الأطباء الشركاء) — entitlement-earning field doctors' AP, standalone
+            (not under the contracts tabs); distinct from the M10 investor partners tab. */}
+        <Route
+          path="finance/doctor-partners"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <DoctorPartnersPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="finance/doctor-partners/:id"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <DoctorPartnerDetailPage />
             </RequireRole>
           }
         />

@@ -28,6 +28,7 @@
     "entitlements": "Entitlements",
     "partners": "Partners",
     "suppliers": "Suppliers",
+    "doctorPartners": "Doctor partners",
     "purchases": "Purchases",
     "reports": "Reports",
     "myIncome": "My income"
@@ -116,10 +117,8 @@
     },
     "entitlements": {
       "title": "Doctor entitlements",
-      "pending": "Pending",
-      "approved": "Approved — ready to pay",
-      "paid": "Paid this month",
-      "note": "Total: {{total}}. Entitlements only pay out after the customer ledger closes."
+      "credited": "Credited this period",
+      "note": "Credited to each doctor's partner account when their supervision batch is settled."
     },
     "vaxReminders": {
       "title": "Vaccination reminders",
@@ -180,50 +179,104 @@
   },
   "permissions": {
     "users": {
-      "approve": { "name": "Approve users", "desc": "Approve or reject registration requests." },
-      "manage": { "name": "Manage users", "desc": "Deactivate or reactivate user accounts." },
+      "approve": {
+        "name": "Approve users",
+        "desc": "Approve or reject registration requests."
+      },
+      "manage": {
+        "name": "Manage users",
+        "desc": "Deactivate or reactivate user accounts."
+      },
       "permissions": {
-        "override": { "name": "Override permissions", "desc": "Grant or deny individual permissions per user." }
+        "override": {
+          "name": "Override permissions",
+          "desc": "Grant or deny individual permissions per user."
+        }
       }
     },
     "settings": {
-      "write": { "name": "Edit settings", "desc": "Edit environment-level system settings." }
+      "write": {
+        "name": "Edit settings",
+        "desc": "Edit environment-level system settings."
+      }
     },
     "catalog": {
-      "write": { "name": "Manage catalog", "desc": "Create, edit, and remove products and services in the catalog." }
+      "write": {
+        "name": "Manage catalog",
+        "desc": "Create, edit, and remove products and services in the catalog."
+      }
     },
     "customers": {
-      "write": { "name": "Manage customers", "desc": "Create, edit, and remove customers, pets, and ledger entries." }
+      "write": {
+        "name": "Manage customers",
+        "desc": "Create, edit, and remove customers, pets, and ledger entries."
+      }
     },
     "medical": {
-      "write": { "name": "Medical records", "desc": "Create and edit visits, procedures, prescriptions, follow-ups, vaccinations, and attachments." }
+      "write": {
+        "name": "Medical records",
+        "desc": "Create and edit visits, procedures, prescriptions, follow-ups, vaccinations, and attachments."
+      }
     },
     "appointments": {
-      "write": { "name": "Manage appointments", "desc": "Create, reschedule, and resolve (attend/cancel/no-show) appointments." }
+      "write": {
+        "name": "Manage appointments",
+        "desc": "Create, reschedule, and resolve (attend/cancel/no-show) appointments."
+      }
     },
     "contracts": {
-      "write": { "name": "Manage contracts", "desc": "Create and edit draft contracts, batches, and per-medication contract prices." },
-      "activate": { "name": "Activate contracts", "desc": "Promote draft contracts to active." }
+      "write": {
+        "name": "Manage contracts",
+        "desc": "Create and edit draft contracts, batches, and per-medication contract prices."
+      },
+      "activate": {
+        "name": "Activate contracts",
+        "desc": "Promote draft contracts to active."
+      }
     },
     "invoices": {
-      "write": { "name": "Issue invoices", "desc": "Issue POS, field, and exam-fee invoices and receipt vouchers." },
-      "refund": { "name": "Refund invoices", "desc": "Refund issued invoices." },
-      "void": { "name": "Void invoices", "desc": "Void issued invoices." }
+      "write": {
+        "name": "Issue invoices",
+        "desc": "Issue POS, field, and exam-fee invoices and receipt vouchers."
+      },
+      "refund": {
+        "name": "Refund invoices",
+        "desc": "Refund issued invoices."
+      },
+      "void": {
+        "name": "Void invoices",
+        "desc": "Void issued invoices."
+      }
     },
     "inventory": {
-      "adjust": { "name": "Adjust inventory", "desc": "Apply inventory adjustments." }
+      "adjust": {
+        "name": "Adjust inventory",
+        "desc": "Apply inventory adjustments."
+      }
     },
     "entitlements": {
-      "approve": { "name": "Approve entitlements", "desc": "Close customer accounts and approve/pay doctor entitlements." }
+      "approve": {
+        "name": "Approve entitlements",
+        "desc": "Close customer accounts and approve/pay doctor entitlements."
+      }
     },
     "partnership": {
-      "manage": { "name": "Manage partnership", "desc": "Manage partners and partnership profit shares (partnership environments only)." }
+      "manage": {
+        "name": "Manage partnership",
+        "desc": "Manage partners and partnership profit shares (partnership environments only)."
+      }
     },
     "reports": {
-      "read": { "name": "View reports", "desc": "View operational and financial reports." }
+      "read": {
+        "name": "View reports",
+        "desc": "View operational and financial reports."
+      }
     },
     "suppliers": {
-      "write": { "name": "Manage suppliers", "desc": "Manage suppliers, record purchase invoices, and pay suppliers." }
+      "write": {
+        "name": "Manage suppliers",
+        "desc": "Manage suppliers, record purchase invoices, and pay suppliers."
+      }
     }
   },
   "validation": {
@@ -552,6 +605,70 @@
     },
     "pickerPlaceholder": "Select a customer"
   },
+  "doctorPartners": {
+    "title": "Doctor partners",
+    "description": "Field doctors who earn supervision fees — accounts payable and payments.",
+    "searchPlaceholder": "Search by doctor name",
+    "filterStatus": "Account status",
+    "new": "New doctor partner",
+    "newTitle": "New doctor partner",
+    "editTitle": "Edit doctor partner",
+    "empty": "No doctor partners",
+    "colDoctor": "Doctor",
+    "colNotes": "Notes",
+    "colBalance": "Balance",
+    "colStatus": "Status",
+    "doctor": "Doctor",
+    "doctorPlaceholder": "Select a doctor",
+    "doctorFixed": "The linked doctor can't be changed after creation.",
+    "notes": "Notes",
+    "balanceOwed": "Owed to doctor",
+    "deleteConfirm": "Doctor partner \"{{name}}\" will be deleted.",
+    "backToList": "Back to doctor partners",
+    "notFound": "Doctor partner not found",
+    "userTaken": "This doctor already has a partner record.",
+    "payment": {
+      "title": "Record doctor payment",
+      "action": "Record payment",
+      "amount": "Amount",
+      "method": "Method",
+      "notes": "Notes",
+      "submit": "Record payment",
+      "submitting": "Recording…",
+      "success": "Payment recorded",
+      "history": "Payment history",
+      "empty": "No payments recorded",
+      "colDate": "Date",
+      "colMethod": "Method",
+      "colAmount": "Amount",
+      "colReference": "Reference"
+    },
+    "statement": {
+      "title": "Account statement",
+      "print": "Print",
+      "rangeAll": "All time",
+      "range90": "Last 90 days",
+      "rangeYear": "This year",
+      "rangeCustom": "Custom",
+      "from": "From",
+      "to": "To",
+      "colDate": "Date",
+      "colRef": "Reference",
+      "colType": "Type",
+      "colDescription": "Description",
+      "colDebit": "Entitlement",
+      "colCredit": "Paid",
+      "colBalance": "Balance",
+      "opening": "Opening balance",
+      "closing": "Closing balance",
+      "totalDebit": "Total credited",
+      "totalCredit": "Total paid",
+      "movementsCount": "{{count}} entries",
+      "empty": "No transactions in this period",
+      "generatedAt": "Generated: {{date}}",
+      "reportTitle": "Doctor partner account statement"
+    }
+  },
   "suppliers": {
     "title": "Suppliers",
     "description": "Manage suppliers, purchases and accounts payable.",
@@ -727,6 +844,11 @@
   },
   "supplierLedgerEntryType": {
     "purchase_invoice": "Purchase invoice",
+    "payment": "Payment",
+    "adjustment": "Adjustment"
+  },
+  "doctorPartnerLedgerEntryType": {
+    "entitlement": "Entitlement",
     "payment": "Payment",
     "adjustment": "Adjustment"
   },
@@ -1768,11 +1890,6 @@
     "open": "Open",
     "closed": "Closed"
   },
-  "entitlementStatus": {
-    "pending": "Pending",
-    "approved": "Approved",
-    "paid": "Paid"
-  },
   "finance": {
     "tabs": {
       "contracts": "Contracts",
@@ -1886,29 +2003,13 @@
       "subtitle": "Computed automatically when a supervision batch is settled and credited to the doctor's account. This view is read-only.",
       "empty": "No entitlements",
       "totalAccrued": "Total accrued",
-      "pending": "Pending",
-      "approved": "Approved — ready to pay",
-      "paid": "Paid",
-      "pendingHint": "Accounts not yet closed",
-      "approvedHint": "Accounts closed, awaiting payment",
-      "paidHint": "Recently paid entitlements",
-      "filterStatus": "Status",
       "colDoctor": "Doctor",
       "colSource": "Source",
       "colSystem": "Calculation system",
       "colDate": "Date",
       "colAmount": "Doctor share",
-      "colStatus": "Status",
       "sourceBatch": "Supervision batch",
-      "sourceVisit": "Visit",
-      "approve": "Approve",
-      "pay": "Pay",
-      "payTitle": "Pay entitlement",
-      "payMethod": "Payment method",
-      "approveConfirm": "Approve this entitlement for payment?",
-      "settlementLock": "Settlement lock: entitlements are not disbursed until the customer's account is fully closed (partial payments release nothing).",
-      "lockedError": "The customer's account isn't closed — close the account first to release settlement.",
-      "approvedTotal": "Total approved, ready to pay"
+      "sourceVisit": "Visit"
     },
     "closeAccount": {
       "action": "Close account & release settlement",
