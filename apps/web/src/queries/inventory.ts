@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   adjustStock,
+  consumeStock,
   listExpiring,
   listFieldInventories,
   listLots,
@@ -10,6 +11,7 @@ import {
   unloadField,
   type AdjustStockInput,
   type ApiError,
+  type ConsumeStockInput,
   type ExpiringParams,
   type ExpiringProduct,
   type FieldInventoryResponse,
@@ -84,6 +86,15 @@ export function useAdjustStock() {
   const qc = useQueryClient();
   return useMutation<IdentifierResponse, ApiError, AdjustStockInput>({
     mutationFn: (input) => adjustStock(apiClient, input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  });
+}
+
+/** POST /inventory/consume — record internal use of a consumable (M27). Refetches all inventory reads. */
+export function useConsumeStock() {
+  const qc = useQueryClient();
+  return useMutation<IdentifierResponse, ApiError, ConsumeStockInput>({
+    mutationFn: (input) => consumeStock(apiClient, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }

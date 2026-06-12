@@ -43,6 +43,7 @@ import { InvoicesPage } from "@/routes/pos/InvoicesPage";
 import { PosLayout } from "@/routes/pos/PosLayout";
 import { PosPage } from "@/routes/pos/PosPage";
 import { AlertsPage } from "@/routes/inventory/AlertsPage";
+import { ConsumablesPage } from "@/routes/inventory/ConsumablesPage";
 import { MovementsPage } from "@/routes/inventory/MovementsPage";
 import { StockPage } from "@/routes/inventory/StockPage";
 import { VaccinationCalendarPage } from "@/routes/vaccinations/VaccinationCalendarPage";
@@ -181,6 +182,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin", "inventory_staff"]}>
               <MovementsPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="inventory/consumables"
+          element={
+            <RequireRole roles={["admin", "inventory_staff"]}>
+              <ConsumablesPage />
             </RequireRole>
           }
         />

@@ -18,6 +18,7 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { omitEmptyStrings } from "@/lib/forms";
 import { useCreateProduct, useUpdateProduct } from "@/queries/products";
 
@@ -33,6 +34,7 @@ const DEFAULTS: ProductRequest = {
   unitOfMeasure: "",
   expirationDate: "",
   reorderPoint: 0,
+  isConsumable: false,
 };
 
 export function ProductFormDialog({
@@ -85,6 +87,7 @@ export function ProductFormDialog({
             unitOfMeasure: product.unitOfMeasure ?? "",
             expirationDate: product.expirationDate ?? "",
             reorderPoint: product.reorderPoint,
+            isConsumable: product.isConsumable ?? false,
           }
         : { ...DEFAULTS, category: lockedCategory ?? DEFAULTS.category, nameAr: defaultName ?? "" },
     );
@@ -204,6 +207,28 @@ export function ProductFormDialog({
               )}
             />
           </Field>
+          {/* M27 — an internal-use consumable is taken out via the المستهلكات screen, never sold. A
+              vaccine (pinned category) is billable, so the toggle is hidden there. */}
+          {lockedCategory ? null : (
+            <Field label={t("admin.products.isConsumable")}>
+              <Controller
+                control={control}
+                name="isConsumable"
+                render={({ field }) => (
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      checked={!!field.value}
+                      onCheckedChange={field.onChange}
+                      aria-label={t("admin.products.isConsumable")}
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {t("admin.products.isConsumableHint")}
+                    </span>
+                  </div>
+                )}
+              />
+            </Field>
+          )}
         </div>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={pending}>

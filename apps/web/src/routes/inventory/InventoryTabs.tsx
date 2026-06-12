@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { to: "/inventory", labelKey: "inventory.tab.stock", end: true },
   { to: "/inventory/movements", labelKey: "inventory.tab.movements", end: false },
+  { to: "/inventory/consumables", labelKey: "inventory.tab.consumables", end: false },
   { to: "/inventory/alerts", labelKey: "inventory.tab.alerts", end: false },
 ];
 
