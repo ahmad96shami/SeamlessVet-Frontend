@@ -362,6 +362,19 @@ export const IMMEDIATE_PAYMENT_METHODS = [
   PaymentMethod.Cheque,
 ] as const;
 
+// M31 — the kind of an employee payment selects its HR-ledger effect (a salary_payment may carry a
+// loanRepaymentAmount to repay a loan out of that salary — the future-salary-deduction pairing).
+export const EmployeePaymentKind = {
+  /** Salary paid to the employee (optionally with a loan deduction). */
+  SalaryPayment: "salary_payment",
+  /** An advance/loan given to the employee. */
+  Loan: "loan",
+  /** A direct cash loan repayment by the employee. */
+  LoanRepayment: "loan_repayment",
+} as const;
+export type EmployeePaymentKind = EnumValues<typeof EmployeePaymentKind>;
+export const EMPLOYEE_PAYMENT_KIND_VALUES = values(EmployeePaymentKind);
+
 // M30 removed the doctor-entitlement approve/pay lifecycle — an entitlement is now an immutable accrual
 // credited to the doctor's partner ledger on batch settle, so there is no EntitlementStatus enum.
 

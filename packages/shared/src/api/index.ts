@@ -15,6 +15,8 @@ export * from "./suppliers";
 export * from "./supplierPayments";
 export * from "./doctorPartners";
 export * from "./doctorPartnerPayments";
+export * from "./employees";
+export * from "./employeePayments";
 export * from "./purchaseInvoices";
 export * from "./visits";
 export * from "./procedures";
