@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/select";
 import { useCustomerLookup } from "@/hooks/useCustomerLookup";
 import { useBatches } from "@/queries/batches";
 import { useProfitPerBatch } from "@/queries/reports";
+import { feeHandling } from "@/routes/finance/feeHandling";
 import { ReportExportButtons } from "@/routes/reports/ReportExportButtons";
 import { ReportPageHeader } from "@/routes/reports/ReportPageHeader";
 import { SummaryGrid, SummaryStat } from "@/routes/reports/SummaryStat";
@@ -52,6 +53,10 @@ export function ProfitPerBatchPage() {
             <Badge variant={d.entitlementEnabled ? "success" : "secondary"}>
               {d.entitlementEnabled ? t("reports.profitPerBatch.enabled") : t("reports.profitPerBatch.disabled")}
             </Badge>
+            {/* M28 — how the supervision fee is handled (subtracted A / added B / retained off). */}
+            <Badge variant="outline">
+              {t("finance.feeHandling.label")}: {t(`finance.feeHandling.${feeHandling(d.entitlementEnabled, d.entitlementSystem)}`)}
+            </Badge>
             <span className="cap-12 text-muted-foreground">{t("reports.common.asOf")} {formatDate(d.asOf, lang)}</span>
           </div>
 
@@ -65,7 +70,12 @@ export function ProfitPerBatchPage() {
               value={<Money value={d.doctorShare} />}
               tone="amber"
             />
-            <SummaryStat label={t("reports.profitPerBatch.clinicShare")} value={<Money value={d.clinicShare} />} tone="teal" />
+            <SummaryStat
+              label={t("reports.profitPerBatch.clinicShare")}
+              value={<Money value={d.clinicShare} />}
+              tone={d.clinicShare < 0 ? "red" : "teal"}
+              hint={d.clinicShare < 0 ? t("finance.feeHandling.negativeClinic") : undefined}
+            />
             <SummaryStat label={t("reports.profitPerBatch.distributed")} value={<Money value={d.distributedToPartners} />} tone="navy" />
             <SummaryStat label={t("reports.profitPerBatch.retained")} value={<Money value={d.retainedByClinic} />} tone="green" />
           </SummaryGrid>

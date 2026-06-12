@@ -1877,8 +1877,6 @@
       "entitlementOn": "Enabled",
       "entitlementOff": "Disabled",
       "entitlementSystem": "Calculation system",
-      "doctorSharePercent": "Doctor share %",
-      "doctorShareCeiling": "Share ceiling (optional)",
       "status": "Status",
       "deleteConfirm": "Delete this batch?",
       "closeWarning": "Closing the batch computes the doctor's entitlement — this can't be undone."
@@ -1900,7 +1898,6 @@
       "colSystem": "Calculation system",
       "colDate": "Date",
       "colAmount": "Doctor share",
-      "colCeiling": "Ceiling",
       "colStatus": "Status",
       "sourceBatch": "Supervision batch",
       "sourceVisit": "Visit",
@@ -1909,7 +1906,6 @@
       "payTitle": "Pay entitlement",
       "payMethod": "Payment method",
       "approveConfirm": "Approve this entitlement for payment?",
-      "ceilingApplied": "Ceiling applied",
       "settlementLock": "Settlement lock: entitlements are not disbursed until the customer's account is fully closed (partial payments release nothing).",
       "lockedError": "The customer's account isn't closed — close the account first to release settlement.",
       "approvedTotal": "Total approved, ready to pay"
@@ -2009,6 +2005,8 @@
       "summary": "Settlement summary",
       "originalTotal": "Invoices total",
       "repricingDelta": "Re-pricing delta",
+      "supervisionFee": "Supervision fee",
+      "supervisionFeeAdded": "Supervision fee (added)",
       "settledTotal": "Settled total",
       "currentBalance": "Current farm balance",
       "projectedBalance": "Balance after settlement",
@@ -2024,6 +2022,14 @@
       "blockedLedgerClosed": "The owner account is closed — re-open it before settling.",
       "blockedEntitlementFrozen": "The doctor's entitlement for this batch is approved/paid — prices can no longer change.",
       "viewDocument": "View settlement document"
+    },
+    "feeHandling": {
+      "label": "Supervision fee handling",
+      "subtractedA": "Subtracted from clinic margin",
+      "addedB": "Charged to the farmer at settlement",
+      "retainedOff": "Retained by the clinic",
+      "none": "No doctor entitlement",
+      "negativeClinic": "Clinic share is negative"
     },
     "farmActions": {
       "recordPayment": "Record payment (receipt voucher)"
@@ -2148,7 +2154,6 @@
       "drugProfit": "Drug profit",
       "examFee": "Exam fee",
       "doctorShare": "Doctor share",
-      "ceiling": "Ceiling applied",
       "clinicShare": "Clinic share",
       "distributed": "Distributed to partners",
       "retained": "Retained by clinic"

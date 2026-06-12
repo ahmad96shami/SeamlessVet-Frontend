@@ -25,6 +25,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useBatchSettlementPreview, useSettleBatch } from "@/queries/batchSettlements";
 
+import { feeHandling } from "./feeHandling";
+
 /**
  * تصفية الدورة (M24) — the end-of-cycle renegotiation screen. One settled price per medication
  * applied across ALL the batch's effective invoices, plus a batch-level discount; confirming closes
@@ -72,8 +74,16 @@ export function BatchSettlementPage() {
   }, [data, prices]);
 
   const totalDelta = rows.reduce((sum, r) => sum + r.delta, 0);
-  const settledTotal = (data?.originalTotal ?? 0) + totalDelta - parsedDiscount;
-  const projectedBalance = (data?.ledgerBalance ?? 0) + totalDelta - parsedDiscount;
+  // M28: a direct_fee batch charges the supervision fee to the farmer on top of the settled
+  // medicines (the server adds it to settled_total + posts a +fee owner-ledger adjustment),
+  // regardless of the entitlement toggle — so the preview must add it too or it understates.
+  // The projected fee is a display estimate (computed on the original total); the server recomputes.
+  const fh = feeHandling(data?.entitlementEnabled, data?.entitlementSystem);
+  const feeChargedToFarmer =
+    data?.entitlementSystem === "direct_fee" ? (data?.supervisionFee ?? 0) : 0;
+  const settledTotal = (data?.originalTotal ?? 0) + totalDelta - parsedDiscount + feeChargedToFarmer;
+  const projectedBalance =
+    (data?.ledgerBalance ?? 0) + totalDelta - parsedDiscount + feeChargedToFarmer;
 
   const blocked =
     !!data && (data.alreadySettled || data.ledgerClosed || data.entitlementFrozen);
@@ -186,6 +196,19 @@ export function BatchSettlementPage() {
           value={t(`entitlementSystem.${data.entitlementSystem}`, {
             defaultValue: data.entitlementSystem ?? "—",
           })}
+        />
+        <Kv
+          label={t("finance.feeHandling.label")}
+          value={
+            fh === "none" ? (
+              <Badge variant="secondary">{t("finance.feeHandling.none")}</Badge>
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <Money value={data.supervisionFee} />
+                <Badge variant="secondary">{t(`finance.feeHandling.${fh}`)}</Badge>
+              </span>
+            )
+          }
         />
       </Card>
 
@@ -310,6 +333,9 @@ export function BatchSettlementPage() {
           <SummaryRow label={t("finance.settlement.originalTotal")} value={data.originalTotal} />
           <SummaryRow label={t("finance.settlement.repricingDelta")} value={totalDelta} signed />
           <SummaryRow label={t("finance.settlement.discount")} value={-parsedDiscount} signed />
+          {feeChargedToFarmer > 0 ? (
+            <SummaryRow label={t("finance.settlement.supervisionFeeAdded")} value={feeChargedToFarmer} signed />
+          ) : null}
           <div className="border-t pt-2">
             <SummaryRow label={t("finance.settlement.settledTotal")} value={settledTotal} bold />
           </div>

@@ -1904,8 +1904,6 @@
       "entitlementOn": "مُفعَّل",
       "entitlementOff": "مُعطَّل",
       "entitlementSystem": "نظام الاحتساب",
-      "doctorSharePercent": "نسبة حصة الطبيب ٪",
-      "doctorShareCeiling": "سقف أعلى للحصة (اختياري)",
       "status": "الحالة",
       "deleteConfirm": "حذف هذه الدورة؟",
       "closeWarning": "إغلاق الدورة سيحتسب مستحقات الطبيب — لا يمكن التراجع."
@@ -1927,7 +1925,6 @@
       "colSystem": "نظام الاحتساب",
       "colDate": "التاريخ",
       "colAmount": "حصة الطبيب",
-      "colCeiling": "السقف",
       "colStatus": "الحالة",
       "sourceBatch": "دورة إشراف",
       "sourceVisit": "زيارة",
@@ -1936,7 +1933,6 @@
       "payTitle": "صرف المستحق",
       "payMethod": "طريقة الصرف",
       "approveConfirm": "إقرار هذا المستحق للصرف؟",
-      "ceilingApplied": "سقف مطبَّق",
       "settlementLock": "قفل التسوية: لا تُصرف المستحقات حتى يُغلق حساب العميل بالكامل (المدفوعات الجزئية لا تُحرّر شيئًا).",
       "lockedError": "حساب العميل غير مغلق — أغلق الحساب أولًا لإطلاق التسوية.",
       "approvedTotal": "إجمالي المُقَرّ المتاح للصرف"
@@ -2036,6 +2032,8 @@
       "summary": "ملخص التصفية",
       "originalTotal": "إجمالي الفواتير",
       "repricingDelta": "فرق التسعير",
+      "supervisionFee": "أجر الإشراف",
+      "supervisionFeeAdded": "أجر الإشراف (يُضاف)",
       "settledTotal": "الإجمالي بعد التصفية",
       "currentBalance": "رصيد المزرعة الحالي",
       "projectedBalance": "الرصيد بعد التصفية",
@@ -2051,6 +2049,14 @@
       "blockedLedgerClosed": "حساب المالك مغلق — أعد فتحه قبل التصفية.",
       "blockedEntitlementFrozen": "مستحقات الطبيب لهذه الدورة معتمدة/مدفوعة — لا يمكن تعديل الأسعار.",
       "viewDocument": "عرض وثيقة التصفية"
+    },
+    "feeHandling": {
+      "label": "معالجة أجر الإشراف",
+      "subtractedA": "مخصوم من ربح العيادة",
+      "addedB": "يُحصَّل من المزارع ضمن التصفية",
+      "retainedOff": "محتجز لدى العيادة",
+      "none": "لا يوجد مستحق للطبيب",
+      "negativeClinic": "حصة العيادة سالبة"
     },
     "farmActions": {
       "recordPayment": "تسجيل دفعة (سند قبض)"
@@ -2175,7 +2181,6 @@
       "drugProfit": "ربح الأدوية",
       "examFee": "الكشفية",
       "doctorShare": "حصة الطبيب",
-      "ceiling": "السقف المطبّق",
       "clinicShare": "حصة المركز",
       "distributed": "موزّع على الشركاء",
       "retained": "محتجز للمركز"
