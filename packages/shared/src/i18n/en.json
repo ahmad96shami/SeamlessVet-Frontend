@@ -1468,6 +1468,24 @@
     "visitLine": {
       "checkupFee": "Checkup fee",
       "nightStay": "Night stay"
+    },
+    "park": {
+      "action": "Park",
+      "parked": "Parked sales",
+      "empty": "No parked sales",
+      "resume": "Resume",
+      "delete": "Delete",
+      "success": "Sale parked",
+      "deleted": "Parked sale deleted",
+      "walkIn": "Quick walk-in sale",
+      "itemCount": "{{n}} items",
+      "withVisit": "Visit-linked",
+      "replaceWarning": "Resuming replaces the current cart — park it first to keep it."
+    },
+    "visitCharges": {
+      "confirmTitle": "Unbilled visit charges",
+      "confirmHint": "These items will be added to the invoice as locked visit lines.",
+      "bill": "Add to invoice"
     }
   },
   "admin": {
