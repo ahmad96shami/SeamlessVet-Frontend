@@ -8,6 +8,7 @@ import {
 import { StatementResponseSchema, type StatementResponse } from "../schemas/ledgers";
 import {
   ClinicProfitsReportSchema,
+  ConsumablesReportSchema,
   DoctorIncomeReportSchema,
   FieldDoctorVisitsReportSchema,
   InventoryMovementReportSchema,
@@ -20,6 +21,8 @@ import {
   VisitProfitReportSchema,
   type ClinicProfitsParams,
   type ClinicProfitsReport,
+  type ConsumablesParams,
+  type ConsumablesReport,
   type DoctorIncomeParams,
   type DoctorIncomeReport,
   type FieldDoctorVisitsParams,
@@ -114,6 +117,15 @@ export async function getInventoryMovement(
 ): Promise<InventoryMovementReport> {
   const res = await client.get("/reports/inventory-movement", { params });
   return InventoryMovementReportSchema.parse(res.data);
+}
+
+/** GET /reports/consumables — internal-use consumption summed by (location, product) (M27). */
+export async function getConsumables(
+  client: AxiosInstance,
+  params?: ConsumablesParams,
+): Promise<ConsumablesReport> {
+  const res = await client.get("/reports/consumables", { params });
+  return ConsumablesReportSchema.parse(res.data);
 }
 
 /** GET /reports/field-doctor-visits — the field-visit log, cursor-paged (task 4). */

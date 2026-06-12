@@ -189,3 +189,22 @@ export const UnloadFieldRequestSchema = z.object({
 });
 export type UnloadFieldRequest = z.infer<typeof UnloadFieldRequestSchema>;
 export type UnloadFieldInput = Omit<UnloadFieldRequest, "id" | "idempotencyKey">;
+
+/**
+ * M27 — record internal use (consumption) of an `is_consumable` product: a single negative-delta
+ * `consume` movement at one location, FEFO-deducted via M25 (its weighted-avg cost is snapshotted on
+ * the movement for the consumables report). `reason` is mandatory; omit BOTH `locationType` and
+ * `locationId` to default to the central warehouse, else pass both. The server rejects a
+ * non-consumable product (`product_not_consumable`) and a negative result (`negative_stock`).
+ */
+export const ConsumeStockRequestSchema = z.object({
+  id: z.string().optional(),
+  productId: z.string().min(1),
+  quantity: z.number().positive(),
+  reason: z.string().trim().min(1).max(512),
+  locationType: z.enum(["warehouse", "field"]).optional(),
+  locationId: z.string().optional(),
+  idempotencyKey: z.string().min(1).max(128),
+});
+export type ConsumeStockRequest = z.infer<typeof ConsumeStockRequestSchema>;
+export type ConsumeStockInput = Omit<ConsumeStockRequest, "id" | "idempotencyKey">;

@@ -23,6 +23,10 @@ export const ProductResponseSchema = z.object({
   unitOfMeasure: z.string().nullish(),
   expirationDate: z.string().nullish(), // DateOnly → "yyyy-MM-dd"
   reorderPoint: z.number(),
+  // M27 — an internal-use consumable (gloves, syringes, …): stocked/received/FEFO-costed like any
+  // product but taken out via the المستهلكات screen (`POST /inventory/consume`) and summed by the
+  // consumables report. Never billed.
+  isConsumable: z.boolean().nullish(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -46,6 +50,8 @@ export const ProductRequestSchema = z.object({
   unitOfMeasure: optionalText,
   expirationDate: optionalText,
   reorderPoint: z.number().min(0),
+  // M27 — flag an internal-use consumable (consumed via the المستهلكات screen, never billed).
+  isConsumable: z.boolean().optional(),
 });
 export type ProductRequest = z.infer<typeof ProductRequestSchema>;
 

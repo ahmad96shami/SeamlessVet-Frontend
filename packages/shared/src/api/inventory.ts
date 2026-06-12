@@ -6,6 +6,7 @@ import { idempotencyKey, newGuidV7 } from "../http/idempotency";
 import { IdentifierResponseSchema, type IdentifierResponse } from "../schemas/common";
 import {
   AdjustStockRequestSchema,
+  ConsumeStockRequestSchema,
   ExpiringProductSchema,
   FieldInventoryResponseSchema,
   InventoryLotSchema,
@@ -15,6 +16,7 @@ import {
   StockLevelResponseSchema,
   UnloadFieldRequestSchema,
   type AdjustStockInput,
+  type ConsumeStockInput,
   type ExpiringParams,
   type ExpiringProduct,
   type FieldInventoryResponse,
@@ -135,4 +137,14 @@ export async function unloadField(
   const key = idempotencyKey();
   const payload = UnloadFieldRequestSchema.parse({ ...input, id: newGuidV7(), idempotencyKey: key });
   return postDelta(client, "/inventory/unload-field", payload, key);
+}
+
+/** POST /inventory/consume — record internal use of a consumable (M27); FEFO-deducted at one location. */
+export async function consumeStock(
+  client: AxiosInstance,
+  input: ConsumeStockInput,
+): Promise<IdentifierResponse> {
+  const key = idempotencyKey();
+  const payload = ConsumeStockRequestSchema.parse({ ...input, id: newGuidV7(), idempotencyKey: key });
+  return postDelta(client, "/inventory/consume", payload, key);
 }

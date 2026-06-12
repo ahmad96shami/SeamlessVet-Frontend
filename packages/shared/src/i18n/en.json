@@ -291,7 +291,8 @@
     "tab": {
       "stock": "Stock",
       "movements": "Movement history",
-      "alerts": "Alerts"
+      "alerts": "Alerts",
+      "consumables": "Consumables"
     },
     "location": {
       "all": "All locations",
@@ -335,13 +336,30 @@
       "noExpiry": "No expiry",
       "empty": "No lots at this location"
     },
+    "consumables": {
+      "title": "Consumables",
+      "description": "Record internal use of consumable stock (gloves, syringes, …).",
+      "recordAction": "Record consumption",
+      "dialogTitle": "Record consumption",
+      "product": "Consumable",
+      "selectProduct": "Select a consumable",
+      "noConsumables": "No consumables yet — flag a product as consumable in the catalog first",
+      "quantity": "Quantity",
+      "reason": "Reason",
+      "location": "Location",
+      "submit": "Record",
+      "success": "Consumption recorded",
+      "historyTitle": "Consumption history",
+      "empty": "No consumption recorded"
+    },
     "movementType": {
       "receive": "Receive",
       "adjust": "Adjust",
       "load_to_field": "Load to field",
       "unload_from_field": "Unload from field",
       "sale_deduct": "Sale deduction",
-      "return_add": "Sale return"
+      "return_add": "Sale return",
+      "consume": "Consumption"
     },
     "kpi": {
       "activeItems": "Active items",
@@ -1569,6 +1587,8 @@
       "unitOfMeasure": "Unit of measure",
       "expirationDate": "Expiration date",
       "reorderPoint": "Reorder point",
+      "isConsumable": "Consumable (internal use)",
+      "isConsumableHint": "Consumed internally (not sold) — tracked on the consumables screen.",
       "colName": "Name",
       "colCategory": "Category",
       "colBarcode": "Barcode",
@@ -2000,6 +2020,7 @@
       "profitAndLoss": "Profit & loss",
       "sales": "Sales",
       "inventoryMovement": "Inventory movement",
+      "consumables": "Consumables",
       "fieldVisits": "Field visits",
       "farmAccount": "Farm account",
       "vaccinations": "Upcoming vaccinations",
@@ -2131,6 +2152,17 @@
       "colAmount": "Amount",
       "colPayments": "Payments",
       "empty": "No sales in the period"
+    },
+    "consumables": {
+      "title": "Consumables",
+      "subtitle": "Internal-use consumption by product and location, with FEFO cost",
+      "colProduct": "Product",
+      "colLocation": "Location",
+      "colQuantity": "Quantity",
+      "colCost": "Cost",
+      "totalQuantity": "Total quantity",
+      "totalCost": "Total cost",
+      "empty": "No consumption in this period"
     },
     "inventoryMovement": {
       "title": "Inventory movement",

@@ -310,7 +310,8 @@
     "tab": {
       "stock": "المخزون",
       "movements": "سجل الحركات",
-      "alerts": "التنبيهات"
+      "alerts": "التنبيهات",
+      "consumables": "المستهلكات"
     },
     "location": {
       "all": "كل المواقع",
@@ -354,13 +355,30 @@
       "noExpiry": "بدون انتهاء",
       "empty": "لا توجد دُفعات على هذا الموقع"
     },
+    "consumables": {
+      "title": "المستهلكات",
+      "description": "سجّل الاستخدام الداخلي للمستهلكات (قفازات، حقن، …).",
+      "recordAction": "تسجيل استهلاك",
+      "dialogTitle": "تسجيل استهلاك",
+      "product": "المستهلَك",
+      "selectProduct": "اختر مستهلَكًا",
+      "noConsumables": "لا توجد مستهلكات بعد — حدِّد منتجًا كمستهلَك من الكتالوج أولًا",
+      "quantity": "الكمية",
+      "reason": "السبب",
+      "location": "الموقع",
+      "submit": "تسجيل",
+      "success": "تم تسجيل الاستهلاك",
+      "historyTitle": "سجل الاستهلاك",
+      "empty": "لا يوجد استهلاك مسجّل"
+    },
     "movementType": {
       "receive": "استلام",
       "adjust": "تعديل",
       "load_to_field": "تحميل ميداني",
       "unload_from_field": "إرجاع من الميدان",
       "sale_deduct": "خصم بيع",
-      "return_add": "إرجاع بيع"
+      "return_add": "إرجاع بيع",
+      "consume": "استهلاك"
     },
     "kpi": {
       "activeItems": "أصناف نشطة",
@@ -1588,6 +1606,8 @@
       "unitOfMeasure": "وحدة القياس",
       "expirationDate": "تاريخ انتهاء الصلاحية",
       "reorderPoint": "حد إعادة الطلب",
+      "isConsumable": "مستهلَك (استخدام داخلي)",
+      "isConsumableHint": "يُستهلك داخليًا (لا يُباع) — يُتابَع من شاشة المستهلكات.",
       "colName": "الاسم",
       "colCategory": "الفئة",
       "colBarcode": "الباركود",
@@ -2027,6 +2047,7 @@
       "profitAndLoss": "الأرباح والخسائر",
       "sales": "المبيعات",
       "inventoryMovement": "حركة المخزون",
+      "consumables": "المستهلكات",
       "fieldVisits": "زيارات الميدان",
       "farmAccount": "حساب المزرعة",
       "vaccinations": "تطعيمات قادمة",
@@ -2158,6 +2179,17 @@
       "colAmount": "المبلغ",
       "colPayments": "عدد الدفعات",
       "empty": "لا مبيعات في الفترة"
+    },
+    "consumables": {
+      "title": "المستهلكات",
+      "subtitle": "استهلاك الاستخدام الداخلي حسب المنتج والموقع، مع تكلفة FEFO",
+      "colProduct": "المنتج",
+      "colLocation": "الموقع",
+      "colQuantity": "الكمية",
+      "colCost": "التكلفة",
+      "totalQuantity": "إجمالي الكمية",
+      "totalCost": "إجمالي التكلفة",
+      "empty": "لا يوجد استهلاك في هذه الفترة"
     },
     "inventoryMovement": {
       "title": "حركة المخزون",

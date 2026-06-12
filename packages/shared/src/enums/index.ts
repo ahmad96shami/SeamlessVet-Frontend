@@ -215,6 +215,8 @@ export const MovementType = {
   UnloadFromField: "unload_from_field",
   SaleDeduct: "sale_deduct",
   ReturnAdd: "return_add",
+  // M27 — internal use of an is_consumable product (gloves, syringes, …); a single negative leg.
+  Consume: "consume",
 } as const;
 export type MovementType = EnumValues<typeof MovementType>;
 export const MOVEMENT_TYPE_VALUES = values(MovementType);

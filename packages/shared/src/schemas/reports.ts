@@ -192,6 +192,46 @@ export interface InventoryMovementParams {
   take?: number;
 }
 
+// ---- Consumables (M27) — internal-use consumption summed by (location, product) ----
+
+/**
+ * One (location, product) line in the consumables report (M27). `quantity` is the magnitude consumed
+ * over the window (the positive of the `consume` movements' negative deltas); `cost` is its FEFO cost
+ * (`Σ qty × inventory_movements.unit_cost`, the per-leg weighted-average snapshotted at deduction).
+ */
+export const ConsumablesReportRowSchema = z.object({
+  productId: z.string(),
+  productName: z.string(),
+  locationType: z.string(),
+  locationId: z.string(),
+  quantity: z.number(),
+  cost: z.number(),
+});
+export type ConsumablesReportRow = z.infer<typeof ConsumablesReportRowSchema>;
+
+export const ConsumablesReportSchema = z.object({
+  from: z.string().nullish(),
+  to: z.string().nullish(),
+  productId: z.string().nullish(),
+  locationType: z.string().nullish(),
+  locationId: z.string().nullish(),
+  totalQuantity: z.number(),
+  totalCost: z.number(),
+  totalCount: z.number(),
+  rows: z.array(ConsumablesReportRowSchema),
+});
+export type ConsumablesReport = z.infer<typeof ConsumablesReportSchema>;
+
+export interface ConsumablesParams {
+  from?: string;
+  to?: string;
+  productId?: string;
+  locationType?: string;
+  locationId?: string;
+  skip?: number;
+  take?: number;
+}
+
 // ---- Field-doctor visits (task 4) — cursor-paged --------------------------
 
 export const FieldVisitServiceLineSchema = z.object({
