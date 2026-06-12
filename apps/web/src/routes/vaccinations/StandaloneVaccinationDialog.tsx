@@ -11,7 +11,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { usePets } from "@/queries/pets";
-import { useServices } from "@/queries/services";
+import { useProducts } from "@/queries/products";
 import { CustomerCombobox } from "@/routes/customers/CustomerCombobox";
 import { useCreateVaccination, useUpdateVaccination } from "@/queries/vaccinations";
 import { VaccineFormDialog } from "@/routes/vaccinations/VaccineFormDialog";
@@ -23,9 +23,10 @@ const todayISO = () => new Date().toISOString().slice(0, 10);
  * recipient: customer live-search → a specific pet, or "the whole group" (a farm-group vaccination,
  * customer-level, no pet). Edit mode keeps the recipient fixed (the backend PATCH can't move it) and
  * only updates the vaccine/dates. `nextDueDate` drives the M18 reminder job + the upcoming calendar.
- * M22: the vaccine is picked from the catalog (services, category `vaccination`) and the price
- * snapshots at recording time; with no visit there is nothing to auto-assemble — sell it from the
- * POS vaccines tab. Editing a legacy free-text record keeps its name unless a vaccine is picked.
+ * M26: the vaccine is picked from the catalog (a product with category `vaccine`) and the selling
+ * price snapshots at recording time; recording deducts stock (FEFO) — with no visit there is nothing
+ * to auto-assemble, so sell it from the POS vaccines tab. Editing a legacy free-text record keeps
+ * its name unless a vaccine is picked.
  */
 export function StandaloneVaccinationDialog({
   open,
@@ -41,7 +42,7 @@ export function StandaloneVaccinationDialog({
   const { t } = useTranslation();
   const create = useCreateVaccination();
   const update = useUpdateVaccination();
-  const vaccines = useServices({ category: VACCINE_CATEGORY, take: 200 });
+  const vaccines = useProducts({ category: VACCINE_CATEGORY, take: 200 });
   const editing = vaccination !== null;
 
   // Recipient (create mode only)
@@ -49,7 +50,7 @@ export function StandaloneVaccinationDialog({
   const [petId, setPetId] = useState(""); // "" = the whole group (farm-group)
 
   // Fields
-  const [serviceId, setServiceId] = useState("");
+  const [productId, setProductId] = useState("");
   const [price, setPrice] = useState("");
   const [dateGiven, setDateGiven] = useState(todayISO());
   const [nextDueDate, setNextDueDate] = useState("");
@@ -66,7 +67,7 @@ export function StandaloneVaccinationDialog({
     if (!open) return;
     setCustomer(null);
     setPetId("");
-    setServiceId(vaccination?.serviceId ?? "");
+    setProductId(vaccination?.productId ?? "");
     setPrice(vaccination?.price != null ? String(vaccination.price) : "");
     setDateGiven(vaccination?.dateGiven ?? todayISO());
     setNextDueDate(vaccination?.nextDueDate ?? "");
@@ -75,15 +76,15 @@ export function StandaloneVaccinationDialog({
   }, [open, vaccination]);
 
   const onPickVaccine = (id: string) => {
-    setServiceId(id);
-    const svc = (vaccines.data ?? []).find((s) => s.id === id);
-    if (svc) setPrice(String(svc.defaultPrice));
+    setProductId(id);
+    const product = (vaccines.data ?? []).find((p) => p.id === id);
+    if (product) setPrice(String(product.sellingPrice));
   };
 
   // Once the freshly-created vaccine lands in the (invalidated) catalog list, select it —
-  // through onPickVaccine so its default price snapshots like any other pick.
+  // through onPickVaccine so its selling price snapshots like any other pick.
   useEffect(() => {
-    if (createdVaccineId && (vaccines.data ?? []).some((s) => s.id === createdVaccineId)) {
+    if (createdVaccineId && (vaccines.data ?? []).some((p) => p.id === createdVaccineId)) {
       onPickVaccine(createdVaccineId);
       setCreatedVaccineId(null);
     }
@@ -92,19 +93,19 @@ export function StandaloneVaccinationDialog({
 
   const vaccineOptions = useMemo(
     () =>
-      (vaccines.data ?? []).map((s) => ({
-        value: s.id,
-        label: s.nameAr,
-        keywords: s.nameLatin ?? undefined,
+      (vaccines.data ?? []).map((p) => ({
+        value: p.id,
+        label: p.nameAr,
+        keywords: p.nameLatin ?? undefined,
       })),
     [vaccines.data],
   );
-  const pickedName = (vaccines.data ?? []).find((s) => s.id === serviceId)?.nameAr;
+  const pickedName = (vaccines.data ?? []).find((p) => p.id === productId)?.nameAr;
 
   const pending = create.isPending || update.isPending;
   const priceValid = price === "" || (!Number.isNaN(Number(price)) && Number(price) >= 0);
   // Catalog-only: a new record needs a picked vaccine; an edit may keep a legacy free-text name.
-  const fieldsValid = dateGiven.trim() !== "" && priceValid && (editing || serviceId !== "");
+  const fieldsValid = dateGiven.trim() !== "" && priceValid && (editing || productId !== "");
   const valid = editing ? fieldsValid : fieldsValid && customer !== null;
 
   const onSubmit = () => {
@@ -118,8 +119,9 @@ export function StandaloneVaccinationDialog({
         {
           id: vaccination.id,
           body: {
-            // Only re-link / re-snapshot when a catalog vaccine is picked (legacy rows keep their name).
-            serviceId: serviceId || undefined,
+            // The product link is immutable once recorded (stock moved) — only re-snapshot the
+            // name/price when a catalog vaccine is picked (legacy rows keep their free-text name).
+            productId: productId || undefined,
             vaccineType: pickedName ?? undefined,
             price: priceNum,
             dateGiven,
@@ -134,9 +136,9 @@ export function StandaloneVaccinationDialog({
           // recipient: a specific pet, else the customer (farm group). No visit — standalone.
           petId: petId || undefined,
           customerId: petId ? undefined : customer.id,
-          serviceId,
+          productId,
           vaccineType: pickedName ?? "",
-          price: priceNum, // omitted → the server snapshots the catalog price
+          price: priceNum, // omitted → the server snapshots the catalog selling price
           dateGiven,
           nextDueDate: due,
         },
@@ -192,11 +194,11 @@ export function StandaloneVaccinationDialog({
         {/* Fields */}
         <Field label={t("vaccinations.form.vaccine")}>
           <Combobox
-            value={serviceId}
+            value={productId}
             onChange={onPickVaccine}
             options={vaccineOptions}
             placeholder={
-              editing && !serviceId && vaccination
+              editing && !productId && vaccination
                 ? vaccination.vaccineType
                 : t("vaccinations.form.selectVaccine")
             }

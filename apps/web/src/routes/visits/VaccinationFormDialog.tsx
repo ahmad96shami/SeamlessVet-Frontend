@@ -9,7 +9,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { DatePicker } from "@/components/ui/datepicker";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useServices } from "@/queries/services";
+import { useProducts } from "@/queries/products";
 import { useCreateVaccination, useUpdateVaccination } from "@/queries/vaccinations";
 import { VaccineFormDialog } from "@/routes/vaccinations/VaccineFormDialog";
 
@@ -17,10 +17,10 @@ const todayISO = () => new Date().toISOString().slice(0, 10);
 
 /**
  * Add / edit a vaccination on the visit. The recipient is the visit's pet when it has one, else the
- * customer (farm group). `nextDueDate` (optional) drives the M11 reminder job. M22: the vaccine is
- * picked from the catalog (a service with category `vaccination`) and its price snapshots like a
- * procedure's — that makes the vaccination billable at issuance. Editing a legacy free-text record
- * keeps its name unless a catalog vaccine is picked.
+ * customer (farm group). `nextDueDate` (optional) drives the M11 reminder job. M26: the vaccine is
+ * picked from the catalog (a product with category `vaccine`) and its selling price snapshots like a
+ * procedure's — recording it deducts stock (FEFO) and makes the vaccination billable at issuance.
+ * Editing a legacy free-text record keeps its name unless a catalog vaccine is picked.
  */
 export function VaccinationFormDialog({
   open,
@@ -36,9 +36,9 @@ export function VaccinationFormDialog({
   const { t } = useTranslation();
   const create = useCreateVaccination();
   const update = useUpdateVaccination();
-  const vaccines = useServices({ category: VACCINE_CATEGORY, take: 200 });
+  const vaccines = useProducts({ category: VACCINE_CATEGORY, take: 200 });
 
-  const [serviceId, setServiceId] = useState("");
+  const [productId, setProductId] = useState("");
   const [price, setPrice] = useState("");
   const [dateGiven, setDateGiven] = useState(todayISO());
   const [nextDueDate, setNextDueDate] = useState("");
@@ -50,7 +50,7 @@ export function VaccinationFormDialog({
 
   useEffect(() => {
     if (!open) return;
-    setServiceId(vaccination?.serviceId ?? "");
+    setProductId(vaccination?.productId ?? "");
     setPrice(vaccination?.price != null ? String(vaccination.price) : "");
     setDateGiven(vaccination?.dateGiven ?? todayISO());
     setNextDueDate(vaccination?.nextDueDate ?? "");
@@ -59,15 +59,15 @@ export function VaccinationFormDialog({
   }, [open, vaccination]);
 
   const onPickVaccine = (id: string) => {
-    setServiceId(id);
-    const svc = (vaccines.data ?? []).find((s) => s.id === id);
-    if (svc) setPrice(String(svc.defaultPrice));
+    setProductId(id);
+    const product = (vaccines.data ?? []).find((p) => p.id === id);
+    if (product) setPrice(String(product.sellingPrice));
   };
 
   // Once the freshly-created vaccine lands in the (invalidated) catalog list, select it —
-  // through onPickVaccine so its default price snapshots like any other pick.
+  // through onPickVaccine so its selling price snapshots like any other pick.
   useEffect(() => {
-    if (createdVaccineId && (vaccines.data ?? []).some((s) => s.id === createdVaccineId)) {
+    if (createdVaccineId && (vaccines.data ?? []).some((p) => p.id === createdVaccineId)) {
       onPickVaccine(createdVaccineId);
       setCreatedVaccineId(null);
     }
@@ -76,20 +76,20 @@ export function VaccinationFormDialog({
 
   const vaccineOptions = useMemo(
     () =>
-      (vaccines.data ?? []).map((s) => ({
-        value: s.id,
-        label: s.nameAr,
-        keywords: s.nameLatin ?? undefined,
+      (vaccines.data ?? []).map((p) => ({
+        value: p.id,
+        label: p.nameAr,
+        keywords: p.nameLatin ?? undefined,
       })),
     [vaccines.data],
   );
-  const pickedName = (vaccines.data ?? []).find((s) => s.id === serviceId)?.nameAr;
+  const pickedName = (vaccines.data ?? []).find((p) => p.id === productId)?.nameAr;
 
   const editing = vaccination !== null;
   const pending = create.isPending || update.isPending;
   const priceValid = price === "" || (!Number.isNaN(Number(price)) && Number(price) >= 0);
   // Catalog-only: a new record needs a picked vaccine; an edit may keep a legacy free-text name.
-  const valid = dateGiven.trim() !== "" && priceValid && (editing || serviceId !== "");
+  const valid = dateGiven.trim() !== "" && priceValid && (editing || productId !== "");
 
   const onSubmit = () => {
     if (!valid) return;
@@ -102,8 +102,9 @@ export function VaccinationFormDialog({
         {
           id: vaccination.id,
           body: {
-            // Only re-link / re-snapshot when a catalog vaccine is picked (legacy rows keep their name).
-            serviceId: serviceId || undefined,
+            // The product link is immutable once recorded (stock moved) — only re-snapshot the
+            // name/price when a catalog vaccine is picked (legacy rows keep their free-text name).
+            productId: productId || undefined,
             vaccineType: pickedName ?? undefined,
             price: priceNum,
             dateGiven,
@@ -119,9 +120,9 @@ export function VaccinationFormDialog({
           petId: visit.petId ?? undefined,
           customerId: visit.petId ? undefined : visit.customerId,
           visitId: visit.id,
-          serviceId,
+          productId,
           vaccineType: pickedName ?? "",
-          price: priceNum, // omitted → the server snapshots the catalog price
+          price: priceNum, // omitted → the server snapshots the catalog selling price
           dateGiven,
           nextDueDate: due,
         },
@@ -139,11 +140,11 @@ export function VaccinationFormDialog({
       <div className="space-y-4">
         <Field label={t("visits.vaccinations.vaccine")}>
           <Combobox
-            value={serviceId}
+            value={productId}
             onChange={onPickVaccine}
             options={vaccineOptions}
             placeholder={
-              editing && !serviceId && vaccination
+              editing && !productId && vaccination
                 ? vaccination.vaccineType
                 : t("visits.vaccinations.selectVaccine")
             }

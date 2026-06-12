@@ -20,7 +20,7 @@ import { VisitPickerDialog, visitRef } from "./VisitPickerDialog";
 /**
  * The visit's UNBILLED billable charges — exactly what the server bills at issuance: billable
  * prescriptions (dispensed-to-owner + M23 billable in-clinic), procedures, catalog-linked
- * vaccinations (M22), and — while the visit is in_progress (M23) — its checkup fee and closed
+ * vaccinations (M26 — vaccine products), and — while the visit is in_progress (M23) — its checkup fee and closed
  * night stays. Anything already back-linked on ANY invoice is filtered out (void included — the
  * server treats voided back-links as billed too); a completed visit's care charges never mirror
  * (completion backstopped whatever the till didn't bill). Names/prices resolve via catalog maps.
@@ -84,13 +84,14 @@ function useVisitCharges(visitId: string) {
       }));
 
     // Only catalog-linked vaccinations bill; legacy free-text rows are clinical records only.
+    // M26: a vaccine is a product, so the locked line is a product line (back-linked by vaccinationId).
     const vaccinations = (vax.data ?? [])
-      .filter((v) => v.serviceId != null && !billedVax.has(v.id))
+      .filter((v) => v.productId != null && !billedVax.has(v.id))
       .map((v) => ({
         id: v.id,
-        serviceId: v.serviceId!,
-        name: v.vaccineType || serviceById.get(v.serviceId!)?.nameAr || "—",
-        price: v.price ?? serviceById.get(v.serviceId!)?.defaultPrice ?? 0,
+        productId: v.productId!,
+        name: v.vaccineType || productById.get(v.productId!)?.nameAr || "—",
+        price: v.price ?? productById.get(v.productId!)?.sellingPrice ?? 0,
       }));
 
     // M23 care charges — only while in_progress: an open visit's fee isn't confirmed yet
@@ -165,8 +166,8 @@ function VisitLinesSync({ visitId }: { visitId: string }) {
       })),
       ...vaccinations.map((v) => ({
         key: v.id,
-        kind: "service" as const,
-        refId: v.serviceId,
+        kind: "product" as const,
+        refId: v.productId,
         name: v.name,
         unitPrice: v.price,
         quantity: 1,

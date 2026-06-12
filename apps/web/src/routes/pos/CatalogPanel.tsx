@@ -46,25 +46,27 @@ export function CatalogPanel() {
     if (typeof window !== "undefined") window.localStorage.setItem(LAYOUT_KEY, layout);
   }, [layout]);
 
-  // Products come from warehouse stock (on-hand + low-stock flag + selling price); the search
-  // matches name + barcode server-side. Services have no inventory. Vaccines (M22) are the
-  // services with category `vaccination` — one fetch, split client-side, own filter tab. The M23
-  // system services (checkup fee / night stay) are billing plumbing, never sold from the catalog.
+  // Products + vaccines both come from warehouse stock (on-hand + low-stock flag + selling price);
+  // the search matches name + barcode server-side. Vaccines (M26) are stock products with category
+  // `vaccine` — split client-side into their own filter tab and sold as ordinary product lines
+  // (administering deducts stock, FEFO). Services have no inventory; the M23 system services
+  // (checkup fee / night stay) are billing plumbing, never sold from the catalog.
   const stock = useStock({ locationType: "warehouse", search: debounced || undefined, take: 50 });
   const services = useServices({ search: debounced || undefined, take: 50 });
 
+  const allStock = stock.data ?? [];
   const allSvcs = (services.data ?? []).filter(
     (s) => s.category == null || !SYSTEM_SERVICE_CATEGORIES.includes(s.category),
   );
-  const products = filter === "services" || filter === "vaccines" ? [] : (stock.data ?? []);
-  const svcs =
-    filter === "products" || filter === "vaccines"
+  const products =
+    filter === "services" || filter === "vaccines"
       ? []
-      : allSvcs.filter((s) => s.category !== VACCINE_CATEGORY);
+      : allStock.filter((p) => p.category !== VACCINE_CATEGORY);
+  const svcs = filter === "products" || filter === "vaccines" ? [] : allSvcs;
   const vaccines =
     filter === "products" || filter === "services"
       ? []
-      : allSvcs.filter((s) => s.category === VACCINE_CATEGORY);
+      : allStock.filter((p) => p.category === VACCINE_CATEGORY);
   const loading = stock.isLoading || services.isLoading;
   const empty = !loading && products.length === 0 && svcs.length === 0 && vaccines.length === 0;
 
@@ -201,31 +203,48 @@ export function CatalogPanel() {
                 <Badge variant="secondary" className="flex-none">{t("pos.catalog.service")}</Badge>
               </button>
             ))}
-            {vaccines.map((s) => (
-              <button
-                key={`v-${s.id}`}
-                type="button"
-                onClick={() =>
-                  addItem({
-                    kind: "service",
-                    refId: s.id,
-                    name: s.nameAr,
-                    unit: t("pos.catalog.vaccine"),
-                    unitPrice: s.defaultPrice,
-                  })
-                }
-                className="flex items-center gap-3 rounded-xl border bg-card p-3 text-start transition-colors hover:border-teal-400"
-              >
-                <span className="grid size-12 flex-none place-items-center rounded-lg bg-teal-50 text-teal-600">
-                  <Icon.syringe className="size-5" />
-                </span>
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-sm font-semibold leading-tight text-navy-900">{s.nameAr}</span>
-                  <span className="mt-1 text-sm font-bold text-navy-900"><Money value={s.defaultPrice} /></span>
-                </div>
-                <Badge variant="secondary" className="flex-none">{t("pos.catalog.vaccine")}</Badge>
-              </button>
-            ))}
+            {vaccines.map((p) => {
+              const out = p.quantity <= 0;
+              return (
+                <button
+                  key={`v-${p.productId}`}
+                  type="button"
+                  disabled={out}
+                  onClick={() =>
+                    addItem({
+                      kind: "product",
+                      refId: p.productId,
+                      name: p.nameAr,
+                      code: p.barcode ?? undefined,
+                      unit: p.unitOfMeasure ?? t("pos.catalog.vaccine"),
+                      unitPrice: p.sellingPrice,
+                      available: p.quantity,
+                    })
+                  }
+                  className="flex items-center gap-3 rounded-xl border bg-card p-3 text-start transition-colors hover:border-teal-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span className="grid size-12 flex-none place-items-center rounded-lg bg-teal-50 text-teal-600">
+                    <Icon.syringe className="size-5" />
+                  </span>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-sm font-semibold leading-tight text-navy-900">{p.nameAr}</span>
+                    <span className="mt-1 text-sm font-bold text-navy-900"><Money value={p.sellingPrice} /></span>
+                  </div>
+                  <div className="flex flex-none flex-col items-end gap-1">
+                    {out ? (
+                      <Badge variant="destructive">{t("pos.catalog.outOfStock")}</Badge>
+                    ) : p.belowReorderPoint ? (
+                      <Badge variant="warning">{t("pos.catalog.lowStock")}</Badge>
+                    ) : (
+                      <Badge variant="secondary">{t("pos.catalog.vaccine")}</Badge>
+                    )}
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {t("pos.catalog.available")}: {formatQuantity(p.quantity, lang)}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

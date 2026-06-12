@@ -31,7 +31,7 @@ export interface CartLine {
   locked?: boolean;
   prescriptionId?: string;
   procedureId?: string;
-  /** M22 — a catalog-linked visit vaccination billed as a service line. */
+  /** M26 — a catalog-linked visit vaccination billed as a product line (vaccines are products). */
   vaccinationId?: string;
   /** M23 — a closed night stay billed as a system-service line (qty = nights, price = rate). */
   nightStayId?: string;
