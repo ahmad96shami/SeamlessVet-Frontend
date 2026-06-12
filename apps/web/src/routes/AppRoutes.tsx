@@ -25,6 +25,7 @@ import { PurchasesPage } from "@/routes/purchases/PurchasesPage";
 import { SupplierDetailPage } from "@/routes/suppliers/SupplierDetailPage";
 import { SuppliersPage } from "@/routes/suppliers/SuppliersPage";
 import { ClinicProfitsPage } from "@/routes/reports/ClinicProfitsPage";
+import { ConsumablesReportPage } from "@/routes/reports/ConsumablesReportPage";
 import { DoctorEntitlementsReportPage } from "@/routes/reports/DoctorEntitlementsReportPage";
 import { DoctorIncomePage } from "@/routes/reports/DoctorIncomePage";
 import { FarmAccountPage } from "@/routes/reports/FarmAccountPage";
@@ -307,6 +308,7 @@ export function AppRoutes() {
           <Route path="field-visit-profit" element={<FieldVisitProfitPage />} />
           <Route path="sales" element={<SalesPage />} />
           <Route path="inventory-movement" element={<InventoryMovementPage />} />
+          <Route path="consumables" element={<ConsumablesReportPage />} />
           <Route path="field-visits" element={<FieldVisitsPage />} />
           <Route path="farm-account" element={<FarmAccountPage />} />
           <Route path="vaccinations" element={<UpcomingVaccinationsPage />} />

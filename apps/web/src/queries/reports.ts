@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
   getClinicProfits,
+  getConsumables,
   getDoctorEntitlementsReport,
   getDoctorIncome,
   getFarmAccountStatus,
@@ -18,6 +19,8 @@ import {
   type ApiError,
   type ClinicProfitsParams,
   type ClinicProfitsReport,
+  type ConsumablesParams,
+  type ConsumablesReport,
   type DoctorEntitlementResponse,
   type DoctorIncomeParams,
   type DoctorIncomeReport,
@@ -106,6 +109,15 @@ export function useInventoryMovement(params: InventoryMovementParams) {
   return useQuery<InventoryMovementReport, ApiError>({
     queryKey: [KEY, "inventory-movement", params],
     queryFn: () => getInventoryMovement(apiClient, params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+/** GET /reports/consumables — internal-use consumption summed by (location, product) (M27). */
+export function useConsumables(params: ConsumablesParams) {
+  return useQuery<ConsumablesReport, ApiError>({
+    queryKey: [KEY, "consumables", params],
+    queryFn: () => getConsumables(apiClient, params),
     placeholderData: (prev) => prev,
   });
 }

@@ -18,6 +18,7 @@ const TABS = [
   { to: "/reports/field-visit-profit", labelKey: "reports.tabs.fieldVisitProfit" },
   { to: "/reports/sales", labelKey: "reports.tabs.sales" },
   { to: "/reports/inventory-movement", labelKey: "reports.tabs.inventoryMovement" },
+  { to: "/reports/consumables", labelKey: "reports.tabs.consumables" },
   { to: "/reports/field-visits", labelKey: "reports.tabs.fieldVisits" },
   { to: "/reports/farm-account", labelKey: "reports.tabs.farmAccount" },
   { to: "/reports/vaccinations", labelKey: "reports.tabs.vaccinations" },
