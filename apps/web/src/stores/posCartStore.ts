@@ -1,6 +1,8 @@
 import type { PaymentMethod } from "@vet/shared";
 import { create } from "zustand";
 
+import { parkedSales } from "@/services/parkedSales";
+
 export type CartLineKind = "product" | "service";
 
 export interface CartLine {
@@ -50,6 +52,26 @@ export interface PaymentLeg {
   chequeDueDate?: string;
 }
 
+/**
+ * A parked (held) sale — a local-only snapshot of the cart, persisted to Dexie so a cashier can
+ * hold one customer's basket, serve another, and resume on the same terminal (survives reload).
+ * Never leaves the device: parking is purely a client convenience; nothing posts to the server
+ * until the resumed cart is issued. A visit-linked park re-reconciles its charges on resume
+ * (VisitLinesSync re-runs `syncVisitLines` since the visit's unbilled charges may have changed).
+ */
+export interface ParkedSale {
+  id: string;
+  /** Epoch ms — drives the resume-list order (most-recent first) and the relative timestamp. */
+  parkedAt: number;
+  /** Captured at park time for the resume list (customer name / walk-in label). */
+  label: string;
+  customerId: string | null;
+  visitId: string | null;
+  lines: CartLine[];
+  invoiceDiscount: number;
+  payments: PaymentLeg[];
+}
+
 interface PosCartState {
   lines: CartLine[];
   /** Linked customer (null = walk-in / no ledger); the name is resolved from the id for display. */
@@ -78,6 +100,14 @@ interface PosCartState {
   clearVisit: () => void;
   setPayments: (payments: PaymentLeg[]) => void;
   clear: () => void;
+  /**
+   * Snapshot the current cart into a parked sale (persisted to Dexie) and empty the cart. No-op on
+   * an empty cart with no linked visit. `label` is captured for the resume list (resolved upstream,
+   * where the customer name is available). Resolves once the Dexie write lands.
+   */
+  park: (label: string) => Promise<void>;
+  /** Load a parked sale back into the cart (replaces the current cart wholesale). */
+  resume: (sale: ParkedSale) => void;
 }
 
 /**
@@ -85,7 +115,7 @@ interface PosCartState {
  * tab/route changes within the cashier surface. Issuance (W6.5) sends it through POST /pos/invoices;
  * the server recomputes the money and is authoritative.
  */
-export const usePosCartStore = create<PosCartState>((set) => ({
+export const usePosCartStore = create<PosCartState>((set, get) => ({
   lines: [],
   customerId: null,
   visitId: null,
@@ -138,4 +168,27 @@ export const usePosCartStore = create<PosCartState>((set) => ({
   setPayments: (payments) => set({ payments }),
   clear: () =>
     set({ lines: [], customerId: null, visitId: null, invoiceDiscount: 0, payments: [] }),
+  park: async (label) => {
+    const s = get();
+    if (s.lines.length === 0 && s.visitId === null) return;
+    await parkedSales.save({
+      id: crypto.randomUUID(),
+      parkedAt: Date.now(),
+      label,
+      customerId: s.customerId,
+      visitId: s.visitId,
+      lines: s.lines,
+      invoiceDiscount: s.invoiceDiscount,
+      payments: s.payments,
+    });
+    set({ lines: [], customerId: null, visitId: null, invoiceDiscount: 0, payments: [] });
+  },
+  resume: (sale) =>
+    set({
+      lines: sale.lines,
+      customerId: sale.customerId,
+      visitId: sale.visitId,
+      invoiceDiscount: sale.invoiceDiscount,
+      payments: sale.payments,
+    }),
 }));
