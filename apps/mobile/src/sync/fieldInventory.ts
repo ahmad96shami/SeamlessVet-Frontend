@@ -67,6 +67,37 @@ export const FIELD_STOCK_SQL = `
            p.name_ar
 ` as const;
 
+/** A vaccine the doctor carries — a product of category 'vaccine' with positive field stock. */
+export interface FieldVaccineRow {
+  id: string;
+  name_ar: string | null;
+  name_latin: string | null;
+  selling_price: number | null;
+  /** The field-inventory location the dose deducts from (the stock row's location). */
+  field_location_id: string;
+  on_hand: number;
+}
+
+/**
+ * Mo11 — vaccines the field doctor can administer: catalog vaccine products that have positive
+ * stock in their car. Joining `stock_items` (location_type='field') yields both the on-hand and the
+ * `field_location_id` the `sale_deduct` movement deducts from. A field doctor has one field
+ * inventory, so each vaccine has at most one field stock row here.
+ */
+export const FIELD_VACCINE_SQL = `
+  SELECT
+    p.id            AS id,
+    p.name_ar       AS name_ar,
+    p.name_latin    AS name_latin,
+    p.selling_price AS selling_price,
+    s.location_id   AS field_location_id,
+    s.quantity      AS on_hand
+  FROM products p
+  JOIN stock_items s ON s.product_id = p.id AND s.location_type = 'field'
+  WHERE p.category = 'vaccine' AND s.quantity > 0
+  ORDER BY p.name_ar
+` as const;
+
 /** SQL pulling the most recent load_to_field movement timestamp into this doctor's car. */
 export const LAST_LOADED_AT_SQL = `
   SELECT MAX(created_at) AS last_loaded_at

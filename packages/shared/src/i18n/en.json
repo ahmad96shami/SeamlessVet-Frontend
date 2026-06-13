@@ -1250,6 +1250,7 @@
       },
       "vaccine": "Vaccine",
       "selectVaccine": "Select a vaccine",
+      "noStock": "No vaccines in your field stock.",
       "price": "Price"
     },
     "files": {

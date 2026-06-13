@@ -14,19 +14,20 @@ import { useTranslation } from "react-i18next";
 import { Forward, Search } from "@/components/icons";
 import { Card, Input, SkeletonList } from "@/components/ui";
 import { useScreenSettled } from "@/hooks/useScreenSettled";
-import { VaccinationForm } from "@/components/forms/VaccinationForm";
+import { VaccinationForm, type VaccineProductOption } from "@/components/forms/VaccinationForm";
 import { ScreenShell, TopBar } from "@/components/layout";
+import { FIELD_VACCINE_SQL, type FieldVaccineRow } from "@/sync/fieldInventory";
 import { useQuery } from "@/sync/hooks";
 import type { CustomerRow, PetRow } from "@/sync/types";
-import { syncInsert } from "@/sync/writes";
+import { administerVaccination } from "@/sync/vaccinations";
 import { colors } from "@/theme";
 
 /**
- * Create a **standalone** vaccination (Mo9.2) — no visit. The recipient is a customer picked
- * here (or fixed via the route param when launched from a customer screen), then a specific
- * pet OR the whole group (farm-group = `customer_id` only, `pet_id` null — SCHEMA). Mirrors
- * the Mo5 contracts/new picker→form flow; writes local-first via `syncInsert("vaccinations")`
- * with `visit_id` null — `PUT /sync/vaccinations` accepts it (recipient is what's required).
+ * Create a **standalone** vaccination (Mo9.2; Mo11 vaccines-as-products) — no visit. The recipient
+ * is a customer picked here (or fixed via the route param when launched from a customer screen),
+ * then a specific pet OR the whole group (farm-group = `customer_id` only, `pet_id` null — SCHEMA).
+ * The vaccine is picked from the doctor's field stock; saving administers it (deducts a dose FEFO
+ * from the car via `administerVaccination`) and the `/sync/vaccinations` row carries `visit_id` null.
  */
 export default function NewStandaloneVaccinationScreen() {
   const router = useRouter();
@@ -44,6 +45,19 @@ export default function NewStandaloneVaccinationScreen() {
   const { data: pets } = useQuery<PetRow>(
     `SELECT * FROM pets WHERE customer_id = ? ORDER BY name`,
     [picked ?? ""],
+  );
+
+  const { data: vaccineRows = [] } = useQuery<FieldVaccineRow>(FIELD_VACCINE_SQL);
+  const vaccineProducts = useMemo<VaccineProductOption[]>(
+    () =>
+      vaccineRows.map((r) => ({
+        id: r.id,
+        name: r.name_ar ?? r.name_latin ?? "—",
+        price: r.selling_price,
+        onHand: r.on_hand,
+        fieldLocationId: r.field_location_id,
+      })),
+    [vaccineRows],
   );
 
   const locked = params.customerId != null;
@@ -83,19 +97,24 @@ export default function NewStandaloneVaccinationScreen() {
             <VaccinationForm
               customerId={picked}
               pets={(pets ?? []).map((p) => ({ id: p.id, name: p.name }))}
+              vaccineProducts={vaccineProducts}
               submitLabel={t("actions.save")}
               submitting={submitting}
               onSubmit={async (values) => {
+                const product = vaccineProducts.find((p) => p.id === values.productId);
                 setSubmitting(true);
                 try {
-                  await syncInsert("vaccinations", {
-                    visit_id: null,
-                    customer_id: values.customerId ?? null,
-                    pet_id: values.petId ?? null,
-                    vaccine_type: values.vaccineType,
-                    date_given: values.dateGiven,
-                    next_due_date: values.nextDueDate ?? null,
-                    certificate_url: null,
+                  await administerVaccination({
+                    visitId: null,
+                    customerId: values.customerId ?? null,
+                    petId: values.petId ?? null,
+                    productId: values.productId ?? null,
+                    vaccineType: values.vaccineType,
+                    price: values.price ?? null,
+                    fieldLocationId: product?.fieldLocationId ?? null,
+                    dateGiven: values.dateGiven,
+                    nextDueDate: values.nextDueDate ?? null,
+                    certificateUrl: null,
                   });
                   router.back();
                 } finally {

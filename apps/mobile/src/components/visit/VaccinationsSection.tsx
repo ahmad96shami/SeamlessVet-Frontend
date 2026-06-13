@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { formatDate } from "@vet/shared";
+import { formatCurrency, formatDate } from "@vet/shared";
 
 import { Add, Forward, Syringe } from "@/components/icons";
 import { Card, Pill } from "@/components/ui";
@@ -98,6 +98,9 @@ export function VaccinationsSection({ visitId, isTerminal }: VaccinationsSection
                     tone="neutral"
                     label={`${t("visits.vaccinations.col.given")}: ${formatDate(r.date_given, i18n.resolvedLanguage)}`}
                   />
+                  {r.price != null ? (
+                    <Pill tone="teal" label={formatCurrency(r.price, i18n.resolvedLanguage)} />
+                  ) : null}
                   {r.next_due_date ? (
                     <Pill
                       tone="amber"
