@@ -7,24 +7,17 @@ import {
   ContractCreateRequestSchema,
   ContractFarmAttachRequestSchema,
   ContractFarmResponseSchema,
-  ContractMedicationPriceCreateRequestSchema,
-  ContractMedicationPricePatchRequestSchema,
-  ContractMedicationPriceResponseSchema,
   ContractPatchRequestSchema,
   ContractResponseSchema,
   type ContractCreateRequest,
   type ContractFarmAttachRequest,
   type ContractFarmResponse,
   type ContractListParams,
-  type ContractMedicationPriceCreateRequest,
-  type ContractMedicationPricePatchRequest,
-  type ContractMedicationPriceResponse,
   type ContractPatchRequest,
   type ContractResponse,
 } from "../schemas/contracts";
 
 const ContractListSchema = z.array(ContractResponseSchema);
-const MedicationPriceListSchema = z.array(ContractMedicationPriceResponseSchema);
 const ContractFarmListSchema = z.array(ContractFarmResponseSchema);
 
 // Mutations carry the `Idempotency-Key` header automatically (the host apiClient injects it on
@@ -99,55 +92,6 @@ export async function cancelContract(
 ): Promise<IdentifierResponse> {
   const res = await client.post(`/contracts/${id}/cancel`);
   return IdentifierResponseSchema.parse(res.data);
-}
-
-// ---- Contract medication prices (nested under a draft contract) -----------
-
-/** GET /contracts/{contractId}/medication-prices — the per-medication overrides for a contract. */
-export async function listContractMedicationPrices(
-  client: AxiosInstance,
-  contractId: string,
-): Promise<ContractMedicationPriceResponse[]> {
-  const res = await client.get(`/contracts/${contractId}/medication-prices`);
-  return MedicationPriceListSchema.parse(res.data);
-}
-
-/** POST /contracts/{contractId}/medication-prices — add an override (parent must be `draft`). */
-export async function createContractMedicationPrice(
-  client: AxiosInstance,
-  contractId: string,
-  body: ContractMedicationPriceCreateRequest,
-): Promise<IdentifierResponse> {
-  const payload = ContractMedicationPriceCreateRequestSchema.parse(body);
-  const res = await client.post(`/contracts/${contractId}/medication-prices`, {
-    ...payload,
-    id: newGuidV7(),
-  });
-  return IdentifierResponseSchema.parse(res.data);
-}
-
-/** PATCH /contracts/{contractId}/medication-prices/{priceId} — edit an override (parent must be `draft`). */
-export async function updateContractMedicationPrice(
-  client: AxiosInstance,
-  contractId: string,
-  priceId: string,
-  body: ContractMedicationPricePatchRequest,
-): Promise<IdentifierResponse> {
-  const payload = ContractMedicationPricePatchRequestSchema.parse(body);
-  const res = await client.patch(
-    `/contracts/${contractId}/medication-prices/${priceId}`,
-    payload,
-  );
-  return IdentifierResponseSchema.parse(res.data);
-}
-
-/** DELETE /contracts/{contractId}/medication-prices/{priceId} — remove an override (parent must be `draft`). */
-export async function deleteContractMedicationPrice(
-  client: AxiosInstance,
-  contractId: string,
-  priceId: string,
-): Promise<void> {
-  await client.delete(`/contracts/${contractId}/medication-prices/${priceId}`);
 }
 
 // ---- Contract <-> farm coverage (M15) -------------------------------------

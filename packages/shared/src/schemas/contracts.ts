@@ -8,8 +8,8 @@ import { optionalText } from "./common";
  * A farm-supervision contract (GET /contracts[/{id}]). `status` ∈ ContractStatus
  * (draft|active|completed|cancelled). A `draft` is editable offline-safely; once `active` its binding
  * terms lock (edits then need `contracts.activate`). Date fields are `yyyy-MM-dd` (DateOnly).
- * `totalPrice` is the agreed contract value; per-medication overrides live under
- * `/contracts/{id}/medication-prices`. `activatedBy/At` are stamped by the activation gate.
+ * `totalPrice` is the agreed contract value (M29 removed per-medication overrides — field
+ * invoices bill catalog). `activatedBy/At` are stamped by the activation gate.
  * The list endpoint returns an untyped 200, so this schema is the contract.
  */
 export const ContractResponseSchema = z.object({
@@ -75,44 +75,6 @@ export interface ContractListParams {
   skip?: number;
   take?: number;
 }
-
-// ---- Contract medication prices (M8) --------------------------------------
-
-/**
- * A per-medication price override on a contract (GET /contracts/{contractId}/medication-prices,
- * PRD §6.6). When the contract is active and covers an invoice date, `IPricingService` bills the
- * medication at `contractPrice` instead of the catalog price. Created/edited only while the parent
- * contract is `draft`.
- */
-export const ContractMedicationPriceResponseSchema = z.object({
-  id: z.string(),
-  contractId: z.string(),
-  productId: z.string(),
-  contractPrice: z.number(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-export type ContractMedicationPriceResponse = z.infer<typeof ContractMedicationPriceResponseSchema>;
-
-/**
- * Create (POST /contracts/{contractId}/medication-prices) — the parent `contractId` comes from the
- * route, not the body; the parent contract must be `draft`. The wrapper mints the client GUID v7 `id`.
- */
-export const ContractMedicationPriceCreateRequestSchema = z.object({
-  productId: z.string().min(1),
-  contractPrice: z.number().min(0),
-});
-export type ContractMedicationPriceCreateRequest = z.infer<
-  typeof ContractMedicationPriceCreateRequestSchema
->;
-
-/** Patch (PATCH /contracts/{contractId}/medication-prices/{priceId}) — parent must be `draft`. */
-export const ContractMedicationPricePatchRequestSchema = z.object({
-  contractPrice: z.number().min(0).optional(),
-});
-export type ContractMedicationPricePatchRequest = z.infer<
-  typeof ContractMedicationPricePatchRequestSchema
->;
 
 // --- Contract <-> farm coverage (M15) ----------------------------------------
 
