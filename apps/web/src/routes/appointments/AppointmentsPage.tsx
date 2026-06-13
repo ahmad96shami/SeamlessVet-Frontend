@@ -110,14 +110,15 @@ export function AppointmentsPage() {
   };
 
   const rangeLabel = useMemo(() => {
-    if (view === "day") return formatDate(anchor, lang, "EEEE، d MMMM yyyy");
-    if (view === "month") return formatDate(anchor, lang, "MMMM yyyy");
+    // Numeric month (e.g. 06/2026) rather than the month name, per product preference.
+    if (view === "day") return formatDate(anchor, lang, "EEEE، d/MM/yyyy");
+    if (view === "month") return formatDate(anchor, lang, "MM/yyyy");
     const d = weekDays(anchor);
     const a = d[0] ?? anchor;
     const b = d[d.length - 1] ?? a;
     return a.getMonth() === b.getMonth()
-      ? `${formatDate(a, lang, "d")} – ${formatDate(b, lang, "d MMMM yyyy")}`
-      : `${formatDate(a, lang, "d MMM")} – ${formatDate(b, lang, "d MMM yyyy")}`;
+      ? `${formatDate(a, lang, "d")} – ${formatDate(b, lang, "d/MM/yyyy")}`
+      : `${formatDate(a, lang, "d/MM")} – ${formatDate(b, lang, "d/MM/yyyy")}`;
   }, [view, anchor, lang]);
 
   return (
