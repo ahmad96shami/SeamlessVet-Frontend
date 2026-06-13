@@ -1,5 +1,5 @@
 import { formatDate, type VaccinationResponse } from "@vet/shared";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,10 @@ export function VaccinationCalendarPage() {
   const itemsOn = (d: Date) => byDay.get(toISODate(d)) ?? [];
   const recipientName = (v: VaccinationResponse) => {
     const r = resolveRecipient(v, maps);
-    return r.name ?? (r.isFarmGroup ? t("vaccinations.recipientFarm") : t("vaccinations.recipientUnknown"));
+    return (
+      r.name ??
+      (r.isFarmGroup ? t("vaccinations.recipientFarm") : t("vaccinations.recipientUnknown"))
+    );
   };
   const openVaccination = (v: VaccinationResponse) => {
     setEditing(v);
@@ -78,23 +81,43 @@ export function VaccinationCalendarPage() {
 
   const shift = (dir: -1 | 1) =>
     setAnchor((a) =>
-      view === "month" ? addMonths(a, dir) : view === "week" ? addDays(a, 7 * dir) : addDays(a, dir),
+      view === "month"
+        ? addMonths(a, dir)
+        : view === "week"
+          ? addDays(a, 7 * dir)
+          : addDays(a, dir),
     );
   const openDay = (d: Date) => {
     setAnchor(startOfDay(d));
     setView("day");
   };
 
-  const rangeLabel = useMemo(() => {
-    // Numeric month (e.g. 06/2026) rather than the month name, per product preference.
-    if (view === "day") return formatDate(anchor, lang, "EEEE، d/MM/yyyy");
-    if (view === "month") return formatDate(anchor, lang, "MM/yyyy");
+  // Numeric month (not the month name), laid out right-to-left as day-range → month → year.
+  // Segments are rendered as separate runs in a dir="rtl" row so the ordering is deterministic
+  // (a slash-joined numeric string would render LTR as one glued run); each multi-number range
+  // is its own `ltr` island so it reads naturally (e.g. "7 – 13").
+  const rangeParts = useMemo<{ text: string; ltr?: boolean }[]>(() => {
+    if (view === "day")
+      return [
+        { text: formatDate(anchor, lang, "EEEE، d") },
+        { text: formatDate(anchor, lang, "MM") },
+        { text: formatDate(anchor, lang, "yyyy") },
+      ];
+    if (view === "month")
+      return [{ text: formatDate(anchor, lang, "MM") }, { text: formatDate(anchor, lang, "yyyy") }];
     const d = weekDays(anchor);
     const a = d[0] ?? anchor;
     const b = d[d.length - 1] ?? a;
     return a.getMonth() === b.getMonth()
-      ? `${formatDate(a, lang, "d")} – ${formatDate(b, lang, "d/MM/yyyy")}`
-      : `${formatDate(a, lang, "d/MM")} – ${formatDate(b, lang, "d/MM/yyyy")}`;
+      ? [
+          { text: `${formatDate(a, lang, "d")} – ${formatDate(b, lang, "d")}`, ltr: true },
+          { text: formatDate(b, lang, "MM") },
+          { text: formatDate(b, lang, "yyyy") },
+        ]
+      : [
+          { text: `${formatDate(a, lang, "d/MM")} – ${formatDate(b, lang, "d/MM")}`, ltr: true },
+          { text: formatDate(b, lang, "yyyy") },
+        ];
   }, [view, anchor, lang]);
 
   return (
@@ -141,8 +164,16 @@ export function VaccinationCalendarPage() {
             <Icon.chevronLeft className="size-4 ltr:hidden" />
             <Icon.chevronRight className="size-4 rtl:hidden" />
           </button>
-          <span className="min-w-40 text-sm font-bold tabular-nums" dir="auto">
-            {rangeLabel}
+          <span
+            className="inline-flex min-w-40 items-center text-sm font-bold tabular-nums"
+            dir="rtl"
+          >
+            {rangeParts.map((p, i) => (
+              <Fragment key={i}>
+                {i > 0 ? <span aria-hidden>/</span> : null}
+                <span dir={p.ltr ? "ltr" : undefined}>{p.text}</span>
+              </Fragment>
+            ))}
           </span>
         </div>
       </div>
@@ -213,70 +244,70 @@ function MonthView({
     // keeps a floor width and pans horizontally instead.
     <div className="overflow-x-auto">
       <div className="min-w-[560px]">
-      <div className="grid grid-cols-7 border-b">
-        {days.slice(0, 7).map((d) => (
-          <div
-            key={d.toISOString()}
-            className="border-s py-2 text-center text-xs font-bold text-muted-foreground first:border-s-0"
-          >
-            {formatDate(d, lang, "EEE")}
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7">
-        {days.map((day, i) => {
-          const inMonth = day.getMonth() === month;
-          const today = isToday(day);
-          const closed = isClosedDay(day);
-          const list = itemsOn(day);
-          return (
-            <button
-              type="button"
-              key={day.toISOString()}
-              onClick={() => onSelectDay(day)}
-              className={cn(
-                "flex min-h-[104px] flex-col gap-1 border-s border-t p-1.5 text-start transition-colors hover:bg-[var(--paper-soft)]",
-                i % 7 === 0 && "border-s-0",
-                i < 7 && "border-t-0",
-              )}
-              style={{
-                background: closed ? "var(--paper-soft)" : undefined,
-                opacity: inMonth ? 1 : 0.45,
-              }}
+        <div className="grid grid-cols-7 border-b">
+          {days.slice(0, 7).map((d) => (
+            <div
+              key={d.toISOString()}
+              className="border-s py-2 text-center text-xs font-bold text-muted-foreground first:border-s-0"
             >
-              <span
+              {formatDate(d, lang, "EEE")}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7">
+          {days.map((day, i) => {
+            const inMonth = day.getMonth() === month;
+            const today = isToday(day);
+            const closed = isClosedDay(day);
+            const list = itemsOn(day);
+            return (
+              <button
+                type="button"
+                key={day.toISOString()}
+                onClick={() => onSelectDay(day)}
                 className={cn(
-                  "flex size-6 items-center justify-center self-start rounded-full text-xs font-bold tabular-nums",
-                  today ? "bg-teal-500 text-white" : "text-[var(--fg-strong)]",
+                  "flex min-h-[104px] flex-col gap-1 border-s border-t p-1.5 text-start transition-colors hover:bg-[var(--paper-soft)]",
+                  i % 7 === 0 && "border-s-0",
+                  i < 7 && "border-t-0",
                 )}
+                style={{
+                  background: closed ? "var(--paper-soft)" : undefined,
+                  opacity: inMonth ? 1 : 0.45,
+                }}
               >
-                {formatDate(day, lang, "d")}
-              </span>
-              <div className="flex flex-col gap-0.5">
-                {list.slice(0, MAX_CHIPS).map((v) => (
-                  <div
-                    key={v.id}
-                    className="truncate rounded px-1 py-0.5 text-[10px] font-semibold leading-tight"
-                    style={{
-                      background: "var(--teal-soft, #d8f1f3)",
-                      color: "#0a6b75",
-                      border: "1px solid rgba(18,154,170,0.35)",
-                    }}
-                  >
-                    <span>{v.vaccineType}</span>{" "}
-                    <span className="opacity-80">· {recipientName(v)}</span>
-                  </div>
-                ))}
-                {list.length > MAX_CHIPS ? (
-                  <span className="ps-1 text-[10px] font-semibold text-muted-foreground">
-                    {moreLabel(list.length - MAX_CHIPS)}
-                  </span>
-                ) : null}
-              </div>
-            </button>
-          );
-        })}
-      </div>
+                <span
+                  className={cn(
+                    "flex size-6 items-center justify-center self-start rounded-full text-xs font-bold tabular-nums",
+                    today ? "bg-teal-500 text-white" : "text-[var(--fg-strong)]",
+                  )}
+                >
+                  {formatDate(day, lang, "d")}
+                </span>
+                <div className="flex flex-col gap-0.5">
+                  {list.slice(0, MAX_CHIPS).map((v) => (
+                    <div
+                      key={v.id}
+                      className="truncate rounded px-1 py-0.5 text-[10px] font-semibold leading-tight"
+                      style={{
+                        background: "var(--teal-soft, #d8f1f3)",
+                        color: "#0a6b75",
+                        border: "1px solid rgba(18,154,170,0.35)",
+                      }}
+                    >
+                      <span>{v.vaccineType}</span>{" "}
+                      <span className="opacity-80">· {recipientName(v)}</span>
+                    </div>
+                  ))}
+                  {list.length > MAX_CHIPS ? (
+                    <span className="ps-1 text-[10px] font-semibold text-muted-foreground">
+                      {moreLabel(list.length - MAX_CHIPS)}
+                    </span>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -301,63 +332,63 @@ function Agenda({
   return (
     // Week view (7 day columns) pans horizontally on narrow screens, like the month grid.
     <div className="overflow-x-auto">
-    <div
-      className={cn("grid", days.length > 1 && "min-w-[560px]")}
-      style={{ gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }}
-    >
-      {days.map((day, i) => {
-        const list = itemsOn(day);
-        return (
-          <div
-            key={day.toISOString()}
-            className={cn("min-h-[16rem] border-s p-2", i === 0 && "border-s-0")}
-            style={{ background: isClosedDay(day) ? "var(--paper-soft)" : undefined }}
-          >
-            <div className="mb-2 flex items-baseline justify-between">
-              <span className="text-xs font-bold text-muted-foreground">
-                {formatDate(day, lang, days.length > 1 ? "EEE" : "EEEE")}
-              </span>
-              <span
-                className={cn(
-                  "flex size-6 items-center justify-center rounded-full text-xs font-bold tabular-nums",
-                  isToday(day) ? "bg-teal-500 text-white" : "text-[var(--fg-strong)]",
+      <div
+        className={cn("grid", days.length > 1 && "min-w-[560px]")}
+        style={{ gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }}
+      >
+        {days.map((day, i) => {
+          const list = itemsOn(day);
+          return (
+            <div
+              key={day.toISOString()}
+              className={cn("min-h-[16rem] border-s p-2", i === 0 && "border-s-0")}
+              style={{ background: isClosedDay(day) ? "var(--paper-soft)" : undefined }}
+            >
+              <div className="mb-2 flex items-baseline justify-between">
+                <span className="text-xs font-bold text-muted-foreground">
+                  {formatDate(day, lang, days.length > 1 ? "EEE" : "EEEE")}
+                </span>
+                <span
+                  className={cn(
+                    "flex size-6 items-center justify-center rounded-full text-xs font-bold tabular-nums",
+                    isToday(day) ? "bg-teal-500 text-white" : "text-[var(--fg-strong)]",
+                  )}
+                >
+                  {formatDate(day, lang, "d")}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {list.length === 0 ? (
+                  <span className="text-xs text-muted-foreground">—</span>
+                ) : (
+                  list.map((v) => (
+                    <button
+                      type="button"
+                      key={v.id}
+                      onClick={() => onSelectVaccination(v)}
+                      className="rounded-lg border p-2 text-start transition-colors hover:bg-[var(--paper-soft)]"
+                      style={{ borderColor: "rgba(18,154,170,0.35)" }}
+                    >
+                      <span className="block truncate text-sm font-semibold">{v.vaccineType}</span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {recipientName(v)}
+                      </span>
+                    </button>
+                  ))
                 )}
-              >
-                {formatDate(day, lang, "d")}
-              </span>
+              </div>
             </div>
-            <div className="flex flex-col gap-1.5">
-              {list.length === 0 ? (
-                <span className="text-xs text-muted-foreground">—</span>
-              ) : (
-                list.map((v) => (
-                  <button
-                    type="button"
-                    key={v.id}
-                    onClick={() => onSelectVaccination(v)}
-                    className="rounded-lg border p-2 text-start transition-colors hover:bg-[var(--paper-soft)]"
-                    style={{ borderColor: "rgba(18,154,170,0.35)" }}
-                  >
-                    <span className="block truncate text-sm font-semibold">{v.vaccineType}</span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {recipientName(v)}
-                    </span>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        );
-      })}
-      {days.every((d) => itemsOn(d).length === 0) ? (
-        <p
-          className="col-span-full py-8 text-center text-sm text-muted-foreground"
-          style={{ gridColumn: "1 / -1" }}
-        >
-          {emptyLabel}
-        </p>
-      ) : null}
-    </div>
+          );
+        })}
+        {days.every((d) => itemsOn(d).length === 0) ? (
+          <p
+            className="col-span-full py-8 text-center text-sm text-muted-foreground"
+            style={{ gridColumn: "1 / -1" }}
+          >
+            {emptyLabel}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

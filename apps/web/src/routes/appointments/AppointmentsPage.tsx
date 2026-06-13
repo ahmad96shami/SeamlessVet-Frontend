@@ -1,9 +1,5 @@
-import {
-  APPOINTMENT_STATUS_VALUES,
-  formatDate,
-  type AppointmentResponse,
-} from "@vet/shared";
-import { useCallback, useMemo, useState } from "react";
+import { APPOINTMENT_STATUS_VALUES, formatDate, type AppointmentResponse } from "@vet/shared";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AdminPage } from "@/components/layout/AdminPage";
@@ -85,7 +81,11 @@ export function AppointmentsPage() {
 
   const shift = (dir: -1 | 1) =>
     setAnchor((a) =>
-      view === "month" ? addMonths(a, dir) : view === "week" ? addDays(a, 7 * dir) : addDays(a, dir),
+      view === "month"
+        ? addMonths(a, dir)
+        : view === "week"
+          ? addDays(a, 7 * dir)
+          : addDays(a, dir),
     );
   const goToday = () => setAnchor(startOfDay(new Date()));
   const openDay = (d: Date) => {
@@ -109,16 +109,32 @@ export function AppointmentsPage() {
     setFormOpen(true);
   };
 
-  const rangeLabel = useMemo(() => {
-    // Numeric month (e.g. 06/2026) rather than the month name, per product preference.
-    if (view === "day") return formatDate(anchor, lang, "EEEE، d/MM/yyyy");
-    if (view === "month") return formatDate(anchor, lang, "MM/yyyy");
+  // Numeric month (not the month name), laid out right-to-left as day-range → month → year.
+  // Segments are rendered as separate runs in a dir="rtl" row so the ordering is deterministic
+  // (a slash-joined numeric string would render LTR as one glued run); each multi-number range
+  // is its own `ltr` island so it reads naturally (e.g. "7 – 13").
+  const rangeParts = useMemo<{ text: string; ltr?: boolean }[]>(() => {
+    if (view === "day")
+      return [
+        { text: formatDate(anchor, lang, "EEEE، d") },
+        { text: formatDate(anchor, lang, "MM") },
+        { text: formatDate(anchor, lang, "yyyy") },
+      ];
+    if (view === "month")
+      return [{ text: formatDate(anchor, lang, "MM") }, { text: formatDate(anchor, lang, "yyyy") }];
     const d = weekDays(anchor);
     const a = d[0] ?? anchor;
     const b = d[d.length - 1] ?? a;
     return a.getMonth() === b.getMonth()
-      ? `${formatDate(a, lang, "d")} – ${formatDate(b, lang, "d/MM/yyyy")}`
-      : `${formatDate(a, lang, "d/MM")} – ${formatDate(b, lang, "d/MM/yyyy")}`;
+      ? [
+          { text: `${formatDate(a, lang, "d")} – ${formatDate(b, lang, "d")}`, ltr: true },
+          { text: formatDate(b, lang, "MM") },
+          { text: formatDate(b, lang, "yyyy") },
+        ]
+      : [
+          { text: `${formatDate(a, lang, "d/MM")} – ${formatDate(b, lang, "d/MM")}`, ltr: true },
+          { text: formatDate(b, lang, "yyyy") },
+        ];
   }, [view, anchor, lang]);
 
   return (
@@ -175,8 +191,16 @@ export function AppointmentsPage() {
               <Icon.chevronLeft className="size-4 ltr:hidden" />
               <Icon.chevronRight className="size-4 rtl:hidden" />
             </button>
-            <span className="min-w-40 text-sm font-bold tabular-nums" dir="auto">
-              {rangeLabel}
+            <span
+              className="inline-flex min-w-40 items-center text-sm font-bold tabular-nums"
+              dir="rtl"
+            >
+              {rangeParts.map((p, i) => (
+                <Fragment key={i}>
+                  {i > 0 ? <span aria-hidden>/</span> : null}
+                  <span dir={p.ltr ? "ltr" : undefined}>{p.text}</span>
+                </Fragment>
+              ))}
             </span>
           </div>
         </div>
