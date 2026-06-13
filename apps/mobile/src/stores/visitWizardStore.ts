@@ -23,6 +23,15 @@ interface VisitWizardState {
   customerId: string | null;
   farmId: string | null;
   petId: string | null;
+  /**
+   * Mo11 — the supervision batch (Dawra) this visit falls under, or null for a standalone field
+   * visit. A visit under a batch is covered by the batch supervision fee, so the كشفية toggle is
+   * hidden downstream (mirrors the backend `exam_fee_covered_by_batch` guard). `batchInitialized`
+   * gates the one-time auto-default to the open batch so it doesn't clobber an explicit opt-out
+   * (e.g. on back-navigation); it resets whenever the customer/farm context changes.
+   */
+  batchId: string | null;
+  batchInitialized: boolean;
   /** productId → quantity (meds step). */
   cart: Record<string, number>;
   /** serviceId → selected (services step). */
@@ -38,6 +47,10 @@ interface VisitWizardState {
   setCustomer: (id: string | null) => void;
   setFarm: (id: string | null) => void;
   setPet: (id: string | null) => void;
+  /** Explicit batch pick (or null = "no batch"); marks the choice so auto-default won't re-fire. */
+  setBatch: (id: string | null) => void;
+  /** One-time auto-default to the open batch; no-op once a choice has been made for this context. */
+  initBatch: (id: string | null) => void;
   setQty: (productId: string, qty: number) => void;
   toggleService: (serviceId: string) => void;
   setExamFeeEnabled: (enabled: boolean) => void;
@@ -52,6 +65,8 @@ const EMPTY = {
   customerId: null,
   farmId: null,
   petId: null,
+  batchId: null,
+  batchInitialized: false,
   cart: {},
   services: {},
   examFeeEnabled: false,
@@ -67,8 +82,12 @@ export const useVisitWizardStore = create<VisitWizardState>()((set) => ({
   // Switching customer invalidates the farm/pet links (they belong to the customer).
   setCustomer: (id) =>
     set((s) => (s.customerId === id ? s : { ...EMPTY, customerId: id, result: null })),
-  setFarm: (id) => set({ farmId: id }),
+  // Switching farm re-scopes the batch — drop the old farm's batch and let the selector re-default.
+  setFarm: (id) =>
+    set((s) => (s.farmId === id ? s : { farmId: id, batchId: null, batchInitialized: false })),
   setPet: (id) => set({ petId: id }),
+  setBatch: (id) => set({ batchId: id, batchInitialized: true }),
+  initBatch: (id) => set((s) => (s.batchInitialized ? s : { batchId: id, batchInitialized: true })),
   setQty: (productId, qty) =>
     set((s) => {
       const cart = { ...s.cart };

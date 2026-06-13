@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { formatDate } from "@vet/shared";
 
 import { Search } from "@/components/icons";
 import { Footer, ScreenShell, StepHeader } from "@/components/layout";
@@ -31,6 +32,14 @@ interface CustomerWithBalance extends CustomerRow {
   total_balance: number | null;
 }
 
+/** Lean open-batch row for the visit-create batch (Dawra) selector. */
+interface BatchPick {
+  id: string;
+  farm_id: string | null;
+  start_date: string;
+  end_date: string | null;
+}
+
 /**
  * Wizard step 1 — pick the client (MoD.5). Replaces the old single-form
  * `/visits/new`; the `customerId` deep-link from the customer-detail CTA still
@@ -41,15 +50,18 @@ interface CustomerWithBalance extends CustomerRow {
  */
 export default function WizardClientScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { customerId: deepLinkId } = useLocalSearchParams<{ customerId?: string }>();
 
   const customerId = useVisitWizardStore((s) => s.customerId);
   const farmId = useVisitWizardStore((s) => s.farmId);
   const petId = useVisitWizardStore((s) => s.petId);
+  const batchId = useVisitWizardStore((s) => s.batchId);
   const setCustomer = useVisitWizardStore((s) => s.setCustomer);
   const setFarm = useVisitWizardStore((s) => s.setFarm);
   const setPet = useVisitWizardStore((s) => s.setPet);
+  const setBatch = useVisitWizardStore((s) => s.setBatch);
+  const initBatch = useVisitWizardStore((s) => s.initBatch);
 
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
@@ -83,6 +95,26 @@ export default function WizardClientScreen() {
     `SELECT * FROM pets WHERE customer_id = ? ORDER BY name`,
     [customerId ?? ""],
   );
+
+  // Mo11 — open supervision batches for this customer/farm, scoped to me by the sync rule
+  // (responsible_doctor_id = me). Same selection rule as the old auto-link
+  // (findOpenBatchIdForCustomer): with a farm picked, that farm's batches + customer-wide ones;
+  // with no farm, every open batch for the customer.
+  const { data: batches = [] } = useQuery<BatchPick>(
+    `SELECT id, farm_id, start_date, end_date
+       FROM batches
+      WHERE customer_id = ? AND status = 'open'
+        AND (? IS NULL OR farm_id = ? OR farm_id IS NULL)
+      ORDER BY (CASE WHEN farm_id = ? THEN 0 ELSE 1 END), COALESCE(updated_at, created_at) DESC`,
+    [customerId ?? "", farmId, farmId, farmId],
+  );
+
+  // Auto-default to the top open batch the first time we land on a customer/farm context, so a
+  // visit under an active Dawra keeps its no-كشفية behaviour without a manual pick. The explicit
+  // "no batch" chip opts out; `batchInitialized` (reset on customer/farm change) stops it re-firing.
+  useEffect(() => {
+    initBatch(batches[0]?.id ?? null);
+  }, [batches, initBatch]);
 
   // M15 — a sole farm pre-selects itself (single-farm customers bill that farm's ledger).
   const soleFarmId = farms.length === 1 ? farms[0]!.id : null;
@@ -173,6 +205,38 @@ export default function WizardClientScreen() {
                   />
                 ))}
               </View>
+            </View>
+          ) : null}
+
+          {batches.length > 0 ? (
+            <View>
+              <Text className="text-ink-700 mb-2 text-[13px] font-tajawal-bold">
+                {t("visits.wizard.batch")}
+              </Text>
+              <View className="flex-row flex-wrap gap-2">
+                <Chip
+                  label={t("visits.wizard.noBatch")}
+                  active={batchId === null ? "navy" : "off"}
+                  onPress={() => setBatch(null)}
+                />
+                {batches.map((b) => (
+                  <Chip
+                    key={b.id}
+                    label={
+                      b.end_date
+                        ? `${formatDate(b.start_date, i18n.resolvedLanguage)} — ${formatDate(b.end_date, i18n.resolvedLanguage)}`
+                        : formatDate(b.start_date, i18n.resolvedLanguage)
+                    }
+                    active={batchId === b.id ? "teal" : "off"}
+                    onPress={() => setBatch(b.id)}
+                  />
+                ))}
+              </View>
+              {batchId ? (
+                <Text className="text-ink-500 mt-1.5 text-[12px] font-tajawal">
+                  {t("visits.wizard.batchCoversExam")}
+                </Text>
+              ) : null}
             </View>
           ) : null}
 

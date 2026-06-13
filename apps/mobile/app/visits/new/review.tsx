@@ -18,7 +18,7 @@ import {
   EMPTY_CHEQUE,
   type ChequeDetails,
 } from "@/components/ChequeFields";
-import { Briefcase, Calendar, Stethoscope } from "@/components/icons";
+import { Box, Briefcase, Calendar, Stethoscope } from "@/components/icons";
 import { Footer, ScreenShell, TopBar } from "@/components/layout";
 import {
   Button,
@@ -49,7 +49,6 @@ import {
 import { useQuery } from "@/sync/hooks";
 import {
   findActiveContractIdForCustomer,
-  findOpenBatchIdForCustomer,
   getDefaultExamFee,
   listLocalVisitNumbers,
 } from "@/sync/queries";
@@ -157,7 +156,11 @@ export default function WizardReviewScreen() {
     [catalog, wizard.services],
   );
 
-  const examFee = wizard.examFeeEnabled ? (wizard.examFee ?? defaultFee ?? 0) : 0;
+  // Mo11 — under a batch (Dawra), the كشفية is covered by the supervision fee (server enforces
+  // `exam_fee_covered_by_batch`); a standalone visit keeps it. The services step already forces the
+  // toggle off under a batch, but gate here too so the estimate + issuance never include it.
+  const examFeeOn = wizard.examFeeEnabled && !wizard.batchId;
+  const examFee = examFeeOn ? (wizard.examFee ?? defaultFee ?? 0) : 0;
   const medsTotal = round2(medLines.reduce((sum, l) => sum + l.lineTotal, 0));
   const servicesTotal = round2(serviceLines.reduce((sum, l) => sum + l.price, 0));
   const fieldTotal = round2(medsTotal + servicesTotal);
@@ -169,11 +172,13 @@ export default function WizardReviewScreen() {
 
   /** Clinical writes shared by draft + confirm — mirrors the old new.tsx field set. */
   const persistClinical = async (): Promise<{ visitId: string; visitNumber: string | null }> => {
-    const [cId, batchId, prior] = await Promise.all([
+    const [cId, prior] = await Promise.all([
       findActiveContractIdForCustomer(customer!.id, wizard.farmId),
-      findOpenBatchIdForCustomer(customer!.id, wizard.farmId),
       listLocalVisitNumbers(user!.userId),
     ]);
+    // Mo11 — the batch is the doctor's explicit pick from step 1 (defaulting to the open batch),
+    // not a silent auto-link; under a batch the visit carries no كشفية.
+    const batchId = wizard.batchId;
     const visitNumber = nextVisitNumber(user!.numberPrefix, prior);
     const visitId = await syncInsert("visits", {
       visit_type: "field",
@@ -187,7 +192,7 @@ export default function WizardReviewScreen() {
       status: "open",
       started_at: new Date().toISOString(),
       chief_complaint: wizard.notes.trim() || null,
-      exam_fee_applied: wizard.examFeeEnabled ? (wizard.examFee ?? defaultFee) : null,
+      exam_fee_applied: examFeeOn ? (wizard.examFee ?? defaultFee) : null,
     });
     for (const line of medLines) {
       await syncInsert("prescriptions", {
@@ -301,7 +306,7 @@ export default function WizardReviewScreen() {
             }),
           );
         }
-        if (wizard.examFeeEnabled) {
+        if (examFeeOn) {
           // amount undefined → server falls back to the visit's applied fee.
           await issue(
             buildExamFeeInvoiceRequest(visitId, {
@@ -381,14 +386,24 @@ export default function WizardReviewScreen() {
                 <Text className="text-ink-500 mt-0.5 text-[13px] font-tajawal">
                   {customer ? t(`customerType.${customer.type}`, { defaultValue: customer.type }) : ""}
                 </Text>
-                {contractId ? (
-                  <View className="mt-1.5 flex-row">
-                    <Pill
-                      tone="teal"
-                      compact
-                      leadingIcon={<Briefcase size={12} color={colors.teal[700]} />}
-                      label={`${t("nav.contracts")} · ${t("contractStatus.active")}`}
-                    />
+                {contractId || wizard.batchId ? (
+                  <View className="mt-1.5 flex-row flex-wrap gap-1.5">
+                    {contractId ? (
+                      <Pill
+                        tone="teal"
+                        compact
+                        leadingIcon={<Briefcase size={12} color={colors.teal[700]} />}
+                        label={`${t("nav.contracts")} · ${t("contractStatus.active")}`}
+                      />
+                    ) : null}
+                    {wizard.batchId ? (
+                      <Pill
+                        tone="navy"
+                        compact
+                        leadingIcon={<Box size={12} color={colors.white} />}
+                        label={t("visits.wizard.underBatch")}
+                      />
+                    ) : null}
                   </View>
                 ) : null}
               </View>
@@ -424,14 +439,14 @@ export default function WizardReviewScreen() {
             ) : null}
 
             {/* Services + exam fee */}
-            {serviceLines.length > 0 || wizard.examFeeEnabled ? (
+            {serviceLines.length > 0 || examFeeOn ? (
               <Card className="p-3.5">
                 <SectionHead
                   title={t("visits.wizard.servicesAndExam")}
                   onEdit={() => router.navigate("/visits/new/services" as never)}
                   editLabel={t("actions.edit")}
                 />
-                {wizard.examFeeEnabled ? (
+                {examFeeOn ? (
                   <LineItem
                     name={t("visits.wizard.fieldExamFee")}
                     qty={t("invoiceType.exam_fee")}
@@ -440,7 +455,7 @@ export default function WizardReviewScreen() {
                 ) : null}
                 {serviceLines.map((l, i) => (
                   <View key={l.serviceId}>
-                    {i > 0 || wizard.examFeeEnabled ? <Divider dashed /> : null}
+                    {i > 0 || examFeeOn ? <Divider dashed /> : null}
                     <LineItem name={l.name} qty="" total={l.price} />
                   </View>
                 ))}

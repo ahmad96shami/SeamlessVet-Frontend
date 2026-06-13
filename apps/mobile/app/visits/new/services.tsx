@@ -10,6 +10,7 @@ import {
   Button,
   FieldLabel,
   IconTile,
+  InfoBanner,
   Input,
   ListRow,
   Money,
@@ -36,6 +37,7 @@ export default function WizardServicesScreen() {
 
   const services = useVisitWizardStore((s) => s.services);
   const toggleService = useVisitWizardStore((s) => s.toggleService);
+  const batchId = useVisitWizardStore((s) => s.batchId);
   const examFeeEnabled = useVisitWizardStore((s) => s.examFeeEnabled);
   const setExamFeeEnabled = useVisitWizardStore((s) => s.setExamFeeEnabled);
   const examFee = useVisitWizardStore((s) => s.examFee);
@@ -55,6 +57,13 @@ export default function WizardServicesScreen() {
     void getDefaultExamFee().then(setDefaultFee);
   }, []);
   const effectiveExamFee = examFee ?? defaultFee ?? 0;
+
+  // Mo11 — a visit under a batch (Dawra) is covered by the supervision fee; force the كشفية off so
+  // it can't ride along (mirrors the backend `exam_fee_covered_by_batch` guard; the toggle is hidden
+  // below). A standalone visit (no batch) keeps the toggle but earns no entitlement.
+  useEffect(() => {
+    if (batchId && examFeeEnabled) setExamFeeEnabled(false);
+  }, [batchId, examFeeEnabled, setExamFeeEnabled]);
 
   const servicesTotal = useMemo(() => {
     let sum = 0;
@@ -107,26 +116,35 @@ export default function WizardServicesScreen() {
           ItemSeparatorComponent={() => <View className="h-3" />}
           ListHeaderComponent={
             <View className="gap-3 pb-3">
-              {/* Exam fee — the design's "كشفية ميدانية" row. */}
-              <SelectableRow
-                selected={examFeeEnabled}
-                onPress={() => setExamFeeEnabled(!examFeeEnabled)}
-                title={t("visits.wizard.fieldExamFee")}
-                price={effectiveExamFee}
-                icon={SERVICE_ICON}
-              />
-              {examFeeEnabled ? (
-                <Input
-                  label={t("invoiceType.exam_fee")}
-                  keyboardType="decimal-pad"
-                  value={examFee != null ? String(examFee) : ""}
-                  placeholder={defaultFee != null ? String(defaultFee) : "0"}
-                  onChangeText={(v) => {
-                    const n = Number(v.trim());
-                    setExamFee(v.trim() === "" || !Number.isFinite(n) ? null : n);
-                  }}
-                />
-              ) : null}
+              {batchId ? (
+                /* Mo11 — under a batch (Dawra), the كشفية is covered by the supervision fee. */
+                <InfoBanner icon={<Stethoscope size={18} color={colors.teal[600]} />}>
+                  {t("visits.wizard.batchCoversExam")}
+                </InfoBanner>
+              ) : (
+                <>
+                  {/* Exam fee — the design's "كشفية ميدانية" row. */}
+                  <SelectableRow
+                    selected={examFeeEnabled}
+                    onPress={() => setExamFeeEnabled(!examFeeEnabled)}
+                    title={t("visits.wizard.fieldExamFee")}
+                    price={effectiveExamFee}
+                    icon={SERVICE_ICON}
+                  />
+                  {examFeeEnabled ? (
+                    <Input
+                      label={t("invoiceType.exam_fee")}
+                      keyboardType="decimal-pad"
+                      value={examFee != null ? String(examFee) : ""}
+                      placeholder={defaultFee != null ? String(defaultFee) : "0"}
+                      onChangeText={(v) => {
+                        const n = Number(v.trim());
+                        setExamFee(v.trim() === "" || !Number.isFinite(n) ? null : n);
+                      }}
+                    />
+                  ) : null}
+                </>
+              )}
             </View>
           }
           ListEmptyComponent={
