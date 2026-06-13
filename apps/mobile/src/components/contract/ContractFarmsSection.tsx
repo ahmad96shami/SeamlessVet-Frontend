@@ -12,7 +12,7 @@ import { colors } from "@/theme";
 
 interface Props {
   contractId: string;
-  /** Coverage is editable only while the parent contract is a draft (mirrors med-prices). */
+  /** Coverage is editable only while the parent contract is a draft. */
   isDraft: boolean;
 }
 

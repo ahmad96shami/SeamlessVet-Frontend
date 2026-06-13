@@ -8,7 +8,6 @@ import { Card, Money, Pill } from "@/components/ui";
 import { ContractBatchesSection } from "@/components/contract/ContractBatchesSection";
 import { ContractFarmsSection } from "@/components/contract/ContractFarmsSection";
 import { ContractLifecycleActions } from "@/components/contract/ContractLifecycleActions";
-import { ContractMedicationPricesSection } from "@/components/contract/ContractMedicationPricesSection";
 import { ScreenShell, TopBar } from "@/components/layout";
 import { useQuery } from "@/sync/hooks";
 import type { ContractRow, CustomerRow } from "@/sync/types";
@@ -121,8 +120,6 @@ export default function ContractDetailScreen() {
       </View>
 
       <ContractFarmsSection contractId={contract.id} isDraft={isDraft} />
-
-      <ContractMedicationPricesSection contractId={contract.id} isDraft={isDraft} />
 
       <ContractBatchesSection contractId={contract.id} />
 

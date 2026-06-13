@@ -40,7 +40,7 @@ export default function EditContractScreen() {
       <ScreenShell header={<TopBar title={t("finance.contracts.editTitle")} onBack={() => router.back()} right={null} />}>
         <Card flat className="bg-amber-soft mt-2 p-3">
           <Text className="text-amber-ink text-center text-[13px] font-tajawal-bold">
-            {t("finance.contracts.medPrices.draftOnly")}
+            {t("finance.contracts.editDraftOnly")}
           </Text>
         </Card>
       </ScreenShell>

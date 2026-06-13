@@ -2026,6 +2026,7 @@
       "deleteConfirm": "Cancel the contract for {{name}}?",
       "proposeAmendment": "Propose amendment",
       "proposeAmendmentHint": "An active contract is read-only on the device. Create a new draft as a proposed amendment — the office activates it.",
+      "editDraftOnly": "A contract can only be edited while it is a draft.",
       "medPrices": {
         "title": "Medication price overrides",
         "subtitle": "Contract prices replace catalog prices once the contract is active",
