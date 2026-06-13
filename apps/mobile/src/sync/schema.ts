@@ -176,16 +176,6 @@ export const AppSchema = new Schema({
     { indexes: { ix_contracts_customer: ["customer_id"] } },
   ),
 
-  contract_medication_prices: new Table(
-    {
-      contract_id: column.text,
-      product_id: column.text,
-      contract_price: column.real,
-      updated_at: column.text,
-    },
-    { indexes: { ix_cmp_contract: ["contract_id"] } },
-  ),
-
   // M15 — which farms (of the contract's customer) a contract covers.
   contract_farms: new Table(
     {

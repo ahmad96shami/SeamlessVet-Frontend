@@ -126,18 +126,13 @@ export default function WizardReviewScreen() {
 
   const { data: stockRows = [] } = useQuery<FieldStockRow>(FIELD_STOCK_SQL);
   const { data: catalog = [] } = useQuery<ServiceRow>(`SELECT * FROM services`);
-  const { data: overrides = [] } = useQuery<{ product_id: string; contract_price: number | null }>(
-    `SELECT product_id, contract_price FROM contract_medication_prices WHERE contract_id = ?`,
-    [contractId ?? ""],
-  );
 
-  // -- Estimate lines (contract-override aware; server stays authoritative) ----
+  // -- Estimate lines (catalog pricing; M29 dropped per-contract med prices, server stays authoritative) --
   const medLines = useMemo(() => {
-    const overrideByProduct = new Map(overrides.map((o) => [o.product_id, o.contract_price]));
     const byProduct = new Map(stockRows.map((r) => [r.product_id, r]));
     return Object.entries(wizard.cart).map(([productId, qty]) => {
       const row = byProduct.get(productId);
-      const price = overrideByProduct.get(productId) ?? row?.selling_price ?? 0;
+      const price = row?.selling_price ?? 0;
       return {
         productId,
         name: row?.name_ar ?? row?.name_latin ?? "—",
@@ -146,7 +141,7 @@ export default function WizardReviewScreen() {
         lineTotal: round2(qty * price),
       };
     });
-  }, [wizard.cart, stockRows, overrides]);
+  }, [wizard.cart, stockRows]);
 
   const serviceLines = useMemo(
     () =>

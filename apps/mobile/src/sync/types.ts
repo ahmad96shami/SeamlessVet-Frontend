@@ -216,14 +216,6 @@ export interface ContractRow {
   updated_at: string | null;
 }
 
-export interface ContractMedicationPriceRow {
-  id: string;
-  contract_id: string;
-  product_id: string;
-  contract_price: number;
-  updated_at: string | null;
-}
-
 export interface BatchRow {
   id: string;
   contract_id: string | null;
