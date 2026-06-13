@@ -69,10 +69,8 @@ export function ContractBatchesSection({ contractId }: Props) {
               </View>
               <View className="flex-row flex-wrap gap-1.5">
                 <Pill tone="neutral" label={`${t("finance.batches.animalCount")}: ${b.animal_count}`} />
-                <Pill tone="neutral" label={`${t(`feeModel.${b.supervision_fee_model}`)}: ${feeValue}`} />
-                {b.doctor_share_percent != null ? (
-                  <Pill tone="teal" label={`${t("finance.batches.colShare")}: ${b.doctor_share_percent}%`} />
-                ) : null}
+                {/* M28 — the supervision fee IS the doctor's entitlement (no share%/ceiling). */}
+                <Pill tone="teal" label={`${t(`feeModel.${b.supervision_fee_model}`)}: ${feeValue}`} />
                 {b.entitlement_system ? (
                   <Pill tone="neutral" label={t(`entitlementSystem.${b.entitlement_system}`)} />
                 ) : null}

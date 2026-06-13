@@ -123,7 +123,12 @@ export interface VaccinationRow {
   pet_id: string | null;
   customer_id: string | null;
   visit_id: string | null;
+  // M26 — catalog vaccine product (category 'vaccine'); null for legacy free-text + next-dose reminders.
+  product_id: string | null;
   vaccine_type: string;
+  price: number | null;
+  /** Server-captured FEFO lot cost; read-only (null on device-administered rows — /sync never deducts). */
+  resolved_unit_cost: number | null;
   date_given: string;
   next_due_date: string | null;
   certificate_url: string | null;
@@ -232,8 +237,7 @@ export interface BatchRow {
   /** SQLite INTEGER 0/1; tri-state — `null` inherits the global entitlement setting (SCHEMA #4). */
   entitlement_enabled: number | null;
   entitlement_system: string | null;
-  doctor_share_percent: number | null;
-  doctor_share_ceiling: number | null;
+  // M28 — doctor_share_percent/doctor_share_ceiling removed: the supervision fee IS the entitlement.
   status: string;
   created_at: string | null;
   updated_at: string | null;

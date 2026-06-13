@@ -208,10 +208,11 @@ export const AppSchema = new Schema({
       end_date: column.text,
       supervision_fee_model: column.text,
       supervision_fee_value: column.real,
+      // M28 — the supervision fee IS the doctor's entitlement (no percent/ceiling); the device
+      // reads entitlement_enabled/_system for the read-only batch view. The dropped server columns
+      // doctor_share_percent/doctor_share_ceiling are gone from the AppSchema too.
       entitlement_enabled: column.integer,
       entitlement_system: column.text,
-      doctor_share_percent: column.real,
-      doctor_share_ceiling: column.real,
       status: column.text,
       created_at: column.text,
       updated_at: column.text,
@@ -299,7 +300,14 @@ export const AppSchema = new Schema({
       pet_id: column.text,
       customer_id: column.text,
       visit_id: column.text,
+      // M26 — vaccines are stock products: product_id links a catalog product (category 'vaccine'),
+      // price snapshots the charge, resolved_unit_cost is the server-captured FEFO lot cost (read-only —
+      // the /sync path never deducts, so it stays null on device-administered doses). vaccine_type is
+      // the product-name snapshot (or free text for legacy/next-dose-reminder rows with product_id null).
+      product_id: column.text,
       vaccine_type: column.text,
+      price: column.real,
+      resolved_unit_cost: column.real,
       date_given: column.text,
       next_due_date: column.text,
       certificate_url: column.text,
