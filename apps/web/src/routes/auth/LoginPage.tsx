@@ -14,7 +14,7 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { useCenters, useLogin } from "@/queries/auth";
 import { AuthLayout } from "@/routes/auth/AuthLayout";
-import { getLastPhone, rememberLogin } from "@/services/centerMemory";
+import { getLastPhone } from "@/services/centerMemory";
 import { useAuthStore } from "@/stores/authStore";
 
 type Step = "phone" | "center" | "password";
@@ -99,10 +99,11 @@ export function LoginPage() {
     login.mutate(
       {
         request: { environmentId: selected.environmentId, phonePrimary: phone, password: values.password },
-        centerName: selected.name,
+        center: selected,
       },
       {
-        onSuccess: () => rememberLogin(phone, selected),
+        // remember-last + session set run in the hook-level onSuccess (this call's onSuccess would be
+        // skipped — a successful login unmounts this page on the redirect); errors keep us mounted.
         onError: (error: ApiError) => applyFieldErrors(error, (name, e) => form.setError(name as never, e)),
       },
     );

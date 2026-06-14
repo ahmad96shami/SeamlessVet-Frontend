@@ -43,6 +43,21 @@ interface AuthState {
   consumeEndedReason: () => SessionEndedReason | null;
 }
 
+/**
+ * Build the state patch for an involuntary session end. Idempotent under concurrent calls: only a
+ * session that was still alive sets a reason, and a reason already pending (not yet shown on the
+ * login page) is preserved — several queries failing at once (e.g. the non-single-flight 403
+ * `environment_suspended`) must not clobber the notice back to null.
+ */
+function endSession(reason: SessionEndedReason) {
+  return (s: AuthState): Partial<AuthState> => ({
+    status: "unauthenticated",
+    user: null,
+    centerName: null,
+    endedReason: s.endedReason ?? (s.status !== "unauthenticated" ? reason : null),
+  });
+}
+
 function userFromAccessToken(accessToken: string, fallbackRole?: string): AuthUser | null {
   const claims = decodeJwt(accessToken);
   if (!claims?.sub) return null;
@@ -118,16 +133,14 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   // login. Voluntary sign-out doesn't set a reason — only a session that ENDED ON ITS OWN.
   handleAuthError: () => {
     tokenStorage.clear();
-    const hadSession = get().status !== "unauthenticated";
-    set({ status: "unauthenticated", user: null, centerName: null, endedReason: hadSession ? "expired" : null });
+    set(endSession("expired"));
   },
 
   // The center was suspended mid-session (a global 403 `environment_suspended`): force logout
   // with a distinct notice. Data stays on the device (the env is suspended, not gone).
   handleEnvironmentSuspended: () => {
     tokenStorage.clear();
-    const hadSession = get().status !== "unauthenticated";
-    set({ status: "unauthenticated", user: null, centerName: null, endedReason: hadSession ? "suspended" : null });
+    set(endSession("suspended"));
   },
 
   consumeEndedReason: () => {
