@@ -58,7 +58,7 @@
     "signOut": "Sign out",
     "language": "Language",
     "account": "Account",
-    "center": "Center · Jenin",
+    "center": "Center",
     "envIndicator": "partner env",
     "menu": "Menu"
   },
@@ -1855,11 +1855,26 @@
       "phone": "Phone number",
       "password": "Password",
       "submit": "Sign in",
+      "continue": "Continue",
       "noAccount": "Don't have an account?",
       "createOne": "Create one"
     },
+    "center": {
+      "select": "Select your center",
+      "selectHint": "Your number is registered at more than one center — choose where to sign in.",
+      "signingInTo": "Signing in to",
+      "none": "No active center is registered for this number.",
+      "back": "Use a different number",
+      "change": "Change center",
+      "code": "Center code",
+      "codeHint": "Ask your center's admin for the code.",
+      "codeUnknown": "No active center matches this code."
+    },
     "register": {
       "title": "Create account",
+      "centerCode": "Center code",
+      "centerCodeHint": "The code your center's admin gave you",
+      "center": "Center",
       "fullName": "Full name",
       "phone": "Phone number",
       "email": "Email (optional)",
@@ -1878,7 +1893,8 @@
     },
     "session": {
       "expiredBanner": "Session expired — reconnect to sync your changes. Your data is kept.",
-      "expiredToast": "Your session has expired. Please sign in again."
+      "expiredToast": "Your session has expired. Please sign in again.",
+      "suspendedToast": "This center has been suspended. Contact the platform administrator."
     }
   },
   "sync": {
@@ -2095,32 +2111,28 @@
       "sourceVisit": "Visit"
     },
     "closeAccount": {
-      "action": "Close account & release settlement",
+      "action": "Close account",
       "title": "Close customer account",
-      "body": "The account will close and related doctor entitlements will be computed. Requires a zero balance.",
+      "body": "The account will be finalized — no new charges can be posted to it. Requires a zero balance. Doctor entitlements are paid at batch settlement (تصفية), not when the account closes.",
       "balanceMustBeZero": "Can't close while a balance is outstanding ({{balance}}). Collect the remainder first.",
       "confirm": "Close the account now",
       "closed": "Account closed",
       "reopen": "Reopen account",
       "reopenBody": "The account will reopen so the customer can be billed again. Already-computed entitlements are unaffected.",
       "reopenConfirm": "Reopen now",
-      "reopened": "Account reopened",
-      "resulting": "Resulting entitlements",
-      "noEntitlements": "No entitlements were produced."
+      "reopened": "Account reopened"
     },
     "closeFarmAccount": {
-      "action": "Close farm account & release settlement",
+      "action": "Close farm account",
       "title": "Close farm account",
-      "body": "This farm's account will close and its entitlements will be computed. It does not affect the customer's other farms or direct account. Requires a zero balance.",
+      "body": "This farm's account will be finalized — no new charges can be posted to it. It does not affect the customer's other farms or direct account. Requires a zero balance. Doctor entitlements are paid at batch settlement (تصفية), not when the account closes.",
       "balanceMustBeZero": "Can't close while the farm has an outstanding balance ({{balance}}). Collect the remainder first.",
       "confirm": "Close the farm account now",
       "closed": "Farm account closed",
       "reopen": "Reopen farm account",
       "reopenBody": "The farm account will reopen so it can be billed again. Already-computed entitlements are unaffected.",
       "reopenConfirm": "Reopen now",
-      "reopened": "Farm account reopened",
-      "resulting": "Resulting entitlements",
-      "noEntitlements": "No entitlements were produced."
+      "reopened": "Farm account reopened"
     },
     "contractFarms": {
       "title": "Covered farms",

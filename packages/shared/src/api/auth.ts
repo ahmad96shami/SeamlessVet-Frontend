@@ -1,13 +1,37 @@
 import type { AxiosInstance } from "axios";
 
 import {
+  CenterOptionSchema,
+  CentersLookupResponseSchema,
   LoginRequestSchema,
   LoginResponseSchema,
   PowerSyncTokenResponseSchema,
+  type CenterOption,
   type LoginRequest,
   type LoginResponse,
   type PowerSyncTokenResponse,
 } from "../schemas/auth";
+
+/**
+ * POST /auth/centers — the active centers a phone number belongs to (M34, tenant-routed login).
+ * Anonymous + IP-rate-limited; always 200 (an empty array means "no active center for this phone";
+ * suspended centers are hidden server-side). Step one of the two-step login: pick a center → its
+ * `environmentId` scopes the `/auth/login` call.
+ */
+export async function fetchCenters(client: AxiosInstance, phone: string): Promise<CenterOption[]> {
+  const response = await client.post("/auth/centers", { phone });
+  return CentersLookupResponseSchema.parse(response.data).centers;
+}
+
+/**
+ * POST /auth/center-by-code — resolve one center by its admin-issued code (M34). Used by the
+ * registration flow to route a sign-up request to the right tenant. 404 when no active center
+ * matches the code (surfaced to the user as an unknown-code error).
+ */
+export async function centerByCode(client: AxiosInstance, code: string): Promise<CenterOption> {
+  const response = await client.post("/auth/center-by-code", { code });
+  return CenterOptionSchema.parse(response.data);
+}
 
 /**
  * POST /auth/login — phone + password → tokens.

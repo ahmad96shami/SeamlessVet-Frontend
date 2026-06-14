@@ -1,7 +1,43 @@
 import { z } from "zod";
 
-/** POST /auth/login request — mirrors components["schemas"]["LoginRequest"]. */
+/**
+ * One center (tenant/environment) a phone number belongs to — the unit of the tenant-routed
+ * login picker (M34). Returned by `/auth/centers` and `/auth/center-by-code`. `name` is the
+ * human label shown in the picker + shell header; `code` is the admin-issued routing key used
+ * at registration; `environmentId` is the tenant key the client must send on login/register.
+ * The endpoints declare no typed 200 body, so this Zod schema is the contract.
+ */
+export const CenterOptionSchema = z.object({
+  environmentId: z.string().min(1),
+  name: z.string(),
+  code: z.string(),
+});
+export type CenterOption = z.infer<typeof CenterOptionSchema>;
+
+/** POST /auth/centers request — the active centers a phone belongs to (suspended ones hidden). */
+export const CentersLookupRequestSchema = z.object({
+  phone: z.string().min(1),
+});
+export type CentersLookupRequest = z.infer<typeof CentersLookupRequestSchema>;
+
+/** POST /auth/centers response — always 200; an empty list means no active center for that phone. */
+export const CentersLookupResponseSchema = z.object({
+  centers: z.array(CenterOptionSchema),
+});
+export type CentersLookupResponse = z.infer<typeof CentersLookupResponseSchema>;
+
+/** POST /auth/center-by-code request — resolve a center by its admin-issued code (registration routing). */
+export const CenterByCodeRequestSchema = z.object({
+  code: z.string().min(1),
+});
+export type CenterByCodeRequest = z.infer<typeof CenterByCodeRequestSchema>;
+
+/**
+ * POST /auth/login request — mirrors components["schemas"]["LoginRequest"]. Tenant-routed since
+ * M34: `environmentId` names the center (picked via `/auth/centers`) the credentials belong to.
+ */
 export const LoginRequestSchema = z.object({
+  environmentId: z.string().min(1),
   phonePrimary: z.string().min(1),
   password: z.string().min(1),
 });
@@ -28,8 +64,12 @@ export const LoginResponseSchema = z.object({
 });
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
 
-/** POST /auth/register request — RegisterRequest. Creates an inactive account + pending request. */
+/**
+ * POST /auth/register request — RegisterRequest. Creates an inactive account + pending request.
+ * Tenant-routed since M34: `environmentId` names the center (resolved via `/auth/center-by-code`).
+ */
 export const RegisterRequestSchema = z.object({
+  environmentId: z.string().min(1),
   fullName: z.string().min(1),
   phonePrimary: z.string().min(1),
   password: z.string().min(8),
