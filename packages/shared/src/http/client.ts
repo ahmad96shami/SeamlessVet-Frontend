@@ -96,7 +96,13 @@ export function createApiClient(options: ApiClientOptions): AxiosInstance {
           config.headers.set("Authorization", `Bearer ${refreshed.accessToken}`);
           return instance(config);
         }
-        if (isLeader) tokenProvider.onAuthError?.();
+        if (isLeader) tokenProvider.onAuthError?.("expired");
+      }
+
+      // The tenant/center was suspended (M32 live-suspension gate): a refresh can't recover a
+      // suspended env, so force logout immediately with a distinct notice. Fires on any request.
+      if (apiError.status === 403 && apiError.code === "environment_suspended") {
+        tokenProvider?.onAuthError?.("suspended");
       }
       return Promise.reject(apiError);
     },

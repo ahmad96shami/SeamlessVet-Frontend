@@ -23,6 +23,13 @@ export interface TokenStorage {
 }
 
 /**
+ * Why the client forced a logout — lets the host app show the right notice.
+ *   - `expired`   : refresh failed / the session is unrecoverable (401 → refresh → null).
+ *   - `suspended` : the tenant/center was suspended (a global 403 `environment_suspended`).
+ */
+export type AuthErrorReason = "expired" | "suspended";
+
+/**
  * Supplies the API client with the current access token and a refresh routine.
  * The client calls `getAccessToken()` per request and `refresh()` once on a 401.
  */
@@ -30,6 +37,6 @@ export interface TokenProvider {
   getAccessToken(): Promise<string | null> | string | null;
   /** Rotate tokens; return the new pair, or null if refresh failed (→ force logout). */
   refresh(): Promise<AuthTokens | null>;
-  /** Called when refresh fails — the app should wipe local state + route to login. */
-  onAuthError?(): void;
+  /** Called when the session ends on its own — the app should wipe local state + route to login. */
+  onAuthError?(reason: AuthErrorReason): void;
 }
