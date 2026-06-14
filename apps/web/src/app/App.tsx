@@ -9,12 +9,16 @@ import { useAuthStore } from "@/stores/authStore";
 export function App() {
   const restore = useAuthStore((s) => s.restore);
   const handleAuthError = useAuthStore((s) => s.handleAuthError);
+  const handleEnvironmentSuspended = useAuthStore((s) => s.handleEnvironmentSuspended);
 
   useEffect(() => {
-    // A failed token refresh flips the store to logged-out (→ guards redirect to /login).
-    setOnAuthError(handleAuthError);
+    // An involuntary session end flips the store to logged-out (→ guards redirect to /login).
+    // A suspended center carries its own notice; everything else is treated as expired.
+    setOnAuthError((reason) =>
+      reason === "suspended" ? handleEnvironmentSuspended() : handleAuthError(),
+    );
     restore();
-  }, [restore, handleAuthError]);
+  }, [restore, handleAuthError, handleEnvironmentSuspended]);
 
   useEffect(() => {
     // Connectivity listeners + replay the offline write-queue on reconnect / at boot.

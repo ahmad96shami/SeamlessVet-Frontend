@@ -1,20 +1,23 @@
 import { createOfflineWriteQueue, type QueueStorage } from "@vet/shared";
 
-import { db } from "@/services/db";
+import { getDb } from "@/services/db";
 
-/** Dexie-backed implementation of the shared {@link QueueStorage} adapter. */
+/**
+ * Dexie-backed implementation of the shared {@link QueueStorage} adapter. Every method resolves
+ * {@link getDb} lazily so the queue follows the active center's DB across an env switch (W24).
+ */
 const storage: QueueStorage = {
   add: async (request) => {
-    await db.requests.add(request);
+    await getDb().requests.add(request);
   },
-  list: () => db.requests.orderBy("createdAt").toArray(),
+  list: () => getDb().requests.orderBy("createdAt").toArray(),
   update: async (id, patch) => {
-    await db.requests.update(id, patch);
+    await getDb().requests.update(id, patch);
   },
   remove: async (id) => {
-    await db.requests.delete(id);
+    await getDb().requests.delete(id);
   },
-  clear: () => db.requests.clear(),
+  clear: () => getDb().requests.clear(),
 };
 
 /**

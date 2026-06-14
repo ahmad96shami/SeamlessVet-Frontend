@@ -1,7 +1,7 @@
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import type { QueryKey } from "@tanstack/react-query";
 
-import { db } from "@/services/db";
+import { getDb } from "@/services/db";
 
 /**
  * Bump on any change that alters persisted query *shapes* (or to force a cold start). The persister
@@ -35,14 +35,17 @@ export function shouldDehydrateQuery(queryKey: QueryKey): boolean {
   return typeof root === "string" && CACHEABLE_KEYS.has(root);
 }
 
-/** Dexie-backed AsyncStorage for the persister — reuses the app's IndexedDB (no extra dep). */
+/**
+ * Dexie-backed AsyncStorage for the persister — reuses the app's IndexedDB (no extra dep). Resolves
+ * {@link getDb} per call so the persisted cache follows the active center's DB across a switch (W24).
+ */
 const dexieStorage = {
-  getItem: async (key: string) => (await db.kv.get(key))?.value ?? null,
+  getItem: async (key: string) => (await getDb().kv.get(key))?.value ?? null,
   setItem: async (key: string, value: string) => {
-    await db.kv.put({ key, value });
+    await getDb().kv.put({ key, value });
   },
   removeItem: async (key: string) => {
-    await db.kv.delete(key);
+    await getDb().kv.delete(key);
   },
 };
 

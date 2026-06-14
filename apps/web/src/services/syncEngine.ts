@@ -76,6 +76,18 @@ export async function syncNow(): Promise<void> {
   }
 }
 
+/**
+ * Re-point the sync engine at the active center's DB after an env switch (W24): cancel any pending
+ * backoff, recount the (now different) queue, and flush if online. The offline queue itself follows
+ * the DB lazily via `getDb()`; this just refreshes the badge + kicks a drain for the new tenant.
+ */
+export async function resetSyncForEnv(): Promise<void> {
+  clearRetry();
+  backoff = 0;
+  await refreshSyncCounts();
+  if (isOnline()) void syncNow();
+}
+
 /** Call after enqueuing a write — refresh the badge and, if online, try to flush immediately. */
 export async function notifyEnqueued(): Promise<void> {
   await refreshSyncCounts();
