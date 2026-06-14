@@ -30,6 +30,7 @@ const SELECTED_ENV_STORAGE_KEY = "vet.web.selectedEnvironmentId";
 export function AppShell() {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
+  const centerName = useAuthStore((s) => s.centerName);
   const logout = useAuthStore((s) => s.logout);
   useNotificationsRealtime(); // open the SignalR hub for the session; live pushes → feed + toast
   const role = user?.role ?? "";
@@ -114,9 +115,9 @@ export function AppShell() {
               <Icon.user size={18} />
             </div>
             <div className="sn-user-text">
-              <div className="sn-user-name">{roleLabel}</div>
+              <div className="sn-user-name">{centerName ?? t("shell.center")}</div>
               <div className="sn-user-role">
-                {t("shell.center")}
+                {roleLabel}
                 {showEnvChip ? (
                   <span className="sn-env-chip" title={envId}>
                     {t("shell.envIndicator")}

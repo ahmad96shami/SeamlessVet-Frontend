@@ -1,15 +1,17 @@
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   applyFieldErrors,
   RegisterRequestSchema,
   ROLE_KEY_VALUES,
   type ApiError,
-  type RegisterRequest,
 } from "@vet/shared";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { z } from "zod";
 
+import { centerByCode } from "@/api/auth";
 import { Field } from "@/components/form/Field";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,12 +22,21 @@ import { AuthLayout } from "@/routes/auth/AuthLayout";
 // Admin/accountant are assigned by an admin, not self-requested.
 const SELECTABLE_ROLES = ROLE_KEY_VALUES.filter((r) => r !== "admin" && r !== "accountant");
 
+// The form carries a `centerCode` instead of `environmentId` (M34, tenant-routed register): the
+// code is resolved to a center via `/auth/center-by-code` at submit, then swapped for its env id.
+const RegisterFormSchema = RegisterRequestSchema.omit({ environmentId: true }).extend({
+  centerCode: z.string().min(1),
+});
+type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
+
 export function RegisterPage() {
   const { t } = useTranslation();
   const register = useRegister();
-  const form = useForm<RegisterRequest>({
-    resolver: zodResolver(RegisterRequestSchema),
+  const [resolving, setResolving] = useState(false);
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(RegisterFormSchema),
     defaultValues: {
+      centerCode: "",
       fullName: "",
       phonePrimary: "",
       email: "",
@@ -35,10 +46,21 @@ export function RegisterPage() {
     },
   });
 
-  const onSubmit = form.handleSubmit((values) => {
-    register.mutate(values, {
-      onError: (error: ApiError) => applyFieldErrors(error, (name, e) => form.setError(name as never, e)),
-    });
+  const onSubmit = form.handleSubmit(async ({ centerCode, ...rest }) => {
+    setResolving(true);
+    let environmentId: string;
+    try {
+      environmentId = (await centerByCode(centerCode.trim())).environmentId;
+    } catch {
+      form.setError("centerCode", { message: t("auth.center.codeUnknown") });
+      return;
+    } finally {
+      setResolving(false);
+    }
+    register.mutate(
+      { ...rest, environmentId },
+      { onError: (error: ApiError) => applyFieldErrors(error, (name, e) => form.setError(name as never, e)) },
+    );
   });
 
   if (register.isSuccess) {
@@ -69,6 +91,13 @@ export function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4" noValidate>
+            <Field
+              label={t("auth.register.centerCode")}
+              error={errors.centerCode?.message}
+              hint={t("auth.register.centerCodeHint")}
+            >
+              <Input dir="ltr" autoCapitalize="characters" {...form.register("centerCode")} />
+            </Field>
             <Field label={t("auth.register.fullName")} error={errors.fullName?.message}>
               <Input autoComplete="name" {...form.register("fullName")} />
             </Field>
@@ -96,7 +125,7 @@ export function RegisterPage() {
             <Field label={t("auth.register.licenseNumber")} error={errors.licenseNumber?.message}>
               <Input dir="ltr" {...form.register("licenseNumber")} />
             </Field>
-            <Button type="submit" variant="teal" className="w-full" disabled={register.isPending}>
+            <Button type="submit" variant="teal" className="w-full" disabled={resolving || register.isPending}>
               {t("auth.register.submit")}
             </Button>
           </form>
