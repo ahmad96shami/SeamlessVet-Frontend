@@ -1,0 +1,25 @@
+# Keep the Docker build context small and reproducible. The Dockerfile copies only the manifests +
+# packages/shared + apps/web, but excluding these speeds up context transfer and prevents host
+# node_modules / prebuilt dist from leaking into the image (everything is rebuilt in-container).
+**/node_modules
+**/dist
+**/build
+**/.git
+**/.turbo
+**/*.tsbuildinfo
+**/*.log
+
+# Mobile-only artifacts (the web build never needs them).
+.expo
+**/.expo
+**/.expo-shared
+apps/mobile/android
+apps/mobile/ios
+
+# Local env / editor cruft
+**/.env
+**/.env.*
+!**/.env.example
+.vscode
+.idea
+.DS_Store
