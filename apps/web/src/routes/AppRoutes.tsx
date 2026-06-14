@@ -25,6 +25,11 @@ import { EmployeeDetailPage } from "@/routes/employees/EmployeeDetailPage";
 import { EmployeesPage } from "@/routes/employees/EmployeesPage";
 import { PartnersPage } from "@/routes/finance/PartnersPage";
 import { ProtectedRoute, RequireRole } from "@/routes/guards";
+import { PlatformProtectedRoute, PlatformPublicOnly } from "@/routes/platform/guards";
+import { PlatformLayout } from "@/routes/platform/PlatformLayout";
+import { PlatformLoginPage } from "@/routes/platform/PlatformLoginPage";
+import { PlatformTenantDetailPage } from "@/routes/platform/PlatformTenantDetailPage";
+import { PlatformTenantsPage } from "@/routes/platform/PlatformTenantsPage";
 import { PurchasesPage } from "@/routes/purchases/PurchasesPage";
 import { SupplierDetailPage } from "@/routes/suppliers/SupplierDetailPage";
 import { SuppliersPage } from "@/routes/suppliers/SuppliersPage";
@@ -85,6 +90,30 @@ export function AppRoutes() {
           </PublicOnly>
         }
       />
+
+      {/* Platform super-admin console (W25) — a separate identity/realm from the tenant app below;
+          its own auth store + Axios client (the two never cross tokens). Ranked above the tenant
+          catch-all, so `/platform/*` resolves here rather than redirecting to the tenant home. */}
+      <Route
+        path="/platform/login"
+        element={
+          <PlatformPublicOnly>
+            <PlatformLoginPage />
+          </PlatformPublicOnly>
+        }
+      />
+      <Route
+        path="/platform"
+        element={
+          <PlatformProtectedRoute>
+            <PlatformLayout />
+          </PlatformProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="/platform/tenants" replace />} />
+        <Route path="tenants" element={<PlatformTenantsPage />} />
+        <Route path="tenants/:id" element={<PlatformTenantDetailPage />} />
+      </Route>
 
       <Route
         path="/"
