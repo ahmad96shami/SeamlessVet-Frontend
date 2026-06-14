@@ -2659,6 +2659,79 @@
     "visit_number_prefix_mismatch": "The visit number prefix does not match the user's prefix.",
     "visit_number_taken": "The visit number is already in use.",
     "visit_server_authoritative": "The visit is closed on the server and cannot be changed — re-pull the authoritative copy.",
-    "warehouse_id_required": "Multiple warehouses exist — specify the warehouse."
+    "warehouse_id_required": "Multiple warehouses exist — specify the warehouse.",
+    "environment_code_taken": "This center code is already taken."
+  },
+  "platform": {
+    "appName": "SeamlessVet Platform",
+    "login": {
+      "title": "Platform admin sign-in",
+      "subtitle": "Manage centers",
+      "phone": "Phone number",
+      "password": "Password",
+      "submit": "Sign in"
+    },
+    "shell": {
+      "title": "Platform console",
+      "signOut": "Sign out",
+      "language": "Language"
+    },
+    "tenants": {
+      "title": "Centers",
+      "description": "Provision and manage the centers on the platform.",
+      "new": "New center",
+      "searchPlaceholder": "Search by name or code...",
+      "filterStatus": "Status",
+      "empty": "No centers yet",
+      "notFound": "Center not found",
+      "backToList": "Back to centers",
+      "colName": "Center",
+      "colCode": "Code",
+      "colMode": "Mode",
+      "colStatus": "Status",
+      "colUsers": "Users",
+      "colCreated": "Created"
+    },
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "mode": {
+      "solo": "Solo",
+      "partnership": "Partnership"
+    },
+    "detail": {
+      "overview": "Overview",
+      "code": "Code",
+      "mode": "Mode",
+      "users": "Users",
+      "created": "Created",
+      "suspend": "Suspend center",
+      "reactivate": "Reactivate",
+      "suspendConfirmTitle": "Suspend center",
+      "suspendConfirmBody": "All users of “{{name}}” will be locked out immediately. You can reactivate later.",
+      "reactivateConfirmTitle": "Reactivate center",
+      "reactivateConfirmBody": "Users of “{{name}}” will be able to sign in again.",
+      "suspended": "Center suspended",
+      "reactivated": "Center reactivated"
+    },
+    "provision": {
+      "title": "Provision a center",
+      "description": "Create a new center and its first administrator.",
+      "centerSection": "Center details",
+      "centerName": "Center name",
+      "code": "Center code",
+      "codeHint": "Unique routing code (letters, digits, dashes).",
+      "codeFormat": "Code must be letters, digits and dashes only (no spaces).",
+      "phoneFormat": "Invalid phone number.",
+      "mode": "Center mode",
+      "adminSection": "First administrator",
+      "adminFullName": "Admin full name",
+      "adminPhone": "Admin phone",
+      "adminPassword": "Password",
+      "adminEmail": "Email (optional)",
+      "submit": "Create center",
+      "created": "Center “{{name}}” created"
+    }
   }
 }

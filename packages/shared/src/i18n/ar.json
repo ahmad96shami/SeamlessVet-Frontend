@@ -2686,6 +2686,79 @@
     "visit_number_prefix_mismatch": "بادئة رقم الزيارة لا تطابق بادئة المستخدم.",
     "visit_number_taken": "رقم الزيارة مستخدم مسبقًا.",
     "visit_server_authoritative": "الزيارة مغلقة على الخادم ولا يمكن تغييرها — حدّث النسخة المحلية.",
-    "warehouse_id_required": "توجد عدة مستودعات — حدّد المستودع."
+    "warehouse_id_required": "توجد عدة مستودعات — حدّد المستودع.",
+    "environment_code_taken": "رمز المركز مستخدم بالفعل."
+  },
+  "platform": {
+    "appName": "منصّة SeamlessVet",
+    "login": {
+      "title": "دخول مسؤول المنصّة",
+      "subtitle": "إدارة المراكز",
+      "phone": "رقم الهاتف",
+      "password": "كلمة المرور",
+      "submit": "دخول"
+    },
+    "shell": {
+      "title": "وحدة تحكّم المنصّة",
+      "signOut": "تسجيل الخروج",
+      "language": "اللغة"
+    },
+    "tenants": {
+      "title": "المراكز",
+      "description": "إنشاء وإدارة المراكز المشتركة في المنصّة.",
+      "new": "مركز جديد",
+      "searchPlaceholder": "ابحث بالاسم أو الرمز...",
+      "filterStatus": "الحالة",
+      "empty": "لا توجد مراكز بعد",
+      "notFound": "المركز غير موجود",
+      "backToList": "العودة إلى المراكز",
+      "colName": "المركز",
+      "colCode": "الرمز",
+      "colMode": "النوع",
+      "colStatus": "الحالة",
+      "colUsers": "المستخدمون",
+      "colCreated": "تاريخ الإنشاء"
+    },
+    "status": {
+      "active": "فعّال",
+      "suspended": "معلّق"
+    },
+    "mode": {
+      "solo": "فردي",
+      "partnership": "شراكة"
+    },
+    "detail": {
+      "overview": "نظرة عامة",
+      "code": "الرمز",
+      "mode": "النوع",
+      "users": "عدد المستخدمين",
+      "created": "تاريخ الإنشاء",
+      "suspend": "تعليق المركز",
+      "reactivate": "إعادة التفعيل",
+      "suspendConfirmTitle": "تعليق المركز",
+      "suspendConfirmBody": "سيُمنع جميع مستخدمي «{{name}}» من الدخول فورًا. يمكنك إعادة التفعيل لاحقًا.",
+      "reactivateConfirmTitle": "إعادة تفعيل المركز",
+      "reactivateConfirmBody": "سيتمكّن مستخدمو «{{name}}» من الدخول مجددًا.",
+      "suspended": "تم تعليق المركز",
+      "reactivated": "تمت إعادة تفعيل المركز"
+    },
+    "provision": {
+      "title": "مركز جديد",
+      "description": "إنشاء مركز جديد مع أول مسؤول له.",
+      "centerSection": "بيانات المركز",
+      "centerName": "اسم المركز",
+      "code": "رمز المركز",
+      "codeHint": "رمز فريد لتوجيه التسجيل (أحرف وأرقام وشَرطات).",
+      "codeFormat": "يجب أن يكون الرمز أحرفًا وأرقامًا وشَرطات فقط (بدون مسافات).",
+      "phoneFormat": "رقم هاتف غير صالح.",
+      "mode": "نوع المركز",
+      "adminSection": "أول مسؤول",
+      "adminFullName": "اسم المسؤول",
+      "adminPhone": "هاتف المسؤول",
+      "adminPassword": "كلمة المرور",
+      "adminEmail": "البريد الإلكتروني (اختياري)",
+      "submit": "إنشاء المركز",
+      "created": "تم إنشاء المركز «{{name}}»"
+    }
   }
 }

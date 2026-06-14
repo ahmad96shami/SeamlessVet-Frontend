@@ -36,3 +36,4 @@ export * from "./partnership";
 export * from "./reports";
 export * from "./notifications";
 export * from "./devices";
+export * from "./platform";
