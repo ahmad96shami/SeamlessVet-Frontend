@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { LoginResponse } from "@vet/shared";
 
 import { logout as logoutApi } from "@/api/auth";
-import { decodeJwt } from "@/lib/jwt";
+import { decodeJwt, permsFromClaims } from "@/lib/jwt";
 import { centerNameFor } from "@/services/centerMemory";
 import { enterEnvironment, exitEnvironment } from "@/services/tenant";
 import { tokenStorage } from "@/services/tokenStorage";
@@ -16,6 +16,13 @@ export interface AuthUser {
   userId: string;
   role: string;
   environmentId: string;
+  /**
+   * Effective permission keys decoded from the token's `perms` claim — role defaults ± per-user
+   * overrides, resolved server-side at login/refresh. Drives permission-based UI gating (e.g. a
+   * receptionist granted `invoices.write` sees POS). Empty for tokens minted before this claim
+   * existed; such a user just falls back to pure role-based visibility until they re-login.
+   */
+  permissions: string[];
 }
 
 interface AuthState {
@@ -65,6 +72,7 @@ function userFromAccessToken(accessToken: string, fallbackRole?: string): AuthUs
     userId: claims.sub,
     role: claims.role ?? fallbackRole ?? "",
     environmentId: claims.environment_id ?? "",
+    permissions: permsFromClaims(claims),
   };
 }
 
@@ -149,3 +157,12 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     return reason;
   },
 }));
+
+/**
+ * True when the current user's effective permissions include {@link key} (e.g.
+ * `PermissionKey.InvoicesWrite`). The server is authoritative — this only gates UX so the user
+ * isn't shown actions they'd get a 403 for.
+ */
+export function useHasPermission(key: string): boolean {
+  return useAuthStore((s) => s.user?.permissions.includes(key) ?? false);
+}

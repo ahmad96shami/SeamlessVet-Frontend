@@ -24,11 +24,23 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 }
 
 /**
- * Role-based route gate. (The JWT carries `role` but not `perms`, so client-side gating is
- * role-based UX; the server enforces fine-grained permissions and returns 403.)
+ * Route gate: admit the user if their `role` is allowed OR (when `permission` is given) their
+ * effective permissions include it — mirroring the nav's OR-gating so a per-user grant (e.g. a
+ * receptionist granted `invoices.write`) can reach the screen, not just see the link. Client-side
+ * gating is UX only; the server enforces fine-grained permissions and returns 403.
  */
-export function RequireRole({ roles, children }: { roles: string[]; children: ReactNode }) {
+export function RequireRole({
+  roles,
+  permission,
+  children,
+}: {
+  roles: string[];
+  permission?: string;
+  children: ReactNode;
+}) {
   const user = useAuthStore((s) => s.user);
-  if (!user || !roles.includes(user.role)) return <Navigate to="/" replace />;
+  const allowed =
+    !!user && (roles.includes(user.role) || (permission ? user.permissions.includes(permission) : false));
+  if (!allowed) return <Navigate to="/" replace />;
   return <>{children}</>;
 }

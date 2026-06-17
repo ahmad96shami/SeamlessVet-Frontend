@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { PermissionKey } from "@vet/shared";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { ProductsPage } from "@/routes/admin/ProductsPage";
@@ -195,7 +196,7 @@ export function AppRoutes() {
         <Route
           path="pos"
           element={
-            <RequireRole roles={["admin", "cashier"]}>
+            <RequireRole roles={["admin", "cashier"]} permission={PermissionKey.InvoicesWrite}>
               <PosLayout />
             </RequireRole>
           }

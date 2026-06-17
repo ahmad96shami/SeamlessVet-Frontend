@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { PermissionKey } from "@vet/shared";
 
 import { Icon } from "@/components/ui/icon";
 
@@ -10,6 +11,12 @@ export interface NavItem {
   section: string;
   /** Roles that may see this item; undefined = all authenticated roles. */
   roles?: string[];
+  /**
+   * If set, the item is ALSO shown to any user whose effective permissions include this key —
+   * OR-ed with `roles`. This lets a per-user override surface a screen the user's role wouldn't
+   * normally show (e.g. a receptionist granted `invoices.write` gets POS).
+   */
+  permission?: string;
 }
 
 /** Sidebar section order (the design groups nav items under labelled sections). */
@@ -57,6 +64,9 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Icon.receipt,
     section: "navSection.sales",
     roles: ["admin", "cashier"],
+    // Anyone allowed to issue invoices gets the register — including a receptionist (or other
+    // role) granted invoices.write via a per-user override, not just the default admin/cashier.
+    permission: PermissionKey.InvoicesWrite,
   },
   {
     to: "/inventory",
@@ -153,6 +163,15 @@ export const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-export function navForRole(role: string): NavItem[] {
-  return NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(role));
+/**
+ * Filter the nav for a user: an item shows when the user's `role` is allowed (or the item is
+ * unrestricted) OR the user holds the item's `permission`. Passing the effective permission set
+ * lets per-user grants reveal screens the role alone wouldn't.
+ */
+export function navForUser(role: string, permissions: readonly string[] = []): NavItem[] {
+  return NAV_ITEMS.filter((item) => {
+    const roleOk = !item.roles || item.roles.includes(role);
+    const permOk = item.permission ? permissions.includes(item.permission) : false;
+    return roleOk || permOk;
+  });
 }
