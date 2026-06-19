@@ -4,6 +4,8 @@ export * from "./auth";
 export * from "./common";
 export * from "./registrationRequests";
 export * from "./users";
+export * from "./roles";
+export * from "./operatingExpenses";
 export * from "./doctors";
 export * from "./products";
 export * from "./services";

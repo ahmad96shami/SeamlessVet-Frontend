@@ -6,6 +6,9 @@ import { z } from "zod";
  */
 export const SystemSettingsResponseSchema = z.object({
   id: z.string(),
+  // The center's display name (lives on the `environments` row, surfaced here so the manager can
+  // rename their center from Settings). Nullish so a pre-rename API response still parses.
+  centerName: z.string().nullish(),
   defaultExamFee: z.number(),
   // M17 — in-clinic checkup fee default (رسوم الكشف, PRD §18.7).
   defaultCheckupFee: z.number(),
@@ -34,6 +37,8 @@ export type SystemSettingsResponse = z.infer<typeof SystemSettingsResponseSchema
  * fields accept `null` to clear them (the form sends `null` for an emptied input).
  */
 export const SystemSettingsPatchRequestSchema = z.object({
+  // Renames the center when supplied; omit to leave it unchanged. The server trims + rejects blanks.
+  centerName: z.string().max(200).optional(),
   defaultExamFee: z.number().min(0).optional(),
   defaultCheckupFee: z.number().min(0).optional(),
   entitlementEnabledGlobal: z.boolean().optional(),

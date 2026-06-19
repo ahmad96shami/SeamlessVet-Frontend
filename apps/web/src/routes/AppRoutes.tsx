@@ -8,6 +8,8 @@ import { RegistrationRequestsPage } from "@/routes/admin/RegistrationRequestsPag
 import { ServicesPage } from "@/routes/admin/ServicesPage";
 import { SettingsPage } from "@/routes/admin/SettingsPage";
 import { UsersPage } from "@/routes/admin/UsersPage";
+import { RolesPage } from "@/routes/admin/RolesPage";
+import { OperatingExpensesPage } from "@/routes/finance/OperatingExpensesPage";
 import { AppointmentsPage } from "@/routes/appointments/AppointmentsPage";
 import { LoginPage } from "@/routes/auth/LoginPage";
 import { RegisterPage } from "@/routes/auth/RegisterPage";
@@ -320,6 +322,16 @@ export function AppRoutes() {
             </RequireRole>
           }
         />
+        {/* Operating expenses (المصاريف التشغيلية) — water/electricity/rent/…; general costs that
+            reduce net profit. Standalone finance page (admin/accountant). */}
+        <Route
+          path="finance/operating-expenses"
+          element={
+            <RequireRole roles={["admin", "accountant"]} permission={PermissionKey.OperatingExpensesManage}>
+              <OperatingExpensesPage />
+            </RequireRole>
+          }
+        />
         <Route
           path="admin/registration-requests"
           element={
@@ -333,6 +345,14 @@ export function AppRoutes() {
           element={
             <RequireRole roles={["admin"]}>
               <UsersPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="admin/roles"
+          element={
+            <RequireRole roles={["admin"]} permission={PermissionKey.RolesManage}>
+              <RolesPage />
             </RequireRole>
           }
         />

@@ -388,7 +388,8 @@
      teal-accent on selected) so all form pickers feel like one family. */
   .datepicker-popup { background: var(--paper); border: 1px solid var(--ink-100); border-radius: var(--radius-chip); box-shadow: var(--shadow-popover); padding: 10px; z-index: 60; user-select: none; }
   .datepicker-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-  .datepicker-title { font-weight: 700; font-size: 13px; color: var(--fg-strong); }
+  .datepicker-title { font-weight: 700; font-size: 13px; color: var(--fg-strong); border: 0; background: transparent; cursor: pointer; border-radius: 8px; padding: 4px 10px; font-family: inherit; font-variant-numeric: tabular-nums; }
+  .datepicker-title:hover { background: var(--ink-50); }
   .datepicker-nav { width: 28px; height: 28px; border-radius: 8px; background: transparent; border: 0; color: var(--ink-600); display: grid; place-items: center; cursor: pointer; }
   .datepicker-nav:hover { background: var(--ink-50); color: var(--fg-strong); }
   .datepicker-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
@@ -400,6 +401,12 @@
   .datepicker-day[data-selected] { background: var(--teal-500); color: white; }
   .datepicker-day[data-selected][data-today] { box-shadow: inset 0 0 0 2px var(--teal-700); }
   .datepicker-day:disabled { color: var(--fg-disabled); cursor: not-allowed; }
+  .datepicker-year-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px 0; }
+  .datepicker-year { height: 40px; border-radius: 8px; border: 0; background: transparent; color: var(--fg-1); font-size: 13px; font-weight: 600; cursor: pointer; display: grid; place-items: center; font-family: inherit; font-variant-numeric: tabular-nums; }
+  .datepicker-year:hover:not(:disabled) { background: var(--ink-50); }
+  .datepicker-year[data-today] { box-shadow: inset 0 0 0 1px var(--teal-200); }
+  .datepicker-year[data-selected] { background: var(--teal-500); color: white; }
+  .datepicker-year:disabled { color: var(--fg-disabled); cursor: not-allowed; }
   .datepicker-foot { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--ink-100); }
   .datepicker-action { flex: 1; padding: 6px 10px; border-radius: 8px; border: 0; background: var(--ink-50); color: var(--ink-700); font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
   .datepicker-action:hover { background: var(--ink-100); color: var(--fg-strong); }

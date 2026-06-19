@@ -72,6 +72,17 @@ export const ClinicProfitsReportSchema = z.object({
   distributedToPartners: z.number(),
   retainedByClinic: z.number(),
   partnerAllocations: z.array(ProfitAllocationSchema),
+  // Operating expenses recognized in the window. `netOperatingProfit` (= netProfit − operatingExpenses)
+  // is the headline "صافي ربح المركز" the UI shows. The payables* figures are a current snapshot of what
+  // the center owes others; `netAfterObligations` = netOperatingProfit − payablesOutstanding.
+  operatingExpenses: z.number().default(0),
+  netOperatingProfit: z.number().default(0),
+  payablesSuppliers: z.number().default(0),
+  payablesDoctorPartners: z.number().default(0),
+  payablesEmployees: z.number().default(0),
+  payablesUnpaidExpenses: z.number().default(0),
+  payablesOutstanding: z.number().default(0),
+  netAfterObligations: z.number().default(0),
 });
 export type ClinicProfitsReport = z.infer<typeof ClinicProfitsReportSchema>;
 

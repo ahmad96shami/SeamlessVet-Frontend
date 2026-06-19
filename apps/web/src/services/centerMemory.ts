@@ -47,6 +47,17 @@ export function getLastCenter(): CenterOption | null {
   return read<CenterOption>(CENTER_KEY);
 }
 
+/**
+ * Update the remembered display name for an env id — used when the manager renames the center from
+ * Settings so the shell/document label survives a reload without forcing a re-login.
+ */
+export function setRememberedCenterName(environmentId: string, name: string): void {
+  if (!environmentId) return;
+  const names = read<Record<string, string>>(NAMES_KEY) ?? {};
+  names[environmentId] = name;
+  write(NAMES_KEY, names);
+}
+
 /** The remembered display name for an env id (the shell header label after a reload), or null. */
 export function centerNameFor(environmentId: string): string | null {
   if (!environmentId) return null;

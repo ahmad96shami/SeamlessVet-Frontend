@@ -32,7 +32,9 @@
     "employees": "Employees",
     "purchases": "Purchases",
     "reports": "Reports",
-    "myIncome": "My income"
+    "myIncome": "My income",
+    "roles": "Roles",
+    "operatingExpenses": "Operating expenses"
   },
   "navSection": {
     "dashboard": "Dashboard",
@@ -277,6 +279,38 @@
       "write": {
         "name": "Manage suppliers",
         "desc": "Manage suppliers, record purchase invoices, and pay suppliers."
+      }
+    },
+    "doctor_partners": {
+      "manage": {
+        "name": "Manage doctor-partners",
+        "desc": "Manage doctor-partners (entitlement payees) and view their balances."
+      },
+      "pay": {
+        "name": "Pay doctor-partners",
+        "desc": "Pay doctor-partners against their entitlement balances."
+      }
+    },
+    "employees": {
+      "manage": {
+        "name": "Manage employees",
+        "desc": "Manage employees (salaries, loans) and view their HR ledger balances."
+      },
+      "pay": {
+        "name": "Pay employees",
+        "desc": "Pay employees (salaries, loans, repayments)."
+      }
+    },
+    "roles": {
+      "manage": {
+        "name": "Manage roles",
+        "desc": "Create custom roles and edit the permissions of any role."
+      }
+    },
+    "operating_expenses": {
+      "manage": {
+        "name": "Manage operating expenses",
+        "desc": "Record and manage operating expenses (water, electricity, rent…)."
       }
     }
   },
@@ -1586,6 +1620,7 @@
       "clear": "Remove",
       "visit": "Linked visit",
       "linkVisit": "Link a visit",
+      "openVisit": "Open visit",
       "noVisit": "No visit",
       "visitCharges": "Visit charges",
       "visitChargesHint": "Visit charges are added to the invoice automatically at issuance, on top of the total shown — don't add them manually",
@@ -1782,11 +1817,14 @@
       "roleDefault": "Default (by role)",
       "roleGrants": "Granted by role",
       "roleDenies": "Not in role",
-      "overrideSaved": "Permission updated"
+      "overrideSaved": "Permission updated",
+      "editTitle": "Edit user"
     },
     "settings": {
       "title": "Settings",
       "description": "System settings for this environment.",
+      "centerName": "Center name",
+      "centerNameHint": "Shown in the header of invoices, receipts, and other printed documents.",
       "defaultExamFee": "Default field exam fee",
       "defaultCheckupFee": "Default in-clinic checkup fee",
       "entitlementEnabledGlobal": "Enable doctor entitlements (global)",
@@ -1847,6 +1885,24 @@
       "colCategory": "Category",
       "colPrice": "Price",
       "deleteConfirm": "Service \"{{name}}\" will be deleted."
+    },
+    "roles": {
+      "title": "Roles",
+      "description": "Manage roles and their permissions — create custom roles and edit the built-in roles' permissions.",
+      "new": "New role",
+      "newTitle": "New role",
+      "editTitle": "Edit role",
+      "name": "Role name",
+      "permissions": "Permissions",
+      "permissionHint": "Select the permissions this role grants.",
+      "colName": "Role",
+      "colPermissions": "Permissions",
+      "colUsers": "Users",
+      "builtIn": "Built-in",
+      "custom": "Custom",
+      "allPermissions": "All permissions",
+      "permCount": "{{count}} permission(s)",
+      "deleteConfirm": "Role \"{{name}}\" will be deleted."
     }
   },
   "auth": {
@@ -1978,7 +2034,8 @@
       "negative_stock": "Negative-stock attempt",
       "account_ready_for_settlement": "Account ready for settlement",
       "entitlement_approved": "Entitlement approved",
-      "report_delivery": "Report ready"
+      "report_delivery": "Report ready",
+      "visit_assigned": "Visit assigned"
     }
   },
   "contractStatus": {
@@ -2081,8 +2138,9 @@
       "contract": "Linked contract",
       "noContract": "No contract",
       "farm": "Farm",
-      "noFarm": "Whole customer",
+      "noFarm": "No farm",
       "farmHint": "Pick the customer first to list its farms",
+      "addFarm": "Add farm",
       "animalCount": "Animal count",
       "startDate": "Start date",
       "endDate": "End date",
@@ -2336,7 +2394,14 @@
       "colPartner": "Partner",
       "colSharePct": "Share",
       "colAmount": "Amount",
-      "noPartners": "No partner distribution (solo environment)"
+      "noPartners": "No partner distribution (solo environment)",
+      "operatingExpenses": "Operating expenses",
+      "operatingExpensesHint": "Water/electricity/rent… within the period",
+      "netProfitHint": "Revenue − COGS − operating expenses",
+      "owed": "Owed to others",
+      "owedHint": "Total the center owes suppliers, doctor-partners, employees and unpaid expenses (as of now)",
+      "netAfterObligations": "Net after obligations",
+      "netAfterObligationsHint": "Net profit − owed to others"
     },
     "profitPerBatch": {
       "title": "Batch profit",
@@ -2733,5 +2798,35 @@
       "submit": "Create center",
       "created": "Center “{{name}}” created"
     }
+  },
+  "operatingExpenses": {
+    "title": "Operating expenses",
+    "description": "Operating costs (water, electricity, rent…) — subtracted from the center's net profit.",
+    "new": "New expense",
+    "newTitle": "New expense",
+    "editTitle": "Edit expense",
+    "category": "Category",
+    "amount": "Amount",
+    "incurredOn": "Date",
+    "paid": "Status",
+    "paidLabel": "Paid",
+    "note": "Note",
+    "colDate": "Date",
+    "colCategory": "Category",
+    "colAmount": "Amount",
+    "colStatus": "Status",
+    "colNote": "Note",
+    "statusPaid": "Paid",
+    "statusUnpaid": "Unpaid",
+    "empty": "No expenses.",
+    "deleteConfirm": "This expense will be deleted."
+  },
+  "operatingExpenseCategory": {
+    "water": "Water",
+    "electricity": "Electricity",
+    "rent": "Rent",
+    "internet": "Internet",
+    "maintenance": "Maintenance",
+    "other": "Other"
   }
 }

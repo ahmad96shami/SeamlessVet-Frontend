@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   applyFieldErrors,
-  CreateUserRequestSchema,
+  UpdateUserRequestSchema,
   type ApiError,
-  type CreateUserRequest,
+  type UpdateUserRequest,
+  type UserResponse,
 } from "@vet/shared";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -16,55 +17,61 @@ import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { omitEmptyStrings } from "@/lib/forms";
 import { RoleSelect } from "@/routes/admin/RoleSelect";
-import { useCreateUser } from "@/queries/users";
-
-const DEFAULTS: CreateUserRequest = {
-  fullName: "",
-  phonePrimary: "",
-  email: "",
-  password: "",
-  roleKey: "",
-  licenseNumber: "",
-};
+import { useUpdateUser } from "@/queries/users";
 
 /**
- * Admin-created staff account (cashier, in-clinic doctor, …) — POST /admin/users.
- * The account is active immediately: no registration-queue round-trip. Create-only;
- * status/permissions edits stay on the roster row actions.
+ * Edit an existing user's profile and role — PATCH /admin/users/{id}. Password is out of scope (a
+ * separate reset flow). Changing the role re-resolves the user's permissions on their next request.
  */
-export function UserFormDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function UserEditDialog({
+  user,
+  onClose,
+}: {
+  user: UserResponse | null;
+  onClose: () => void;
+}) {
   const { t } = useTranslation();
-  const create = useCreateUser();
-  const form = useForm<CreateUserRequest>({
-    resolver: zodResolver(CreateUserRequestSchema),
-    defaultValues: DEFAULTS,
+  const update = useUpdateUser();
+  const form = useForm<UpdateUserRequest>({
+    resolver: zodResolver(UpdateUserRequestSchema),
+    defaultValues: { fullName: "", phonePrimary: "", email: "", roleKey: "", licenseNumber: "" },
   });
   const { register, control, handleSubmit, reset, setError, watch, formState } = form;
   const errors = formState.errors;
 
   useEffect(() => {
-    if (open) reset(DEFAULTS);
-  }, [open, reset]);
+    if (!user) return;
+    reset({
+      fullName: user.fullName,
+      phonePrimary: user.phonePrimary,
+      email: user.email ?? "",
+      roleKey: user.roleKey,
+      licenseNumber: user.licenseNumber ?? "",
+    });
+  }, [user, reset]);
 
-  // The license field only applies to vet roles (mirrors the self-registration form).
   const roleKey = watch("roleKey");
   const isVetRole = roleKey.startsWith("vet_");
 
   const onSubmit = handleSubmit((values) => {
-    create.mutate(omitEmptyStrings(values) as CreateUserRequest, {
-      onSuccess: () => {
-        toast.success(t("admin.users.created"));
-        onClose();
+    if (!user) return;
+    update.mutate(
+      { id: user.id, body: omitEmptyStrings(values) as UpdateUserRequest },
+      {
+        onSuccess: () => {
+          toast.success(t("admin.common.updated"));
+          onClose();
+        },
+        onError: (e: ApiError) => {
+          applyFieldErrors(e, (name, err) => setError(name as never, err));
+          if (!e.fieldErrors) toast.error(e.message);
+        },
       },
-      onError: (e: ApiError) => {
-        applyFieldErrors(e, (name, err) => setError(name as never, err));
-        if (!e.fieldErrors) toast.error(e.message);
-      },
-    });
+    );
   });
 
   return (
-    <Dialog open={open} onClose={onClose} title={t("admin.users.newTitle")}>
+    <Dialog open={user !== null} onClose={onClose} title={t("admin.users.editTitle")}>
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("admin.users.formFullName")} error={errors.fullName?.message}>
@@ -75,9 +82,6 @@ export function UserFormDialog({ open, onClose }: { open: boolean; onClose: () =
           </Field>
           <Field label={t("admin.users.formEmail")} error={errors.email?.message}>
             <Input dir="ltr" type="email" {...register("email")} />
-          </Field>
-          <Field label={t("admin.users.formPassword")} error={errors.password?.message}>
-            <Input dir="ltr" type="password" autoComplete="new-password" {...register("password")} />
           </Field>
           <Field label={t("admin.users.formRole")} error={errors.roleKey?.message}>
             <Controller
@@ -95,11 +99,11 @@ export function UserFormDialog({ open, onClose }: { open: boolean; onClose: () =
           ) : null}
         </div>
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onClose} disabled={create.isPending}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={update.isPending}>
             {t("admin.common.cancel")}
           </Button>
-          <Button type="submit" disabled={create.isPending}>
-            {create.isPending ? t("admin.common.saving") : t("admin.common.save")}
+          <Button type="submit" disabled={update.isPending}>
+            {update.isPending ? t("admin.common.saving") : t("admin.common.save")}
           </Button>
         </div>
       </form>

@@ -9,6 +9,7 @@ import {
 import { forwardRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useCenterName } from "@/hooks/useCenterName";
 import { visitRef } from "@/routes/visits/VisitsPage";
 
 export interface VisitReportDocumentProps {
@@ -34,6 +35,7 @@ export const VisitReportDocument = forwardRef<HTMLDivElement, VisitReportDocumen
   ) {
     const { t, i18n } = useTranslation();
     const lang = i18n.language;
+    const centerName = useCenterName();
 
     const kv: { k: string; v: string }[] = [
       petLabel ? { k: t("visits.col.pet"), v: petLabel } : null,
@@ -56,8 +58,7 @@ export const VisitReportDocument = forwardRef<HTMLDivElement, VisitReportDocumen
       <div ref={ref} dir="rtl" className="bg-white p-8 text-navy-900" style={{ width: "210mm", fontFamily: "Tajawal, sans-serif" }}>
         <div className="mb-6 flex items-start justify-between border-b pb-4">
           <div>
-            <h1 className="text-xl font-extrabold">{t("appName")}</h1>
-            <p className="text-sm text-muted-foreground">{t("shell.center")}</p>
+            <h1 className="text-xl font-extrabold" dir="auto">{centerName}</h1>
           </div>
           <div className="text-end">
             <h2 className="text-lg font-bold">{t("visits.report.title")}</h2>

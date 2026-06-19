@@ -125,11 +125,12 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["admin", "accountant"],
   },
   {
-    to: "/admin/registration-requests",
-    labelKey: "nav.registrations",
-    icon: Icon.inbox,
-    section: "navSection.system",
-    roles: ["admin"],
+    to: "/finance/operating-expenses",
+    labelKey: "nav.operatingExpenses",
+    icon: Icon.receipt,
+    section: "navSection.finance",
+    roles: ["admin", "accountant"],
+    permission: PermissionKey.OperatingExpensesManage,
   },
   {
     to: "/admin/users",
@@ -138,6 +139,8 @@ export const NAV_ITEMS: NavItem[] = [
     section: "navSection.system",
     roles: ["admin"],
   },
+  // Registration requests + roles are managed via tabs inside the Users page
+  // (/admin/registration-requests, /admin/roles), not standalone sidebar items.
   {
     to: "/admin/settings",
     labelKey: "nav.settings",

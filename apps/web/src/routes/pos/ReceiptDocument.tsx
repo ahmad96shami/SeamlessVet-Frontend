@@ -2,6 +2,8 @@ import { formatCurrency, formatDateTime, formatQuantity, type InvoiceResponse } 
 import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useCenterName } from "@/hooks/useCenterName";
+
 export interface ReceiptDocumentProps {
   invoice: InvoiceResponse;
   customerName: string | null;
@@ -21,6 +23,7 @@ export const ReceiptDocument = forwardRef<HTMLDivElement, ReceiptDocumentProps>(
   function ReceiptDocument({ invoice, customerName, taxDetails }, ref) {
     const { t, i18n } = useTranslation();
     const lang = i18n.language;
+    const centerName = useCenterName();
 
     const nonCreditPaid = invoice.payments.reduce(
       (sum, p) => (p.method === "credit" ? sum : sum + p.amount),
@@ -39,8 +42,7 @@ export const ReceiptDocument = forwardRef<HTMLDivElement, ReceiptDocumentProps>(
         style={{ width: "80mm", padding: "4mm", fontFamily: "Tajawal, sans-serif", fontSize: 12, lineHeight: 1.5 }}
       >
         <div className="text-center">
-          <div className="text-base font-extrabold">{t("appName")}</div>
-          <div className="text-[10px]">{t("shell.center")}</div>
+          <div className="text-base font-extrabold" dir="auto">{centerName}</div>
           {taxDetails ? <div className="whitespace-pre-wrap text-[10px]">{taxDetails}</div> : null}
         </div>
 

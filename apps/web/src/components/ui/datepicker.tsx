@@ -73,6 +73,13 @@ function addMonths(d: Date, n: number): Date {
   return new Date(d.getFullYear(), d.getMonth() + n, 1);
 }
 
+function addYears(d: Date, n: number): Date {
+  return new Date(d.getFullYear() + n, d.getMonth(), 1);
+}
+
+/** How many years the year-picker grid shows at once (3 columns × 4 rows). */
+const YEAR_PAGE = 12;
+
 function isSameDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
@@ -107,6 +114,8 @@ export function DatePicker({
   const maxDate = parseValue(max, withTime);
 
   const [open, setOpen] = React.useState(false);
+  // The calendar body toggles between the day grid and a year-picker grid (tap the title).
+  const [mode, setMode] = React.useState<"days" | "years">("days");
   const [viewMonth, setViewMonth] = React.useState<Date>(() => startOfMonth(selected ?? new Date()));
   const [focusedDay, setFocusedDay] = React.useState<Date>(() => selected ?? new Date());
   const [draftTime, setDraftTime] = React.useState<{ h: number; m: number }>(() => {
@@ -166,6 +175,7 @@ export function DatePicker({
   const openCalendar = () => {
     if (disabled) return;
     const initial = selected ?? new Date();
+    setMode("days");
     setViewMonth(startOfMonth(initial));
     setFocusedDay(initial);
     if (withTime) {
@@ -216,6 +226,9 @@ export function DatePicker({
       triggerRef.current?.focus();
       return;
     }
+    // The year grid is plain buttons — let native focus/click/Enter handle it; only Escape (above)
+    // is intercepted here.
+    if (mode === "years") return;
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       if (withTime) confirmWithTime();
@@ -247,8 +260,20 @@ export function DatePicker({
     return dayNameFormatter.format(d);
   });
 
-  const monthLabel = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(viewMonth);
+  // `-u-nu-latn` keeps Arabic month names but forces Latin digits for the year (app-wide rule).
+  const monthLabel = new Intl.DateTimeFormat(`${locale}-u-nu-latn`, {
+    month: "long",
+    year: "numeric",
+  }).format(viewMonth);
   const today = new Date();
+
+  // Year-picker grid: a YEAR_PAGE window aligned to a decade boundary so the header chevrons page
+  // cleanly by ±YEAR_PAGE. Year numbers render via `String` → always Latin digits.
+  const viewYear = viewMonth.getFullYear();
+  const yearBase = Math.floor(viewYear / YEAR_PAGE) * YEAR_PAGE;
+  const yearCells = Array.from({ length: YEAR_PAGE }, (_, i) => yearBase + i);
+  const yearRangeLabel = `${yearBase} – ${yearBase + YEAR_PAGE - 1}`;
+  const highlightYear = (withTime ? focusedDay : selected)?.getFullYear();
 
   const firstOfView = startOfMonth(viewMonth);
   const leading = (firstOfView.getDay() - weekStart + 7) % 7;
@@ -262,7 +287,7 @@ export function DatePicker({
 
   const display = selected
     ? withTime
-      ? formatDateTime(selected, locale, "yyyy/MM/dd h:mm a")
+      ? formatDateTime(selected, locale)
       : formatDate(selected, locale)
     : (placeholder ?? t(withTime ? "datepicker.placeholderDateTime" : "datepicker.placeholder"));
 
@@ -300,21 +325,60 @@ export function DatePicker({
                 <button
                   type="button"
                   className="datepicker-nav"
-                  aria-label="Previous month"
-                  onClick={() => setViewMonth((m) => addMonths(m, -1))}
+                  aria-label={mode === "years" ? "Previous years" : "Previous month"}
+                  onClick={() =>
+                    setViewMonth((m) => (mode === "years" ? addYears(m, -YEAR_PAGE) : addMonths(m, -1)))
+                  }
                 >
                   <Icon.chevronRight className="size-4" />
                 </button>
-                <span className="datepicker-title">{monthLabel}</span>
+                {/* Tap the title to switch to / from the year picker. */}
+                <button
+                  type="button"
+                  className="datepicker-title"
+                  aria-label="Select year"
+                  onClick={() => setMode((mo) => (mo === "years" ? "days" : "years"))}
+                >
+                  {mode === "years" ? yearRangeLabel : monthLabel}
+                </button>
                 <button
                   type="button"
                   className="datepicker-nav"
-                  aria-label="Next month"
-                  onClick={() => setViewMonth((m) => addMonths(m, 1))}
+                  aria-label={mode === "years" ? "Next years" : "Next month"}
+                  onClick={() =>
+                    setViewMonth((m) => (mode === "years" ? addYears(m, YEAR_PAGE) : addMonths(m, 1)))
+                  }
                 >
                   <Icon.chevronLeft className="size-4" />
                 </button>
               </div>
+              {mode === "years" ? (
+                <div className="datepicker-year-grid" role="grid">
+                  {yearCells.map((y) => {
+                    const yDis = Boolean(
+                      (minDate && y < minDate.getFullYear()) || (maxDate && y > maxDate.getFullYear()),
+                    );
+                    return (
+                      <button
+                        key={y}
+                        type="button"
+                        role="gridcell"
+                        disabled={yDis}
+                        aria-selected={highlightYear === y}
+                        data-today={y === today.getFullYear() || undefined}
+                        data-selected={highlightYear === y || undefined}
+                        className="datepicker-year"
+                        onClick={() => {
+                          setViewMonth((m) => new Date(y, m.getMonth(), 1));
+                          setMode("days");
+                        }}
+                      >
+                        {y}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
               <div className="datepicker-grid" role="grid">
                 {weekdays.map((w, i) => (
                   <div key={`w${i}`} className="datepicker-weekday">
@@ -323,7 +387,10 @@ export function DatePicker({
                 ))}
                 {cells.map((d) => {
                   const inMonth = d.getMonth() === viewMonth.getMonth();
-                  const isSelected = selected ? isSameDay(d, selected) : false;
+                  // In time mode the committed `value` only changes on "Done", so highlight the
+                  // draft day (`focusedDay` — what "Done" will commit) to give immediate feedback
+                  // when a day is clicked. In date-only mode highlight the committed value.
+                  const isSelected = withTime ? isSameDay(d, focusedDay) : selected ? isSameDay(d, selected) : false;
                   const isFocused = isSameDay(d, focusedDay);
                   const isToday = isSameDay(d, today);
                   const isDis = isDisabledDate(d);
@@ -348,6 +415,7 @@ export function DatePicker({
                   );
                 })}
               </div>
+              )}
               {withTime ? (
                 <div className="datepicker-time">
                   <span className="datepicker-time-label">{t("datepicker.time")}</span>
@@ -383,6 +451,7 @@ export function DatePicker({
                   type="button"
                   className="datepicker-action"
                   onClick={() => {
+                    setMode("days");
                     setViewMonth(startOfMonth(today));
                     setFocusedDay(today);
                     if (withTime) setDraftTime({ h: today.getHours(), m: Math.floor(today.getMinutes() / minuteStep) * minuteStep });

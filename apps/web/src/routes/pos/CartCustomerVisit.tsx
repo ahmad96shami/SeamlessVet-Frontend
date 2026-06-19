@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import type { VisitResponse } from "@vet/shared";
@@ -130,6 +131,7 @@ function LinkChip({
  *  old stacked label/value blocks, so the header costs the cart a single line. */
 export function CartCustomerVisit() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const customerId = usePosCartStore((s) => s.customerId);
   const visitId = usePosCartStore((s) => s.visitId);
   const hasLines = usePosCartStore((s) => s.lines.length > 0);
@@ -178,13 +180,25 @@ export function CartCustomerVisit() {
         )}
         {customerId ? (
           visitId ? (
-            <LinkChip
-              icon={<Icon.link className="size-3.5 flex-none text-muted-foreground" aria-hidden />}
-              label={visit.data ? visitRef(visit.data) : `#${visitId.slice(0, 8)}`}
-              ltr
-              onClear={clearVisit}
-              clearLabel={t("pos.link.clear")}
-            />
+            <>
+              <LinkChip
+                icon={<Icon.link className="size-3.5 flex-none text-muted-foreground" aria-hidden />}
+                label={visit.data ? visitRef(visit.data) : `#${visitId.slice(0, 8)}`}
+                ltr
+                onClear={clearVisit}
+                clearLabel={t("pos.link.clear")}
+              />
+              {/* Jump back to the visit this sale was rung up from (the cart state is kept). */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(`/operations/visits/${visitId}`)}
+              >
+                <Icon.stethoscope className="size-4" />
+                {t("pos.link.openVisit")}
+              </Button>
+            </>
           ) : (
             <Button type="button" variant="ghost" size="sm" onClick={() => setPickVisit(true)}>
               <Icon.link className="size-4" />

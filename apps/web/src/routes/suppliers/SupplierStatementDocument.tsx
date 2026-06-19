@@ -3,6 +3,7 @@ import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Money } from "@/components/ui/money";
+import { useCenterName } from "@/hooks/useCenterName";
 
 export interface SupplierStatementDocumentProps {
   supplierName: string;
@@ -27,6 +28,7 @@ export const SupplierStatementDocument = forwardRef<HTMLDivElement, SupplierStat
   ) {
     const { t, i18n } = useTranslation();
     const lang = i18n.language;
+    const centerName = useCenterName();
     const refOf = (e: SupplierLedgerEntryResponse) => {
       const id = e.purchaseInvoiceId ?? e.supplierPaymentId;
       return id ? `#${id.slice(0, 8)}` : "—";
@@ -36,8 +38,7 @@ export const SupplierStatementDocument = forwardRef<HTMLDivElement, SupplierStat
       <div ref={ref} dir="rtl" className="bg-white p-8 text-navy-900" style={{ width: "210mm", fontFamily: "Tajawal, sans-serif" }}>
         <div className="mb-6 flex items-start justify-between border-b pb-4">
           <div>
-            <h1 className="text-xl font-extrabold">{t("appName")}</h1>
-            <p className="text-sm text-muted-foreground">{t("shell.center")}</p>
+            <h1 className="text-xl font-extrabold" dir="auto">{centerName}</h1>
           </div>
           <div className="text-end">
             <h2 className="text-lg font-bold">{t("suppliers.statement.reportTitle")}</h2>

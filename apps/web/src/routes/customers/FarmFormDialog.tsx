@@ -49,12 +49,18 @@ export function FarmFormDialog({
   open,
   customerId,
   farm,
+  defaultName,
   onClose,
+  onCreated,
 }: {
   open: boolean;
   customerId: string;
   farm: FarmResponse | null;
+  /** Prefill the name on create (e.g. the combobox "add «term»" flow). */
+  defaultName?: string;
   onClose: () => void;
+  /** Fired with the new farm's id after a successful create (lets callers auto-select it). */
+  onCreated?: (id: string) => void;
 }) {
   const { t } = useTranslation();
   const create = useCreateFarm();
@@ -78,9 +84,9 @@ export function FarmFormDialog({
             headCount: farm.headCount != null ? String(farm.headCount) : "",
             notes: farm.notes ?? "",
           }
-        : DEFAULTS,
+        : { ...DEFAULTS, name: defaultName ?? "" },
     );
-  }, [open, farm, reset]);
+  }, [open, farm, defaultName, reset]);
 
   const onSubmit = handleSubmit((v) => {
     const body: FarmRequest = {
@@ -107,8 +113,9 @@ export function FarmFormDialog({
       );
     } else {
       create.mutate(body, {
-        onSuccess: () => {
+        onSuccess: (res) => {
           toast.success(t("admin.common.created"));
+          onCreated?.(res.id);
           onClose();
         },
         onError,

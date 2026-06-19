@@ -20,11 +20,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useSystemSettings, useUpdateSystemSettings } from "@/queries/systemSettings";
+import { useAuthStore } from "@/stores/authStore";
 
 export function SettingsPage() {
   const { t } = useTranslation();
   const query = useSystemSettings();
   const update = useUpdateSystemSettings();
+  const setCenterName = useAuthStore((s) => s.setCenterName);
 
   const form = useForm<SystemSettingsPatchRequest>({
     resolver: zodResolver(SystemSettingsPatchRequestSchema),
@@ -36,6 +38,7 @@ export function SettingsPage() {
   useEffect(() => {
     if (!query.data) return;
     reset({
+      centerName: query.data.centerName ?? "",
       defaultExamFee: query.data.defaultExamFee,
       defaultCheckupFee: query.data.defaultCheckupFee,
       entitlementEnabledGlobal: query.data.entitlementEnabledGlobal,
@@ -54,14 +57,21 @@ export function SettingsPage() {
   }, [query.data, reset]);
 
   const onSubmit = handleSubmit((values) => {
-    // PATCH the full snapshot; empty text clears the column (→ null).
+    // PATCH the full snapshot; empty text clears the column (→ null). The center name is never
+    // cleared — omit it when blank so the rename is a no-op rather than a rejected empty value.
+    const centerName = values.centerName?.trim() ? values.centerName.trim() : undefined;
     const body: SystemSettingsPatchRequest = {
       ...values,
+      centerName,
       logoUrl: values.logoUrl?.trim() ? values.logoUrl.trim() : null,
       invoiceTaxDetails: values.invoiceTaxDetails?.trim() ? values.invoiceTaxDetails.trim() : null,
     };
     update.mutate(body, {
-      onSuccess: () => toast.success(t("admin.settings.saved")),
+      onSuccess: () => {
+        // Reflect the rename in the shell + document headers immediately (the JWT carries no name).
+        if (centerName) setCenterName(centerName);
+        toast.success(t("admin.settings.saved"));
+      },
       onError: (e: ApiError) => applyFieldErrors(e, (name, err) => setError(name as never, err)),
     });
   });
@@ -79,6 +89,14 @@ export function SettingsPage() {
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-6" noValidate>
+              <Field
+                label={t("admin.settings.centerName")}
+                error={errors.centerName?.message}
+                hint={t("admin.settings.centerNameHint")}
+              >
+                <Input {...register("centerName")} />
+              </Field>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label={t("admin.settings.defaultExamFee")} error={errors.defaultExamFee?.message}>
                   <Input

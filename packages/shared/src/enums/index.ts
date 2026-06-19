@@ -81,6 +81,13 @@ export const PermissionKey = {
   PartnershipManage: "partnership.manage",
   ReportsRead: "reports.read",
   SuppliersWrite: "suppliers.write",
+  DoctorPartnersManage: "doctor_partners.manage",
+  DoctorPartnersPay: "doctor_partners.pay",
+  EmployeesManage: "employees.manage",
+  EmployeesPay: "employees.pay",
+  // Roles tab (custom roles + editing built-in role permissions) and operating expenses.
+  RolesManage: "roles.manage",
+  OperatingExpensesManage: "operating_expenses.manage",
 } as const;
 export type PermissionKey = EnumValues<typeof PermissionKey>;
 export const PERMISSION_KEY_VALUES = values(PermissionKey);
@@ -103,8 +110,12 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<RoleKey, readonly PermissionKey[]>
     PermissionKey.CustomersWrite,
     PermissionKey.ContractsWrite,
     PermissionKey.ContractsActivate,
-    PermissionKey.EntitlementsApprove,
     PermissionKey.SuppliersWrite,
+    PermissionKey.DoctorPartnersManage,
+    PermissionKey.DoctorPartnersPay,
+    PermissionKey.EmployeesManage,
+    PermissionKey.EmployeesPay,
+    PermissionKey.OperatingExpensesManage,
   ],
   [RoleKey.InventoryStaff]: [PermissionKey.InventoryAdjust, PermissionKey.CatalogWrite],
   [RoleKey.VetClinic]: [
@@ -377,6 +388,19 @@ export const EMPLOYEE_PAYMENT_KIND_VALUES = values(EmployeePaymentKind);
 
 // M30 removed the doctor-entitlement approve/pay lifecycle — an entitlement is now an immutable accrual
 // credited to the doctor's partner ledger on batch settle, so there is no EntitlementStatus enum.
+
+// Operating expenses (water, electricity, rent, …) — general costs that reduce net profit.
+// Declaration order = dropdown order.
+export const OperatingExpenseCategory = {
+  Water: "water",
+  Electricity: "electricity",
+  Rent: "rent",
+  Internet: "internet",
+  Maintenance: "maintenance",
+  Other: "other",
+} as const;
+export type OperatingExpenseCategory = EnumValues<typeof OperatingExpenseCategory>;
+export const OPERATING_EXPENSE_CATEGORY_VALUES = values(OperatingExpenseCategory);
 
 // --- 9. System ---------------------------------------------------------------
 

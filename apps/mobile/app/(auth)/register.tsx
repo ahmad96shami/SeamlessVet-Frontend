@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   applyFieldErrors,
   RegisterRequestSchema,
@@ -10,6 +12,7 @@ import {
   type RegisterRequest,
 } from "@vet/shared";
 
+import { centerByCode } from "@/api/auth";
 import { Shield } from "@/components/icons";
 import { Button, Card, Divider, Input, StateHero } from "@/components/ui";
 import { omitEmptyStrings } from "@/lib/forms";
@@ -21,12 +24,22 @@ import { colors } from "@/theme";
 // Admin/accountant/center-staff accounts are created by an admin (web).
 const ROLE: RegisterRequest["requestedRoleKey"] = "vet_field";
 
+// A not-yet-user can't be found by phone lookup, so registration routes to a center by its
+// admin-issued code (Mo13): the form carries a `centerCode`, resolved to an `environmentId` via
+// `/auth/center-by-code` at submit, then swapped in before the register request.
+const RegisterFormSchema = RegisterRequestSchema.omit({ environmentId: true }).extend({
+  centerCode: z.string().min(1),
+});
+type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
+
 export default function RegisterScreen() {
   const { t } = useTranslation();
   const registerMut = useRegister();
-  const form = useForm<RegisterRequest>({
-    resolver: zodResolver(RegisterRequestSchema),
+  const [resolving, setResolving] = useState(false);
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(RegisterFormSchema),
     defaultValues: {
+      centerCode: "",
       fullName: "",
       phonePrimary: "",
       email: "",
@@ -37,12 +50,23 @@ export default function RegisterScreen() {
     },
   });
 
-  const onSubmit = form.handleSubmit((values) => {
+  const onSubmit = form.handleSubmit(async ({ centerCode, ...rest }) => {
+    // Resolve the center code → environmentId first; an unknown code is a field error, not a toast.
+    setResolving(true);
+    let environmentId: string;
+    try {
+      environmentId = (await centerByCode(centerCode.trim())).environmentId;
+    } catch {
+      form.setError("centerCode", { message: t("auth.center.codeUnknown") });
+      return;
+    } finally {
+      setResolving(false);
+    }
     // Empty optional text → omitted (stored as null on the backend, never ""),
     // matching the web pattern. Critical for `license_details` (jsonb) which
     // rejects empty strings, and `email` (unique-when-present) where "" would
     // collide between accounts.
-    registerMut.mutate(omitEmptyStrings(values), {
+    registerMut.mutate(omitEmptyStrings({ ...rest, environmentId }), {
       onError: (err) => {
         const error = err as ApiError;
         applyFieldErrors(error, (name, e) => form.setError(name as never, e));
@@ -110,6 +134,22 @@ export default function RegisterScreen() {
         </View>
 
         <View className="gap-3.5">
+          <Controller
+            control={form.control}
+            name="centerCode"
+            render={({ field, fieldState }) => (
+              <Input
+                label={t("auth.register.centerCode")}
+                hint={t("auth.register.centerCodeHint")}
+                error={fieldState.error?.message}
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                autoCapitalize="characters"
+                autoCorrect={false}
+              />
+            )}
+          />
           <Controller
             control={form.control}
             name="fullName"
@@ -190,7 +230,7 @@ export default function RegisterScreen() {
           <Button
             label={t("auth.register.submit")}
             onPress={onSubmit}
-            loading={registerMut.isPending}
+            loading={registerMut.isPending || resolving}
             block
           />
         </View>

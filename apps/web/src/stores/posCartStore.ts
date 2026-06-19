@@ -99,6 +99,13 @@ interface PosCartState {
   linkVisit: (visitId: string, customerId: string) => void;
   clearVisit: () => void;
   setPayments: (payments: PaymentLeg[]) => void;
+  /**
+   * Reset the payment legs to a single cash leg (amount 0) — the "ring up at POS from a visit"
+   * default, so the cashier always lands on a clean, open cash row ready for the amount. Entering
+   * POS from a visit is a deliberate "bill this visit now" action, so any leg left over from an
+   * earlier (unrelated) cart is intentionally cleared rather than kept.
+   */
+  seedCashPayment: () => void;
   clear: () => void;
   /**
    * Snapshot the current cart into a parked sale (persisted to Dexie) and empty the cart. No-op on
@@ -166,6 +173,8 @@ export const usePosCartStore = create<PosCartState>((set, get) => ({
   linkVisit: (visitId, customerId) => set({ visitId, customerId }),
   clearVisit: () => set((s) => ({ visitId: null, lines: s.lines.filter((l) => !l.locked) })),
   setPayments: (payments) => set({ payments }),
+  seedCashPayment: () =>
+    set({ payments: [{ key: crypto.randomUUID(), method: "cash", amount: 0 }] }),
   clear: () =>
     set({ lines: [], customerId: null, visitId: null, invoiceDiscount: 0, payments: [] }),
   park: async (label) => {

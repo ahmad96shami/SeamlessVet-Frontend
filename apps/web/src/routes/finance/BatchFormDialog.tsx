@@ -24,7 +24,7 @@ import { Select } from "@/components/ui/select";
 import type { DoctorOption } from "@/hooks/useDoctorOptions";
 import { useContracts } from "@/queries/contracts";
 import { useCreateBatch, useUpdateBatch } from "@/queries/batches";
-import { useFarms } from "@/queries/farms";
+import { FarmCombobox } from "@/routes/customers/FarmCombobox";
 import { CustomerPickerDialog } from "@/routes/pos/CustomerPickerDialog";
 
 /**
@@ -93,11 +93,9 @@ export function BatchFormDialog({
   const errors = formState.errors;
   const customerId = watch("customerId");
 
-  // The contract + farm dropdowns are scoped to the chosen customer.
+  // The contract dropdown is scoped to the chosen customer (farms too, inside FarmCombobox).
   const contractsQuery = useContracts({ customerId: customerId || undefined, take: 200 });
   const contracts = customerId ? (contractsQuery.data ?? []) : [];
-  const farmsQuery = useFarms({ customerId: customerId || undefined, take: 200 });
-  const farms = customerId ? (farmsQuery.data ?? []) : [];
 
   useEffect(() => {
     if (!open) return;
@@ -230,22 +228,18 @@ export function BatchFormDialog({
             />
           </Field>
           <Field label={t("finance.batches.farm")} error={errors.farmId?.message}>
+            {/* Searchable farm picker scoped to the chosen customer, with an inline "add farm" row
+                (disabled until a customer is selected — a farm belongs to a customer). */}
             <Controller
               name="farmId"
               control={control}
               render={({ field }) => (
-                <Select
+                <FarmCombobox
+                  customerId={customerId || undefined}
                   value={field.value}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  disabled={!customerId}
-                >
-                  <option value="">{t("finance.batches.noFarm")}</option>
-                  {farms.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.name}
-                    </option>
-                  ))}
-                </Select>
+                  onChange={field.onChange}
+                  noneLabel={t("finance.batches.noFarm")}
+                />
               )}
             />
           </Field>
@@ -343,6 +337,7 @@ export function BatchFormDialog({
           setPickerOpen(false);
         }}
       />
+
     </Dialog>
   );
 }

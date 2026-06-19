@@ -21,6 +21,7 @@ import {
   useRegistrationRequests,
   useRejectRegistration,
 } from "@/queries/registrationRequests";
+import { UsersTabs } from "@/routes/admin/UsersTabs";
 
 function statusVariant(status: string): BadgeProps["variant"] {
   if (status === "approved") return "success";
@@ -130,6 +131,7 @@ export function RegistrationRequestsPage() {
       description={t("admin.registrations.description")}
     >
       <div className="space-y-4">
+        <UsersTabs />
         <div className="flex items-center gap-2">
           <Label className="text-muted-foreground">{t("admin.registrations.filterStatus")}</Label>
           <Select

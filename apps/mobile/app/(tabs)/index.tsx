@@ -109,7 +109,14 @@ export default function Index() {
 
   return (
     <ScreenShell
-      header={<HomeHeader greeting={t(`dashboard.greeting.${greetingKey}`)} name={user?.fullName ?? ""} onOpenSync={() => setReviewOpen(true)} />}
+      header={
+        <HomeHeader
+          greeting={t(`dashboard.greeting.${greetingKey}`)}
+          name={user?.fullName ?? ""}
+          center={user?.centerName ?? ""}
+          onOpenSync={() => setReviewOpen(true)}
+        />
+      }
     >
       {/* Stat row */}
       <View className="flex-row gap-2.5">
@@ -349,27 +356,34 @@ function QuickActionsGrid({ items }: { items: QuickActionItem[] }) {
   );
 }
 
-/** The design's greeting header — avatar tile, greeting + name, live sync pill + bell. */
+/** The design's greeting header — avatar tile, greeting + name + active center, live sync pill + bell. */
 function HomeHeader({
   greeting,
   name,
+  center,
   onOpenSync,
 }: {
   greeting: string;
   name: string;
+  center: string;
   onOpenSync: () => void;
 }) {
   return (
     <View className="bg-paper border-ink-100 flex-row items-center justify-between border-b px-5 pb-4 pt-3">
-      <View className="flex-row items-center gap-3">
+      <View className="min-w-0 flex-1 flex-row items-center gap-3">
         <IconTile tone="teal">
           <User size={22} color={colors.teal[700]} />
         </IconTile>
-        <View>
+        <View className="min-w-0 flex-1">
           <Text className="text-ink-500 text-[12px] font-tajawal">{greeting}،</Text>
           <Text className="text-navy-900 text-[16px] font-tajawal-extrabold" numberOfLines={1}>
             {name || "—"}
           </Text>
+          {center ? (
+            <Text className="text-teal-700 text-[12px] font-tajawal-bold" numberOfLines={1}>
+              {center}
+            </Text>
+          ) : null}
         </View>
       </View>
       <View className="flex-row items-center gap-2">

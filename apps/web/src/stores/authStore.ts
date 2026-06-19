@@ -3,7 +3,7 @@ import type { LoginResponse } from "@vet/shared";
 
 import { logout as logoutApi } from "@/api/auth";
 import { decodeJwt, permsFromClaims } from "@/lib/jwt";
-import { centerNameFor } from "@/services/centerMemory";
+import { centerNameFor, setRememberedCenterName } from "@/services/centerMemory";
 import { enterEnvironment, exitEnvironment } from "@/services/tenant";
 import { tokenStorage } from "@/services/tokenStorage";
 
@@ -43,6 +43,8 @@ interface AuthState {
    */
   endedReason: SessionEndedReason | null;
   setSessionFromLogin: (res: LoginResponse, centerName?: string) => void;
+  /** Reflect a center rename (Settings) immediately in the shell + documents, and remember it across reloads. */
+  setCenterName: (name: string) => void;
   restore: () => void;
   logout: () => void;
   handleAuthError: () => void;
@@ -97,6 +99,12 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       user,
       centerName: centerName ?? (user ? centerNameFor(user.environmentId) : null),
     });
+  },
+
+  setCenterName: (name) => {
+    const envId = get().user?.environmentId;
+    if (envId) setRememberedCenterName(envId, name);
+    set({ centerName: name });
   },
 
   restore: () => {

@@ -19,6 +19,7 @@ export function PosPage() {
   const [params, setParams] = useSearchParams();
   const linkVisit = usePosCartStore((s) => s.linkVisit);
   const setCustomer = usePosCartStore((s) => s.setCustomer);
+  const seedCashPayment = usePosCartStore((s) => s.seedCashPayment);
   const applied = useRef(false);
 
   useEffect(() => {
@@ -26,10 +27,13 @@ export function PosPage() {
     applied.current = true;
     const visitId = params.get("visitId");
     const customerId = params.get("customerId");
-    if (visitId && customerId) linkVisit(visitId, customerId);
-    else if (customerId) setCustomer(customerId);
+    if (visitId && customerId) {
+      linkVisit(visitId, customerId);
+      // Land on an open cash payment row (amount 0) ready to collect — the visit-checkout default.
+      seedCashPayment();
+    } else if (customerId) setCustomer(customerId);
     if (visitId || customerId) setParams({}, { replace: true });
-  }, [params, linkVisit, setCustomer, setParams]);
+  }, [params, linkVisit, setCustomer, seedCashPayment, setParams]);
 
   return (
     // Below lg the panes stack (catalog on top, cart under it — `col-reverse` keeps the cart

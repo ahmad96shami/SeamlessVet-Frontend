@@ -14,10 +14,24 @@ import { prefs } from "@/services/mmkv";
  * captured request bodies (no credentials, no PII beyond what the user already typed
  * into a form that will hit the API anyway).
  */
-const KEY = "offlineQueue:v1";
+// The queue is keyed PER CENTER (Mo13): a field doctor who logs out of one center and into
+// another must never replay the first center's queued money writes against the second. The env
+// id is published here by the auth store ({@link setQueueEnvironment}) on login / restore and
+// cleared on logout, so every read/write below resolves to that tenant's own slot. Logged out
+// (no env), the queue falls back to the legacy anon key — which in practice holds nothing, since
+// you must be signed in to enqueue.
+const LEGACY_KEY = "offlineQueue:v1";
+const ENV_KEY = "offlineQueue.env";
+const keyFor = (envId: string): string => `offlineQueue:${envId}:v1`;
 
-function readAll(): QueuedRequest[] {
-  const json = prefs.getString(KEY);
+/** The MMKV key for the queue slot the current session writes to. */
+function currentKey(): string {
+  const envId = prefs.getString(ENV_KEY);
+  return envId ? keyFor(envId) : LEGACY_KEY;
+}
+
+function readKey(key: string): QueuedRequest[] {
+  const json = prefs.getString(key);
   if (!json) return [];
   try {
     const parsed = JSON.parse(json) as unknown;
@@ -30,8 +44,33 @@ function readAll(): QueuedRequest[] {
   }
 }
 
+function readAll(): QueuedRequest[] {
+  return readKey(currentKey());
+}
+
 function writeAll(items: QueuedRequest[]): void {
-  prefs.set(KEY, JSON.stringify(items));
+  prefs.set(currentKey(), JSON.stringify(items));
+}
+
+/**
+ * Publish the active center so the queue reads/writes its per-tenant slot. Called by the auth
+ * store on login / restore (with the env id) and on logout (with `null`). On first scoping for a
+ * given env, any items still parked under the pre-Mo13 anon key (`offlineQueue:v1`) are migrated
+ * into the tenant slot so an in-flight upgrade never orphans a queued field sale.
+ */
+export function setQueueEnvironment(envId: string | null): void {
+  if (!envId) {
+    prefs.remove(ENV_KEY);
+    return;
+  }
+  prefs.set(ENV_KEY, envId);
+  // One-time legacy migration: move pre-Mo13 anon-keyed items into this center's slot, but never
+  // clobber items already there (a later session for the same env keeps its own queue).
+  const legacy = readKey(LEGACY_KEY);
+  if (legacy.length > 0 && readKey(keyFor(envId)).length === 0) {
+    prefs.set(keyFor(envId), JSON.stringify(legacy));
+    prefs.remove(LEGACY_KEY);
+  }
 }
 
 const storage: QueueStorage = {
@@ -46,7 +85,7 @@ const storage: QueueStorage = {
     writeAll(readAll().filter((r) => r.id !== id));
   },
   clear: async () => {
-    prefs.remove(KEY);
+    prefs.remove(currentKey());
   },
 };
 

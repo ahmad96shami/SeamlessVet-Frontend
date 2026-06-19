@@ -6,9 +6,11 @@ import {
   getUser,
   listUsers,
   reactivateUser,
+  updateUser,
   type ApiError,
   type CreateUserRequest,
   type PermissionOverrideRequest,
+  type UpdateUserRequest,
   type UserDetailResponse,
   type UserListParams,
   type UserResponse,
@@ -40,6 +42,17 @@ export function useCreateUser() {
   return useMutation<UserResponse, ApiError, CreateUserRequest>({
     mutationFn: (body) => createUser(apiClient, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: [USERS] }),
+  });
+}
+
+export function useUpdateUser() {
+  const qc = useQueryClient();
+  return useMutation<UserResponse, ApiError, { id: string; body: UpdateUserRequest }>({
+    mutationFn: ({ id, body }) => updateUser(apiClient, id, body),
+    onSuccess: (_data, { id }) => {
+      void qc.invalidateQueries({ queryKey: [USERS] });
+      void qc.invalidateQueries({ queryKey: [USER, id] });
+    },
   });
 }
 

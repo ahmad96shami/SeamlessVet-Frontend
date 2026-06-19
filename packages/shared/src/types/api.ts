@@ -788,6 +788,38 @@ export interface paths {
         patch: operations["Partners_Update"];
         trace?: never;
     };
+    "/operating-expenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OperatingExpenses_List"];
+        put?: never;
+        post: operations["OperatingExpenses_Create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/operating-expenses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OperatingExpenses_Get"];
+        put?: never;
+        post?: never;
+        delete: operations["OperatingExpenses_Delete"];
+        options?: never;
+        head?: never;
+        patch: operations["OperatingExpenses_Update"];
+        trace?: never;
+    };
     "/notifications": {
         parameters: {
             query?: never;
@@ -2116,6 +2148,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Admin_Roles_List"];
+        put?: never;
+        post: operations["Admin_Roles_Create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["Admin_Roles_Delete"];
+        options?: never;
+        head?: never;
+        patch: operations["Admin_Roles_Update"];
+        trace?: never;
+    };
+    "/admin/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Admin_Permissions_Catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/services": {
         parameters: {
             query?: never;
@@ -2193,7 +2273,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["Admin_Users_Update"];
         trace?: never;
     };
     "/admin/users/{id}/deactivate": {
@@ -2564,6 +2644,26 @@ export interface components {
             userId?: string | null;
             displayName?: string | null;
             notes?: string | null;
+        };
+        CreateOperatingExpenseRequest: {
+            /** Format: guid */
+            id?: string | null;
+            category?: string;
+            /** Format: decimal */
+            amount?: number;
+            /** Format: date */
+            incurredOn?: string;
+            paid?: boolean;
+            note?: string | null;
+        };
+        UpdateOperatingExpenseRequest: {
+            category?: string | null;
+            /** Format: decimal */
+            amount?: number | null;
+            /** Format: date */
+            incurredOn?: string | null;
+            paid?: boolean | null;
+            note?: string | null;
         };
         NightStayCreateRequest: {
             /** Format: guid */
@@ -3130,6 +3230,14 @@ export interface components {
         RejectRequest: {
             notes?: string;
         };
+        CreateRoleRequest: {
+            name?: string;
+            permissions?: string[];
+        };
+        UpdateRoleRequest: {
+            name?: string;
+            permissions?: string[];
+        };
         ServiceRequest: {
             /** Format: guid */
             id?: string | null;
@@ -3147,6 +3255,7 @@ export interface components {
             defaultPrice?: number | null;
         };
         SystemSettingsPatchRequest: {
+            centerName?: string | null;
             /** Format: decimal */
             defaultExamFee?: number | null;
             /** Format: decimal */
@@ -3178,6 +3287,14 @@ export interface components {
             phonePrimary?: string;
             email?: string | null;
             password?: string;
+            roleKey?: string;
+            licenseNumber?: string | null;
+            licenseDetails?: string | null;
+        };
+        UpdateUserRequest: {
+            fullName?: string;
+            phonePrimary?: string;
+            email?: string | null;
             roleKey?: string;
             licenseNumber?: string | null;
             licenseDetails?: string | null;
@@ -4805,6 +4922,112 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["PartnerPatchRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OperatingExpenses_List: {
+        parameters: {
+            query?: {
+                category?: string | null;
+                from?: string | null;
+                to?: string | null;
+                paid?: boolean | null;
+                skip?: number | null;
+                take?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OperatingExpenses_Create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOperatingExpenseRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OperatingExpenses_Get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OperatingExpenses_Delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OperatingExpenses_Update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOperatingExpenseRequest"];
             };
         };
         responses: {
@@ -7248,6 +7471,103 @@ export interface operations {
             };
         };
     };
+    Admin_Roles_List: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Admin_Roles_Create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRoleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Admin_Roles_Delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Admin_Roles_Update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRoleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Admin_Permissions_Catalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     Admin_Services_List: {
         parameters: {
             query?: {
@@ -7444,6 +7764,29 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    Admin_Users_Update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {

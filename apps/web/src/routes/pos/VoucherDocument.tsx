@@ -2,6 +2,8 @@ import { formatCurrency, formatDateTime, type ReceiptVoucherResponse } from "@ve
 import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useCenterName } from "@/hooks/useCenterName";
+
 export interface VoucherDocumentProps {
   voucher: ReceiptVoucherResponse;
   customerName: string | null;
@@ -19,6 +21,7 @@ export const VoucherDocument = forwardRef<HTMLDivElement, VoucherDocumentProps>(
   function VoucherDocument({ voucher, customerName }, ref) {
     const { t, i18n } = useTranslation();
     const lang = i18n.language;
+    const centerName = useCenterName();
     const number = `#${voucher.id.slice(0, 8)}`;
     const row = "flex justify-between gap-2";
 
@@ -30,8 +33,7 @@ export const VoucherDocument = forwardRef<HTMLDivElement, VoucherDocumentProps>(
         style={{ width: "80mm", padding: "4mm", fontFamily: "Tajawal, sans-serif", fontSize: 12, lineHeight: 1.6 }}
       >
         <div className="text-center">
-          <div className="text-base font-extrabold">{t("appName")}</div>
-          <div className="text-[10px]">{t("shell.center")}</div>
+          <div className="text-base font-extrabold" dir="auto">{centerName}</div>
         </div>
         <div className="my-1 text-center text-sm font-bold">{t("pos.voucher.receiptTitle")}</div>
 

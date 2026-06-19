@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createApiClient, type AuthTokens, type TokenProvider } from "@vet/shared";
+import { createApiClient, type AuthErrorReason, type AuthTokens, type TokenProvider } from "@vet/shared";
 
 import { API_BASE_URL } from "@/lib/config";
 import { tokenStorage } from "@/services/tokenStorage";
@@ -8,9 +8,13 @@ import { tokenStorage } from "@/services/tokenStorage";
 // can't recurse into the refresh loop.
 const refreshClient = axios.create({ baseURL: API_BASE_URL });
 
-let onAuthError: (() => void) | undefined;
-/** Registered at app bootstrap so a failed refresh can flip the auth store to logged-out. */
-export function setOnAuthError(handler: () => void): void {
+let onAuthError: ((reason: AuthErrorReason) => void) | undefined;
+/**
+ * Registered at app bootstrap so a session that ends on its own flips the auth store. `reason`
+ * (Mo13) distinguishes an expired/unrecoverable session (read-only or logout) from a suspended
+ * center (a global 403 `environment_suspended` → forced logout + notice).
+ */
+export function setOnAuthError(handler: (reason: AuthErrorReason) => void): void {
   onAuthError = handler;
 }
 
@@ -41,9 +45,9 @@ const tokenProvider: TokenProvider = {
       return null;
     }
   },
-  onAuthError() {
+  onAuthError(reason) {
     void tokenStorage.clear();
-    onAuthError?.();
+    onAuthError?.(reason);
   },
 };
 

@@ -24,13 +24,13 @@ function toLatinDigits(s: string): string {
 }
 
 export const DATE_FORMAT = "yyyy/MM/dd";
-// 12-hour clock — one convention for both locales: date first, then time, then the am/pm
-// marker ("2026/05/28 7:18 ص" / "… 7:18 AM"). The marker trails the digits, so bidi keeps
-// it glued to the time in both RTL and LTR contexts — no LRM anchoring needed (the old
-// leading-marker ar pattern is what used to require it).
-// Date-fns `a` → "ص"/"م" (ar) or "AM"/"PM" (en).
-export const DATE_TIME_FORMAT_AR = "yyyy/MM/dd h:mm a";
-export const DATE_TIME_FORMAT_EN = "yyyy/MM/dd h:mm a";
+// 12-hour clock — one convention for both locales: am/pm marker first, then time, then date
+// ("م 4:01 2026/06/19" / "PM 4:01 2026/06/19"). Because the marker now LEADS the string, the
+// whole value is wrapped in an LTR isolate (LRI…PDI) by `formatDateTime` so it renders in this
+// exact order in every context — `dir="ltr"` cells AND bare RTL cells (notification list, visit
+// timeline) alike — without per-cell anchoring. Date-fns `a` → "ص"/"م" (ar) or "AM"/"PM" (en).
+export const DATE_TIME_FORMAT_AR = "a h:mm yyyy/MM/dd";
+export const DATE_TIME_FORMAT_EN = "a h:mm yyyy/MM/dd";
 /** Back-compat: callers that explicitly pass a pattern still work; locale-default uses the pair above. */
 export const DATE_TIME_FORMAT = DATE_TIME_FORMAT_AR;
 
@@ -49,5 +49,11 @@ export function formatDateTime(
   pattern?: string,
 ): string {
   const resolved = pattern ?? (locale.startsWith("ar") ? DATE_TIME_FORMAT_AR : DATE_TIME_FORMAT_EN);
-  return toLatinDigits(formatDateFns(toDate(value), resolved, { locale: localeFor(locale) }));
+  const text = toLatinDigits(formatDateFns(toDate(value), resolved, { locale: localeFor(locale) }));
+  // The Arabic am/pm marker (ar) leads the string; on its own it turns the following Latin digits
+  // into Arabic-numbers (bidi rule W2) and the whole run flips back to date-first. Insert an LRM
+  // (U+200E) right after the marker to keep the digits LTR, then wrap the value in an LTR isolate
+  // (LRI U+2066 .. PDI U+2069) so it renders "<marker> <time> <date>" in every context.
+  const anchored = text.replace(/^(\S+)(\s)/, "$1\u200E$2");
+  return `\u2066${anchored}\u2069`;
 }

@@ -129,7 +129,7 @@ export function VisitDetailPage() {
     customer.data ? `${t("visits.detail.owner")}: ${customer.data.fullName}` : null,
     `${t("visits.detail.visitNumber")} ${visitRef(v)}`,
     v.startedAt
-      ? `${t("visits.detail.startedAt")} ${formatDateTime(v.startedAt, lang, "yyyy/MM/dd h:mm a")}`
+      ? `${t("visits.detail.startedAt")} ${formatDateTime(v.startedAt, lang)}`
       : null,
     doctorName,
   ].filter(Boolean) as string[];
@@ -338,6 +338,7 @@ export function VisitDetailPage() {
               min="0"
               dir="ltr"
               className="w-32"
+              data-autofocus
               value={startFee}
               onChange={(e) => setStartFee(e.target.value)}
             />

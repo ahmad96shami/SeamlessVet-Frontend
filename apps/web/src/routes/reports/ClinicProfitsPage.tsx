@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate, formatPercent } from "@vet/shared";
+import { formatDate, formatPercent } from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
@@ -31,7 +31,18 @@ export function ClinicProfitsPage() {
       <SummaryGrid>
         <SummaryStat label={t("reports.clinicProfits.revenue")} value={<Money value={d?.revenue ?? 0} />} />
         <SummaryStat label={t("reports.clinicProfits.cogs")} value={<Money value={d?.cogs ?? 0} />} tone="red" />
-        <SummaryStat label={t("reports.clinicProfits.netProfit")} value={<Money value={d?.netProfit ?? 0} />} tone="teal" />
+        <SummaryStat
+          label={t("reports.clinicProfits.operatingExpenses")}
+          value={<Money value={d?.operatingExpenses ?? 0} />}
+          tone="red"
+          hint={t("reports.clinicProfits.operatingExpensesHint")}
+        />
+        <SummaryStat
+          label={t("reports.clinicProfits.netProfit")}
+          value={<Money value={d?.netOperatingProfit ?? 0} />}
+          tone="teal"
+          hint={t("reports.clinicProfits.netProfitHint")}
+        />
         <SummaryStat
           label={t("reports.clinicProfits.doctorShares")}
           value={<Money value={d?.doctorShares ?? 0} />}
@@ -39,6 +50,18 @@ export function ClinicProfitsPage() {
         />
         <SummaryStat label={t("reports.clinicProfits.distributed")} value={<Money value={d?.distributedToPartners ?? 0} />} tone="navy" />
         <SummaryStat label={t("reports.clinicProfits.retained")} value={<Money value={d?.retainedByClinic ?? 0} />} tone="green" />
+        <SummaryStat
+          label={t("reports.clinicProfits.owed")}
+          value={<Money value={d?.payablesOutstanding ?? 0} />}
+          tone="amber"
+          hint={t("reports.clinicProfits.owedHint")}
+        />
+        <SummaryStat
+          label={t("reports.clinicProfits.netAfterObligations")}
+          value={<Money value={d?.netAfterObligations ?? 0} />}
+          tone="navy"
+          hint={t("reports.clinicProfits.netAfterObligationsHint")}
+        />
       </SummaryGrid>
 
       <div className="card flush">

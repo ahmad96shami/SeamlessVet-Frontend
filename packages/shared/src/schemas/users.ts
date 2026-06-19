@@ -55,6 +55,21 @@ export const CreateUserRequestSchema = z.object({
 });
 export type CreateUserRequest = z.infer<typeof CreateUserRequestSchema>;
 
+/**
+ * PATCH /admin/users/{id} body — edit an existing user's profile and role. Mirrors the backend
+ * UpdateUserRequest (no password — that's a separate reset flow). Changing `roleKey` re-resolves the
+ * user's permissions on their next request.
+ */
+export const UpdateUserRequestSchema = z.object({
+  fullName: z.string().min(1).max(128),
+  phonePrimary: z.string().regex(/^\+?[0-9- ]{7,32}$/, "invalid_phone"),
+  email: z.string().email().max(255).optional().or(z.literal("")),
+  roleKey: z.string().min(1),
+  licenseNumber: z.string().max(64).optional(),
+  licenseDetails: z.string().optional(),
+});
+export type UpdateUserRequest = z.infer<typeof UpdateUserRequestSchema>;
+
 /** Query params for the roster list — offset-paged (admin-table convention). */
 export interface UserListParams {
   search?: string;

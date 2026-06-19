@@ -3,6 +3,7 @@ import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Money } from "@/components/ui/money";
+import { useCenterName } from "@/hooks/useCenterName";
 
 export interface EmployeeStatementDocumentProps {
   employeeName: string;
@@ -27,6 +28,7 @@ export const EmployeeStatementDocument = forwardRef<HTMLDivElement, EmployeeStat
   ) {
     const { t, i18n } = useTranslation();
     const lang = i18n.language;
+    const centerName = useCenterName();
     const refOf = (e: EmployeeLedgerEntryResponse) =>
       e.employeePaymentId ? `#${e.employeePaymentId.slice(0, 8)}` : "—";
 
@@ -39,8 +41,7 @@ export const EmployeeStatementDocument = forwardRef<HTMLDivElement, EmployeeStat
       >
         <div className="mb-6 flex items-start justify-between border-b pb-4">
           <div>
-            <h1 className="text-xl font-extrabold">{t("appName")}</h1>
-            <p className="text-sm text-muted-foreground">{t("shell.center")}</p>
+            <h1 className="text-xl font-extrabold" dir="auto">{centerName}</h1>
           </div>
           <div className="text-end">
             <h2 className="text-lg font-bold">{t("employees.statement.reportTitle")}</h2>

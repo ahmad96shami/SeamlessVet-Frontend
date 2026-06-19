@@ -63,6 +63,12 @@ export function Dialog({ open, onClose, title, description, children, className 
   // rebinding the effect would re-run the focus-restore and steal focus whenever a child opens.
   const isTopRef = React.useRef(isTop);
   isTopRef.current = isTop;
+  // Read the latest onClose from inside the effect via a ref — keeping it out of the deps so a parent
+  // re-render (e.g. typing in a controlled field whose `onClose` is an inline arrow) doesn't tear down
+  // and re-run this effect, which would otherwise restore-then-re-grab focus and yank it to the first
+  // focusable (the header ✕) on every keystroke.
+  const onCloseRef = React.useRef(onClose);
+  onCloseRef.current = onClose;
 
   React.useEffect(() => {
     if (!open) return;
@@ -72,7 +78,7 @@ export function Dialog({ open, onClose, title, description, children, className 
     const onKey = (e: KeyboardEvent) => {
       if (!isTopRef.current) return;
       if (e.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== "Tab" || !content) return;
@@ -100,10 +106,13 @@ export function Dialog({ open, onClose, title, description, children, className 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // Move focus into the dialog once it's painted (first focusable, else the panel itself).
+    // Move focus into the dialog once it's painted: an opt-in `[data-autofocus]` target if a caller
+    // marked one (e.g. the primary text field), else the first focusable, else the panel itself.
     const raf = requestAnimationFrame(() => {
-      const first = content?.querySelector<HTMLElement>(FOCUSABLE);
-      (first ?? content)?.focus();
+      const target =
+        content?.querySelector<HTMLElement>("[data-autofocus]") ??
+        content?.querySelector<HTMLElement>(FOCUSABLE);
+      (target ?? content)?.focus();
     });
 
     return () => {
@@ -112,7 +121,7 @@ export function Dialog({ open, onClose, title, description, children, className 
       cancelAnimationFrame(raf);
       previouslyFocused?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 

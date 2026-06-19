@@ -4,10 +4,12 @@ import { z } from "zod";
 import {
   CreateUserRequestSchema,
   PermissionOverrideRequestSchema,
+  UpdateUserRequestSchema,
   UserDetailResponseSchema,
   UserResponseSchema,
   type CreateUserRequest,
   type PermissionOverrideRequest,
+  type UpdateUserRequest,
   type UserDetailResponse,
   type UserListParams,
   type UserResponse,
@@ -37,6 +39,17 @@ export async function createUser(
 ): Promise<UserResponse> {
   const payload = CreateUserRequestSchema.parse(body);
   const res = await client.post("/admin/users", payload);
+  return UserResponseSchema.parse(res.data);
+}
+
+/** PATCH /admin/users/{id} — edit an existing user's profile and role (`id` lives in the URL). */
+export async function updateUser(
+  client: AxiosInstance,
+  id: string,
+  body: UpdateUserRequest,
+): Promise<UserResponse> {
+  const payload = UpdateUserRequestSchema.parse(body);
+  const res = await client.patch(`/admin/users/${id}`, payload);
   return UserResponseSchema.parse(res.data);
 }
 

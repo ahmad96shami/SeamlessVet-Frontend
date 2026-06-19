@@ -15,8 +15,10 @@ import { Select } from "@/components/ui/select";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useDeactivateUser, useReactivateUser, useUsers } from "@/queries/users";
+import { UserEditDialog } from "@/routes/admin/UserEditDialog";
 import { UserFormDialog } from "@/routes/admin/UserFormDialog";
 import { UserPermissionsDialog } from "@/routes/admin/UserPermissionsDialog";
+import { UsersTabs } from "@/routes/admin/UsersTabs";
 
 function statusVariant(status: string): BadgeProps["variant"] {
   if (status === "active") return "success";
@@ -31,6 +33,7 @@ export function UsersPage() {
   const [role, setRole] = useState("");
   const [status, setStatus] = useState("");
   const [permUserId, setPermUserId] = useState<string | null>(null);
+  const [editUser, setEditUser] = useState<UserResponse | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
 
@@ -93,6 +96,15 @@ export function UsersPage() {
           const u = row.original;
           return (
             <div className="flex justify-end gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                aria-label={t("admin.common.edit")}
+                onClick={() => setEditUser(u)}
+              >
+                <Icon.edit className="size-4" />
+                {t("admin.common.edit")}
+              </Button>
               {u.status === "active" ? (
                 <Button
                   size="sm"
@@ -135,6 +147,7 @@ export function UsersPage() {
   return (
     <AdminPage title={t("admin.users.title")} description={t("admin.users.description")}>
       <div className="space-y-4">
+        <UsersTabs />
         <div className="flex flex-wrap items-center gap-2">
           <Input
             placeholder={t("admin.users.searchPlaceholder")}
@@ -188,6 +201,7 @@ export function UsersPage() {
       </div>
 
       <UserFormDialog open={addOpen} onClose={() => setAddOpen(false)} />
+      <UserEditDialog user={editUser} onClose={() => setEditUser(null)} />
       <UserPermissionsDialog userId={permUserId} onClose={() => setPermUserId(null)} />
     </AdminPage>
   );

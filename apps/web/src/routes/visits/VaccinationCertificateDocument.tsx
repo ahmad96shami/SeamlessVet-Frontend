@@ -2,6 +2,8 @@ import { formatDate, type VaccinationResponse } from "@vet/shared";
 import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useCenterName } from "@/hooks/useCenterName";
+
 export interface VaccinationCertificateDocumentProps {
   vaccination: VaccinationResponse;
   recipientName: string | null;
@@ -17,6 +19,7 @@ export const VaccinationCertificateDocument = forwardRef<HTMLDivElement, Vaccina
   function VaccinationCertificateDocument({ vaccination, recipientName, ownerName, doctorName }, ref) {
     const { t, i18n } = useTranslation();
     const lang = i18n.language;
+    const centerName = useCenterName();
     const dash = "—";
 
     const rows: { ar: string; en: string; v: string }[] = [
@@ -35,8 +38,7 @@ export const VaccinationCertificateDocument = forwardRef<HTMLDivElement, Vaccina
       <div ref={ref} dir="rtl" className="bg-white p-10 text-navy-900" style={{ width: "210mm", fontFamily: "Tajawal, sans-serif" }}>
         <div className="rounded-2xl border-2 border-teal-600 p-8">
           <div className="text-center">
-            <h1 className="text-2xl font-extrabold">{t("appName")}</h1>
-            <p className="text-sm text-muted-foreground">{t("shell.center")}</p>
+            <h1 className="text-2xl font-extrabold" dir="auto">{centerName}</h1>
             <div className="my-5 border-t" />
             <h2 className="text-xl font-bold text-teal-700">شهادة تطعيم</h2>
             <p className="text-sm font-semibold tracking-wide text-teal-700">VACCINATION CERTIFICATE</p>

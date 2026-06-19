@@ -60,6 +60,11 @@ export default function MeScreen() {
           <Text className="text-ink-500 mt-0.5 text-[13px] font-tajawal">
             {user?.role ? t(`roles.${user.role}`, { defaultValue: user.role }) : ""}
           </Text>
+          {user?.centerName ? (
+            <Text className="text-teal-700 mt-0.5 text-[13px] font-tajawal-bold" numberOfLines={1}>
+              {`${t("shell.center")} · ${user.centerName}`}
+            </Text>
+          ) : null}
           {user?.numberPrefix ? (
             <View className="mt-1.5 flex-row">
               <Pill tone="teal" compact label={`${t("me.prefix")} · ${user.numberPrefix}`} />
