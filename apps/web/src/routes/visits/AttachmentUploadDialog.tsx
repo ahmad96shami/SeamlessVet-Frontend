@@ -62,7 +62,6 @@ export function AttachmentUploadDialog({
           toast.success(t("visits.files.uploaded"));
           onClose();
         },
-        onError: (e) => toast.error(e.message),
       },
     );
   };

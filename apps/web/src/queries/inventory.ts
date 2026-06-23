@@ -99,12 +99,17 @@ export function useConsumeStock() {
   });
 }
 
-/** POST /inventory/load-field — warehouse → field two-leg transfer. Refetches all inventory reads. */
+/**
+ * POST /inventory/load-field — warehouse → field two-leg transfer. Refetches all inventory reads.
+ * Fired once per line by the load dialog, which shows per-line errors inline + one summary toast —
+ * so it opts out of the global error toast (which would otherwise stack one per failed line).
+ */
 export function useLoadField() {
   const qc = useQueryClient();
   return useMutation<IdentifierResponse, ApiError, LoadFieldInput>({
     mutationFn: (input) => loadField(apiClient, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+    meta: { skipGlobalErrorToast: true },
   });
 }
 
@@ -114,5 +119,6 @@ export function useUnloadField() {
   return useMutation<IdentifierResponse, ApiError, UnloadFieldInput>({
     mutationFn: (input) => unloadField(apiClient, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+    meta: { skipGlobalErrorToast: true }, // per-line dialog owns the messaging (see useLoadField)
   });
 }

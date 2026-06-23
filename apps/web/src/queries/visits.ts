@@ -58,6 +58,7 @@ export function useCreateVisit() {
         doctorId: body.doctorId,
         status: body.status ?? "open",
         chiefComplaint: body.chiefComplaint ?? null,
+        checkupFeeBilled: false, // a brand-new visit has billed nothing yet
         createdAt: now,
         updatedAt: now,
       };
@@ -86,7 +87,12 @@ export function useCompleteVisit() {
   const qc = useQueryClient();
   return useMutation<IdentifierResponse, ApiError, string>({
     mutationFn: (id) => completeVisit(apiClient, id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [KEY] });
+      // The completion backstop may post the checkup fee + night-stay charges → their `billed` flags
+      // flip; refresh night-stays (visits is [KEY] above) so the «مُفوترة» badges update immediately.
+      qc.invalidateQueries({ queryKey: ["night-stays"] });
+    },
   });
 }
 

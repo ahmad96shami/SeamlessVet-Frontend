@@ -1,4 +1,4 @@
-import { type ApiError, type CustomerResponse, type PetResponse } from "@vet/shared";
+import { type CustomerResponse, type PetResponse } from "@vet/shared";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -36,7 +36,6 @@ export function TransferPetDialog({
           toast.success(t("customers.pets.transferred"));
           onClose();
         },
-        onError: (e: ApiError) => toast.error(e.message),
       },
     );
   };

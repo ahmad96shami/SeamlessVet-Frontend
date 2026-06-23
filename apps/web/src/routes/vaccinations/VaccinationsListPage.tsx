@@ -137,7 +137,6 @@ export function VaccinationsListPage() {
         toast.success(t("admin.common.deleted"));
         setDeleteTarget(null);
       },
-      onError: (e) => toast.error(e.message),
     });
   };
 

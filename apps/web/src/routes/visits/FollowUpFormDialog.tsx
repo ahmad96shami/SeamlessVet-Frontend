@@ -1,4 +1,4 @@
-import { type ApiError, type DailyFollowUpResponse } from "@vet/shared";
+import { type DailyFollowUpResponse } from "@vet/shared";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -55,7 +55,6 @@ export function FollowUpFormDialog({
 
   const onSubmit = () => {
     if (!valid) return;
-    const onError = (e: ApiError) => toast.error(e.message);
     const fields = {
       condition: text(condition),
       temperature: num(temperature),
@@ -67,12 +66,12 @@ export function FollowUpFormDialog({
     if (followUp) {
       update.mutate(
         { id: followUp.id, body: { entryDate, ...fields } },
-        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); } },
       );
     } else {
       create.mutate(
         { visitId, entryDate, ...fields },
-        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); } },
       );
     }
   };

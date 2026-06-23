@@ -163,7 +163,6 @@ export function ReceiptVoucherDialog({
           setIssuedId(res.id);
           toast.success(t("pos.voucher.success"));
         },
-        onError: (e) => toast.error(e.message),
       },
     );
   };

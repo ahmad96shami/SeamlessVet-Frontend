@@ -133,7 +133,6 @@ export function OperatingExpensesPage() {
         toast.success(t("admin.common.deleted"));
         setDeleteTarget(null);
       },
-      onError: (e) => toast.error(e.message),
     });
   };
 

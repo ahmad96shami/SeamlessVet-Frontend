@@ -58,7 +58,6 @@ export function UserFormDialog({ open, onClose }: { open: boolean; onClose: () =
       },
       onError: (e: ApiError) => {
         applyFieldErrors(e, (name, err) => setError(name as never, err));
-        if (!e.fieldErrors) toast.error(e.message);
       },
     });
   });

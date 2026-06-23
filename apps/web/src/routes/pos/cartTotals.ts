@@ -25,7 +25,8 @@ export function computeTotals(
   invoiceDiscount: number,
   tax: { enabled: boolean; rate: number },
 ): CartTotals {
-  const subtotal = round2(lines.reduce((sum, l) => sum + lineTotal(l), 0));
+  // Billed («مُفوترة») lines are reference-only — already on an earlier invoice, so they never count.
+  const subtotal = round2(lines.filter((l) => !l.billed).reduce((sum, l) => sum + lineTotal(l), 0));
   const discount = round2(invoiceDiscount);
   const taxable = Math.max(0, subtotal - discount);
   const taxAmount = tax.enabled ? round2((taxable * tax.rate) / 100) : 0;

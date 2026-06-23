@@ -1,4 +1,4 @@
-import type { ApiError, ContractResponse } from "@vet/shared";
+import type { ContractResponse } from "@vet/shared";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -35,12 +35,10 @@ export function ContractLifecycleActions({
   if (!isDraft && !isActive) return null;
 
   const pending = activate.isPending || complete.isPending || cancel.isPending;
-  const onError = (e: ApiError) => toast.error(e.message);
 
   const doActivate = () =>
     activate.mutate(contract.id, {
       onSuccess: () => toast.success(t("admin.common.updated")),
-      onError,
     });
 
   const runConfirmed = () => {
@@ -50,7 +48,6 @@ export function ContractLifecycleActions({
         toast.success(t("admin.common.updated"));
         setConfirm(null);
       },
-      onError,
     });
   };
 

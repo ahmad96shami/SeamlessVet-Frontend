@@ -48,7 +48,6 @@ export function DoctorPartnerFormDialog({
 
   const onError = (e: ApiError) => {
     if (e.fieldErrors) applyFieldErrors(e, (name, err) => setError(name as never, err));
-    else toast.error(e.code === "doctor_partner_user_taken" ? t("doctorPartners.userTaken") : e.message);
   };
 
   const onSubmit = handleSubmit((values) => {

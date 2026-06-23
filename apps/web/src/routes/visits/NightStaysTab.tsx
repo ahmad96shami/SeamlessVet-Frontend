@@ -15,7 +15,6 @@ import { toDateTimeLocal } from "@/lib/calendar";
 import { useCloseNightStay, useDeleteNightStay, useNightStays } from "@/queries/nightStays";
 import { useSystemSettings } from "@/queries/systemSettings";
 import { NightStayFormDialog } from "@/routes/visits/NightStayFormDialog";
-import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
 
 /**
  * Hotel-style night count for an open stay (mirrors the backend `NightStayChargeCalculator`): a guest
@@ -51,7 +50,6 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
   const checkoutHour = settings.data?.nightStayCheckoutHour ?? 12;
   const close = useCloseNightStay();
   const del = useDeleteNightStay();
-  const billed = useBilledChargeIds(visitId);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<NightStayResponse | null>(null);
@@ -113,7 +111,7 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
         id: "status",
         header: t("visits.nightStays.col.status"),
         cell: ({ row }) =>
-          billed.nightStays.has(row.original.id) ? (
+          row.original.billed ? (
             <Badge variant="success">{t("visits.nightStays.billed")}</Badge>
           ) : isClosed(row.original) ? (
             <Badge variant="secondary">{t("visits.nightStays.statusClosed")}</Badge>
@@ -128,7 +126,7 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
         header: "",
         cell: ({ row }) => {
           const s = row.original;
-          if (billed.nightStays.has(s.id)) {
+          if (s.billed) {
             // Billed (invoice line or completion backstop) — frozen, server-enforced too.
             return (
               <span
@@ -178,7 +176,7 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
       });
     }
     return cols;
-  }, [t, lang, readOnly, checkoutHour, now, billed]);
+  }, [t, lang, readOnly, checkoutHour, now]);
 
   const confirmClose = () => {
     if (!closeTarget) return;
@@ -189,7 +187,6 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
           toast.success(t("visits.nightStays.closed"));
           setCloseTarget(null);
         },
-        onError: (e) => toast.error(e.message),
       },
     );
   };
@@ -203,7 +200,6 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
           toast.success(t("admin.common.updated"));
           setRecloseTarget(null);
         },
-        onError: (e) => toast.error(e.message),
       },
     );
   };
@@ -215,7 +211,6 @@ export function NightStaysTab({ visitId, readOnly }: { visitId: string; readOnly
         toast.success(t("admin.common.deleted"));
         setDeleteTarget(null);
       },
-      onError: (e) => toast.error(e.message),
     });
   };
 

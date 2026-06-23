@@ -1,4 +1,4 @@
-import { formatCurrency, type ApiError, type VisitResponse } from "@vet/shared";
+import { formatCurrency, type VisitResponse } from "@vet/shared";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -9,7 +9,6 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Money } from "@/components/ui/money";
 import { useSystemSettings } from "@/queries/systemSettings";
-import { useBilledChargeIds } from "@/routes/visits/useBilledChargeIds";
 import { useUpdateVisit } from "@/queries/visits";
 
 /**
@@ -25,7 +24,6 @@ export function CheckupFeeCard({ visit, readOnly }: { visit: VisitResponse; read
   const lang = i18n.language;
   const settings = useSystemSettings();
   const update = useUpdateVisit();
-  const billed = useBilledChargeIds(visit.id);
   const def = settings.data?.defaultCheckupFee;
 
   const seed = () =>
@@ -45,7 +43,6 @@ export function CheckupFeeCard({ visit, readOnly }: { visit: VisitResponse; read
       { id: visit.id, body: { checkupFeeApplied: current } },
       {
         onSuccess: () => toast.success(t("visits.checkupFee.saved")),
-        onError: (e: ApiError) => toast.error(e.message),
       },
     );
   };
@@ -53,8 +50,9 @@ export function CheckupFeeCard({ visit, readOnly }: { visit: VisitResponse; read
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-xl border p-3">
       <span className="text-sm font-medium">{t("visits.checkupFee.label")}</span>
-      {billed.checkupFee ? (
-        // Billed on an invoice (or the completion backstop posted it) — locked, server-enforced too.
+      {visit.checkupFeeBilled ? (
+        // Server-authoritative flag — billed on an invoice OR posted by the completion backstop
+        // (ledger key checkup-{visitId}). Either way: locked, re-pricing rejected server-side too.
         <>
           <span dir="ltr" className="font-semibold">
             <Money value={visit.checkupFeeApplied ?? 0} />

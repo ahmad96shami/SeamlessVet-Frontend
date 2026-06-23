@@ -75,7 +75,6 @@ export function OperatingExpenseFormDialog({
     const body = omitEmptyStrings(values) as CreateOperatingExpenseRequest;
     const onError = (e: ApiError) => {
       applyFieldErrors(e, (name, err) => setError(name as never, err));
-      if (!e.fieldErrors) toast.error(e.message);
     };
     if (expense) {
       update.mutate(

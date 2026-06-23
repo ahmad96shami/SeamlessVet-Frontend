@@ -48,6 +48,10 @@ export function useIssuePosInvoice() {
       qc.invalidateQueries({ queryKey: ["inventory"] }); // sale_deduct moved stock
       qc.invalidateQueries({ queryKey: ["customers"] }); // ledger balance changed (credit sale)
       qc.invalidateQueries({ queryKey: ["statement"] });
+      // Billing a visit's checkup fee / night stay flips their server `billed` flags — refresh the
+      // visit + night-stays reads so the «مُفوترة» badges (tabs) and POS reference lines stay current.
+      qc.invalidateQueries({ queryKey: ["visits"] });
+      qc.invalidateQueries({ queryKey: ["night-stays"] });
     },
   });
 }

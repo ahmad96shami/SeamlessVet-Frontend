@@ -19,9 +19,9 @@ void i18next
     react: { useSuspense: false }, // resources are bundled (sync init); no Suspense boundary needed
   });
 
-// Every ApiError's `message` localises by its stable backend code at construction, so toasts
-// (the central queryClient notify + the many `toast.error(e.message)` sites) read in the UI
-// language. Unmapped codes fall back to the server's English text.
+// Every ApiError's `message` localises by its stable backend code at construction, so the central
+// queryClient error toast (the single `notify` authority) reads in the UI language. Unmapped codes
+// fall back to the server's English text.
 setApiErrorTranslator((code, fallback) => i18next.t(`apiErrors.${code}`, { defaultValue: fallback }));
 
 /** Mirror the active language onto <html dir/lang> (Arabic → RTL). */

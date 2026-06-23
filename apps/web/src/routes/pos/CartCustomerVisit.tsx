@@ -25,7 +25,7 @@ import { VisitPickerDialog, visitRef } from "./VisitPickerDialog";
  * issuance regardless. Renders nothing; the store merge keeps the cashier's edits across refetches.
  */
 function VisitLinesSync({ visitId }: { visitId: string }) {
-  const { prescriptions, procedures, vaccinations, checkupFee, nightStays, isLoading } =
+  const { prescriptions, procedures, vaccinations, checkupFee, nightStays, billed, isLoading } =
     useVisitCharges(visitId);
   const syncVisitLines = usePosCartStore((s) => s.syncVisitLines);
 
@@ -87,8 +87,36 @@ function VisitLinesSync({ visitId }: { visitId: string }) {
         discountAmount: 0,
         nightStayId: s.id,
       })),
+      // Already-billed charges — `billed: true` greys them out, drops them from the total (cartTotals)
+      // and from the issue payload (CartIssue). They stay visible so a re-rung visit's earlier charges
+      // read «مُفوترة» instead of silently vanishing. Same keys as the unbilled maps, but a charge is
+      // only ever in one set, so no collision.
+      ...billed.prescriptions.map((p) => ({
+        key: p.id, kind: "product" as const, refId: p.productId, name: p.name, unit: p.unit,
+        unitPrice: p.unitPrice, quantity: p.quantity, discountAmount: 0, prescriptionId: p.id, billed: true,
+      })),
+      ...billed.procedures.map((p) => ({
+        key: p.id, kind: "service" as const, refId: p.serviceId, name: p.name,
+        unitPrice: p.price, quantity: 1, discountAmount: 0, procedureId: p.id, billed: true,
+      })),
+      ...billed.vaccinations.map((v) => ({
+        key: v.id, kind: "product" as const, refId: v.productId, name: v.name,
+        unitPrice: v.price, quantity: 1, discountAmount: 0, vaccinationId: v.id, billed: true,
+      })),
+      ...(billed.checkupFee
+        ? [{
+            key: `checkup-${billed.checkupFee.visitId}`, kind: "service" as const,
+            refId: `checkup-${billed.checkupFee.visitId}`, name: billed.checkupFee.name,
+            unitPrice: billed.checkupFee.price, quantity: 1, discountAmount: 0,
+            checkupFeeVisitId: billed.checkupFee.visitId, billed: true,
+          }]
+        : []),
+      ...billed.nightStays.map((s) => ({
+        key: s.id, kind: "service" as const, refId: s.id, name: s.name,
+        unitPrice: s.rate, quantity: s.nights, discountAmount: 0, nightStayId: s.id, billed: true,
+      })),
     ]);
-  }, [isLoading, prescriptions, procedures, vaccinations, checkupFee, nightStays, syncVisitLines]);
+  }, [isLoading, prescriptions, procedures, vaccinations, checkupFee, nightStays, billed, syncVisitLines]);
 
   return null;
 }
@@ -108,8 +136,10 @@ function LinkChip({
   onClear: () => void;
   clearLabel: string;
 }) {
+  // Tajawal sits high in its line-box, so mirror the Button recipe (leading-none + a slight
+  // downward pad + icons nudged back up) to land the text on the optical centre.
   return (
-    <span className="inline-flex h-8 min-w-0 items-center gap-1.5 rounded-full border bg-[var(--paper-soft)] pe-1.5 ps-2.5 text-[13px] font-medium text-navy-900">
+    <span className="inline-flex h-8 min-w-0 items-center gap-1.5 rounded-full border bg-[var(--paper-soft)] pe-1.5 ps-2.5 pt-1 pb-px text-[13px] font-medium leading-none text-navy-900 [&_svg]:-translate-y-[1.5px]">
       {icon}
       <span className="truncate" dir={ltr ? "ltr" : undefined}>
         {label}

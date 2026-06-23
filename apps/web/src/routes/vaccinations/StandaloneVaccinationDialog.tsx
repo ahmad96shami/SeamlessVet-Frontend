@@ -1,4 +1,4 @@
-import { VACCINE_CATEGORY, type ApiError, type CustomerResponse, type VaccinationResponse } from "@vet/shared";
+import { VACCINE_CATEGORY, type CustomerResponse, type VaccinationResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -110,7 +110,6 @@ export function StandaloneVaccinationDialog({
 
   const onSubmit = () => {
     if (!valid) return;
-    const onError = (e: ApiError) => toast.error(e.message);
     const due = nextDueDate.trim() === "" ? undefined : nextDueDate;
     const priceNum = price.trim() === "" ? undefined : Number(price);
 
@@ -128,7 +127,7 @@ export function StandaloneVaccinationDialog({
             nextDueDate: due,
           },
         },
-        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); } },
       );
     } else if (customer) {
       create.mutate(
@@ -142,7 +141,7 @@ export function StandaloneVaccinationDialog({
           dateGiven,
           nextDueDate: due,
         },
-        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); } },
       );
     }
   };

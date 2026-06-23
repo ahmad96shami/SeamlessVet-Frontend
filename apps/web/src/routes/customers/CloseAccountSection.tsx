@@ -57,9 +57,8 @@ function CloseAccountBase({
         setReopenConfirmOpen(false);
         toast.success(t(`${ns}.reopened`));
       },
-      onError: (e) => {
+      onError: () => {
         setReopenConfirmOpen(false);
-        toast.error(e.message);
       },
     });
   const doClose = () =>
@@ -68,15 +67,8 @@ function CloseAccountBase({
         setConfirmOpen(false);
         toast.success(t(`${ns}.closed`));
       },
-      onError: (e) => {
+      onError: () => {
         setConfirmOpen(false);
-        // The close endpoint rejects a non-zero balance with `account_not_settled` (a race past the
-        // disabled button); `settlement_locked` is mapped too for safety.
-        toast.error(
-          e.code === "account_not_settled" || e.code === "settlement_locked"
-            ? t(`${ns}.balanceMustBeZero`, { balance: formatCurrency(balance, lang) })
-            : e.message,
-        );
       },
     });
 

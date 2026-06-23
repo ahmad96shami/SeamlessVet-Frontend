@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ApiError, type PurchaseInvoiceInput } from "@vet/shared";
+import { type PurchaseInvoiceInput } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -147,7 +147,6 @@ export function PurchaseFormDialog({
         toast.success(t("purchases.success"));
         onClose();
       },
-      onError: (e: ApiError) => toast.error(e.message),
     });
   });
 

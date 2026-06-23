@@ -474,7 +474,7 @@
   /* Always visible (a hover-only reveal grew the footer under the cursor and stole clicks
      from the last nav item): a compact stacked column in the collapsed rail, a row when
      expanded. The footer only ever SHRINKS on hover, so nothing appears under the cursor. */
-  .sidenav .sn-utility { display: flex; flex-direction: column; gap: 4px; }
+  .sidenav .sn-utility { display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .sidenav:is(:hover, .mobile-open) .sn-utility { flex-direction: row; gap: 6px; }
   .sidenav .sn-utility .icon-pill { width: 32px; height: 32px; border-radius: 8px; background: var(--ink-50); flex: 0 0 auto; }
   .sidenav:is(:hover, .mobile-open) .sn-utility .icon-pill { width: 36px; height: 36px; }

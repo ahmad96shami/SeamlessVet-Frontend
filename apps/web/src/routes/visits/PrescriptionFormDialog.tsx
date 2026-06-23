@@ -1,6 +1,5 @@
 import {
   DISPENSE_TYPE_VALUES,
-  type ApiError,
   type PrescriptionCreateRequest,
   type PrescriptionResponse,
 } from "@vet/shared";
@@ -147,7 +146,6 @@ export function PrescriptionFormDialog({
 
   const onSubmit = () => {
     if (!valid) return;
-    const onError = (e: ApiError) => toast.error(e.message);
     const text = (s: string) => (s.trim() === "" ? undefined : s.trim());
     // M23 — the billable toggle only travels for in-clinic meds, and never once billed (frozen).
     const billableBody =
@@ -165,7 +163,7 @@ export function PrescriptionFormDialog({
             ...reminderBody(),
           },
         },
-        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); } },
       );
     } else {
       create.mutate(
@@ -181,7 +179,7 @@ export function PrescriptionFormDialog({
           ...billableBody,
           ...reminderBody(),
         },
-        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); } },
       );
     }
   };

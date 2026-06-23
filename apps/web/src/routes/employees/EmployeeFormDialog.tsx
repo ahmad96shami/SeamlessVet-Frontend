@@ -102,7 +102,6 @@ export function EmployeeFormDialog({
 
   const onError = (e: ApiError) => {
     if (e.fieldErrors) applyFieldErrors(e, (name, err) => setError(name as never, err));
-    else toast.error(e.code === "employee_user_taken" ? t("employees.userTaken") : e.message);
   };
 
   const onSubmit = handleSubmit((values) => {

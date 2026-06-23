@@ -1,6 +1,5 @@
 import {
   VISIT_TYPE_VALUES,
-  type ApiError,
   type CustomerResponse,
 } from "@vet/shared";
 import { useEffect, useState } from "react";
@@ -77,7 +76,6 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
             navigate(`/operations/visits/${res.id}`);
           }
         },
-        onError: (e: ApiError) => toast.error(e.message),
       },
     );
   };

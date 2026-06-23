@@ -53,7 +53,6 @@ export function InvoiceDetailDialog({
         toast.success(t("pos.void.success"));
         onClose();
       },
-      onError: (e) => toast.error(e.message),
     });
 
   return (

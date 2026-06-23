@@ -31,6 +31,12 @@ export interface CartLine {
    * discount are the cashier's. Carries the back-link the server de-dupes assembly against.
    */
   locked?: boolean;
+  /**
+   * A billed line is an already-invoiced (or backstop-posted) visit charge, shown «مُفوترة» for
+   * reference only: greyed + non-interactive, EXCLUDED from the totals (cartTotals) and from the
+   * issue payload (CartIssue) so it is never charged twice. Billed lines are always `locked` too.
+   */
+  billed?: boolean;
   prescriptionId?: string;
   procedureId?: string;
   /** M26 — a catalog-linked visit vaccination billed as a product line (vaccines are products). */

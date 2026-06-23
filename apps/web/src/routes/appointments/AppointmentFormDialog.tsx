@@ -169,7 +169,6 @@ export function AppointmentFormDialog({
       setServerError(
         e.code === "appointment_conflict" ? t("appointments.conflictError") : e.message,
       );
-      toast.error(e.message);
     };
 
     if (appointment) {
@@ -222,7 +221,6 @@ export function AppointmentFormDialog({
   const runAction = () => {
     if (!appointment || !pendingAction) return;
     const id = appointment.id;
-    const fail = (e: ApiError) => toast.error(e.message);
     if (pendingAction === "attend") {
       attend.mutate(id, {
         onSuccess: async () => {
@@ -236,7 +234,6 @@ export function AppointmentFormDialog({
           onClose();
           if (visitId) navigate(`/operations/visits/${visitId}`);
         },
-        onError: fail,
       });
     } else if (pendingAction === "cancel") {
       cancelAppt.mutate(id, {
@@ -244,7 +241,6 @@ export function AppointmentFormDialog({
           toast.success(t("appointments.cancelled"));
           onClose();
         },
-        onError: fail,
       });
     } else {
       noShow.mutate(id, {
@@ -252,7 +248,6 @@ export function AppointmentFormDialog({
           toast.success(t("appointments.noShowed"));
           onClose();
         },
-        onError: fail,
       });
     }
   };

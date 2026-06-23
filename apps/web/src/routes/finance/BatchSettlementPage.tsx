@@ -115,9 +115,8 @@ export function BatchSettlementPage() {
             navigate("/finance/batches");
           }
         },
-        onError: (err) => {
+        onError: () => {
           setConfirmOpen(false);
-          toast.error(err.message);
         },
       },
     );

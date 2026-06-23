@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Money } from "@/components/ui/money";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,29 @@ function CartLineRow({
     const n = Math.floor(Number(raw));
     if (raw !== "" && Number.isFinite(n) && n >= 1) setQty(line.key, n);
   };
+
+  // A «مُفوترة» reference line — already billed on an earlier invoice. Greyed and non-interactive
+  // (no expander / qty / remove), and excluded from the total + the issue payload. It stays visible
+  // so a re-rung visit's earlier charges read as billed instead of silently disappearing.
+  if (line.billed) {
+    return (
+      <div
+        className="flex items-center gap-2 border-b px-3 py-2.5 opacity-70"
+        title={t("pos.cart.billedHint")}
+      >
+        <span className="flex-none translate-y-[1.5px] text-sm font-bold tabular-nums text-muted-foreground">
+          {line.quantity} ×
+        </span>
+        <span className="min-w-0 flex-1 translate-y-[1.5px] truncate text-sm font-medium text-muted-foreground">
+          {line.name}
+        </span>
+        <Badge variant="success">{t("pos.cart.billed")}</Badge>
+        <span className="flex-none translate-y-[1.5px] text-sm font-semibold tabular-nums text-muted-foreground">
+          <Money value={lineTotal(line)} />
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="border-b">

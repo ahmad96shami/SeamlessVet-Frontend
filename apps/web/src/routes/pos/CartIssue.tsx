@@ -35,7 +35,8 @@ export function CartIssue({ total }: { total: number }) {
   const [walkInWarning, setWalkInWarning] = useState(false);
 
   const { overpaid, remaining } = paymentSummary(payments, total);
-  const hasSomethingToBill = lines.length > 0 || visitId !== null;
+  // «مُفوترة» reference lines don't count — there must be at least one billable (non-billed) line.
+  const hasSomethingToBill = lines.some((l) => !l.billed);
   // A linked visit implies a customer, so this can only hold for a plain walk-in cart.
   const walkInUnpaid = customerId === null && remaining > 0;
   const canIssue = hasSomethingToBill && !issue.isPending && (visitId !== null || !overpaid);
@@ -50,7 +51,9 @@ export function CartIssue({ total }: { total: number }) {
       customerId: s.customerId ?? undefined,
       visitId: s.visitId ?? undefined,
       discountAmount: s.invoiceDiscount,
-      items: s.lines.map((l) => {
+      // Skip «مُفوترة» reference lines — they're already on an earlier invoice; re-sending their
+      // back-links would either 409 (already billed) or risk a double charge.
+      items: s.lines.filter((l) => !l.billed).map((l) => {
         // M23 care-charge lines (checkup fee / night stay) carry a synthetic refId and send NO
         // catalog ids — the server resolves the per-environment system service from the back-link.
         const careCharge = l.nightStayId != null || l.checkupFeeVisitId != null;
@@ -69,18 +72,23 @@ export function CartIssue({ total }: { total: number }) {
           checkupFeeVisitId: l.checkupFeeVisitId,
         };
       }),
-      payments: s.payments.map((p) => ({
-        method: p.method,
-        amount: p.amount,
-        // M19 — carry cheque reference metadata only on a cheque leg (omit blanks).
-        ...(p.method === "cheque"
-          ? {
-              ...(p.chequeNumber?.trim() ? { chequeNumber: p.chequeNumber.trim() } : {}),
-              ...(p.chequeBank?.trim() ? { chequeBank: p.chequeBank.trim() } : {}),
-              ...(p.chequeDueDate ? { chequeDueDate: p.chequeDueDate } : {}),
-            }
-          : {}),
-      })),
+      // Drop zero-amount legs — a blank/0 payment row isn't a payment (and would trip the server's
+      // `amount > 0` rule). Whatever stays unpaid lands on the customer ledger as credit; a walk-in
+      // with nothing paid is already caught above by `walkInUnpaid` with a friendly message.
+      payments: s.payments
+        .filter((p) => p.amount > 0)
+        .map((p) => ({
+          method: p.method,
+          amount: p.amount,
+          // M19 — carry cheque reference metadata only on a cheque leg (omit blanks).
+          ...(p.method === "cheque"
+            ? {
+                ...(p.chequeNumber?.trim() ? { chequeNumber: p.chequeNumber.trim() } : {}),
+                ...(p.chequeBank?.trim() ? { chequeBank: p.chequeBank.trim() } : {}),
+                ...(p.chequeDueDate ? { chequeDueDate: p.chequeDueDate } : {}),
+              }
+            : {}),
+        })),
     };
     issue.mutate(input, {
       onSuccess: (res) => {
@@ -94,7 +102,6 @@ export function CartIssue({ total }: { total: number }) {
           setIssuedId(res.id);
         }
       },
-      onError: (e) => toast.error(e.message),
     });
   };
 

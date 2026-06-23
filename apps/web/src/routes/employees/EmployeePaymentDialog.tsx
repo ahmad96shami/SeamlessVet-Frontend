@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   EMPLOYEE_PAYMENT_KIND_VALUES,
   IMMEDIATE_PAYMENT_METHODS,
-  type ApiError,
   type EmployeePaymentInput,
 } from "@vet/shared";
 import { useEffect } from "react";
@@ -103,7 +102,6 @@ export function EmployeePaymentDialog({
         toast.success(t("employees.payment.success"));
         onClose();
       },
-      onError: (e: ApiError) => toast.error(e.message),
     });
   });
 

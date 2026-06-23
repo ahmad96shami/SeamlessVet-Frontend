@@ -105,7 +105,6 @@ export function ScheduleFollowUpDialog({
           setServerError(
             e.code === "appointment_conflict" ? t("visits.scheduleFollowUp.conflictError") : e.message,
           );
-          toast.error(e.message);
         },
       },
     );

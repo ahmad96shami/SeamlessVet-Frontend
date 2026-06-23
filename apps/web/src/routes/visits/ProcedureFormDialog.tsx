@@ -1,4 +1,4 @@
-import { type ApiError, type ProcedureResponse } from "@vet/shared";
+import { type ProcedureResponse } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -82,7 +82,6 @@ export function ProcedureFormDialog({
 
   const onSubmit = () => {
     if (!valid) return;
-    const onError = (e: ApiError) => toast.error(e.message);
     if (procedure) {
       update.mutate(
         {
@@ -93,7 +92,7 @@ export function ProcedureFormDialog({
             resultText: resultText.trim(),
           },
         },
-        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); } },
       );
     } else {
       create.mutate(
@@ -103,7 +102,7 @@ export function ProcedureFormDialog({
           price: price.trim() === "" ? undefined : Number(price),
           resultText: resultText.trim(),
         },
-        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); } },
       );
     }
   };

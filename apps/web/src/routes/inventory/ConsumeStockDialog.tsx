@@ -1,4 +1,3 @@
-import { type ApiError } from "@vet/shared";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -68,7 +67,6 @@ export function ConsumeStockDialog({ open, onClose }: { open: boolean; onClose: 
           toast.success(t("inventory.consumables.success"));
           onClose();
         },
-        onError: (e: ApiError) => toast.error(e.message),
       },
     );
   };

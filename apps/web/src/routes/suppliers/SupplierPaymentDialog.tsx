@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IMMEDIATE_PAYMENT_METHODS, type ApiError, type SupplierPaymentInput } from "@vet/shared";
+import { IMMEDIATE_PAYMENT_METHODS, type SupplierPaymentInput } from "@vet/shared";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -76,7 +76,6 @@ export function SupplierPaymentDialog({
         toast.success(t("suppliers.payment.success"));
         onClose();
       },
-      onError: (e: ApiError) => toast.error(e.message),
     });
   });
 

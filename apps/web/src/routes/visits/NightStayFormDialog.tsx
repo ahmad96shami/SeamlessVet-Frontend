@@ -1,4 +1,4 @@
-import { CARE_TYPE_VALUES, type ApiError, type NightStayResponse } from "@vet/shared";
+import { CARE_TYPE_VALUES, type NightStayResponse } from "@vet/shared";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -69,7 +69,6 @@ export function NightStayFormDialog({
   }, [open, rateTouched, careType, settings.data]);
 
   const pending = create.isPending || update.isPending;
-  const onError = (e: ApiError) => toast.error(e.message);
   const rateNum = nightlyRate.trim() === "" ? undefined : Number(nightlyRate);
 
   const onSubmit = () => {
@@ -82,12 +81,12 @@ export function NightStayFormDialog({
     if (isEdit) {
       update.mutate(
         { id: stay.id, body },
-        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.updated")); onClose(); } },
       );
     } else {
       create.mutate(
         { visitId, ...body },
-        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); }, onError },
+        { onSuccess: () => { toast.success(t("admin.common.created")); onClose(); } },
       );
     }
   };

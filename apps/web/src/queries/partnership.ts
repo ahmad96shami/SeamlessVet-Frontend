@@ -79,6 +79,8 @@ export function useCreatePartnershipShare() {
   return useMutation<IdentifierResponse, ApiError, PartnershipShareCreateRequest>({
     mutationFn: (body) => createPartnershipShare(apiClient, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: [SHARES] }),
+    // ShareFormDialog shows a context-specific message for the ≤100% conflict — it owns the toast.
+    meta: { skipGlobalErrorToast: true },
   });
 }
 
@@ -91,6 +93,7 @@ export function useUpdatePartnershipShare() {
   >({
     mutationFn: ({ id, body }) => updatePartnershipShare(apiClient, id, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: [SHARES] }),
+    meta: { skipGlobalErrorToast: true }, // ShareFormDialog owns the toast (see useCreatePartnershipShare)
   });
 }
 

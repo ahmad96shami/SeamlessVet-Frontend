@@ -1,4 +1,4 @@
-import { type ApiError, type RoleListItem } from "@vet/shared";
+import { type RoleListItem } from "@vet/shared";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -57,7 +57,6 @@ export function RoleFormDialog({
       return;
     }
     const body = { name: trimmed, permissions: [...selected] };
-    const onError = (e: ApiError) => toast.error(e.message);
     if (role) {
       update.mutate(
         { id: role.id, body },
@@ -66,7 +65,6 @@ export function RoleFormDialog({
             toast.success(t("admin.common.updated"));
             onClose();
           },
-          onError,
         },
       );
     } else {
@@ -75,7 +73,6 @@ export function RoleFormDialog({
           toast.success(t("admin.common.created"));
           onClose();
         },
-        onError,
       });
     }
   };
