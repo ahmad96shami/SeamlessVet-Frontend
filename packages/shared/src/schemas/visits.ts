@@ -44,6 +44,10 @@ export const VisitResponseSchema = z.object({
   followUpOfVisitId: z.string().nullish(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  // M23 — derived: the checkup fee is billed, via a POS invoice line (back-link) OR the
+  // visit-completion ledger backstop (key checkup-{visitId}). Drives «مُفوترة» on the checkup-fee
+  // card + POS. `.default(false)` keeps an older backend that omits it parsing as "not billed".
+  checkupFeeBilled: z.boolean().default(false),
 });
 export type VisitResponse = z.infer<typeof VisitResponseSchema>;
 

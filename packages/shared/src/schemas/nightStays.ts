@@ -21,6 +21,11 @@ export const NightStayResponseSchema = z.object({
   notes: z.string().nullish(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  // M23 — derived: the boarding charge is billed, via a POS invoice line (back-link) OR the
+  // visit-completion ledger backstop (key night-stay-{id}). Drives the «مُفوترة» badge + lock on the
+  // night-stays tab and the POS cart. `.default(false)` keeps an older backend that omits it parsing
+  // as "not billed" rather than throwing.
+  billed: z.boolean().default(false),
 });
 export type NightStayResponse = z.infer<typeof NightStayResponseSchema>;
 

@@ -1,4 +1,5 @@
 import { isAxiosError } from "axios";
+import { ZodError } from "zod";
 
 /** The backend error envelope (ExceptionHandlingMiddleware → `{ code, message, fieldErrors? }`). */
 export interface ApiErrorBody {
@@ -75,6 +76,13 @@ export function toApiError(err: unknown): ApiError {
     }
     // No response → offline / network failure (the offline queue should retry).
     return new ApiError({ code: "network_error", message: err.message });
+  }
+
+  // A client-side schema violation (e.g. building a request body, or parsing a response). Zod 4
+  // serialises `err.message` to the raw issues JSON, so map it to a friendly, localisable code
+  // instead of letting that array reach a toast.
+  if (err instanceof ZodError) {
+    return new ApiError({ code: "validation_failed", message: "Some fields are not valid." });
   }
 
   if (err instanceof Error) return new ApiError({ code: "unknown_error", message: err.message });
