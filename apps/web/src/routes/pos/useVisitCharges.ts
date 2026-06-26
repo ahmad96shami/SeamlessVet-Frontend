@@ -17,13 +17,14 @@ import { useVisit } from "@/queries/visits";
  * the checkup fee + closed night stays.
  *
  * - **Unbilled** drives the POS cart's active LOCKED lines (VisitLinesSync) and the W19 confirm dialog.
- *   Care charges (checkup fee / night stays) appear only while the visit is `in_progress` — an open
- *   visit hasn't confirmed the fee (بدء الكشف), and a completed visit's were already settled.
+ *   Care charges (checkup fee / night stays) appear once the exam has started — `in_progress` OR
+ *   `completed` — and stay billable until the POS actually bills them. An OPEN visit shows none (بدء
+ *   الكشف hasn't confirmed the fee yet). Completion no longer posts anything to the ledger, so a
+ *   completed visit's care charges are collected here on the invoice rail, never auto-charged.
  * - **Billed** drives the POS cart's greyed «مُفوترة» reference lines (0 to the total, never re-sent).
  *   rx/proc/vax come from invoice back-links (their only writer); the care charges use the server's
- *   authoritative `billed` flags (`night_stay.billed` / `visit.checkupFeeBilled`), which also catch
- *   the completion backstop — so a COMPLETED visit still shows its billed checkup fee + night stays,
- *   which is exactly what makes a re-rung visit's already-billed charges visible instead of vanishing.
+ *   authoritative `billed` flags (`night_stay.billed` / `visit.checkupFeeBilled`) — true only once a
+ *   POS invoice line bills them, so an already-billed charge stays visible instead of vanishing.
  */
 export function useVisitCharges(visitId: string) {
   const { t } = useTranslation();
@@ -89,8 +90,10 @@ export function useVisitCharges(visitId: string) {
 
     const v = visit.data;
     const inClinic = v?.visitType === "in_clinic";
-    // Care charges are offered as billable only mid-visit (M23); billed ones show regardless of status.
-    const careChargesActive = inClinic && v?.status === "in_progress";
+    // Care charges are billable once the exam started and until the POS bills them (in_progress OR
+    // completed); an open visit shows none. Billed ones show greyed «مُفوترة» regardless of status.
+    const careChargesActive =
+      inClinic && (v?.status === "in_progress" || v?.status === "completed");
     const feeAmount = v?.checkupFeeApplied ?? 0;
     const feeBilled = v?.checkupFeeBilled ?? false; // server flag — invoice back-link OR backstop
 
