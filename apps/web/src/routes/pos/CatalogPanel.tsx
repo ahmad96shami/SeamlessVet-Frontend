@@ -1,14 +1,18 @@
-import { formatQuantity, SYSTEM_SERVICE_CATEGORIES, VACCINE_CATEGORY } from "@vet/shared";
-import { useEffect, useState } from "react";
+import { formatQuantity, listStock, SYSTEM_SERVICE_CATEGORIES, VACCINE_CATEGORY } from "@vet/shared";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { Money } from "@/components/ui/money";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
+import { useBarcodeScan } from "@/hooks/useBarcodeScan";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/services/apiClient";
 import { useStock } from "@/queries/inventory";
 import { useServices } from "@/queries/services";
 import { usePosCartStore } from "@/stores/posCartStore";
@@ -33,8 +37,10 @@ export function CatalogPanel() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const addItem = usePosCartStore((s) => s.addItem);
+  const qc = useQueryClient();
 
   const [search, setSearch] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
   const debounced = useDebouncedValue(search, 300);
   const [filter, setFilter] = useState<Filter>("all");
   const [voucherOpen, setVoucherOpen] = useState(false);
@@ -45,6 +51,53 @@ export function CatalogPanel() {
   useEffect(() => {
     if (typeof window !== "undefined") window.localStorage.setItem(LAYOUT_KEY, layout);
   }, [layout]);
+
+  // Hardware barcode scanner: a detected scan (fast burst + Enter) resolves the code to a sellable
+  // warehouse product and drops it straight in the cart, then clears + refocuses the box for the
+  // next scan. The catalog's debounced search hasn't fetched the scanned code yet, so look it up
+  // imperatively (cached via the query client) and exact-match the barcode.
+  const handleScan = useCallback(
+    async (code: string) => {
+      const params = { locationType: "warehouse", search: code, take: 50 } as const;
+      let rows;
+      try {
+        rows = await qc.fetchQuery({
+          queryKey: ["inventory", "stock", params],
+          queryFn: () => listStock(apiClient, params),
+        });
+      } catch {
+        return; // the global error toast already surfaced the failure
+      }
+      const lower = code.toLowerCase();
+      const match =
+        rows.find((r) => r.barcode?.toLowerCase() === lower) ??
+        (rows.length === 1 ? rows[0] : undefined);
+
+      setSearch("");
+      searchRef.current?.focus();
+
+      if (!match) {
+        toast.error(t("pos.scan.notFound", { code }));
+        return;
+      }
+      if (match.quantity <= 0) {
+        toast.error(t("pos.scan.outOfStock", { name: match.nameAr }));
+        return;
+      }
+      addItem({
+        kind: "product",
+        refId: match.productId,
+        name: match.nameAr,
+        code: match.barcode ?? undefined,
+        unit: match.unitOfMeasure ?? (match.category === VACCINE_CATEGORY ? t("pos.catalog.vaccine") : undefined),
+        unitPrice: match.sellingPrice,
+        available: match.quantity,
+      });
+      toast.success(t("pos.scan.added", { name: match.nameAr }));
+    },
+    [qc, addItem, t],
+  );
+  const onSearchKeyDown = useBarcodeScan(handleScan);
 
   // Products + vaccines both come from warehouse stock (on-hand + low-stock flag + selling price);
   // the search matches name + barcode server-side. Vaccines (M26) are stock products with category
@@ -76,9 +129,11 @@ export function CatalogPanel() {
         <div className="relative flex-1">
           <Icon.search className="pointer-events-none absolute inset-y-0 start-3 my-auto size-4 text-muted-foreground" />
           <Input
+            ref={searchRef}
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={onSearchKeyDown}
             placeholder={t("pos.search.placeholder")}
             className="ps-9"
           />
