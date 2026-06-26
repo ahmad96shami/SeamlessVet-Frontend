@@ -17,10 +17,58 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useSystemSettings, useUpdateSystemSettings } from "@/queries/systemSettings";
 import { useAuthStore } from "@/stores/authStore";
+
+type LeadPreset = { value: number; key: string };
+type TFn = (key: string, options?: Record<string, unknown>) => string;
+
+// "Fire before due" presets per reminder. Vaccination due is date-only (days); dosage/appointments
+// are intraday (minutes). Stored as a plain int — the option values ARE those ints.
+const VACCINATION_LEAD_PRESETS: LeadPreset[] = [
+  { value: 0, key: "onDueDate" },
+  { value: 1, key: "day1" },
+  { value: 2, key: "day2" },
+  { value: 3, key: "day3" },
+  { value: 7, key: "week1" },
+];
+const MEDICATION_LEAD_PRESETS: LeadPreset[] = [
+  { value: 0, key: "atDose" },
+  { value: 5, key: "min5" },
+  { value: 15, key: "min15" },
+  { value: 30, key: "min30" },
+  { value: 60, key: "hour1" },
+  { value: 1440, key: "day1" },
+];
+const APPOINTMENT_LEAD_PRESETS: LeadPreset[] = [
+  { value: 30, key: "min30" },
+  { value: 60, key: "hour1" },
+  { value: 120, key: "hour2" },
+  { value: 1440, key: "day1" },
+  { value: 2880, key: "day2" },
+];
+
+/** Options for a lead-time <Select>; keeps a stored non-preset value selectable rather than dropping it. */
+function leadOptions(current: number | undefined, presets: LeadPreset[], t: TFn) {
+  const known = current == null || presets.some((p) => p.value === current);
+  return [
+    ...(known
+      ? []
+      : [
+          <option key="current" value={current}>
+            {t("admin.settings.lead.custom", { value: current })}
+          </option>,
+        ]),
+    ...presets.map((p) => (
+      <option key={p.value} value={p.value}>
+        {t(`admin.settings.lead.${p.key}`)}
+      </option>
+    )),
+  ];
+}
 
 export function SettingsPage() {
   const { t } = useTranslation();
@@ -53,6 +101,8 @@ export function SettingsPage() {
       nightStayRateHotel: query.data.nightStayRateHotel,
       nightStayCheckoutHour: query.data.nightStayCheckoutHour,
       medicationReminderLeadMinutes: query.data.medicationReminderLeadMinutes,
+      vaccinationReminderLeadDays: query.data.vaccinationReminderLeadDays,
+      appointmentReminderLeadMinutes: query.data.appointmentReminderLeadMinutes,
     });
   }, [query.data, reset]);
 
@@ -115,28 +165,6 @@ export function SettingsPage() {
                     step="0.01"
                     dir="ltr"
                     {...register("defaultCheckupFee", { valueAsNumber: true })}
-                  />
-                </Field>
-                <Field
-                  label={t("admin.settings.expirationWarningDays")}
-                  error={errors.expirationWarningDays?.message}
-                >
-                  <Input
-                    type="number"
-                    step="1"
-                    dir="ltr"
-                    {...register("expirationWarningDays", { valueAsNumber: true })}
-                  />
-                </Field>
-                <Field
-                  label={t("admin.settings.lowStockThresholdPct")}
-                  error={errors.lowStockThresholdPct?.message}
-                >
-                  <Input
-                    type="number"
-                    step="0.1"
-                    dir="ltr"
-                    {...register("lowStockThresholdPct", { valueAsNumber: true })}
                   />
                 </Field>
                 <Field label={t("admin.settings.taxRate")} error={errors.taxRate?.message}>
@@ -227,16 +255,76 @@ export function SettingsPage() {
                       {...register("nightStayCheckoutHour", { valueAsNumber: true })}
                     />
                   </Field>
+                </div>
+              </div>
+
+              <div className="space-y-4 rounded-md border p-4">
+                <div>
+                  <h3 className="text-sm font-semibold">{t("admin.settings.remindersSection")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("admin.settings.remindersHint")}</p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field
+                    label={t("admin.settings.vaccinationReminderLeadDays")}
+                    error={errors.vaccinationReminderLeadDays?.message}
+                  >
+                    <Select
+                      value={String(watch("vaccinationReminderLeadDays") ?? "")}
+                      onChange={(e) =>
+                        setValue("vaccinationReminderLeadDays", Number(e.target.value), { shouldDirty: true })
+                      }
+                    >
+                      {leadOptions(watch("vaccinationReminderLeadDays"), VACCINATION_LEAD_PRESETS, t)}
+                    </Select>
+                  </Field>
                   <Field
                     label={t("admin.settings.medicationReminderLeadMinutes")}
                     error={errors.medicationReminderLeadMinutes?.message}
+                  >
+                    <Select
+                      value={String(watch("medicationReminderLeadMinutes") ?? "")}
+                      onChange={(e) =>
+                        setValue("medicationReminderLeadMinutes", Number(e.target.value), { shouldDirty: true })
+                      }
+                    >
+                      {leadOptions(watch("medicationReminderLeadMinutes"), MEDICATION_LEAD_PRESETS, t)}
+                    </Select>
+                  </Field>
+                  <Field
+                    label={t("admin.settings.appointmentReminderLeadMinutes")}
+                    error={errors.appointmentReminderLeadMinutes?.message}
+                  >
+                    <Select
+                      value={String(watch("appointmentReminderLeadMinutes") ?? "")}
+                      onChange={(e) =>
+                        setValue("appointmentReminderLeadMinutes", Number(e.target.value), { shouldDirty: true })
+                      }
+                    >
+                      {leadOptions(watch("appointmentReminderLeadMinutes"), APPOINTMENT_LEAD_PRESETS, t)}
+                    </Select>
+                  </Field>
+                  <Field
+                    label={t("admin.settings.expirationWarningDays")}
+                    error={errors.expirationWarningDays?.message}
                   >
                     <Input
                       type="number"
                       step="1"
                       min="0"
                       dir="ltr"
-                      {...register("medicationReminderLeadMinutes", { valueAsNumber: true })}
+                      {...register("expirationWarningDays", { valueAsNumber: true })}
+                    />
+                  </Field>
+                  <Field
+                    label={t("admin.settings.lowStockThresholdPct")}
+                    error={errors.lowStockThresholdPct?.message}
+                  >
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      dir="ltr"
+                      {...register("lowStockThresholdPct", { valueAsNumber: true })}
                     />
                   </Field>
                 </div>

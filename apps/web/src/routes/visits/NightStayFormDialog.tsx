@@ -50,6 +50,7 @@ export function NightStayFormDialog({
   const [nightlyRate, setNightlyRate] = useState("");
   const [rateTouched, setRateTouched] = useState(false);
   const [checkInAt, setCheckInAt] = useState("");
+  const [exitHour, setExitHour] = useState(""); // "" = unset, else "0".."23"
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export function NightStayFormDialog({
     setNightlyRate(stay?.nightlyRate != null ? String(stay.nightlyRate) : "");
     setRateTouched(isEdit); // an existing rate is authoritative — don't auto-overwrite it
     setCheckInAt(stay?.checkInAt ? toDateTimeLocal(new Date(stay.checkInAt)) : "");
+    setExitHour(stay?.exitHour != null ? String(stay.exitHour) : "");
     setNotes(stay?.notes ?? "");
   }, [open, stay, isEdit]);
 
@@ -76,6 +78,7 @@ export function NightStayFormDialog({
       careType,
       checkInAt: checkInAt ? new Date(checkInAt).toISOString() : undefined,
       nightlyRate: rateNum,
+      exitHour: exitHour === "" ? undefined : Number(exitHour),
       notes: notes.trim() || undefined,
     };
     if (isEdit) {
@@ -123,9 +126,21 @@ export function NightStayFormDialog({
             />
           </Field>
         </div>
-        <Field label={t("visits.nightStays.checkIn")}>
-          <DatePicker withTime value={checkInAt} onChange={(e) => setCheckInAt(e.target.value)} />
-        </Field>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={t("visits.nightStays.checkIn")}>
+            <DatePicker withTime value={checkInAt} onChange={(e) => setCheckInAt(e.target.value)} />
+          </Field>
+          <Field label={t("visits.nightStays.exitHour")}>
+            <Select value={exitHour} onChange={(e) => setExitHour(e.target.value)}>
+              <option value="">{t("visits.nightStays.exitHourUnset")}</option>
+              {Array.from({ length: 24 }, (_, h) => (
+                <option key={h} value={h}>
+                  {String(h).padStart(2, "0")}:00
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
         <Field label={t("visits.nightStays.notes")}>
           <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
         </Field>
