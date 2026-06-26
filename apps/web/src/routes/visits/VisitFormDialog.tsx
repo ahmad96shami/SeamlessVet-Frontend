@@ -9,10 +9,12 @@ import { toast } from "sonner";
 
 import { Field } from "@/components/form/Field";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { Dialog } from "@/components/ui/dialog";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomerCombobox } from "@/routes/customers/CustomerCombobox";
+import { PetFormDialog } from "@/routes/customers/PetFormDialog";
 import { useDoctorOptions } from "@/hooks/useDoctorOptions";
 import { usePets } from "@/queries/pets";
 import { useCreateVisit } from "@/queries/visits";
@@ -41,6 +43,11 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
   const [visitType, setVisitType] = useState<"in_clinic" | "field">("in_clinic");
   const [chiefComplaint, setChiefComplaint] = useState("");
 
+  // Inline "add new animal" — reuses the pet form; the new id is auto-selected once it lands.
+  const [addPetOpen, setAddPetOpen] = useState(false);
+  const [petDefaultName, setPetDefaultName] = useState("");
+  const [createdPetId, setCreatedPetId] = useState<string | null>(null);
+
   // The chosen customer's pets (the visit's pet must belong to it).
   const petsQuery = usePets(customer ? { customerId: customer.id, take: 100 } : { take: 0 });
   const pets = customer ? (petsQuery.data ?? []) : [];
@@ -52,7 +59,17 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
     setDoctorId(isVet && me ? me.userId : "");
     setVisitType("in_clinic");
     setChiefComplaint("");
+    setAddPetOpen(false);
+    setCreatedPetId(null);
   }, [open, isVet, me]);
+
+  // Once the freshly-created pet lands in the (invalidated) list, select it.
+  useEffect(() => {
+    if (createdPetId && (petsQuery.data ?? []).some((p) => p.id === createdPetId)) {
+      setPetId(createdPetId);
+      setCreatedPetId(null);
+    }
+  }, [createdPetId, petsQuery.data]);
 
   const onConfirm = () => {
     if (!customer || !doctorId) return;
@@ -98,15 +115,23 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
         {customer ? (
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={t("visits.create.pet")}>
-              <Select value={petId} onChange={(e) => setPetId(e.target.value)}>
-                <option value="">{t("visits.create.noPet")}</option>
-                {pets.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                    {p.species ? ` · ${p.species}` : ""}
-                  </option>
-                ))}
-              </Select>
+              <Combobox
+                value={petId}
+                onChange={setPetId}
+                options={[
+                  { value: "", label: t("visits.create.noPet") },
+                  ...pets.map((p) => ({
+                    value: p.id,
+                    label: p.name,
+                    sublabel: p.species ?? undefined,
+                  })),
+                ]}
+                placeholder={t("visits.create.noPet")}
+                onCreateNew={(term) => {
+                  setPetDefaultName(term);
+                  setAddPetOpen(true);
+                }}
+              />
             </Field>
             <Field label={t("visits.create.doctor")}>
               <Select value={doctorId} onChange={(e) => setDoctorId(e.target.value)}>
@@ -152,6 +177,16 @@ export function VisitFormDialog({ open, onClose }: { open: boolean; onClose: () 
         </div>
       </div>
 
+      {customer ? (
+        <PetFormDialog
+          open={addPetOpen}
+          customerId={customer.id}
+          pet={null}
+          defaultName={petDefaultName}
+          onClose={() => setAddPetOpen(false)}
+          onCreated={(id) => setCreatedPetId(id)}
+        />
+      ) : null}
     </Dialog>
   );
 }

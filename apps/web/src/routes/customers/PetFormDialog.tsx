@@ -28,6 +28,8 @@ const PetFormSchema = z.object({
   species: z.string().trim().max(64),
   breed: z.string().trim().max(128),
   sex: z.enum(["", "male", "female", "unknown"]),
+  // Spayed/castrated (معقم/مخصي). Tri-state: "" = unrecorded → undefined on the wire.
+  isNeutered: z.enum(["", "yes", "no"]),
   dateOfBirth: z.string(),
   weightLatest: z
     .string()
@@ -43,6 +45,7 @@ const DEFAULTS: PetFormValues = {
   species: "",
   breed: "",
   sex: "",
+  isNeutered: "",
   dateOfBirth: "",
   weightLatest: "",
   colorMarks: "",
@@ -55,11 +58,17 @@ export function PetFormDialog({
   customerId,
   pet,
   onClose,
+  defaultName,
+  onCreated,
 }: {
   open: boolean;
   customerId: string;
   pet: PetResponse | null;
   onClose: () => void;
+  /** Pre-fill the name when creating (e.g. the term typed in an "add new" combobox). */
+  defaultName?: string;
+  /** Fired with the new pet's id after a successful create (lets a caller auto-select it). */
+  onCreated?: (id: string) => void;
 }) {
   const { t } = useTranslation();
   const create = useCreatePet();
@@ -77,15 +86,16 @@ export function PetFormDialog({
             species: pet.species ?? "",
             breed: pet.breed ?? "",
             sex: (pet.sex ?? "") as PetFormValues["sex"],
+            isNeutered: pet.isNeutered === true ? "yes" : pet.isNeutered === false ? "no" : "",
             dateOfBirth: pet.dateOfBirth ?? "",
             weightLatest: pet.weightLatest != null ? String(pet.weightLatest) : "",
             colorMarks: pet.colorMarks ?? "",
             microchipNo: pet.microchipNo ?? "",
             healthNotes: pet.healthNotes ?? "",
           }
-        : DEFAULTS,
+        : { ...DEFAULTS, name: defaultName ?? "" },
     );
-  }, [open, pet, reset]);
+  }, [open, pet, defaultName, reset]);
 
   const onSubmit = handleSubmit((v) => {
     const body: PetRequest = {
@@ -99,6 +109,7 @@ export function PetFormDialog({
       weightLatest: v.weightLatest ? Number(v.weightLatest) : undefined,
       microchipNo: v.microchipNo || undefined,
       healthNotes: v.healthNotes || undefined,
+      isNeutered: v.isNeutered === "yes" ? true : v.isNeutered === "no" ? false : undefined,
     };
     const onError = (e: ApiError) =>
       applyFieldErrors(e, (name, err) => setError(name as never, err));
@@ -115,8 +126,9 @@ export function PetFormDialog({
       );
     } else {
       create.mutate(body, {
-        onSuccess: () => {
+        onSuccess: (res) => {
           toast.success(t("admin.common.created"));
+          onCreated?.(res.id);
           onClose();
         },
         onError,
@@ -156,6 +168,19 @@ export function PetFormDialog({
                       {t(`petSex.${s}`)}
                     </option>
                   ))}
+                </Select>
+              )}
+            />
+          </Field>
+          <Field label={t("customers.pets.neutered")} error={errors.isNeutered?.message}>
+            <Controller
+              name="isNeutered"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)}>
+                  <option value="">{t("customers.pets.neuteredUnset")}</option>
+                  <option value="yes">{t("customers.pets.neuteredYes")}</option>
+                  <option value="no">{t("customers.pets.neuteredNo")}</option>
                 </Select>
               )}
             />

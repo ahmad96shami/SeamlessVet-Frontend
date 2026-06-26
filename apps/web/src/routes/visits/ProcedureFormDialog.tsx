@@ -78,7 +78,8 @@ export function ProcedureFormDialog({
   );
 
   const pending = create.isPending || update.isPending;
-  const valid = resultText.trim().length > 0 && (price === "" || !Number.isNaN(Number(price)));
+  // Result is optional (the field is nullable everywhere downstream); only the price must parse.
+  const valid = price === "" || !Number.isNaN(Number(price));
 
   const onSubmit = () => {
     if (!valid) return;

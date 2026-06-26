@@ -1,5 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type PurchaseInvoiceInput } from "@vet/shared";
+import {
+  IMMEDIATE_PAYMENT_METHODS,
+  recordSupplierPayment,
+  type PurchaseInvoiceInput,
+  type SupplierPaymentInput,
+} from "@vet/shared";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -15,11 +21,14 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Money } from "@/components/ui/money";
 import { Select } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { omitEmptyStrings } from "@/lib/forms";
 import { useProducts } from "@/queries/products";
 import { useCreatePurchaseInvoice } from "@/queries/purchaseInvoices";
 import { useSuppliers } from "@/queries/suppliers";
 import { ProductFormDialog } from "@/routes/admin/ProductFormDialog";
+import { apiClient } from "@/services/apiClient";
 
 const LineSchema = z.object({
   productId: z.string().min(1),
@@ -61,6 +70,7 @@ export function PurchaseFormDialog({
   presetSupplierId?: string;
 }) {
   const { t } = useTranslation();
+  const qc = useQueryClient();
   const create = useCreatePurchaseInvoice();
   const suppliers = useSuppliers({ take: 200 });
   const products = useProducts({ take: 200 });
@@ -92,12 +102,26 @@ export function PurchaseFormDialog({
   const [addForLine, setAddForLine] = useState<number | null>(null);
   const [createdProductId, setCreatedProductId] = useState<string | null>(null);
 
+  // Optional "pay the supplier now" — recorded as a second call after the invoice posts.
+  const [payNow, setPayNow] = useState(false);
+  const [payMethod, setPayMethod] = useState<(typeof IMMEDIATE_PAYMENT_METHODS)[number]>("cash");
+  const [payAmount, setPayAmount] = useState("");
+  const [chequeNumber, setChequeNumber] = useState("");
+  const [chequeBank, setChequeBank] = useState("");
+  const [chequeDueDate, setChequeDueDate] = useState("");
+
   useEffect(() => {
     if (!open) return;
     reset({ ...DEFAULTS, supplierId: presetSupplierId ?? "", lines: [{ ...EMPTY_LINE }] });
     setAddProductOpen(false);
     setAddForLine(null);
     setCreatedProductId(null);
+    setPayNow(false);
+    setPayMethod("cash");
+    setPayAmount("");
+    setChequeNumber("");
+    setChequeBank("");
+    setChequeDueDate("");
   }, [open, presetSupplierId, reset]);
 
   // Once the freshly-created product lands in the (invalidated) catalog list, select it
@@ -125,8 +149,10 @@ export function PurchaseFormDialog({
     return sum + Math.max(0, q * c - d);
   }, 0);
   const total = Math.max(0, subtotal - invoiceDiscount + tax);
+  // When "pay now" is on, the payment amount must be a positive number before we can submit.
+  const payInvalid = payNow && !(Number(payAmount) > 0);
 
-  const onSubmit = handleSubmit((values) => {
+  const onSubmit = handleSubmit(async (values) => {
     const input: PurchaseInvoiceInput = {
       supplierId: values.supplierId,
       discountAmount: values.discountAmount,
@@ -142,12 +168,36 @@ export function PurchaseFormDialog({
       ...(values.taxAmount > 0 ? { taxAmount: values.taxAmount } : {}),
       ...(values.notes && values.notes.trim() ? { notes: values.notes.trim() } : {}),
     };
-    create.mutate(input, {
-      onSuccess: () => {
-        toast.success(t("purchases.success"));
-        onClose();
-      },
-    });
+
+    // 1) Post the invoice. On failure the global mutation-error toast fires; keep the dialog open.
+    try {
+      await create.mutateAsync(input);
+    } catch {
+      return;
+    }
+    toast.success(t("purchases.success"));
+
+    // 2) Optionally record a supplier payment (separate, idempotent call). If it fails the invoice
+    // is already saved, so we surface a clear message rather than losing it.
+    const amount = Number(payAmount);
+    if (payNow && amount > 0) {
+      const cheque =
+        payMethod === "cheque"
+          ? omitEmptyStrings({ chequeNumber, chequeBank, chequeDueDate })
+          : {};
+      const paymentInput: SupplierPaymentInput = { amount, method: payMethod, ...cheque };
+      try {
+        await recordSupplierPayment(apiClient, values.supplierId, paymentInput);
+        qc.invalidateQueries({ queryKey: ["suppliers"] });
+        qc.invalidateQueries({ queryKey: ["supplier-statement", values.supplierId] });
+        qc.invalidateQueries({ queryKey: ["supplier-payments", values.supplierId] });
+        toast.success(t("purchases.paymentRecorded"));
+      } catch {
+        toast.error(t("purchases.paymentFailed"));
+      }
+    }
+
+    onClose();
   });
 
   return (
@@ -310,6 +360,66 @@ export function PurchaseFormDialog({
           <Textarea rows={2} {...register("notes")} />
         </Field>
 
+        {/* Optional: pay the supplier in the same step (invoice first, then the payment call). */}
+        <div className="space-y-3 rounded-xl border p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-medium">{t("purchases.payNow")}</div>
+              <div className="text-xs text-muted-foreground">{t("purchases.payNowHint")}</div>
+            </div>
+            <Switch
+              checked={payNow}
+              onCheckedChange={(c) => {
+                setPayNow(c);
+                if (c && !payAmount) setPayAmount(total > 0 ? String(total) : "");
+              }}
+              aria-label={t("purchases.payNow")}
+            />
+          </div>
+
+          {payNow ? (
+            <div className="space-y-3">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label={t("purchases.paymentAmount")}>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    dir="ltr"
+                    value={payAmount}
+                    onChange={(e) => setPayAmount(e.target.value)}
+                  />
+                </Field>
+                <Field label={t("suppliers.payment.method")}>
+                  <Select
+                    value={payMethod}
+                    onChange={(e) => setPayMethod(e.target.value as typeof payMethod)}
+                  >
+                    {IMMEDIATE_PAYMENT_METHODS.map((m) => (
+                      <option key={m} value={m}>
+                        {t(`paymentMethod.${m}`)}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+              </div>
+              {payMethod === "cheque" ? (
+                <div className="grid gap-4 rounded-xl border bg-[var(--paper-soft)] p-3 sm:grid-cols-2">
+                  <Field label={t("cheque.number")}>
+                    <Input dir="ltr" value={chequeNumber} onChange={(e) => setChequeNumber(e.target.value)} />
+                  </Field>
+                  <Field label={t("cheque.bank")}>
+                    <Input value={chequeBank} onChange={(e) => setChequeBank(e.target.value)} />
+                  </Field>
+                  <Field label={t("cheque.dueDate")}>
+                    <DatePicker value={chequeDueDate} onChange={(e) => setChequeDueDate(e.target.value)} />
+                  </Field>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+
         {/* Live preview — server-authoritative on issue. */}
         <div className="flex flex-wrap items-center justify-end gap-4 border-t pt-3 text-sm">
           <span className="text-muted-foreground">
@@ -330,7 +440,7 @@ export function PurchaseFormDialog({
           <Button type="button" variant="outline" onClick={onClose} disabled={create.isPending}>
             {t("admin.common.cancel")}
           </Button>
-          <Button type="submit" disabled={create.isPending}>
+          <Button type="submit" disabled={create.isPending || payInvalid}>
             {create.isPending ? t("purchases.submitting") : t("purchases.submit")}
           </Button>
         </div>
