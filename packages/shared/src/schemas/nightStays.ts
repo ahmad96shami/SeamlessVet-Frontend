@@ -18,6 +18,8 @@ export const NightStayResponseSchema = z.object({
   nightsCount: z.number().int(),
   nightlyRate: z.number(),
   total: z.number(),
+  // Intended discharge hour 0–23, recorded at creation — informational only (never affects billing).
+  exitHour: z.number().int().nullish(),
   notes: z.string().nullish(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -39,6 +41,7 @@ export const NightStayCreateRequestSchema = z.object({
   careType: z.enum(["medical", "icu", "hotel"]),
   checkInAt: z.string().optional(),
   nightlyRate: z.number().nonnegative().optional(),
+  exitHour: z.number().int().min(0).max(23).optional(),
   notes: optionalText,
 });
 export type NightStayCreateRequest = z.infer<typeof NightStayCreateRequestSchema>;
@@ -48,6 +51,7 @@ export const NightStayPatchRequestSchema = z.object({
   careType: z.enum(["medical", "icu", "hotel"]).optional(),
   checkInAt: z.string().optional(),
   nightlyRate: z.number().nonnegative().optional(),
+  exitHour: z.number().int().min(0).max(23).optional(),
   notes: optionalText,
 });
 export type NightStayPatchRequest = z.infer<typeof NightStayPatchRequestSchema>;

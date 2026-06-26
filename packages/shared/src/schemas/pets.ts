@@ -16,6 +16,7 @@ export const PetResponseSchema = z.object({
   photoUrl: z.string().nullish(),
   microchipNo: z.string().nullish(),
   healthNotes: z.string().nullish(),
+  isNeutered: z.boolean().nullish(), // spayed/castrated (معقم/مخصي); null = unrecorded
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -37,6 +38,7 @@ export const PetRequestSchema = z.object({
   weightLatest: z.number().nonnegative().optional(),
   microchipNo: z.string().trim().max(64).optional(),
   healthNotes: optionalText,
+  isNeutered: z.boolean().optional(), // spayed/castrated (معقم/مخصي)
 });
 export type PetRequest = z.infer<typeof PetRequestSchema>;
 

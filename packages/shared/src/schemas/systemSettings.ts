@@ -28,6 +28,10 @@ export const SystemSettingsResponseSchema = z.object({
   // M18 — minutes before a dose to fire its `medication_due` reminder; a prescription's null
   // `leadMinutes` falls back to this (PRD §18.9).
   medicationReminderLeadMinutes: z.number().int(),
+  // Reminder lead times (surfaced from `extra`): days before a vaccination's due date, and minutes
+  // before an appointment — the per-reminder "fire before due" Settings section.
+  vaccinationReminderLeadDays: z.number().int(),
+  appointmentReminderLeadMinutes: z.number().int(),
   updatedAt: z.string(),
 });
 export type SystemSettingsResponse = z.infer<typeof SystemSettingsResponseSchema>;
@@ -56,5 +60,8 @@ export const SystemSettingsPatchRequestSchema = z.object({
   nightStayCheckoutHour: z.number().int().min(0).max(23).optional(),
   // M18 — default medication-reminder lead time (minutes).
   medicationReminderLeadMinutes: z.number().int().min(0).optional(),
+  // Merged into `extra.vaccinationReminder` / `extra.appointmentReminder` server-side.
+  vaccinationReminderLeadDays: z.number().int().min(0).max(365).optional(),
+  appointmentReminderLeadMinutes: z.number().int().min(0).max(10080).optional(),
 });
 export type SystemSettingsPatchRequest = z.infer<typeof SystemSettingsPatchRequestSchema>;
