@@ -55,10 +55,12 @@ export function CatalogPanel() {
   // Hardware barcode scanner: a detected scan (fast burst + Enter) resolves the code to a sellable
   // warehouse product and drops it straight in the cart, then clears + refocuses the box for the
   // next scan. The catalog's debounced search hasn't fetched the scanned code yet, so look it up
-  // imperatively (cached via the query client) and exact-match the barcode.
+  // imperatively (cached via the query client) and exact-match the barcode. A barcode may be shared
+  // by several products — when more than one matches, we DON'T auto-add: instead the code is dropped
+  // into the search box so the catalog grid lists every match for the cashier to pick from.
   const handleScan = useCallback(
     async (code: string) => {
-      const params = { locationType: "warehouse", search: code, take: 50 } as const;
+      const params = { locationType: "warehouse", search: code, take: 50, includeZeroStock: true } as const;
       let rows;
       try {
         rows = await qc.fetchQuery({
@@ -69,9 +71,18 @@ export function CatalogPanel() {
         return; // the global error toast already surfaced the failure
       }
       const lower = code.toLowerCase();
-      const match =
-        rows.find((r) => r.barcode?.toLowerCase() === lower) ??
-        (rows.length === 1 ? rows[0] : undefined);
+      const exact = rows.filter((r) => r.barcode?.toLowerCase() === lower);
+
+      // Shared barcode → show every match in the grid (keep the code in the box) and let the user pick.
+      if (exact.length > 1) {
+        setSearch(code);
+        searchRef.current?.focus();
+        toast.info(t("pos.scan.multiple", { count: exact.length }));
+        return;
+      }
+
+      // Exactly one barcode match (or a single lone result) → add it straight to the cart.
+      const match = exact[0] ?? (rows.length === 1 ? rows[0] : undefined);
 
       setSearch("");
       searchRef.current?.focus();
@@ -104,7 +115,14 @@ export function CatalogPanel() {
   // `vaccine` — split client-side into their own filter tab and sold as ordinary product lines
   // (administering deducts stock, FEFO). Services have no inventory; the M23 system services
   // (checkup fee / night stay) are billing plumbing, never sold from the catalog.
-  const stock = useStock({ locationType: "warehouse", search: debounced || undefined, take: 50 });
+  // includeZeroStock: list every sellable product (even never-received ones) so a just-created item
+  // is visible at the till — out-of-stock tiles are greyed + non-addable until stock is received.
+  const stock = useStock({
+    locationType: "warehouse",
+    search: debounced || undefined,
+    take: 50,
+    includeZeroStock: true,
+  });
   const services = useServices({ search: debounced || undefined, take: 50 });
 
   const allStock = stock.data ?? [];
