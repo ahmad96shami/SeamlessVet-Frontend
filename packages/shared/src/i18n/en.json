@@ -39,7 +39,10 @@
   "navSection": {
     "dashboard": "Dashboard",
     "operations": "Operations",
-    "sales": "Sales & inventory",
+    "sales": "Sales & catalog",
+    "inventory": "Inventory & purchasing",
+    "contracts": "Contracts",
+    "reports": "Reports",
     "finance": "Finance",
     "system": "System"
   },

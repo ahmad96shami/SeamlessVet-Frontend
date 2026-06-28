@@ -39,7 +39,10 @@
   "navSection": {
     "dashboard": "الرئيسية",
     "operations": "العمليات",
-    "sales": "البيع والمخزون",
+    "sales": "البيع والكتالوج",
+    "inventory": "المخزون والمشتريات",
+    "contracts": "العقود",
+    "reports": "التقارير",
     "finance": "المالية",
     "system": "النظام"
   },
