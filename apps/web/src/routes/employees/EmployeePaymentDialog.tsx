@@ -26,7 +26,7 @@ import { useRecordEmployeePayment } from "@/queries/employees";
 // leaving (the loan_repayment kind is the employee handing cash back) → immediate methods only.
 const FormSchema = z
   .object({
-    kind: z.enum(["salary_payment", "loan", "loan_repayment"]),
+    kind: z.enum(["salary_payment", "loan", "loan_repayment", "deduction"]),
     amount: z.number().positive(),
     loanRepaymentAmount: z.number().min(0).optional(),
     method: z.enum(["cash", "card", "bank_transfer", "cheque"]),
