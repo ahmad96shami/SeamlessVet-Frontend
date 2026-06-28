@@ -10,9 +10,10 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths(),
     VitePWA({
-      // Prompt (not autoUpdate): a silent reload could interrupt a form or an in-flight sync, so
-      // the user chooses when to apply an update (W7 — services/pwa.ts surfaces the toast).
-      registerType: "prompt",
+      // autoUpdate: the new service worker (skipWaiting + clientsClaim, set automatically for
+      // autoUpdate) activates and the page reloads to the new build on the next load — no user
+      // prompt. Trade-off (accepted): an in-progress unsaved form can be lost on that reload.
+      registerType: "autoUpdate",
       manifest: {
         name: "نظام إدارة العيادة البيطرية",
         short_name: "VetSystem",

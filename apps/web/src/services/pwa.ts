@@ -11,7 +11,8 @@ interface BeforeInstallPromptEvent extends Event {
 
 /**
  * Wire the PWA service worker and the install prompt. Called once at boot.
- *   - a new SW waiting → a sticky toast offering reload (prompt mode, never auto-reload);
+ *   - autoUpdate mode (vite.config.ts): a new SW activates and the page reloads to the new build
+ *     on the next load automatically — no prompt, so there's no `onNeedRefresh` handler here;
  *   - first offline-readiness → a one-off success toast;
  *   - the browser's `beforeinstallprompt` → a toast whose action triggers the native install.
  * In dev (SW disabled) `registerSW` is a no-op stub, so this is safe to call everywhere.
@@ -19,14 +20,7 @@ interface BeforeInstallPromptEvent extends Event {
 export function registerPwa(): void {
   const t = i18n.t.bind(i18n);
 
-  const updateSW = registerSW({
-    onNeedRefresh() {
-      toast(t("pwa.updateTitle"), {
-        description: t("pwa.updateBody"),
-        duration: Infinity,
-        action: { label: t("pwa.reload"), onClick: () => void updateSW(true) },
-      });
-    },
+  registerSW({
     onOfflineReady() {
       toast.success(t("pwa.offlineReady"));
     },
