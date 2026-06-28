@@ -19,17 +19,25 @@ export interface NavItem {
   permission?: string;
 }
 
-/** Sidebar section order (the design groups nav items under labelled sections). */
+/**
+ * Sidebar section order. Sections render as plain dividers (no visible header) between groups,
+ * so this list defines the seven separator-delimited groups of the rail, top to bottom.
+ */
 export const NAV_SECTION_ORDER = [
   "navSection.dashboard",
   "navSection.operations",
   "navSection.sales",
-  "navSection.finance",
+  "navSection.inventory",
+  "navSection.contracts",
+  "navSection.reports",
   "navSection.system",
 ] as const;
 
 export const NAV_ITEMS: NavItem[] = [
+  // — الرئيسية —
   { to: "/", labelKey: "nav.dashboard", icon: Icon.home, section: "navSection.dashboard" },
+
+  // — العملاء / الزيارات / المواعيد —
   {
     to: "/operations/customers",
     labelKey: "nav.customers",
@@ -51,13 +59,8 @@ export const NAV_ITEMS: NavItem[] = [
     section: "navSection.operations",
     roles: ["admin", "receptionist", "vet_clinic", "vet_both"],
   },
-  {
-    to: "/vaccinations",
-    labelKey: "nav.vaccinations",
-    icon: Icon.syringe,
-    section: "navSection.operations",
-    roles: ["admin", "receptionist", "vet_clinic", "vet_field", "vet_both"],
-  },
+
+  // — نقطة البيع / المنتجات / الخدمات / التطعيمات —
   {
     to: "/pos",
     labelKey: "nav.pos",
@@ -67,13 +70,6 @@ export const NAV_ITEMS: NavItem[] = [
     // Anyone allowed to issue invoices gets the register — including a receptionist (or other
     // role) granted invoices.write via a per-user override, not just the default admin/cashier.
     permission: PermissionKey.InvoicesWrite,
-  },
-  {
-    to: "/inventory",
-    labelKey: "nav.inventory",
-    icon: Icon.truck,
-    section: "navSection.sales",
-    roles: ["admin", "inventory_staff"],
   },
   {
     to: "/admin/products",
@@ -90,47 +86,85 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["admin"],
   },
   {
-    to: "/finance/contracts",
-    labelKey: "nav.contracts",
-    icon: Icon.paper,
-    section: "navSection.finance",
-    roles: ["admin", "accountant"],
+    to: "/vaccinations",
+    labelKey: "nav.vaccinations",
+    icon: Icon.syringe,
+    section: "navSection.sales",
+    roles: ["admin", "receptionist", "vet_clinic", "vet_field", "vet_both"],
+  },
+
+  // — المخزون / المورّدون / المشتريات / المصاريف التشغيلية —
+  {
+    to: "/inventory",
+    labelKey: "nav.inventory",
+    icon: Icon.truck,
+    section: "navSection.inventory",
+    roles: ["admin", "inventory_staff"],
   },
   {
     to: "/finance/suppliers",
     labelKey: "nav.suppliers",
     icon: Icon.truck,
-    section: "navSection.finance",
-    roles: ["admin", "accountant"],
-  },
-  {
-    to: "/finance/doctor-partners",
-    labelKey: "nav.doctorPartners",
-    icon: Icon.stethoscope,
-    section: "navSection.finance",
+    section: "navSection.inventory",
     roles: ["admin", "accountant"],
   },
   {
     to: "/finance/purchases",
     labelKey: "nav.purchases",
     icon: Icon.inbox,
-    section: "navSection.finance",
-    roles: ["admin", "accountant"],
-  },
-  {
-    to: "/finance/employees",
-    labelKey: "nav.employees",
-    icon: Icon.user,
-    section: "navSection.finance",
+    section: "navSection.inventory",
     roles: ["admin", "accountant"],
   },
   {
     to: "/finance/operating-expenses",
     labelKey: "nav.operatingExpenses",
     icon: Icon.receipt,
-    section: "navSection.finance",
+    section: "navSection.inventory",
     roles: ["admin", "accountant"],
     permission: PermissionKey.OperatingExpensesManage,
+  },
+
+  // — العقود —
+  {
+    to: "/finance/contracts",
+    labelKey: "nav.contracts",
+    icon: Icon.paper,
+    section: "navSection.contracts",
+    roles: ["admin", "accountant"],
+  },
+
+  // — التقارير —
+  {
+    to: "/reports",
+    labelKey: "nav.reports",
+    icon: Icon.chart,
+    section: "navSection.reports",
+    roles: ["admin", "accountant"],
+  },
+  {
+    // Doctor self-service income — outside the reports.read gate (vets only; admins/accountants
+    // get the full reports surface above).
+    to: "/my-income",
+    labelKey: "nav.myIncome",
+    icon: Icon.chart,
+    section: "navSection.reports",
+    roles: ["vet_clinic", "vet_field", "vet_both"],
+  },
+
+  // — الأطباء الشركاء / الموظفون / المستخدمون / الإعدادات —
+  {
+    to: "/finance/doctor-partners",
+    labelKey: "nav.doctorPartners",
+    icon: Icon.stethoscope,
+    section: "navSection.system",
+    roles: ["admin", "accountant"],
+  },
+  {
+    to: "/finance/employees",
+    labelKey: "nav.employees",
+    icon: Icon.user,
+    section: "navSection.system",
+    roles: ["admin", "accountant"],
   },
   {
     to: "/admin/users",
@@ -147,22 +181,6 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Icon.settings,
     section: "navSection.system",
     roles: ["admin"],
-  },
-  {
-    to: "/reports",
-    labelKey: "nav.reports",
-    icon: Icon.chart,
-    section: "navSection.finance",
-    roles: ["admin", "accountant"],
-  },
-  {
-    // Doctor self-service income — outside the reports.read gate (vets only; admins/accountants
-    // get the full reports surface above).
-    to: "/my-income",
-    labelKey: "nav.myIncome",
-    icon: Icon.chart,
-    section: "navSection.operations",
-    roles: ["vet_clinic", "vet_field", "vet_both"],
   },
 ];
 
