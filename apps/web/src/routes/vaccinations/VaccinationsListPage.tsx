@@ -142,7 +142,7 @@ export function VaccinationsListPage() {
 
   return (
     <div className="space-y-4">
-      {/* Toolbar: customer filter + new */}
+      {/* Toolbar: customer filter. Vaccinations are recorded from visits, not created here. */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1">
           <Button variant="outline" onClick={() => setPickerOpen(true)}>
@@ -160,16 +160,6 @@ export function VaccinationsListPage() {
             </Button>
           ) : null}
         </div>
-        <Button
-          onClick={() => {
-            setEditing(null);
-            setEditingLabel(null);
-            setFormOpen(true);
-          }}
-        >
-          <Icon.plus className="size-4" />
-          {t("vaccinations.new")}
-        </Button>
       </div>
 
       <DataTable
