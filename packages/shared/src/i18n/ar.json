@@ -999,12 +999,14 @@
     "salary_payment": "دفع راتب",
     "loan": "سلفة",
     "loan_repayment": "سداد سلفة",
-    "adjustment": "تسوية"
+    "adjustment": "تسوية",
+    "deduction": "خصم"
   },
   "employeePaymentKind": {
     "salary_payment": "دفع راتب",
     "loan": "سلفة",
-    "loan_repayment": "سداد سلفة"
+    "loan_repayment": "سداد سلفة",
+    "deduction": "خصم"
   },
   "invoiceType": {
     "pos": "كاشير",
@@ -1624,8 +1626,16 @@
       "add": "إضافة",
       "vaccine": "لقاح"
     },
+    "batch": {
+      "link": "فوترة دورة",
+      "pickTitle": "اختيار دورة نشطة",
+      "pickHint": "تُضاف الفاتورة إلى تصفية الدورة المحددة (دون زيارة ميدانية)",
+      "none": "لا توجد دورات مفتوحة لهذا العميل",
+      "chip": "دورة • {{farm}}"
+    },
     "scan": {
       "added": "تمت إضافة {{name}}",
+      "multiple": "هذا الباركود مشترك بين {{count}} منتجات — اختر المطلوب من القائمة",
       "notFound": "لا يوجد منتج بالباركود {{code}}",
       "outOfStock": "{{name}} غير متوفر بالمخزون"
     },

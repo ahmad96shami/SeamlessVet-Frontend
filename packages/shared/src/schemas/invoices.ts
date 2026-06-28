@@ -140,6 +140,9 @@ export const PosInvoiceRequestSchema = z.object({
   id: z.string().optional(),
   customerId: z.string().optional(),
   visitId: z.string().optional(),
+  /** Bill an active farm batch (Dawra) directly from the till — the sale joins that batch's
+   *  settlement. The server takes the customer + farm from the batch; a settled batch is rejected. */
+  batchId: z.string().optional(),
   number: optionalText,
   discountAmount: z.number().min(0).default(0),
   items: z.array(InvoiceLineRequestSchema),

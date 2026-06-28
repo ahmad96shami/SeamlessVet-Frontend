@@ -44,8 +44,8 @@ export type BatchResponse = z.infer<typeof BatchResponseSchema>;
 export const BatchCreateRequestSchema = z.object({
   contractId: z.string().optional(),
   customerId: z.string().min(1),
-  /** Optional — restrict the batch to one farm of `customerId` (validated same-customer → 409 `farm_customer_mismatch`). */
-  farmId: z.string().optional(),
+  /** Required — the farm of `customerId` this cycle runs on (validated same-customer → 409 `farm_customer_mismatch`). */
+  farmId: z.string().min(1),
   responsibleDoctorId: z.string().min(1),
   animalCount: z.number().int().min(0),
   startDate: z.string().min(1),

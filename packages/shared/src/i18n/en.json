@@ -980,12 +980,14 @@
     "salary_payment": "Salary payment",
     "loan": "Loan",
     "loan_repayment": "Loan repayment",
-    "adjustment": "Adjustment"
+    "adjustment": "Adjustment",
+    "deduction": "Deduction"
   },
   "employeePaymentKind": {
     "salary_payment": "Salary payment",
     "loan": "Loan",
-    "loan_repayment": "Loan repayment"
+    "loan_repayment": "Loan repayment",
+    "deduction": "Deduction"
   },
   "invoiceType": {
     "pos": "POS",
@@ -1605,8 +1607,16 @@
       "add": "Add",
       "vaccine": "Vaccine"
     },
+    "batch": {
+      "link": "Bill a batch",
+      "pickTitle": "Select an active batch",
+      "pickHint": "The invoice is added to the selected batch's settlement (no field visit)",
+      "none": "No open batches for this customer",
+      "chip": "Batch • {{farm}}"
+    },
     "scan": {
       "added": "Added {{name}}",
+      "multiple": "This barcode matches {{count}} products — pick one from the list",
       "notFound": "No product with barcode {{code}}",
       "outOfStock": "{{name}} is out of stock"
     },

@@ -382,6 +382,8 @@ export const EmployeePaymentKind = {
   Loan: "loan",
   /** A direct cash loan repayment by the employee. */
   LoanRepayment: "loan_repayment",
+  /** خصم — a deduction/penalty withheld from the employee; debits (reduces) the payable. */
+  Deduction: "deduction",
 } as const;
 export type EmployeePaymentKind = EnumValues<typeof EmployeePaymentKind>;
 export const EMPLOYEE_PAYMENT_KIND_VALUES = values(EmployeePaymentKind);

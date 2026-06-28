@@ -99,6 +99,12 @@ export interface StockListParams {
   productId?: string;
   search?: string;
   lowStockOnly?: boolean;
+  /**
+   * POS catalog mode: also list sellable products with NO stock row (quantity 0) at the location, so
+   * a just-created item appears (greyed/out-of-stock) instead of being invisible. Consumables are
+   * excluded server-side. Other stock views omit this and keep the stocked-rows-only behavior.
+   */
+  includeZeroStock?: boolean;
   skip?: number;
   take?: number;
 }
