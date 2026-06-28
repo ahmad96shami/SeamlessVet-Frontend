@@ -73,6 +73,8 @@ export interface ParkedSale {
   label: string;
   customerId: string | null;
   visitId: string | null;
+  /** An active farm batch (Dawra) this held sale bills to (mutually exclusive with a linked visit). */
+  batchId: string | null;
   lines: CartLine[];
   invoiceDiscount: number;
   payments: PaymentLeg[];
@@ -84,6 +86,12 @@ interface PosCartState {
   customerId: string | null;
   /** Linked visit — its unbilled dispensed meds + procedures + vaccinations auto-assemble server-side at issuance. */
   visitId: string | null;
+  /**
+   * An active farm batch (Dawra) to bill directly from the till (no field visit): the sale joins
+   * that batch's settlement and posts to the farm owner ledger. Mutually exclusive with a linked
+   * visit; the server takes the customer + farm from the batch and rejects a settled batch.
+   */
+  batchId: string | null;
   invoiceDiscount: number;
   payments: PaymentLeg[];
 
@@ -99,11 +107,14 @@ interface PosCartState {
    */
   syncVisitLines: (visitLines: Omit<CartLine, "locked">[]) => void;
   setInvoiceDiscount: (amount: number) => void;
-  /** Set/clear the customer. Changing the customer drops any linked visit (it belonged to the old one). */
+  /** Set/clear the customer. Changing the customer drops any linked visit/batch (they belonged to the old one). */
   setCustomer: (id: string | null) => void;
   /** Link a visit + its owning customer together (visit picker / deep-link). */
   linkVisit: (visitId: string, customerId: string) => void;
   clearVisit: () => void;
+  /** Bill an active farm batch + its owning customer together (batch picker). Drops any linked visit. */
+  linkBatch: (batchId: string, customerId: string) => void;
+  clearBatch: () => void;
   setPayments: (payments: PaymentLeg[]) => void;
   /**
    * Reset the payment legs to a single cash leg (amount 0) — the "ring up at POS from a visit"
@@ -132,6 +143,7 @@ export const usePosCartStore = create<PosCartState>((set, get) => ({
   lines: [],
   customerId: null,
   visitId: null,
+  batchId: null,
   invoiceDiscount: 0,
   payments: [],
 
@@ -173,16 +185,20 @@ export const usePosCartStore = create<PosCartState>((set, get) => ({
       return { lines: [...merged, ...s.lines.filter((l) => !l.locked)] };
     }),
   setInvoiceDiscount: (invoiceDiscount) => set({ invoiceDiscount }),
-  // Dropping/charging the customer or visit also drops the visit's locked lines.
+  // Dropping/charging the customer also drops any linked visit/batch and the visit's locked lines.
   setCustomer: (customerId) =>
-    set((s) => ({ customerId, visitId: null, lines: s.lines.filter((l) => !l.locked) })),
-  linkVisit: (visitId, customerId) => set({ visitId, customerId }),
+    set((s) => ({ customerId, visitId: null, batchId: null, lines: s.lines.filter((l) => !l.locked) })),
+  linkVisit: (visitId, customerId) => set({ visitId, customerId, batchId: null }),
   clearVisit: () => set((s) => ({ visitId: null, lines: s.lines.filter((l) => !l.locked) })),
+  // A batch sale has no visit-derived locked lines — linking one drops any linked visit + its lines.
+  linkBatch: (batchId, customerId) =>
+    set((s) => ({ batchId, customerId, visitId: null, lines: s.lines.filter((l) => !l.locked) })),
+  clearBatch: () => set({ batchId: null }),
   setPayments: (payments) => set({ payments }),
   seedCashPayment: () =>
     set({ payments: [{ key: crypto.randomUUID(), method: "cash", amount: 0 }] }),
   clear: () =>
-    set({ lines: [], customerId: null, visitId: null, invoiceDiscount: 0, payments: [] }),
+    set({ lines: [], customerId: null, visitId: null, batchId: null, invoiceDiscount: 0, payments: [] }),
   park: async (label) => {
     const s = get();
     if (s.lines.length === 0 && s.visitId === null) return;
@@ -192,17 +208,19 @@ export const usePosCartStore = create<PosCartState>((set, get) => ({
       label,
       customerId: s.customerId,
       visitId: s.visitId,
+      batchId: s.batchId,
       lines: s.lines,
       invoiceDiscount: s.invoiceDiscount,
       payments: s.payments,
     });
-    set({ lines: [], customerId: null, visitId: null, invoiceDiscount: 0, payments: [] });
+    set({ lines: [], customerId: null, visitId: null, batchId: null, invoiceDiscount: 0, payments: [] });
   },
   resume: (sale) =>
     set({
       lines: sale.lines,
       customerId: sale.customerId,
       visitId: sale.visitId,
+      batchId: sale.batchId ?? null,
       invoiceDiscount: sale.invoiceDiscount,
       payments: sale.payments,
     }),

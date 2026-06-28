@@ -104,11 +104,12 @@ export function BatchesPage() {
       {
         id: "actions",
         header: "",
-        cell: ({ row }) => (
-          <div className="flex justify-end gap-1">
-            {/* M24 — settling (تصفية) is THE close path: re-price + discount + close + compute.
-                Available until a settlement exists, even for batches closed via the old PATCH. */}
-            {!row.original.settledAt ? (
+        cell: ({ row }) =>
+          // A settled batch (تصفية) is frozen end-to-end — no settle/edit/delete (the server rejects
+          // them too: batch_already_settled / batch_settled). The status column shows the مُصفّاة badge.
+          row.original.settledAt ? null : (
+            <div className="flex justify-end gap-1">
+              {/* M24 — settling (تصفية) is THE close path: re-price + discount + close + compute. */}
               <Button
                 size="sm"
                 variant="outline"
@@ -117,28 +118,27 @@ export function BatchesPage() {
                 <Icon.receipt className="size-4" />
                 {t("finance.settlement.action")}
               </Button>
-            ) : null}
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label={t("admin.common.edit")}
-              onClick={() => {
-                setEditing(row.original);
-                setFormOpen(true);
-              }}
-            >
-              <Icon.edit className="size-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label={t("admin.common.delete")}
-              onClick={() => setDeleteTarget(row.original)}
-            >
-              <Icon.trash className="size-4 text-destructive" />
-            </Button>
-          </div>
-        ),
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label={t("admin.common.edit")}
+                onClick={() => {
+                  setEditing(row.original);
+                  setFormOpen(true);
+                }}
+              >
+                <Icon.edit className="size-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label={t("admin.common.delete")}
+                onClick={() => setDeleteTarget(row.original)}
+              >
+                <Icon.trash className="size-4 text-destructive" />
+              </Button>
+            </div>
+          ),
       },
     ],
     [t, lang, customers.byId, doctors.byId],

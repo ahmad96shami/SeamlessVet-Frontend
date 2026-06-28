@@ -50,6 +50,8 @@ export function CartIssue({ total }: { total: number }) {
     const input: PosInvoiceInput = {
       customerId: s.customerId ?? undefined,
       visitId: s.visitId ?? undefined,
+      // Bill the active farm batch directly (the server derives the customer + farm from it).
+      batchId: s.batchId ?? undefined,
       discountAmount: s.invoiceDiscount,
       // Skip «مُفوترة» reference lines — they're already on an earlier invoice; re-sending their
       // back-links would either 409 (already billed) or risk a double charge.

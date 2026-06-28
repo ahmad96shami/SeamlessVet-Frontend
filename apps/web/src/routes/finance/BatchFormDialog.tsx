@@ -40,7 +40,8 @@ const FormSchema = z.object({
   customerId: z.string().min(1),
   responsibleDoctorId: z.string().min(1),
   contractId: z.string(),
-  farmId: z.string(),
+  // A cycle (Dawra) always runs on a specific farm of the customer — required (matches the server).
+  farmId: z.string().min(1),
   animalCount: z.string(),
   startDate: z.string().min(1),
   endDate: z.string(),
@@ -150,7 +151,8 @@ export function BatchFormDialog({
         },
       );
     } else {
-      const body: BatchCreateRequest = { ...shared, customerId: values.customerId };
+      // farmId is required on create (form-validated non-empty) — pass the value, not the optional text().
+      const body: BatchCreateRequest = { ...shared, customerId: values.customerId, farmId: values.farmId };
       create.mutate(body, {
         onSuccess: () => {
           toast.success(t("admin.common.created"));
@@ -229,7 +231,8 @@ export function BatchFormDialog({
           </Field>
           <Field label={t("finance.batches.farm")} error={errors.farmId?.message}>
             {/* Searchable farm picker scoped to the chosen customer, with an inline "add farm" row
-                (disabled until a customer is selected — a farm belongs to a customer). */}
+                (disabled until a customer is selected — a farm belongs to a customer). Farm is
+                required, so no "no farm" row is offered. */}
             <Controller
               name="farmId"
               control={control}
@@ -238,7 +241,7 @@ export function BatchFormDialog({
                   customerId={customerId || undefined}
                   value={field.value}
                   onChange={field.onChange}
-                  noneLabel={t("finance.batches.noFarm")}
+                  placeholder={t("finance.batches.farm")}
                 />
               )}
             />

@@ -7,11 +7,14 @@ import type { VisitResponse } from "@vet/shared";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { useFarmLookup } from "@/hooks/useFarmLookup";
+import { useBatch } from "@/queries/batches";
 import { useCustomer } from "@/queries/customers";
 import { useParkSale, useParkedSales } from "@/queries/parkedSales";
 import { useVisit } from "@/queries/visits";
 import { usePosCartStore } from "@/stores/posCartStore";
 
+import { BatchPickerDialog, batchFarmName } from "./BatchPickerDialog";
 import { CustomerPickerDialog } from "./CustomerPickerDialog";
 import { ParkedSalesDialog } from "./ParkedSalesDialog";
 import { useVisitCharges } from "./useVisitCharges";
@@ -164,20 +167,26 @@ export function CartCustomerVisit() {
   const navigate = useNavigate();
   const customerId = usePosCartStore((s) => s.customerId);
   const visitId = usePosCartStore((s) => s.visitId);
+  const batchId = usePosCartStore((s) => s.batchId);
   const hasLines = usePosCartStore((s) => s.lines.length > 0);
   const setCustomer = usePosCartStore((s) => s.setCustomer);
   const linkVisit = usePosCartStore((s) => s.linkVisit);
   const clearVisit = usePosCartStore((s) => s.clearVisit);
+  const linkBatch = usePosCartStore((s) => s.linkBatch);
+  const clearBatch = usePosCartStore((s) => s.clearBatch);
   const clear = usePosCartStore((s) => s.clear);
 
   const [pickCustomer, setPickCustomer] = useState(false);
   const [pickVisit, setPickVisit] = useState(false);
+  const [pickBatch, setPickBatch] = useState(false);
   const [showParked, setShowParked] = useState(false);
   // The visit awaiting a charge-confirm (W19.2): picked from the list, not yet linked to the cart.
   const [pendingVisit, setPendingVisit] = useState<VisitResponse | null>(null);
 
   const customer = useCustomer(customerId);
   const visit = useVisit(visitId);
+  const batch = useBatch(batchId);
+  const farms = useFarmLookup();
 
   const park = useParkSale();
   const parkedCount = useParkedSales().data?.length ?? 0;
@@ -209,7 +218,19 @@ export function CartCustomerVisit() {
           </Button>
         )}
         {customerId ? (
-          visitId ? (
+          batchId ? (
+            // Billing an active farm batch directly (الدورة) — the sale joins its settlement.
+            <LinkChip
+              icon={<Icon.receipt className="size-3.5 flex-none text-muted-foreground" aria-hidden />}
+              label={t("pos.batch.chip", {
+                farm: batch.data
+                  ? (batchFarmName(batch.data, farms.byId) ?? t("finance.batches.noFarm"))
+                  : "…",
+              })}
+              onClear={clearBatch}
+              clearLabel={t("pos.link.clear")}
+            />
+          ) : visitId ? (
             <>
               <LinkChip
                 icon={<Icon.link className="size-3.5 flex-none text-muted-foreground" aria-hidden />}
@@ -230,10 +251,16 @@ export function CartCustomerVisit() {
               </Button>
             </>
           ) : (
-            <Button type="button" variant="ghost" size="sm" onClick={() => setPickVisit(true)}>
-              <Icon.link className="size-4" />
-              {t("pos.link.linkVisit")}
-            </Button>
+            <>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setPickVisit(true)}>
+                <Icon.link className="size-4" />
+                {t("pos.link.linkVisit")}
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setPickBatch(true)}>
+                <Icon.receipt className="size-4" />
+                {t("pos.batch.link")}
+              </Button>
+            </>
           )
         ) : null}
 
@@ -313,6 +340,17 @@ export function CartCustomerVisit() {
           onConfirm={() => {
             linkVisit(pendingVisit.id, pendingVisit.customerId);
             setPendingVisit(null);
+          }}
+        />
+      ) : null}
+      {customerId ? (
+        <BatchPickerDialog
+          open={pickBatch}
+          onClose={() => setPickBatch(false)}
+          customerId={customerId}
+          onSelect={(b) => {
+            linkBatch(b.id, b.customerId);
+            setPickBatch(false);
           }}
         />
       ) : null}
