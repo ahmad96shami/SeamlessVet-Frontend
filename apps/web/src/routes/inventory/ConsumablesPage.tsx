@@ -1,5 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatDateTime, formatQuantity, type InventoryMovementResponse } from "@vet/shared";
+import {
+  formatDateTime,
+  formatQuantity,
+  type InventoryMovementResponse,
+  PermissionKey,
+} from "@vet/shared";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,6 +18,7 @@ import { useFieldInventories, useMovements } from "@/queries/inventory";
 import { useProducts } from "@/queries/products";
 import { ConsumeStockDialog } from "@/routes/inventory/ConsumeStockDialog";
 import { InventoryTabs } from "@/routes/inventory/InventoryTabs";
+import { useHasPermission } from "@/stores/authStore";
 
 /**
  * The المستهلكات screen (M27): record internal use of consumable stock and review the consumption
@@ -22,6 +28,9 @@ import { InventoryTabs } from "@/routes/inventory/InventoryTabs";
 export function ConsumablesPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  // Recording consumption deducts stock — a write gated on inventory.adjust; view-only
+  // (inventory.read) grantees still see the consumption history.
+  const canAdjust = useHasPermission(PermissionKey.InventoryAdjust);
   const [recordOpen, setRecordOpen] = useState(false);
   const { page, skip, take, canPrev, next, prev } = useOffsetPager(20);
 
@@ -93,10 +102,12 @@ export function ConsumablesPage() {
       title={t("inventory.consumables.title")}
       description={t("inventory.consumables.description")}
       actions={
-        <Button onClick={() => setRecordOpen(true)}>
-          <Icon.plus className="size-4" />
-          {t("inventory.consumables.recordAction")}
-        </Button>
+        canAdjust ? (
+          <Button onClick={() => setRecordOpen(true)}>
+            <Icon.plus className="size-4" />
+            {t("inventory.consumables.recordAction")}
+          </Button>
+        ) : undefined
       }
     >
       <div className="space-y-4">

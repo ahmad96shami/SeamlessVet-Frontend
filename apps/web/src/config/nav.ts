@@ -100,6 +100,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Icon.truck,
     section: "navSection.inventory",
     roles: ["admin", "inventory_staff"],
+    permission: PermissionKey.InventoryRead,
   },
   {
     to: "/finance/suppliers",

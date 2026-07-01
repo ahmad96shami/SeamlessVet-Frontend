@@ -76,6 +76,7 @@ export const PermissionKey = {
   InvoicesWrite: "invoices.write",
   InvoicesRefund: "invoices.refund",
   InvoicesVoid: "invoices.void",
+  InventoryRead: "inventory.read",
   InventoryAdjust: "inventory.adjust",
   EntitlementsApprove: "entitlements.approve",
   PartnershipManage: "partnership.manage",
@@ -117,7 +118,7 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<RoleKey, readonly PermissionKey[]>
     PermissionKey.EmployeesPay,
     PermissionKey.OperatingExpensesManage,
   ],
-  [RoleKey.InventoryStaff]: [PermissionKey.InventoryAdjust, PermissionKey.CatalogWrite],
+  [RoleKey.InventoryStaff]: [PermissionKey.InventoryRead, PermissionKey.InventoryAdjust, PermissionKey.CatalogWrite],
   [RoleKey.VetClinic]: [
     PermissionKey.CustomersWrite,
     PermissionKey.MedicalWrite,

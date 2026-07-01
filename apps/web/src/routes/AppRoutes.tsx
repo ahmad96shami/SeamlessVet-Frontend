@@ -209,7 +209,7 @@ export function AppRoutes() {
         <Route
           path="inventory"
           element={
-            <RequireRole roles={["admin", "inventory_staff"]}>
+            <RequireRole roles={["admin", "inventory_staff"]} permission={PermissionKey.InventoryRead}>
               <StockPage />
             </RequireRole>
           }
@@ -217,7 +217,7 @@ export function AppRoutes() {
         <Route
           path="inventory/movements"
           element={
-            <RequireRole roles={["admin", "inventory_staff"]}>
+            <RequireRole roles={["admin", "inventory_staff"]} permission={PermissionKey.InventoryRead}>
               <MovementsPage />
             </RequireRole>
           }
@@ -225,7 +225,7 @@ export function AppRoutes() {
         <Route
           path="inventory/consumables"
           element={
-            <RequireRole roles={["admin", "inventory_staff"]}>
+            <RequireRole roles={["admin", "inventory_staff"]} permission={PermissionKey.InventoryRead}>
               <ConsumablesPage />
             </RequireRole>
           }
@@ -233,7 +233,7 @@ export function AppRoutes() {
         <Route
           path="inventory/alerts"
           element={
-            <RequireRole roles={["admin", "inventory_staff"]}>
+            <RequireRole roles={["admin", "inventory_staff"]} permission={PermissionKey.InventoryRead}>
               <AlertsPage />
             </RequireRole>
           }

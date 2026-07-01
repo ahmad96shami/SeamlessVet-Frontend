@@ -3,6 +3,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import {
   formatDate,
   formatQuantity,
+  PermissionKey,
   STOCK_LOCATION_VALUES,
   type StockLevelResponse,
 } from "@vet/shared";
@@ -25,6 +26,7 @@ import { AdjustStockDialog } from "@/routes/inventory/AdjustStockDialog";
 import { InventoryTabs } from "@/routes/inventory/InventoryTabs";
 import { LoadFieldDialog } from "@/routes/inventory/LoadFieldDialog";
 import { LotsDialog } from "@/routes/inventory/LotsDialog";
+import { useHasPermission } from "@/stores/authStore";
 
 /** True once today is past the expiration day (date-only comparison). */
 function isExpired(date: string): boolean {
@@ -36,6 +38,9 @@ function isExpired(date: string): boolean {
 export function StockPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  // View-only grantees (inventory.read) see the stock list but not the write actions;
+  // load/unload and per-row adjust require the inventory.adjust permission.
+  const canAdjust = useHasPermission(PermissionKey.InventoryAdjust);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
@@ -169,19 +174,21 @@ export function StockPage() {
             >
               <Icon.list className="size-4" />
             </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label={t("inventory.adjust.action")}
-              onClick={() => setAdjustTarget(row.original)}
-            >
-              <Icon.edit className="size-4" />
-            </Button>
+            {canAdjust ? (
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label={t("inventory.adjust.action")}
+                onClick={() => setAdjustTarget(row.original)}
+              >
+                <Icon.edit className="size-4" />
+              </Button>
+            ) : null}
           </div>
         ),
       },
     ],
-    [t, lang, locationLabel],
+    [t, lang, locationLabel, canAdjust],
   );
 
   return (
@@ -191,10 +198,12 @@ export function StockPage() {
       // Receiving stock happens through purchase invoices (M19) — the manual receive
       // action was retired; load/unload remains the only header action here.
       actions={
-        <Button variant="secondary" onClick={() => setLoadOpen(true)}>
-          <Icon.truck className="size-4" />
-          {t("inventory.load.action")}
-        </Button>
+        canAdjust ? (
+          <Button variant="secondary" onClick={() => setLoadOpen(true)}>
+            <Icon.truck className="size-4" />
+            {t("inventory.load.action")}
+          </Button>
+        ) : undefined
       }
     >
       <div className="space-y-4">

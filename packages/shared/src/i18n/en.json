@@ -255,6 +255,10 @@
       }
     },
     "inventory": {
+      "read": {
+        "name": "View inventory",
+        "desc": "View inventory stock, movements, lots, and alerts (read-only)."
+      },
       "adjust": {
         "name": "Adjust inventory",
         "desc": "Apply inventory adjustments."
