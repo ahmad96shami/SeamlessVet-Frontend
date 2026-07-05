@@ -82,8 +82,11 @@ export function BatchSettlementPage() {
   const feeChargedToFarmer =
     data?.entitlementSystem === "direct_fee" ? (data?.supervisionFee ?? 0) : 0;
   const settledTotal = (data?.originalTotal ?? 0) + totalDelta - parsedDiscount + feeChargedToFarmer;
+  // Batch (Dawra) invoices defer their ledger post to settlement, so `ledgerBalance` excludes the
+  // cycle's charges (`deferredTotal`). Settling lands them all — the projected balance adds them back.
+  const deferredTotal = data?.deferredTotal ?? 0;
   const projectedBalance =
-    (data?.ledgerBalance ?? 0) + totalDelta - parsedDiscount + feeChargedToFarmer;
+    (data?.ledgerBalance ?? 0) + deferredTotal + totalDelta - parsedDiscount + feeChargedToFarmer;
 
   const blocked =
     !!data && (data.alreadySettled || data.ledgerClosed || data.entitlementFrozen);
@@ -340,6 +343,9 @@ export function BatchSettlementPage() {
           </div>
           <div className="border-t pt-2 space-y-2">
             <SummaryRow label={t("finance.settlement.currentBalance")} value={data.ledgerBalance} />
+            {deferredTotal !== 0 ? (
+              <SummaryRow label={t("finance.settlement.deferredTotal")} value={deferredTotal} signed />
+            ) : null}
             <SummaryRow
               label={t("finance.settlement.projectedBalance")}
               value={projectedBalance}

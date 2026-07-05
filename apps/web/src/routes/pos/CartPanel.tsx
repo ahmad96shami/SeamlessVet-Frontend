@@ -252,6 +252,7 @@ export function CartPanel() {
   const { t } = useTranslation();
   const lines = usePosCartStore((s) => s.lines);
   const visitId = usePosCartStore((s) => s.visitId);
+  const batchId = usePosCartStore((s) => s.batchId);
   const invoiceDiscount = usePosCartStore((s) => s.invoiceDiscount);
   const payments = usePosCartStore((s) => s.payments);
   const setPayments = usePosCartStore((s) => s.setPayments);
@@ -296,19 +297,22 @@ export function CartPanel() {
 
       <div className="flex-none border-t bg-ink-50/50 p-4">
         {/* Add payment / add discount — one action row above the totals (replaces the old
-            payments header and the always-on discount row). */}
+            payments header and the always-on discount row). A batch (Dawra) sale is on-account only:
+            no payment is collected at the till — the charge lands on the farm balance at تصفية. */}
         {hasSomethingToBill ? (
           <div className="mb-3 flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={addPaymentLeg}
-            >
-              <Icon.add className="size-4" />
-              {t("pos.payment.add")}
-            </Button>
+            {batchId === null ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={addPaymentLeg}
+              >
+                <Icon.add className="size-4" />
+                {t("pos.payment.add")}
+              </Button>
+            ) : null}
             {lines.length > 0 && !discountShown ? (
               <Button
                 type="button"
@@ -339,7 +343,13 @@ export function CartPanel() {
           {/* No grand-total row — the amount due lives on the collect button (CartIssue). */}
         </dl>
 
-        <CartPayments total={totals.total} />
+        {batchId === null ? (
+          <CartPayments total={totals.total} />
+        ) : hasSomethingToBill ? (
+          <p className="mt-3 rounded-lg bg-ink-100/60 p-2.5 text-xs text-muted-foreground">
+            {t("pos.batch.onAccount")}
+          </p>
+        ) : null}
         <CartIssue total={totals.total} />
       </div>
     </div>

@@ -52,6 +52,12 @@ export const BatchSettlementPreviewSchema = z.object({
   /** M28 — the supervision fee projected on `originalTotal` (= the doctor's entitlement when enabled). */
   supervisionFee: z.number(),
   originalTotal: z.number(),
+  /**
+   * The cycle's charges not yet on the owner ledger. Batch (Dawra) invoices defer their ledger post to
+   * settlement, so their value is absent from `ledgerBalance` until تصفية. The settle screen adds this
+   * to the projected post-settle balance (`ledgerBalance` already excludes it).
+   */
+  deferredTotal: z.number(),
   ledgerId: z.string().nullish(),
   ledgerBalance: z.number(),
   ledgerStatus: z.string(),

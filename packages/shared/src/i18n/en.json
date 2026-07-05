@@ -1632,7 +1632,8 @@
       "pickTitle": "Select an active batch",
       "pickHint": "The invoice is added to the selected batch's settlement (no field visit)",
       "none": "No open batches for this customer",
-      "chip": "Batch • {{farm}}"
+      "chip": "Batch • {{farm}}",
+      "onAccount": "On-account batch sale — nothing is collected now; it's added to the farm balance when the batch is settled"
     },
     "scan": {
       "added": "Added {{name}}",
@@ -2339,6 +2340,7 @@
       "supervisionFeeAdded": "Supervision fee (added)",
       "settledTotal": "Settled total",
       "currentBalance": "Current farm balance",
+      "deferredTotal": "Deferred cycle charges",
       "projectedBalance": "Balance after settlement",
       "negativeBalanceWarning": "The balance would go into credit (overpayment) — double-check before continuing.",
       "confirm": "Confirm settlement",

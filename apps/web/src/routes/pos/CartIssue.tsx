@@ -77,7 +77,9 @@ export function CartIssue({ total }: { total: number }) {
       // Drop zero-amount legs — a blank/0 payment row isn't a payment (and would trip the server's
       // `amount > 0` rule). Whatever stays unpaid lands on the customer ledger as credit; a walk-in
       // with nothing paid is already caught above by `walkInUnpaid` with a friendly message.
-      payments: s.payments
+      // A batch (Dawra) sale is on-account only — send no payment legs (the server rejects them and
+      // defers the whole charge to تصفية).
+      payments: (s.batchId ? [] : s.payments)
         .filter((p) => p.amount > 0)
         .map((p) => ({
           method: p.method,

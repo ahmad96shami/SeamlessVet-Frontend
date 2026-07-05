@@ -191,8 +191,10 @@ export const usePosCartStore = create<PosCartState>((set, get) => ({
   linkVisit: (visitId, customerId) => set({ visitId, customerId, batchId: null }),
   clearVisit: () => set((s) => ({ visitId: null, lines: s.lines.filter((l) => !l.locked) })),
   // A batch sale has no visit-derived locked lines — linking one drops any linked visit + its lines.
+  // It is also strictly on-account (the server rejects a till payment on a batch sale and defers the
+  // whole charge to تصفية), so any staged payment legs are cleared.
   linkBatch: (batchId, customerId) =>
-    set((s) => ({ batchId, customerId, visitId: null, lines: s.lines.filter((l) => !l.locked) })),
+    set((s) => ({ batchId, customerId, visitId: null, payments: [], lines: s.lines.filter((l) => !l.locked) })),
   clearBatch: () => set({ batchId: null }),
   setPayments: (payments) => set({ payments }),
   seedCashPayment: () =>
