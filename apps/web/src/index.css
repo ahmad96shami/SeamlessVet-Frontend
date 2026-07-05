@@ -266,7 +266,10 @@
   .tbl td { padding: 14px 16px; border-bottom: 1px solid var(--ink-100); color: var(--fg-1); vertical-align: middle; }
   .tbl tr:last-child td { border-bottom: 0; }
   .tbl tr.clickable:hover td { background: var(--ink-50); cursor: pointer; }
-  .tbl td.num, .tbl th.num { text-align: end; font-variant-numeric: tabular-nums; }
+  /* `isolate` (not the global .num `plaintext`) so `text-align: end` resolves to the SAME physical
+     side for an Arabic header and a Latin-digit value — otherwise plaintext auto-flips the number
+     cell to LTR and the header/value split to opposite edges of a wide column. */
+  .tbl td.num, .tbl th.num { text-align: end; font-variant-numeric: tabular-nums; unicode-bidi: isolate; }
 
   /* ── Stat tile ──────────────────────────────────────────── */
   .stat { background: var(--paper); border: 1px solid var(--ink-100); border-radius: 14px; padding: 16px; position: relative; }
