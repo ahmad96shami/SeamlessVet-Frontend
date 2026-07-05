@@ -17,6 +17,12 @@ export interface NavItem {
    * normally show (e.g. a receptionist granted `invoices.write` gets POS).
    */
   permission?: string;
+  /**
+   * If true, the item shows only in a `partnership` environment. The mode isn't in the JWT, so
+   * `AppShell` resolves it at runtime via `usePartnershipEnabled` (probes `GET /partners`) and
+   * filters these out in a solo center — the same solo-gate the finance surface used before.
+   */
+  partnershipOnly?: boolean;
 }
 
 /**
@@ -152,7 +158,15 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["vet_clinic", "vet_field", "vet_both"],
   },
 
-  // — الأطباء الشركاء / الموظفون / المستخدمون / الإعدادات —
+  // — الشركاء والأرباح (partnership only) / الأطباء الشركاء / الموظفون / المستخدمون / الإعدادات —
+  {
+    to: "/finance/partners",
+    labelKey: "finance.tabs.partners",
+    icon: Icon.users,
+    section: "navSection.system",
+    roles: ["admin", "accountant"],
+    partnershipOnly: true,
+  },
   {
     to: "/finance/doctor-partners",
     labelKey: "nav.doctorPartners",

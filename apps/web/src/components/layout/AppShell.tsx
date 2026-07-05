@@ -7,6 +7,7 @@ import { SyncIndicator } from "@/components/layout/SyncIndicator";
 import { Icon } from "@/components/ui/icon";
 import { NAV_SECTION_ORDER, navForUser } from "@/config/nav";
 import { useNotificationsRealtime } from "@/hooks/useNotificationsRealtime";
+import { usePartnershipEnabled } from "@/hooks/usePartnershipEnabled";
 import { toggleLanguage } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
@@ -34,7 +35,13 @@ export function AppShell() {
   const logout = useAuthStore((s) => s.logout);
   useNotificationsRealtime(); // open the SignalR hub for the session; live pushes → feed + toast
   const role = user?.role ?? "";
-  const items = navForUser(role, user?.permissions ?? []);
+  // Partnership-only nav items (الشركاء والأرباح) surface only in a partnership env. The mode isn't
+  // in the JWT, so probe it — but only for roles that could see the item, to avoid a needless 403.
+  const canSeePartnership = role === "admin" || role === "accountant";
+  const { enabled: partnershipEnabled } = usePartnershipEnabled({ enabled: canSeePartnership });
+  const items = navForUser(role, user?.permissions ?? []).filter(
+    (item) => !item.partnershipOnly || partnershipEnabled,
+  );
   const roleLabel = role ? t(`roles.${role}`, { defaultValue: role }) : "";
   const envId = user?.environmentId ?? "";
   const selectedEnv = typeof window !== "undefined" ? window.localStorage.getItem(SELECTED_ENV_STORAGE_KEY) : null;

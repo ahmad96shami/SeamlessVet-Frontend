@@ -1,13 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 
-import { usePartnershipEnabled } from "@/hooks/usePartnershipEnabled";
 import { cn } from "@/lib/utils";
 
 /**
- * Sub-nav for the finance surface (contracts · batches · entitlements). The partners tab is appended
- * only in a partnership environment (the solo-gate: `GET /partners` 404s in solo). Mirrors the
- * POS/inventory tab pattern.
+ * Sub-nav for the finance surface (contracts · batches · entitlements). The partners surface
+ * (الشركاء والأرباح) lives in the sidebar now (partnership-only, gated in `AppShell`), not here.
  */
 const TABS = [
   { to: "/finance/contracts", labelKey: "finance.tabs.contracts" },
@@ -17,10 +15,7 @@ const TABS = [
 
 export function FinanceTabs() {
   const { t } = useTranslation();
-  const { enabled: partnershipEnabled } = usePartnershipEnabled();
-  const tabs = partnershipEnabled
-    ? [...TABS, { to: "/finance/partners", labelKey: "finance.tabs.partners" }]
-    : TABS;
+  const tabs = TABS;
   return (
     <div className="flex flex-wrap gap-1 border-b">
       {tabs.map((tab) => (

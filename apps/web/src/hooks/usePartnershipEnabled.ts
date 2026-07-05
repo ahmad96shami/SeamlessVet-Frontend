@@ -13,7 +13,13 @@ import { apiClient } from "@/services/apiClient";
  * rather than rejecting — otherwise the global query-error toast would fire "not found" on every
  * finance screen in a solo environment. Any other failure still rejects (and toasts).
  */
-export function usePartnershipEnabled(): { enabled: boolean; isLoading: boolean } {
+export function usePartnershipEnabled(options?: { enabled?: boolean }): {
+  enabled: boolean;
+  isLoading: boolean;
+} {
+  // Caller can gate the probe (e.g. the sidebar only checks for roles that could see the item), so
+  // we don't fire GET /partners — and eat a 403 — for a cashier/vet who'd never see it anyway.
+  const queryEnabled = options?.enabled ?? true;
   const q = useQuery<boolean>({
     queryKey: ["partnership-enabled"],
     queryFn: async () => {
@@ -26,9 +32,10 @@ export function usePartnershipEnabled(): { enabled: boolean; isLoading: boolean 
         throw err;
       }
     },
+    enabled: queryEnabled,
     retry: false,
     staleTime: Infinity,
     gcTime: Infinity,
   });
-  return { enabled: q.data === true, isLoading: q.isPending };
+  return { enabled: q.data === true, isLoading: queryEnabled && q.isPending };
 }

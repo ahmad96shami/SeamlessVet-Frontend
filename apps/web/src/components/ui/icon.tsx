@@ -211,6 +211,14 @@ export const Icon = {
       <path d="M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5" />
     </Svg>
   ),
+  users: (p: IconProps) => (
+    <Svg {...p}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2 20c1.3-3.5 3.7-5 7-5s5.7 1.5 7 5" />
+      <path d="M16 4.7a3.5 3.5 0 0 1 0 6.6" />
+      <path d="M18 15.2c2 .6 3.4 2.1 4 4.8" />
+    </Svg>
+  ),
   stethoscope: (p: IconProps) => (
     <Svg {...p}>
       <path d="M5 4v5a4 4 0 0 0 8 0V4" />
