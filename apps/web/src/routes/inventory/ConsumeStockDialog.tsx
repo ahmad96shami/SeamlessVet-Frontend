@@ -17,9 +17,9 @@ import { useProducts } from "@/queries/products";
 const WAREHOUSE = "__warehouse__";
 
 /**
- * Record internal use (consumption) of an is_consumable product (M27): product + quantity + reason
- * + location → `POST /inventory/consume` (FEFO-deducted). The product picker is limited to products
- * flagged consumable in the catalog; reason is mandatory (server-enforced).
+ * Record internal use (consumption) of an is_consumable product (M27): product + quantity + location
+ * (+ optional reason) → `POST /inventory/consume` (FEFO-deducted). The product picker is limited to
+ * products flagged consumable in the catalog; reason is optional.
  */
 export function ConsumeStockDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
@@ -50,18 +50,14 @@ export function ConsumeStockDialog({ open, onClose }: { open: boolean; onClose: 
 
   const qtyNum = Number(quantity);
   const valid =
-    productId !== "" &&
-    quantity.trim() !== "" &&
-    !Number.isNaN(qtyNum) &&
-    qtyNum > 0 &&
-    reason.trim() !== "";
+    productId !== "" && quantity.trim() !== "" && !Number.isNaN(qtyNum) && qtyNum > 0;
 
   const onSubmit = () => {
     if (!valid) return;
     const loc =
       location === WAREHOUSE ? {} : { locationType: "field" as const, locationId: location };
     consume.mutate(
-      { productId, quantity: qtyNum, reason: reason.trim(), ...loc },
+      { productId, quantity: qtyNum, reason: reason.trim() || undefined, ...loc },
       {
         onSuccess: () => {
           toast.success(t("inventory.consumables.success"));
