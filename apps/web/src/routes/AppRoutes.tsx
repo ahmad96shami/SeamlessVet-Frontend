@@ -250,8 +250,17 @@ export function AppRoutes() {
           <Route path="contracts" element={<ContractsPage />} />
           <Route path="batches" element={<BatchesPage />} />
           <Route path="entitlements" element={<EntitlementsPage />} />
-          <Route path="partners" element={<PartnersPage />} />
         </Route>
+        {/* الشركاء وتوزيع الأرباح (M10 investor partners) — standalone (not under the contracts
+            tabs, which don't apply here); reached from the sidebar, gated partnership-only there. */}
+        <Route
+          path="finance/partners"
+          element={
+            <RequireRole roles={["admin", "accountant"]}>
+              <PartnersPage />
+            </RequireRole>
+          }
+        />
         {/* M24 — the settle screen is a focused full-page workflow, standalone like suppliers. */}
         <Route
           path="finance/batches/:id/settle"
