@@ -23,7 +23,7 @@ import { Money } from "@/components/ui/money";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { omitEmptyStrings } from "@/lib/forms";
+import { omitEmptyStrings, preventEnterSubmit } from "@/lib/forms";
 import { useProducts } from "@/queries/products";
 import { useCreatePurchaseInvoice } from "@/queries/purchaseInvoices";
 import { useSuppliers } from "@/queries/suppliers";
@@ -202,7 +202,7 @@ export function PurchaseFormDialog({
 
   return (
     <Dialog open={open} onClose={onClose} title={t("purchases.newTitle")} className="max-w-3xl">
-      <form onSubmit={onSubmit} className="space-y-4" noValidate>
+      <form onSubmit={onSubmit} onKeyDown={preventEnterSubmit} className="space-y-4" noValidate>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("purchases.supplier")} error={errors.supplierId?.message}>
             <Controller
