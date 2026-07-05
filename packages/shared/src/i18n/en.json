@@ -324,6 +324,7 @@
   "validation": {
     "invalid": "Invalid value",
     "nonzero": "Must not be zero",
+    "positive": "Must be a positive number",
     "required": "Required",
     "minChars": "Must be at least {{count}} characters",
     "invalid_phone": "Invalid phone number"
@@ -475,8 +476,18 @@
       "title": "Adjust stock balance",
       "product": "Product",
       "location": "Location",
-      "delta": "Change amount",
-      "deltaHint": "Positive to add, negative to remove",
+      "direction": "Adjustment type",
+      "increase": "Increase",
+      "decrease": "Decrease",
+      "quantity": "Quantity",
+      "reasonPlaceholder": "Select a reason",
+      "reasons": {
+        "waste": "Waste",
+        "expiry": "Expired",
+        "damage": "Damage",
+        "theft": "Theft",
+        "loss": "Loss"
+      },
       "reason": "Reason",
       "submit": "Confirm adjustment",
       "success": "Stock adjusted"
@@ -2462,7 +2473,11 @@
       "noPartners": "No partner distribution (solo environment)",
       "operatingExpenses": "Operating expenses",
       "operatingExpensesHint": "Water/electricity/rent… within the period",
-      "netProfitHint": "Revenue − COGS − operating expenses",
+      "consumables": "Consumables",
+      "consumablesHint": "Cost of internally-used consumables within the period",
+      "wastage": "Wastage & damage",
+      "wastageHint": "Cost of stock decreases (waste/damage/theft/loss/expiry) within the period",
+      "netProfitHint": "Revenue − COGS − operating expenses − consumables − wastage",
       "owed": "Owed to others",
       "owedHint": "Total the center owes suppliers, doctor-partners, employees and unpaid expenses (as of now)",
       "netAfterObligations": "Net after obligations",

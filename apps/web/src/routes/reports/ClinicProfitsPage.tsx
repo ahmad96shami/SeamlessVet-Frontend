@@ -38,6 +38,18 @@ export function ClinicProfitsPage() {
           hint={t("reports.clinicProfits.operatingExpensesHint")}
         />
         <SummaryStat
+          label={t("reports.clinicProfits.consumables")}
+          value={<Money value={d?.consumablesCost ?? 0} />}
+          tone="red"
+          hint={t("reports.clinicProfits.consumablesHint")}
+        />
+        <SummaryStat
+          label={t("reports.clinicProfits.wastage")}
+          value={<Money value={d?.wastageCost ?? 0} />}
+          tone="red"
+          hint={t("reports.clinicProfits.wastageHint")}
+        />
+        <SummaryStat
           label={t("reports.clinicProfits.netProfit")}
           value={<Money value={d?.netOperatingProfit ?? 0} />}
           tone="teal"

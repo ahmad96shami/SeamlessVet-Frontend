@@ -76,6 +76,11 @@ export const ClinicProfitsReportSchema = z.object({
   // is the headline "صافي ربح المركز" the UI shows. The payables* figures are a current snapshot of what
   // the center owes others; `netAfterObligations` = netOperatingProfit − payablesOutstanding.
   operatingExpenses: z.number().default(0),
+  // Stock costs recognized in the window, subtracted from `netOperatingProfit` alongside operating
+  // expenses: `consumablesCost` = cost of internal-use consumption; `wastageCost` = cost of negative
+  // stock adjustments (هدر/تلف/سرقة/فقد/انتهاء صلاحية). Neither changes the partner-split basis.
+  consumablesCost: z.number().default(0),
+  wastageCost: z.number().default(0),
   netOperatingProfit: z.number().default(0),
   payablesSuppliers: z.number().default(0),
   payablesDoctorPartners: z.number().default(0),
