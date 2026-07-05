@@ -65,6 +65,10 @@ export const CustomerRequestSchema = z.object({
   idNumber: z.string().trim().max(64).optional(),
   notes: optionalText,
   assignedDoctorId: z.string().optional(),
+  // Optional starting balance migrated from before the system launch. Applied only on create — the
+  // backend seeds the customer's ledger with it and posts a matching append-only opening entry.
+  // Positive = the customer owes the clinic; negative = the customer is in credit.
+  openingBalance: z.number().optional(),
 });
 export type CustomerRequest = z.infer<typeof CustomerRequestSchema>;
 

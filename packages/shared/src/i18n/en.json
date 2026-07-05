@@ -440,7 +440,7 @@
       "selectProduct": "Select a consumable",
       "noConsumables": "No consumables yet — flag a product as consumable in the catalog first",
       "quantity": "Quantity",
-      "reason": "Reason",
+      "reason": "Reason (optional)",
       "location": "Location",
       "submit": "Record",
       "success": "Consumption recorded",
@@ -649,7 +649,9 @@
       "reportTitle": "Account statement",
       "shareUnavailable": "This customer has no phone number to send the statement to."
     },
-    "pickerPlaceholder": "Select a customer"
+    "pickerPlaceholder": "Select a customer",
+    "openingBalance": "Opening balance",
+    "openingBalanceHint": "Balance carried over from before the system launched (optional) — a positive value means the customer owes the clinic."
   },
   "doctorPartners": {
     "title": "Doctor partners",
@@ -1922,6 +1924,10 @@
       "reorderPoint": "Reorder point",
       "isConsumable": "Consumable (internal use)",
       "isConsumableHint": "Consumed internally (not sold) — tracked on the consumables screen.",
+      "openingStock": "Opening stock",
+      "openingStockHint": "Quantity on hand before the system launched (optional) — recorded as the first warehouse lot.",
+      "openingStockReason": "Opening stock",
+      "openingStockFailed": "Product created, but the opening stock couldn't be recorded. You can receive it later from the inventory screen.",
       "colName": "Name",
       "colCategory": "Category",
       "colBarcode": "Barcode",

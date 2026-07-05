@@ -8,10 +8,12 @@ import {
   listMovements,
   listStock,
   loadField,
+  receiveStock,
   unloadField,
   type AdjustStockInput,
   type ApiError,
   type ConsumeStockInput,
+  type ReceiveStockInput,
   type ExpiringParams,
   type ExpiringProduct,
   type FieldInventoryResponse,
@@ -78,6 +80,21 @@ export function useExpiringStock(params?: ExpiringParams) {
     queryKey: [KEY, "expiring", params ?? {}],
     queryFn: () => listExpiring(apiClient, params),
     placeholderData: (prev) => prev,
+  });
+}
+
+/**
+ * POST /inventory/receive — receive stock into a warehouse (defaults to the central one). Used for
+ * the "opening stock" seed on product/vaccine create and any purchase-order receive. Refetches all
+ * inventory reads. Opts out of the global error toast so callers can word their own message (the
+ * product create succeeded even if the follow-up receive failed).
+ */
+export function useReceiveStock() {
+  const qc = useQueryClient();
+  return useMutation<IdentifierResponse, ApiError, ReceiveStockInput>({
+    mutationFn: (input) => receiveStock(apiClient, input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+    meta: { skipGlobalErrorToast: true },
   });
 }
 

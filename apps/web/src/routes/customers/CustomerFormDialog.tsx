@@ -82,7 +82,10 @@ export function CustomerFormDialog({
   }, [open, customer, defaultName, reset]);
 
   const onSubmit = handleSubmit((values) => {
-    const body = omitEmptyStrings(values); // empty optional text → omitted (stored as null)
+    // Opening balance is a create-only migration hint; strip it from the shared body and re-attach
+    // only on the create branch when it's a valid non-zero number (blank number input → NaN).
+    const { openingBalance, ...rest } = values;
+    const body = omitEmptyStrings(rest); // empty optional text → omitted (stored as null)
     const onError = (e: ApiError) =>
       applyFieldErrors(e, (name, err) => setError(name as never, err));
     if (customer) {
@@ -97,7 +100,11 @@ export function CustomerFormDialog({
         },
       );
     } else {
-      create.mutate(body, {
+      const createBody =
+        typeof openingBalance === "number" && !Number.isNaN(openingBalance) && openingBalance !== 0
+          ? { ...body, openingBalance }
+          : body;
+      create.mutate(createBody, {
         onSuccess: (res) => {
           toast.success(t("admin.common.created"));
           onCreated?.(res.id);
@@ -172,6 +179,22 @@ export function CustomerFormDialog({
         <Field label={t("customers.notes")} error={errors.notes?.message}>
           <Textarea rows={2} {...register("notes")} />
         </Field>
+        {/* Opening balance is a one-time migration hint on create only — an existing customer's
+            balance is server-authoritative (corrections go through the ledger, not this form). */}
+        {customer ? null : (
+          <Field
+            label={t("customers.openingBalance")}
+            error={errors.openingBalance?.message}
+            hint={t("customers.openingBalanceHint")}
+          >
+            <Input
+              type="number"
+              step="0.01"
+              dir="ltr"
+              {...register("openingBalance", { valueAsNumber: true })}
+            />
+          </Field>
+        )}
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={pending}>
             {t("admin.common.cancel")}
