@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { omitEmptyStrings } from "@/lib/forms";
 import { RoleSelect } from "@/routes/admin/RoleSelect";
 import { useUpdateUser } from "@/queries/users";
+import { useAuthStore } from "@/stores/authStore";
 
 /**
  * Edit an existing user's profile and role — PATCH /admin/users/{id}. Password is out of scope (a
@@ -32,6 +33,11 @@ export function UserEditDialog({
 }) {
   const { t } = useTranslation();
   const update = useUpdateUser();
+  const currentUserId = useAuthStore((s) => s.user?.userId);
+  // You cannot change your own role — the server rejects it (`cannot_change_own_role`); mirror that
+  // in the UI so the role picker is locked when you're editing your own account. Profile fields stay
+  // editable. Guards against an admin demoting themselves and losing access.
+  const isSelf = user != null && user.id === currentUserId;
   const form = useForm<UpdateUserRequest>({
     resolver: zodResolver(UpdateUserRequestSchema),
     defaultValues: { fullName: "", phonePrimary: "", email: "", roleKey: "", licenseNumber: "" },
@@ -82,12 +88,16 @@ export function UserEditDialog({
           <Field label={t("admin.users.formEmail")} error={errors.email?.message}>
             <Input dir="ltr" type="email" {...register("email")} />
           </Field>
-          <Field label={t("admin.users.formRole")} error={errors.roleKey?.message}>
+          <Field
+            label={t("admin.users.formRole")}
+            error={errors.roleKey?.message}
+            hint={isSelf ? t("admin.users.selfRoleLocked") : undefined}
+          >
             <Controller
               name="roleKey"
               control={control}
               render={({ field }) => (
-                <RoleSelect value={field.value} onChange={field.onChange} />
+                <RoleSelect value={field.value} onChange={field.onChange} disabled={isSelf} />
               )}
             />
           </Field>

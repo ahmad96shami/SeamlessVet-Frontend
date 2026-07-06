@@ -10,15 +10,17 @@ import { useRoles } from "@/queries/roles";
 export function RoleSelect({
   value,
   onChange,
+  disabled,
 }: {
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }) {
   const { t } = useTranslation();
   const roles = useRoles();
 
   return (
-    <Select value={value} onChange={(e) => onChange(e.target.value)}>
+    <Select value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled}>
       <option value="" disabled>
         {t("admin.users.formRole")}
       </option>

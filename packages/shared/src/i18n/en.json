@@ -1873,7 +1873,9 @@
       "roleGrants": "Granted by role",
       "roleDenies": "Not in role",
       "overrideSaved": "Permission updated",
-      "editTitle": "Edit user"
+      "editTitle": "Edit user",
+      "selfRoleLocked": "You cannot change your own role. Ask another administrator.",
+      "selfPermissionsLocked": "You cannot change your own permissions. Ask another administrator."
     },
     "settings": {
       "title": "Settings",
@@ -2668,6 +2670,8 @@
     "batch_id_collision": "A batch with the same id already exists.",
     "batch_settled": "The batch has been settled — its invoices are frozen. Correct via a manual ledger adjustment.",
     "billable_in_clinic_only": "Only in-clinic prescriptions carry the billable toggle.",
+    "cannot_change_own_role": "You cannot change your own role. Ask another administrator to do it.",
+    "cannot_modify_own_permissions": "You cannot change your own permissions. Ask another administrator to do it.",
     "cannot_void_void_row": "A void row cannot itself be voided.",
     "care_charge_concurrently_billed": "A checkup-fee or night-stay charge on this invoice was just billed elsewhere (visit completion or another till) — reload the visit and retry.",
     "checkup_fee_already_billed": "The checkup fee is already billed (invoice line or completion backstop).",

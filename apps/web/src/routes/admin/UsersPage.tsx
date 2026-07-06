@@ -15,6 +15,7 @@ import { Select } from "@/components/ui/select";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useDeactivateUser, useReactivateUser, useUsers } from "@/queries/users";
+import { useAuthStore } from "@/stores/authStore";
 import { UserEditDialog } from "@/routes/admin/UserEditDialog";
 import { UserFormDialog } from "@/routes/admin/UserFormDialog";
 import { UserPermissionsDialog } from "@/routes/admin/UserPermissionsDialog";
@@ -52,6 +53,7 @@ export function UsersPage() {
   const deactivate = useDeactivateUser();
   const reactivate = useReactivateUser();
   const statusBusy = deactivate.isPending || reactivate.isPending;
+  const currentUserId = useAuthStore((s) => s.user?.userId);
 
   const columns = useMemo<ColumnDef<UserResponse>[]>(
     () => [
@@ -94,6 +96,10 @@ export function UsersPage() {
         header: "",
         cell: ({ row }) => {
           const u = row.original;
+          // A user can't edit their own permissions (role or overrides) — the server enforces this
+          // (cannot_change_own_role / cannot_modify_own_permissions). Hide the overrides action on
+          // your own row; the Edit dialog keeps the role picker locked for self.
+          const isSelf = u.id === currentUserId;
           return (
             <div className="flex justify-end gap-2">
               <Button
@@ -132,16 +138,18 @@ export function UsersPage() {
                   {t("admin.users.reactivate")}
                 </Button>
               ) : null}
-              <Button size="sm" variant="ghost" onClick={() => setPermUserId(u.id)}>
-                <Icon.shield className="size-4" />
-                {t("admin.users.permissions")}
-              </Button>
+              {isSelf ? null : (
+                <Button size="sm" variant="ghost" onClick={() => setPermUserId(u.id)}>
+                  <Icon.shield className="size-4" />
+                  {t("admin.users.permissions")}
+                </Button>
+              )}
             </div>
           );
         },
       },
     ],
-    [t, statusBusy, deactivate, reactivate],
+    [t, statusBusy, deactivate, reactivate, currentUserId],
   );
 
   return (

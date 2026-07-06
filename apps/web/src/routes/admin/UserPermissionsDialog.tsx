@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Icon } from "@/components/ui/icon";
 import { useAddPermissionOverride, useUserDetail } from "@/queries/users";
+import { useAuthStore } from "@/stores/authStore";
 
 /**
  * Per-user permission overrides (grant/deny on top of role defaults). Each row shows the localized
@@ -24,6 +25,10 @@ export function UserPermissionsDialog({
   const { t } = useTranslation();
   const detail = useUserDetail(userId);
   const override = useAddPermissionOverride(userId);
+  const currentUserId = useAuthStore((s) => s.user?.userId);
+  // Self-override is a lockout risk and the server rejects it (`cannot_modify_own_permissions`).
+  // UsersPage already hides this dialog's trigger on your own row; this is the defensive backstop.
+  const isSelf = userId != null && userId === currentUserId;
 
   const roleKey = detail.data?.roleKey as RoleKey | undefined;
   const roleGrants = new Set<string>(roleKey ? ROLE_DEFAULT_PERMISSIONS[roleKey] ?? [] : []);
@@ -63,6 +68,12 @@ export function UserPermissionsDialog({
             </div>
           ) : null}
 
+          {isSelf ? (
+            <p className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+              {t("admin.users.selfPermissionsLocked")}
+            </p>
+          ) : null}
+
           {PERMISSION_KEY_VALUES.map((key) => {
             const current = effectFor(key);
             const roleAllows = roleGrants.has(key);
@@ -85,7 +96,7 @@ export function UserPermissionsDialog({
                       size="sm"
                       variant={current === "grant" ? "default" : "outline"}
                       onClick={() => setEffect(key, "grant")}
-                      disabled={override.isPending}
+                      disabled={override.isPending || isSelf}
                     >
                       {t("admin.users.effectGrant")}
                     </Button>
@@ -93,7 +104,7 @@ export function UserPermissionsDialog({
                       size="sm"
                       variant={current === "deny" ? "destructive" : "outline"}
                       onClick={() => setEffect(key, "deny")}
-                      disabled={override.isPending}
+                      disabled={override.isPending || isSelf}
                     >
                       {t("admin.users.effectDeny")}
                     </Button>
