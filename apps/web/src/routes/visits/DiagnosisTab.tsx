@@ -1,16 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { applyFieldErrors, SEVERITY_VALUES, type ApiError, type VisitResponse } from "@vet/shared";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { z } from "zod";
 
+import { AutosaveStatus } from "@/components/form/AutosaveStatus";
 import { Field } from "@/components/form/Field";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useAutosave } from "@/hooks/useAutosave";
 import { useUpdateVisit } from "@/queries/visits";
 
 const DiagnosisFormSchema = z.object({
@@ -32,22 +32,29 @@ function formFromVisit(v: VisitResponse): DiagnosisForm {
   };
 }
 
-/** Diagnosis section (PRD §5.2-B) — section-level PATCH save. */
+/** Diagnosis section (PRD §5.2-B) — debounced section-level PATCH autosave. */
 export function DiagnosisTab({ visit, readOnly }: { visit: VisitResponse; readOnly: boolean }) {
   const { t } = useTranslation();
   const update = useUpdateVisit();
   const form = useForm<DiagnosisForm>({
     resolver: zodResolver(DiagnosisFormSchema),
     defaultValues: formFromVisit(visit),
+    shouldFocusError: false, // autosave validates silently — never yank focus mid-typing
   });
   const { register, handleSubmit, reset, setError, formState } = form;
   const errors = formState.errors;
 
+  // Re-sync from the server. On a different visit → full reset; on a same-visit refetch (our own
+  // autosave invalidates the visit) → keep the fields the user is still editing so a slow round trip
+  // never clobbers in-flight keystrokes.
+  const lastIdRef = useRef(visit.id);
   useEffect(() => {
-    reset(formFromVisit(visit));
+    const idChanged = lastIdRef.current !== visit.id;
+    lastIdRef.current = visit.id;
+    reset(formFromVisit(visit), idChanged ? undefined : { keepDirtyValues: true });
   }, [visit, reset]);
 
-  const onSubmit = handleSubmit((vals) => {
+  const onValid = (vals: DiagnosisForm) => {
     update.mutate(
       {
         id: visit.id,
@@ -58,18 +65,20 @@ export function DiagnosisTab({ visit, readOnly }: { visit: VisitResponse; readOn
           icdVetCode: text(vals.icdVetCode),
         },
       },
-      {
-        onSuccess: () => toast.success(t("visits.diagnosis.saved")),
-        onError: (e: ApiError) => applyFieldErrors(e, (n, err) => setError(n as never, err)),
-      },
+      { onError: (e: ApiError) => applyFieldErrors(e, (n, err) => setError(n as never, err)) },
     );
-  });
+  };
+
+  useAutosave(form, onValid, { enabled: !readOnly });
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+    <form onSubmit={handleSubmit(onValid)} className="space-y-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <Field label={t("visits.diagnosis.preliminary")} error={errors.preliminaryDiagnosis?.message}>
+          <Field
+            label={t("visits.diagnosis.preliminary")}
+            error={errors.preliminaryDiagnosis?.message}
+          >
             <Textarea rows={2} disabled={readOnly} {...register("preliminaryDiagnosis")} />
           </Field>
         </div>
@@ -92,13 +101,7 @@ export function DiagnosisTab({ visit, readOnly }: { visit: VisitResponse; readOn
           <Input dir="ltr" disabled={readOnly} {...register("icdVetCode")} />
         </Field>
       </div>
-      {!readOnly ? (
-        <div className="flex justify-end">
-          <Button type="submit" disabled={update.isPending}>
-            {update.isPending ? t("admin.common.saving") : t("visits.diagnosis.save")}
-          </Button>
-        </div>
-      ) : null}
+      {!readOnly ? <AutosaveStatus pending={update.isPending} error={update.isError} /> : null}
     </form>
   );
 }
