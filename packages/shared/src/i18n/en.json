@@ -11,6 +11,11 @@
     "close": "Close",
     "ok": "OK"
   },
+  "autosave": {
+    "hint": "Saved automatically",
+    "saving": "Saving…",
+    "error": "Couldn't save — will retry on edit"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "customers": "Customers",
@@ -1204,9 +1209,7 @@
       "heartRate": "Heart rate (/min)",
       "respiratoryRate": "Resp. rate (/min)",
       "weight": "Weight (kg)",
-      "clinicalNotes": "Clinical notes",
-      "save": "Save assessment",
-      "saved": "Assessment saved"
+      "clinicalNotes": "Clinical notes"
     },
     "diagnosis": {
       "title": "Diagnosis",
@@ -1214,9 +1217,7 @@
       "final": "Final diagnosis",
       "severity": "Severity",
       "severityNone": "Unspecified",
-      "icdVetCode": "ICD-Vet code",
-      "save": "Save diagnosis",
-      "saved": "Diagnosis saved"
+      "icdVetCode": "ICD-Vet code"
     },
     "procedures": {
       "title": "Procedures",
@@ -1704,6 +1705,7 @@
       "queued": "Sale saved locally — it'll post when you're back online",
       "newSale": "New sale",
       "printReceipt": "Print receipt",
+      "backToVisit": "Back to visit",
       "needLines": "Add a product or service, or link a visit with charges"
     },
     "receipt": {

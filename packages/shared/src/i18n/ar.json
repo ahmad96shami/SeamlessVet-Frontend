@@ -11,6 +11,11 @@
     "close": "إغلاق",
     "ok": "حسناً"
   },
+  "autosave": {
+    "hint": "يُحفظ تلقائيًا",
+    "saving": "جارٍ الحفظ…",
+    "error": "تعذّر الحفظ — سيُعاد المحاولة عند التعديل"
+  },
   "nav": {
     "dashboard": "الرئيسية",
     "customers": "العملاء",
@@ -1223,9 +1228,7 @@
       "heartRate": "النبض (/د)",
       "respiratoryRate": "التنفس (/د)",
       "weight": "الوزن (كغ)",
-      "clinicalNotes": "ملاحظات سريرية",
-      "save": "حفظ التقييم",
-      "saved": "تم حفظ التقييم"
+      "clinicalNotes": "ملاحظات سريرية"
     },
     "diagnosis": {
       "title": "التشخيص",
@@ -1233,9 +1236,7 @@
       "final": "تشخيص نهائي",
       "severity": "الحدة",
       "severityNone": "بدون تحديد",
-      "icdVetCode": "كود ICD-Vet",
-      "save": "حفظ التشخيص",
-      "saved": "تم حفظ التشخيص"
+      "icdVetCode": "كود ICD-Vet"
     },
     "procedures": {
       "title": "الإجراءات",
@@ -1723,6 +1724,7 @@
       "queued": "تم حفظ البيع محليًا — سيُرحَّل عند عودة الاتصال",
       "newSale": "بيع جديد",
       "printReceipt": "طباعة الإيصال",
+      "backToVisit": "العودة إلى الزيارة",
       "needLines": "أضف منتجًا أو خدمة، أو اربط زيارة بها رسوم"
     },
     "receipt": {
