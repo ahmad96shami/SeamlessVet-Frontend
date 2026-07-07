@@ -1,6 +1,6 @@
-import { formatCurrency } from "@vet/shared";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { Money } from "@/components/ui/money";
 
@@ -18,12 +18,21 @@ import { ReceiptDocument } from "./ReceiptDocument";
  * only `{id}`), with an 80mm receipt print and a "new sale" reset. The receipt reflects the server's
  * totals (incl. any auto-assembled visit charges + tax), not the cleared cart.
  */
-export function IssuedSaleDialog({ invoiceId, onClose }: { invoiceId: string; onClose: () => void }) {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+export function IssuedSaleDialog({
+  invoiceId,
+  onClose,
+}: {
+  invoiceId: string;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const invoice = useInvoice(invoiceId);
   const customer = useCustomer(invoice.data?.customerId ?? null);
   const settings = useSystemSettings();
+  // Present only when this sale was rung up from a visit (via «تحصيل في نقطة البيع») — offers a way
+  // straight back to that visit instead of forcing a fresh «بيع جديد».
+  const visitId = invoice.data?.visitId ?? null;
 
   const printRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
@@ -49,14 +58,39 @@ export function IssuedSaleDialog({ invoiceId, onClose }: { invoiceId: string; on
               <Money value={invoice.data.total} />
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button type="button" variant="secondary" className="flex-1" onClick={() => handlePrint()}>
-              <Icon.print className="size-4" />
-              {t("pos.issue.printReceipt")}
-            </Button>
-            <Button type="button" className="flex-1" onClick={onClose}>
-              {t("pos.issue.newSale")}
-            </Button>
+          <div className="space-y-2">
+            {visitId ? (
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => {
+                  onClose();
+                  navigate(`/operations/visits/${visitId}`);
+                }}
+              >
+                <Icon.stethoscope className="size-4" />
+                {t("pos.issue.backToVisit")}
+              </Button>
+            ) : null}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                className="flex-1"
+                onClick={() => handlePrint()}
+              >
+                <Icon.print className="size-4" />
+                {t("pos.issue.printReceipt")}
+              </Button>
+              <Button
+                type="button"
+                variant={visitId ? "secondary" : "default"}
+                className="flex-1"
+                onClick={onClose}
+              >
+                {t("pos.issue.newSale")}
+              </Button>
+            </div>
           </div>
         </div>
       )}
