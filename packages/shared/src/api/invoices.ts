@@ -20,7 +20,7 @@ const InvoiceListSchema = z.array(InvoiceResponseSchema);
 
 // ---- Reads ----------------------------------------------------------------
 
-/** GET /invoices — newest-first, offset-paged; filters customerId / visitId / status. */
+/** GET /invoices — newest-first, offset-paged; filters customerId / visitId / status / search. */
 export async function listInvoices(
   client: AxiosInstance,
   params?: InvoiceListParams,

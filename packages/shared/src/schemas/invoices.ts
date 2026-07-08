@@ -81,6 +81,8 @@ export interface InvoiceListParams {
   customerId?: string;
   visitId?: string;
   status?: string;
+  /** Free-text: matches the invoice number or the linked customer's name / phone. */
+  search?: string;
   skip?: number;
   take?: number;
 }

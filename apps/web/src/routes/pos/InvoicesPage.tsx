@@ -7,7 +7,9 @@ import { Money } from "@/components/ui/money";
 import { DataTable } from "@/components/data-table/DataTable";
 import { Pagination } from "@/components/data-table/Pagination";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useOffsetPager } from "@/hooks/useOffsetPager";
 import { useCustomers } from "@/queries/customers";
 import { useInvoices } from "@/queries/invoices";
@@ -22,10 +24,17 @@ export function InvoicesPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const [status, setStatus] = useState("");
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
   const { page, skip, take, canPrev, next, prev, reset } = useOffsetPager(20);
-  useEffect(() => reset(), [status, reset]);
+  useEffect(() => reset(), [status, debouncedSearch, reset]);
 
-  const query = useInvoices({ status: status || undefined, skip, take });
+  const query = useInvoices({
+    status: status || undefined,
+    search: debouncedSearch.trim() || undefined,
+    skip,
+    take,
+  });
   const rows = query.data ?? [];
   const customers = useCustomers({ take: 200 });
   const customerName = useMemo(
@@ -96,7 +105,13 @@ export function InvoicesPage() {
 
   return (
     <div className="mx-auto flex h-full max-w-5xl flex-col gap-4 overflow-auto p-1">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          placeholder={t("pos.invoices.searchPlaceholder")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-xs"
+        />
         <Select value={status} onChange={(e) => setStatus(e.target.value)} containerClassName="w-52">
           <option value="">{`${t("pos.invoices.filterStatus")}: ${t("pos.invoices.all")}`}</option>
           {STATUSES.map((s) => (

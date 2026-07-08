@@ -1750,6 +1750,7 @@
     "invoices": {
       "title": "Invoices",
       "empty": "No invoices",
+      "searchPlaceholder": "Search by invoice no., customer name or phone",
       "number": "Number",
       "date": "Date",
       "customer": "Customer",
