@@ -7,6 +7,7 @@ import type { VisitResponse } from "@vet/shared";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { Money } from "@/components/ui/money";
 import { useFarmLookup } from "@/hooks/useFarmLookup";
 import { useBatch } from "@/queries/batches";
 import { useCustomer } from "@/queries/customers";
@@ -310,6 +311,17 @@ export function CartCustomerVisit() {
           ) : null}
         </div>
       </div>
+
+      {/* Selected customer's outstanding balance — surfaced prominently so the cashier sees how much
+          the customer owes before ringing up / collecting. Only shown once a customer is linked. */}
+      {customerId && customer.data ? (
+        <div className="flex items-baseline gap-2">
+          <span className="text-sm font-medium text-muted-foreground">{t("pos.voucher.balance")}:</span>
+          <span className="text-base font-bold tabular-nums text-navy-900">
+            <Money value={customer.data.balance} />
+          </span>
+        </div>
+      ) : null}
 
       {visitId ? <VisitLinesSync visitId={visitId} /> : null}
 

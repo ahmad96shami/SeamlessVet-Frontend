@@ -222,8 +222,11 @@ export function ReceiptVoucherDialog({
           {allClosed ? (
             <p className="text-xs text-destructive">{t("pos.voucher.allClosed")}</p>
           ) : selectedTarget && selectedTarget.balance > 0 ? (
-            <div className="text-xs text-muted-foreground tabular-nums">
-              <Money value={selectedTarget.balance} />
+            <div className="flex items-baseline gap-2 rounded-lg bg-ink-50/60 px-3 py-2">
+              <span className="text-sm font-medium text-muted-foreground">{t("pos.voucher.balance")}:</span>
+              <span className="text-lg font-bold tabular-nums text-navy-900">
+                <Money value={selectedTarget.balance} />
+              </span>
             </div>
           ) : null}
 

@@ -1728,6 +1728,7 @@
       "new": "Receipt voucher",
       "subtitle": "Record a payment received from a customer",
       "customer": "Customer",
+      "balance": "Balance",
       "amount": "Amount",
       "method": "Method",
       "notes": "Notes",
