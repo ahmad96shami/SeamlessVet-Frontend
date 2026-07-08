@@ -36,17 +36,19 @@ function CartLineRow({
   const { setQty, setUnitPrice, setLineDiscount, removeLine } = usePosCartStore.getState();
   const overSell = line.available != null && line.quantity > line.available;
   // Transient draft so the qty field can go empty mid-edit without the store dropping the line
-  // (it only commits a value ≥ 1). Dropped when the expander closes — including when another
+  // (it only commits a value > 0). Dropped when the expander closes — including when another
   // line's expander steals the accordion slot — so reopening never shows a stale half-edit.
   const [qtyDraft, setQtyDraft] = useState<string | null>(null);
   useEffect(() => {
     if (!open) setQtyDraft(null);
   }, [open]);
 
+  // Fractional quantities are allowed (e.g. 0.1) — products can be sold by weight/volume. The
+  // backend persists quantity as numeric(14,3), so keep the decimal instead of flooring it.
   const commitQty = (raw: string) => {
     setQtyDraft(raw);
-    const n = Math.floor(Number(raw));
-    if (raw !== "" && Number.isFinite(n) && n >= 1) setQty(line.key, n);
+    const n = Number(raw);
+    if (raw !== "" && Number.isFinite(n) && n > 0) setQty(line.key, n);
   };
 
   // A «مُفوترة» reference line — already billed on an earlier invoice. Greyed and non-interactive
@@ -150,9 +152,9 @@ function CartLineRow({
                 focus lands on the price instead. */}
             <Input
               type="number"
-              inputMode="numeric"
-              min={1}
-              step="1"
+              inputMode="decimal"
+              min={0}
+              step="any"
               dir="ltr"
               disabled={line.locked}
               title={line.locked ? t("pos.cart.visitLineHint") : undefined}
