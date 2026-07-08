@@ -78,7 +78,6 @@ export const PermissionKey = {
   InvoicesVoid: "invoices.void",
   InventoryRead: "inventory.read",
   InventoryAdjust: "inventory.adjust",
-  EntitlementsApprove: "entitlements.approve",
   PartnershipManage: "partnership.manage",
   ReportsRead: "reports.read",
   SuppliersWrite: "suppliers.write",

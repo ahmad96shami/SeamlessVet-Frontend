@@ -269,12 +269,6 @@
         "desc": "Apply inventory adjustments."
       }
     },
-    "entitlements": {
-      "approve": {
-        "name": "Approve entitlements",
-        "desc": "Close customer accounts and approve/pay doctor entitlements."
-      }
-    },
     "partnership": {
       "manage": {
         "name": "Manage partnership",

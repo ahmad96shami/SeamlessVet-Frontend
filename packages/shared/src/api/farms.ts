@@ -85,7 +85,7 @@ export async function getFarmStatement(
  * POST /farms/{id}/close-account (M16) — close the farm's account (zero-balance only) and compute its
  * entitlements. Rejects with 409 `account_not_settled` if the farm ledger isn't fully paid. Closing
  * one farm leaves the owning customer and its other farms open. Carries the auto-injected
- * `Idempotency-Key`; payout authority (`entitlements.approve`).
+ * `Idempotency-Key`; account-close authority (`contracts.activate`).
  */
 export async function closeFarmAccount(
   client: AxiosInstance,
@@ -97,7 +97,7 @@ export async function closeFarmAccount(
 
 /**
  * POST /farms/{id}/reopen-account (M16) — lift the settlement lock on a closed farm ledger so its new
- * visits can be billed. Idempotent; payout authority (`entitlements.approve`).
+ * visits can be billed. Idempotent; account-close authority (`contracts.activate`).
  */
 export async function reopenFarmAccount(
   client: AxiosInstance,
