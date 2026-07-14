@@ -49,22 +49,43 @@ export async function startNotificationsHub(): Promise<void> {
       withCredentials: false,
     })
     .withAutomaticReconnect()
-    .configureLogging(LogLevel.Warning)
+    // Information (not Warning) so the SignalR client prints negotiate/transport selection to the
+    // browser console — the fastest way to diagnose a hub that won't connect in a deployed env.
+    .configureLogging(LogLevel.Information)
     .build();
 
   conn.on("ReceiveNotification", (raw: unknown) => {
     const parsed = NotificationResponseSchema.safeParse(raw);
-    if (!parsed.success) return;
+    if (!parsed.success) {
+      console.warn("[notifications] dropped a push that failed schema validation", raw);
+      return;
+    }
     for (const handler of handlers) handler(parsed.data);
   });
+
+  // Surface the connection lifecycle so a silent realtime failure is visible in DevTools.
+  conn.onreconnecting((err) => console.warn("[notifications] hub reconnecting", err));
+  conn.onreconnected((id) => console.info("[notifications] hub reconnected", id));
+  conn.onclose((err) =>
+    err
+      ? console.error("[notifications] hub closed with error", err)
+      : console.info("[notifications] hub closed"),
+  );
 
   connection = conn;
 
   try {
     await conn.start();
-  } catch {
-    // A hard handshake failure (e.g. a 401, or the API being down) is non-fatal: the feed still
-    // works over REST, and `withAutomaticReconnect` retries transient drops once connected.
+    console.info(`[notifications] hub connected → ${API_BASE_URL}/hubs/notifications`);
+  } catch (err) {
+    // A hard handshake failure (401, CORS, negotiate 404, mixed-content, or the API being down) is
+    // non-fatal — the feed still works over REST — but it was previously swallowed with no trace, so
+    // "no realtime notifications" looked like a mystery. Log it loudly; `withAutomaticReconnect` only
+    // retries drops AFTER a first successful connect, so an initial failure stays down for the session.
+    console.error(
+      `[notifications] hub failed to start (${API_BASE_URL}/hubs/notifications) — realtime pushes are off; the REST feed still works`,
+      err,
+    );
     if (connection === conn) connection = null;
   }
 }
