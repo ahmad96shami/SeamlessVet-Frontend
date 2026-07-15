@@ -103,6 +103,7 @@ export function SettingsPage() {
       medicationReminderLeadMinutes: query.data.medicationReminderLeadMinutes,
       vaccinationReminderLeadDays: query.data.vaccinationReminderLeadDays,
       appointmentReminderLeadMinutes: query.data.appointmentReminderLeadMinutes,
+      dailyReminderHour: query.data.dailyReminderHour,
     });
   }, [query.data, reset]);
 
@@ -301,6 +302,24 @@ export function SettingsPage() {
                       }
                     >
                       {leadOptions(watch("appointmentReminderLeadMinutes"), APPOINTMENT_LEAD_PRESETS, t)}
+                    </Select>
+                  </Field>
+                  <Field
+                    label={t("admin.settings.dailyReminderHour")}
+                    hint={t("admin.settings.dailyReminderHourHint")}
+                    error={errors.dailyReminderHour?.message}
+                  >
+                    <Select
+                      value={String(watch("dailyReminderHour") ?? "")}
+                      onChange={(e) =>
+                        setValue("dailyReminderHour", Number(e.target.value), { shouldDirty: true })
+                      }
+                    >
+                      {Array.from({ length: 24 }, (_, h) => (
+                        <option key={h} value={h}>
+                          {`${String(h).padStart(2, "0")}:00`}
+                        </option>
+                      ))}
                     </Select>
                   </Field>
                   <Field

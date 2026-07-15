@@ -1899,6 +1899,8 @@
       "remindersHint": "When each reminder fires ahead of its due time.",
       "vaccinationReminderLeadDays": "Vaccination reminder",
       "appointmentReminderLeadMinutes": "Appointment reminder",
+      "dailyReminderHour": "Daily reminder time",
+      "dailyReminderHourHint": "When the daily vaccination, low-stock, and expiry reminders go out (clinic time).",
       "lead": {
         "onDueDate": "On the due date",
         "atDose": "At dose time",

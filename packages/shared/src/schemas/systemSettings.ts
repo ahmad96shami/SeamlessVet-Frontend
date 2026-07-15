@@ -32,6 +32,9 @@ export const SystemSettingsResponseSchema = z.object({
   // before an appointment — the per-reminder "fire before due" Settings section.
   vaccinationReminderLeadDays: z.number().int(),
   appointmentReminderLeadMinutes: z.number().int(),
+  // Clinic-local hour (0–23) at which the daily scans (vaccination reminders, low-stock, expiration)
+  // fire for this center; surfaced from `extra`.
+  dailyReminderHour: z.number().int(),
   updatedAt: z.string(),
 });
 export type SystemSettingsResponse = z.infer<typeof SystemSettingsResponseSchema>;
@@ -63,5 +66,7 @@ export const SystemSettingsPatchRequestSchema = z.object({
   // Merged into `extra.vaccinationReminder` / `extra.appointmentReminder` server-side.
   vaccinationReminderLeadDays: z.number().int().min(0).max(365).optional(),
   appointmentReminderLeadMinutes: z.number().int().min(0).max(10080).optional(),
+  // Merged into `extra.dailyReminder` server-side — the clinic-local hour the daily scans fire.
+  dailyReminderHour: z.number().int().min(0).max(23).optional(),
 });
 export type SystemSettingsPatchRequest = z.infer<typeof SystemSettingsPatchRequestSchema>;

@@ -1918,6 +1918,8 @@
       "remindersHint": "متى يُطلق كل تذكير قبل موعده.",
       "vaccinationReminderLeadDays": "تذكير التطعيم",
       "appointmentReminderLeadMinutes": "تذكير الموعد",
+      "dailyReminderHour": "وقت التذكيرات اليومية",
+      "dailyReminderHourHint": "متى تُرسل التذكيرات اليومية (التطعيم، نقص المخزون، قرب انتهاء الصلاحية) بتوقيت العيادة.",
       "lead": {
         "onDueDate": "يوم الاستحقاق",
         "atDose": "وقت الجرعة",
